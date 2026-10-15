@@ -3,43 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0f172a">
-<meta name="description" content="TusAlergias - Gestión inteligente de alérgenos e intolerancias para restaurantes y hostelería.">
+<meta name="theme-color" content="#0b132b">
+<meta name="description" content="TusAlergias - Red de restaurantes seguros y control interactivo de alérgenos para clientes y hostelería.">
 <link rel="manifest" href="manifest.json">
-<title>TusAlergias - Control de Alérgenos</title>
+<!-- Mapa interactivo Leaflet (OpenStreetMap) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<title>TusAlergias - Garantía en Hostelería</title>
 <style>
   :root {
-    --bg: #0f172a; --card: #1e293b; --card-alt: #020617; --text: #f8fafc; --muted: #94a3b8;
-    --green: #10b981; --amber: #f59e0b; --red: #ef4444; --accent: #38bdf8; --purple: #a855f7; --orange: #f97316; --border: #334155;
+    --bg: #0b132b; --card: #1c2541; --card-alt: #060b19; --text: #f8fafc; --muted: #94a3b8;
+    --green: #10b981; --amber: #f59e0b; --red: #ef4444; --accent: #38bdf8; --purple: #a855f7; --orange: #f97316; --border: #2d3a5d;
   }
   * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
   body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: 80px; }
 
-  header { background: var(--card-alt); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 30; border-bottom: 1px solid var(--border); user-select: none; }
-  .brand-header { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-  .rest-logo { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border); background: #fff; }
-  h1 { margin: 0; font-size: 1rem; letter-spacing: 0.4px; }
-  
-  .container { padding: 14px; max-width: 780px; margin: auto; }
-  .section-title { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin: 14px 0 6px; font-weight: 800; letter-spacing: 0.5px; }
+  /* CABECERA GLOBAL CON MENÚ HAMBURGUESA Y LOGO */
+  header {
+    background: var(--card-alt); padding: 11px 14px; display: flex; justify-content: space-between;
+    align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border); user-select: none;
+  }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .menu-btn {
+    background: var(--card); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px;
+    border-radius: 9px; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .brand-header { display: flex; align-items: center; gap: 9px; cursor: pointer; }
+  .app-logo-svg { width: 34px; height: 34px; flex-shrink: 0; }
+  .rest-logo { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border); background: #fff; }
+  h1 { margin: 0; font-size: 1rem; font-weight: 800; letter-spacing: 0.3px; color: #fff; }
+  .header-sub { font-size: 0.65rem; color: var(--accent); display: block; font-weight: 600; }
 
-  /* HOME / HUB PRINCIPAL */
-  .hero-box { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 18px; }
-  .hero-title { font-size: 1.5rem; font-weight: 900; margin: 0 0 6px; color: var(--accent); }
-  .hero-sub { font-size: 0.85rem; color: var(--muted); margin: 0 0 16px; }
-  
-  .hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 20px; }
-  .hub-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; cursor: pointer; transition: 0.15s; display: flex; flex-direction: column; gap: 6px; }
-  .hub-card:hover { border-color: var(--accent); }
-  .hub-card h3 { margin: 0; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; }
-  .hub-card p { margin: 0; font-size: 0.78rem; color: var(--muted); line-height: 1.35; }
+  /* MENÚ LATERAL DESPLEGABLE (DRAWER) */
+  .drawer-backdrop {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 2000;
+  }
+  .drawer {
+    position: fixed; top: 0; left: -300px; width: 285px; height: 100%; background: var(--card-alt);
+    border-right: 1px solid var(--border); z-index: 2001; transition: left 0.25s ease; display: flex; flex-direction: column;
+  }
+  .drawer.open { left: 0; }
+  .drawer-header {
+    padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+  }
+  .drawer-nav { padding: 12px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; flex: 1; }
+  .drawer-item {
+    padding: 12px 14px; border-radius: 10px; color: var(--text); font-weight: 700; font-size: 0.85rem;
+    display: flex; align-items: center; gap: 10px; cursor: pointer; border: 1px solid transparent;
+  }
+  .drawer-item:hover, .drawer-item.active { background: var(--card); border-color: var(--border); color: var(--accent); }
+  .drawer-divider { height: 1px; background: var(--border); margin: 8px 0; }
+  .drawer-section-label { font-size: 0.68rem; text-transform: uppercase; color: var(--muted); padding: 4px 10px; font-weight: 800; }
 
-  .rest-list-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-  .rest-info { display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1; }
-  .rest-info img { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; background: #fff; border: 1px solid var(--border); }
+  .container { padding: 14px; max-width: 820px; margin: auto; }
+  .section-title { font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin: 16px 0 8px; font-weight: 800; letter-spacing: 0.5px; }
 
-  /* BOTONES */
-  .btn { padding: 9px 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; font-size: 0.78rem; display: inline-flex; align-items: center; justify-content: center; gap: 5px; text-decoration: none; }
+  /* TARJETAS Y BOTONES */
+  .hero-box {
+    background: linear-gradient(135deg, #1c2541 0%, #0b132b 100%); border: 1px solid var(--border);
+    border-radius: 16px; padding: 18px; margin-bottom: 16px;
+  }
+  .search-bar-home { display: flex; gap: 8px; margin-top: 12px; }
+  .search-bar-home input {
+    flex: 1; padding: 11px 12px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--card-alt); color: #fff; font-size: 0.86rem;
+  }
+
+  .rest-list-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px;
+    margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .rest-info { display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1; min-width: 200px; }
+  .rest-info img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; background: #fff; border: 1px solid var(--border); }
+  .verified-badge {
+    display: inline-flex; align-items: center; gap: 4px; background: rgba(16, 185, 129, 0.15);
+    color: var(--green); border: 1px solid rgba(16, 185, 129, 0.35); font-size: 0.65rem; padding: 2px 7px; border-radius: 20px; font-weight: 800;
+  }
+
+  .btn {
+    padding: 9px 12px; border-radius: 9px; border: none; font-weight: 700; cursor: pointer;
+    font-size: 0.78rem; display: inline-flex; align-items: center; justify-content: center; gap: 5px; text-decoration: none;
+  }
   .btn-primary { background: var(--accent); color: #020617; }
   .btn-green { background: var(--green); color: #020617; }
   .btn-amber { background: var(--amber); color: #000; }
@@ -48,13 +92,26 @@
   .btn-danger { background: var(--red); color: #fff; }
   .btn-outline { background: transparent; border: 1px solid #64748b; color: var(--text); }
 
-  /* VISTA RESTAURANTE */
-  .staff-bar { display: none; background: #172554; border-bottom: 2px solid var(--amber); padding: 10px 14px; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between; position: sticky; top: 63px; z-index: 29; }
+  /* MAPA MUNDIAL */
+  #mapContainer {
+    width: 100%; height: 420px; border-radius: 14px; border: 1.5px solid var(--border); overflow: hidden; margin-bottom: 14px; z-index: 10;
+  }
+  .leaflet-popup-content-wrapper { background: #1c2541; color: #fff; border-radius: 12px; border: 1px solid var(--accent); }
+  .leaflet-popup-tip { background: #1c2541; }
+
+  /* VISTA INTERACTIVA DE ALÉRGENOS */
+  .staff-bar {
+    display: none; background: #172554; border-bottom: 2px solid var(--amber); padding: 10px 14px;
+    gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  }
   .staff-bar.show { display: flex; }
 
   .allergen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
   .diet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); gap: 6px; margin-top: 6px; }
-  .chip { background: var(--card); border: 1.5px solid var(--border); color: var(--text); padding: 9px 4px; border-radius: 10px; font-size: 0.72rem; font-weight: 700; text-align: center; cursor: pointer; user-select: none; }
+  .chip {
+    background: var(--card); border: 1.5px solid var(--border); color: var(--text); padding: 9px 4px;
+    border-radius: 10px; font-size: 0.72rem; font-weight: 700; text-align: center; cursor: pointer; user-select: none;
+  }
   .chip.active { background: rgba(239, 68, 68, 0.22); border-color: var(--red); color: #fca5a5; }
   .chip.diet.active { background: rgba(168, 85, 247, 0.22); border-color: var(--purple); color: #e9d5ff; }
 
@@ -70,9 +127,6 @@
   .controls-bar { display: flex; gap: 8px; align-items: center; margin: 12px 0; flex-wrap: wrap; }
   .search-input { flex: 1; min-width: 150px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: #fff; font-size: 0.86rem; }
   .cat-filter { padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: #fff; font-size: 0.84rem; }
-
-  .action-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-  .trace-toggle { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--muted); cursor: pointer; }
 
   .tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
   .tab { padding: 10px 4px; border-radius: 10px; text-align: center; font-weight: 800; font-size: 0.78rem; cursor: pointer; border: 2px solid transparent; background: var(--card); color: var(--muted); }
@@ -95,7 +149,7 @@
   .mod-box.protocol { background: rgba(168, 85, 247, 0.15); color: #e9d5ff; border: 1px solid rgba(168, 85, 247, 0.35); margin-top: 6px; }
 
   .ing-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .ing-pill { font-size: 0.74rem; padding: 5px 8px; border-radius: 6px; background: #0f172a; color: #cbd5e1; border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .ing-pill { font-size: 0.74rem; padding: 5px 8px; border-radius: 6px; background: var(--bg); color: #cbd5e1; border: 1px solid var(--border); display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
   .ing-pill.is-mod { border-color: rgba(245, 158, 11, 0.5); }
   .ing-pill .al-tag { color: var(--accent); font-weight: 700; font-size: 0.68rem; }
   .ing-pill .sub-tag { color: #94a3b8; font-size: 0.66rem; font-style: italic; }
@@ -105,146 +159,253 @@
   .staff-quick-toggle.mod-on { background: var(--amber); color: #000; }
   .staff-quick-toggle.mod-off { background: #475569; color: #fff; }
 
-  /* MODALS */
-  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 50; overflow-y: auto; padding: 12px; }
-  .modal-content { background: var(--card); max-width: 680px; margin: 10px auto 40px; padding: 16px; border-radius: 14px; border: 1px solid var(--border); }
+  /* MODALES */
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 3000; overflow-y: auto; padding: 12px; }
+  .modal-content { background: var(--card); max-width: 660px; margin: 15px auto 40px; padding: 18px; border-radius: 16px; border: 1px solid var(--border); }
   .form-group { margin-bottom: 10px; }
   .form-group label { display: block; font-size: 0.76rem; color: var(--muted); margin-bottom: 4px; font-weight: 700; }
-  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 0.85rem; }
-  
-  .ing-editor-card { background: #0f172a; padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 9px 10px; border-radius: 8px; border: 1px solid #475569; background: var(--bg); color: #fff; font-size: 0.85rem; }
+  .ing-editor-card { background: var(--bg); padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); }
   .mini-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
   .mini-chip { font-size: 0.66rem; padding: 4px 7px; border-radius: 5px; background: var(--card); border: 1px solid #475569; color: var(--muted); cursor: pointer; font-weight: 700; user-select: none; }
   .mini-chip.selected { background: var(--red); color: #fff; border-color: var(--red); }
   .mini-chip.diet-sel { background: var(--purple); color: #fff; border-color: var(--purple); }
   .mini-chip.trace-sel { background: var(--accent); color: #000; border-color: var(--accent); }
-
-  .legal-footer { text-align: center; font-size: 0.72rem; color: var(--muted); margin-top: 30px; padding: 14px; border-top: 1px solid var(--border); }
 </style>
 </head>
 <body>
 
-<!-- VISTA 1: MENÚ PRINCIPAL (HUB DE RESTAURANTES) -->
-<div id="homeView">
-  <header>
-    <div class="brand-header">
-      <span style="font-size:1.4rem;">🛡️</span>
-      <h1>TusAlergias</h1>
-    </div>
-    <button class="btn btn-outline" onclick="openLegalModal()">⚖️ Privacidad y Aviso Legal</button>
-  </header>
+<!-- DEFINICIÓN DEL LOGO VECTORIAL SERIO Y CORPORATIVO (SE USA EN TODAS LAS CABECERAS) -->
+<svg style="display:none;">
+  <symbol id="tusalergias-logo" viewBox="0 0 100 100">
+    <defs>
+      <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#0ea5e9" />
+        <stop offset="100%" stop-color="#10b981" />
+      </linearGradient>
+    </defs>
+    <rect width="100" height="100" rx="22" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+    <path d="M50 12 L82 24 V48 C82 70 67 84 50 90 C33 84 18 70 18 48 V24 L50 12 Z" fill="url(#shieldGrad)" opacity="0.95"/>
+    <path d="M50 18 L76 28 V48 C76 66 64 78 50 84 C36 78 24 66 24 48 V28 L50 18 Z" fill="#0b132b"/>
+    <!-- Tenedor y Hoja de Seguridad -->
+    <path d="M42 32 V46 C42 50 45 52 46 54 V72 H51 V54 C52 52 55 50 55 46 V32 H52 V43 H50 V32 H47 V43 H45 V32 H42 Z" fill="#f8fafc"/>
+    <path d="M52 58 C58 52 68 53 68 53 C68 53 67 63 61 68 C57 71 52 68 52 68 Z" fill="#10b981"/>
+    <circle cx="63" cy="36" r="8" fill="#10b981"/>
+    <path d="M59 36 L62 39 L67 33" stroke="#0b132b" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  </symbol>
+</svg>
 
-  <div class="container">
-    <div class="hero-box">
-      <h2 class="hero-title">TusAlergias Pro</h2>
-      <p class="hero-sub">Control inteligente de los 14 alérgenos oficiales, trazas, dietas e ingredientes ocultos para hostelería.</p>
-      <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="openNewRestaurantModal()">➕ Crear Nuevo Restaurante</button>
-        <button class="btn btn-amber" onclick="openBulkImportModal()">⚡ Importador Masivo de Carta</button>
+<!-- MENÚ LATERAL DESPLEGABLE (3 LÍNEAS ARRIBA A LA IZQUIERDA) -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleDrawer(false)"></div>
+<aside class="drawer" id="mainDrawer">
+  <div class="drawer-header">
+    <div class="brand-header" onclick="showView('home'); toggleDrawer(false);">
+      <svg class="app-logo-svg"><use href="#tusalergias-logo"></use></svg>
+      <div>
+        <h1>TusAlergias</h1>
+        <span class="header-sub">Garantía Alimentaria</span>
       </div>
     </div>
+    <button class="btn btn-outline" onclick="toggleDrawer(false)">✕</button>
+  </div>
+  <div class="drawer-nav">
+    <div class="drawer-section-label">Zona Cliente</div>
+    <div class="drawer-item" onclick="showView('home'); toggleDrawer(false);">🏠 Mis Restaurantes</div>
+    <div class="drawer-item" onclick="showView('map'); toggleDrawer(false);">🗺️ Mapa Mundial de Restaurantes</div>
+    <div class="drawer-item" onclick="openScanOrCodeModal(); toggleDrawer(false);">📷 Escanear / Añadir por Bidi</div>
 
-    <div class="section-title">Mis Restaurantes / Cartas Activas:</div>
-    <div id="restaurantsList"></div>
+    <div class="drawer-divider"></div>
+    <div class="drawer-section-label">Zona para Restaurantes</div>
+    <div class="drawer-item" onclick="openNewRestaurantModal(); toggleDrawer(false);">➕ Crear Nuevo Restaurante</div>
+    <div class="drawer-item" onclick="openBulkImportModal(); toggleDrawer(false);">⚡ Importar Carta (Texto/Excel/IA)</div>
+    <div class="drawer-item" onclick="loadSampleRestaurant(); toggleDrawer(false);">🍽️ Cargar Restaurante de Prueba</div>
 
-    <div class="section-title" style="margin-top:24px;">Herramientas Rápidas:</div>
-    <div class="hub-grid">
-      <div class="hub-card" onclick="openBulkImportModal()">
-        <h3>📄 Volcado Rápido (Texto / Excel)</h3>
-        <p>Pega una lista de platos o sube un archivo Excel (.CSV) para crear tu carta en segundos sin ir ingrediente a ingrediente.</p>
-      </div>
-      <div class="hub-card" onclick="copyAiPrompt()">
-        <h3>🤖 Convertir Carta con IA</h3>
-        <p>Copia la instrucción automática para que ChatGPT o Gemini transforme una foto o PDF de tu carta al formato de la app.</p>
-      </div>
-      <div class="hub-card" onclick="loadDemoRestaurant()">
-        <h3>🍣 Cargar Restaurante Demo</h3>
-        <p>Carga una carta de ejemplo completa (Fusión Asiática-Mediterránea) para probar todas las funciones al instante.</p>
-      </div>
-    </div>
+    <div class="drawer-divider"></div>
+    <div class="drawer-section-label">Información y Garantía</div>
+    <div class="drawer-item" onclick="openLegalModal(); toggleDrawer(false);">⚖️ Privacidad y Sello de Calidad</div>
+  </div>
+</aside>
 
-    <div class="legal-footer">
-      <b>TusAlergias</b> cumple con el Reglamento (UE) Nº 1169/2011 sobre información alimentaria facilitada al consumidor.<br>
-      Los datos se almacenan localmente en tu dispositivo. <a href="#" style="color:var(--accent);" onclick="openLegalModal()">Política de Privacidad</a>.
+<!-- CABECERA SUPERIOR GLOBAL (PRESENTE EN TODAS LAS VISTAS) -->
+<header>
+  <div class="header-left">
+    <button class="menu-btn" onclick="toggleDrawer(true)" aria-label="Abrir menú">☰</button>
+    <div class="brand-header" onclick="handleHeaderTap()">
+      <svg class="app-logo-svg" id="globalBrandSvg"><use href="#tusalergias-logo"></use></svg>
+      <img id="activeRestLogo" class="rest-logo" src="" alt="Logo" style="display:none;">
+      <div>
+        <h1 id="headerMainTitle">TusAlergias</h1>
+        <span class="header-sub" id="headerSubTitle">Tus restaurantes seguros</span>
+      </div>
     </div>
   </div>
-</div>
+  <div id="headerRightActions" style="display:flex; gap:6px;">
+    <button class="btn btn-primary" onclick="showView('map')">🗺️ Mapa</button>
+  </div>
+</header>
 
-<!-- VISTA 2: PANTALLA DE CONTROL DEL RESTAURANTE ACTIVO -->
-<div id="appView" style="display:none;">
-  <header>
-    <div class="brand-header" onclick="handleSecretTap()" title="Toca 5 veces para Modo Staff">
-      <img id="activeRestLogo" class="rest-logo" src="" alt="Logo">
+<!-- VISTA 1: PÁGINA PRINCIPAL (MIS RESTAURANTES + BUSCADOR CLIENTE) -->
+<div id="homeView" class="container">
+  <div class="hero-box">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+      <svg style="width:46px; height:46px; flex-shrink:0;"><use href="#tusalergias-logo"></use></svg>
       <div>
-        <h1 id="activeRestTitle">RESTAURANTE</h1>
-        <span style="font-size:0.65rem; color:var(--muted);">Toca 5 veces el título para Modo Staff</span>
+        <h2 style="margin:0; font-size:1.2rem; color:#fff;">Sal a cenar con total tranquilidad</h2>
+        <p style="margin:3px 0 0; font-size:0.78rem; color:var(--muted);">Guarda tus restaurantes favoritos, escanea su código Bidi en la mesa o explora el mapa de locales verificados.</p>
       </div>
     </div>
-    <div style="display:flex; gap:6px;">
-      <button class="btn btn-outline" id="btnBackHub" onclick="tryExitToHub()">🏠 Menú</button>
-      <button class="btn btn-outline" onclick="clearAllFilters()">Limpiar</button>
-    </div>
-  </header>
 
+    <div class="search-bar-home">
+      <input type="text" id="homeSearchInput" placeholder="🔍 Buscar en mis restaurantes o directorio por nombre o ciudad..." oninput="renderHomeHub()">
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="openNewRestaurantModal()">➕ Añadir / Crear Restaurante</button>
+      <button class="btn btn-green" onclick="showView('map')">🗺️ Ver Mapa de Restaurantes</button>
+      <button class="btn btn-outline" onclick="openScanOrCodeModal()">📷 Escanear / Pegar Bidi</button>
+    </div>
+  </div>
+
+  <div class="section-title">⭐ Mis Restaurantes Guardados:</div>
+  <div id="myRestaurantsList"></div>
+
+  <div class="section-title" style="margin-top:24px;">🌍 Directorio de Restaurantes con Garantía TusAlergias:</div>
+  <p style="font-size:0.76rem; color:var(--muted); margin:0 0 10px;">Pulsa en cualquiera para interactuar con su carta de alérgenos o añadirlo a tu lista habitual:</p>
+  <div id="directoryRestaurantsList"></div>
+</div>
+
+<!-- VISTA 2: MAPA MUNDIAL DE RESTAURANTES CERTIFICADOS -->
+<div id="mapView" class="container" style="display:none;">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+    <div>
+      <h2 style="margin:0; font-size:1.1rem;">🗺️ Mapa de Garantía TusAlergias</h2>
+      <p style="margin:2px 0 0; font-size:0.76rem; color:var(--muted);">Toca cualquier chincheta para abrir su carta interactiva de alérgenos o guardarlo en tus favoritos.</p>
+    </div>
+    <div style="display:flex; gap:6px;">
+      <button class="btn btn-green" onclick="locateUserOnMap()">📍 Mi Zona (GPS)</button>
+      <button class="btn btn-outline" onclick="showView('home')">🏠 Volver</button>
+    </div>
+  </div>
+
+  <div id="mapContainer"></div>
+
+  <div class="section-title">Restaurantes verificados en el mapa:</div>
+  <div id="mapCardsList"></div>
+</div>
+
+<!-- VISTA 3: HERRAMIENTA INTERACTIVA DE ALÉRGENOS Y CARTA DEL RESTAURANTE -->
+<div id="appView" style="display:none;">
   <div class="staff-bar" id="staffBar">
     <div style="font-size:0.75rem; font-weight:700; color:#fde047; width:100%;">
       🔓 MODO STAFF ACTIVO (PIN: <span id="currentPinDisplay">2026</span>) — Toca cualquier ingrediente para alternar entre Fijo (🔒) y Adaptable (🔄)
     </div>
     <div style="display:flex; gap:6px; flex-wrap:wrap; width:100%;">
       <button class="btn btn-amber" onclick="openDishModal()">+ Plato</button>
-      <button class="btn btn-orange" onclick="openBulkImportModal(true)">⚡ Volcar Platos</button>
+      <button class="btn btn-orange" onclick="openBulkImportModal(true)">⚡ Volcar Carta</button>
       <button class="btn btn-purple" onclick="openBasesModal()">🧪 Salsas/Bases</button>
-      <button class="btn btn-outline" onclick="openEditRestModal()">🖼️ Logo/Nombre</button>
-      <button class="btn btn-outline" onclick="toggleKioskMode()" id="kioskBtn">🔒 Modo Mesa (Kiosco)</button>
-      <button class="btn btn-outline" onclick="exportRestaurantData()">📤 Copiar JSON</button>
-      <button class="btn btn-primary" style="margin-left:auto;" onclick="lockStaffMode()">Salir Staff</button>
+      <button class="btn btn-green" onclick="openQrModal(activeRestId)">📱 Código Bidi</button>
+      <button class="btn btn-outline" onclick="openEditRestModal(activeRestId)">🖼️ Logo/Ubicación</button>
+      <button class="btn btn-primary" style="margin-left:auto;" onclick="lockStaffMode()">Cerrar Staff</button>
     </div>
   </div>
 
   <div class="container">
-    <div class="section-title">1. Alérgenos oficiales (UE 1169/2011) a evitar:</div>
+    <!-- Barra de información del restaurante para el cliente -->
+    <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+      <div>
+        <span class="verified-badge">🛡️ Garantía TusAlergias</span>
+        <span id="activeRestCity" style="font-size:0.75rem; color:var(--muted); margin-left:6px;"></span>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button class="btn btn-outline" id="btnToggleFavorite" onclick="toggleFavoriteRest(activeRestId)">⭐ Guardar en Mis Restaurantes</button>
+        <button class="btn btn-primary" onclick="openQrModal(activeRestId)">📱 Ver Bidi de esta Carta</button>
+      </div>
+    </div>
+
+    <div class="section-title">1. Selecciona los alérgenos oficiales a evitar:</div>
     <div class="allergen-grid" id="allergenGrid"></div>
 
     <div class="section-title">2. Filtros dietéticos y estilo de vida:</div>
     <div class="diet-grid" id="dietGrid"></div>
 
-    <div class="section-title">3. 🚫 Alergia a CUALQUIER otro ingrediente (rastrea plato y salsas):</div>
+    <div class="section-title">3. 🚫 ¿Alergia o intolerancia a cualquier otro ingrediente?:</div>
     <div class="custom-avoid-box">
       <div class="custom-input-row">
-        <input type="text" id="customIngInput" placeholder="Ej. ajo, manzana, maíz, aguacate, cilantro..." onkeydown="if(event.key==='Enter') addCustomIngFromInput()">
-        <button class="btn btn-orange" onclick="addCustomIngFromInput()">+ Bloquear</button>
+        <input type="text" id="customIngInput" placeholder="Escribe cualquier ingrediente (ej. ajo, manzana, maíz, cilantro...)" onkeydown="if(event.key==='Enter') addCustomIngFromInput()">
+        <button class="btn btn-orange" onclick="addCustomIngFromInput()">+ Evitar</button>
       </div>
       <div class="quick-ing-bar" id="quickIngBar"></div>
       <div class="active-custom-tags" id="activeCustomTags"></div>
     </div>
 
     <div class="controls-bar">
-      <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar plato o ingrediente..." oninput="renderDishes()">
+      <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar plato o ingrediente en la carta..." oninput="renderDishes()">
       <select id="catFilter" class="cat-filter" onchange="renderDishes()"></select>
     </div>
 
-    <div class="action-row">
-      <label class="trace-toggle">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+      <label style="display:flex; align-items:center; gap:6px; font-size:0.78rem; color:var(--muted); cursor:pointer;">
         <input type="checkbox" id="strictTraces" onchange="renderDishes()">
-        Bloquear también por trazas
+        Bloquear también platos con trazas
       </label>
       <div style="display:flex; gap:6px;">
-        <button class="btn btn-green" onclick="shareWhatsApp()">📲 Enviar informe</button>
-        <button class="btn btn-outline" onclick="window.print()">🖨️ Imprimir</button>
+        <button class="btn btn-outline" onclick="clearAllFilters()">🧹 Limpiar Filtros</button>
+        <button class="btn btn-green" onclick="shareWhatsApp()">📲 Compartir Selección</button>
       </div>
     </div>
 
     <div class="tabs">
       <div class="tab aptos active" id="tab-aptos" onclick="setTab('aptos')">APTOS (0)</div>
       <div class="tab mod" id="tab-mod" onclick="setTab('mod')">ADAPTABLES (0)</div>
-      <div class="tab proh" id="tab-proh" onclick="setTab('proh')">PROHIBIDOS (0)</div>
+      <div class="tab proh" id="tab-proh" onclick="setTab('proh')">NO APTOS (0)</div>
     </div>
 
     <div id="dishList"></div>
   </div>
 </div>
 
-<!-- MODAL CREAR / EDITAR RESTAURANTE + SUBIR LOGO -->
+<!-- MODAL CÓDIGO BIDI (QR) EXCLUSIVO DE CADA CARTA/RESTAURANTE -->
+<div class="modal" id="qrModal">
+  <div class="modal-content" style="text-align:center;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h2 style="margin:0; font-size:1rem;">📱 Código Bidi de la Carta</h2>
+      <button class="btn btn-outline" onclick="document.getElementById('qrModal').style.display='none'">✕</button>
+    </div>
+    <p style="font-size:0.8rem; color:var(--muted); margin:0 0 12px;">
+      Muestra o imprime este código Bidi para tus clientes. Al escanearlo, abrirán directamente la carta interactiva de <b id="qrRestName" style="color:#fff;"></b> en su móvil:
+    </p>
+    <div style="background:#fff; padding:16px; border-radius:16px; display:inline-block; margin-bottom:12px;">
+      <img id="qrImageDisplay" src="" alt="Código Bidi" style="width:230px; height:230px; display:block;">
+    </div>
+    <div class="form-group" style="text-align:left;">
+      <label>Enlace directo interactivo de este restaurante:</label>
+      <input type="text" id="qrDirectLink" readonly onclick="this.select()">
+    </div>
+    <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:12px;">
+      <button class="btn btn-primary" onclick="copyQrLink()">📋 Copiar Enlace Directo</button>
+      <button class="btn btn-green" onclick="window.print()">🖨️ Imprimir Bidi para Mesas</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ESCANEAR / PEGAR ENLACE BIDI DE UN RESTAURANTE -->
+<div class="modal" id="scanModal">
+  <div class="modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h2 style="margin:0; font-size:1rem;">📷 Añadir Restaurante por Bidi o Enlace</h2>
+      <button class="btn btn-outline" onclick="document.getElementById('scanModal').style.display='none'">✕</button>
+    </div>
+    <p style="font-size:0.8rem; color:var(--muted); line-height:1.4;">
+      Si estás en un restaurante que usa <b>TusAlergias</b>, escanea su código Bidi con la cámara de tu teléfono y se abrirá automáticamente. También puedes pegar aquí su enlace o código compartido:
+    </p>
+    <div class="form-group">
+      <input type="text" id="pasteBidiInput" placeholder="Pega aquí el enlace o código del restaurante...">
+    </div>
+    <button class="btn btn-primary" style="width:100%; padding:11px;" onclick="importFromBidiInput()">➕ Cargar Carta y Guardar en Mis Restaurantes</button>
+  </div>
+</div>
+
+<!-- MODAL CREAR / EDITAR RESTAURANTE + SUBIR LOGO + UBICACIÓN MAPA -->
 <div class="modal" id="restModal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -253,26 +414,45 @@
     </div>
     <input type="hidden" id="restEditId">
     <div class="form-group">
-      <label>Nombre del Restaurante o Carta:</label>
-      <input type="text" id="restNameInput" placeholder="Ej. Manduka Bolnuevo / Restaurante La Plaza">
+      <label>Nombre del Restaurante:</label>
+      <input type="text" id="restNameInput" placeholder="Ej. Bistró Olivo & Mar / Restaurante Brisa del Norte">
     </div>
-    <div class="form-group">
-      <label>Logo del Restaurante (subir imagen desde tu móvil):</label>
-      <input type="file" id="restLogoFile" accept="image/*" onchange="handleLogoUpload(event)">
-      <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
-        <img id="restLogoPreview" src="" style="width:60px; height:60px; border-radius:10px; object-fit:cover; background:#fff; display:none; border:1px solid var(--border);">
-        <span style="font-size:0.74rem; color:var(--muted);">La imagen se ajusta y guarda automáticamente en la app.</span>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+      <div class="form-group">
+        <label>Ciudad / Zona:</label>
+        <input type="text" id="restCityInput" placeholder="Ej. Madrid / Valencia / Sevilla">
+      </div>
+      <div class="form-group">
+        <label>PIN Modo Staff:</label>
+        <input type="text" id="restPinInput" value="2026" placeholder="2026">
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr 110px; gap:8px; align-items:end;">
+      <div class="form-group">
+        <label>Latitud (Mapa):</label>
+        <input type="number" step="any" id="restLatInput" placeholder="40.4168">
+      </div>
+      <div class="form-group">
+        <label>Longitud (Mapa):</label>
+        <input type="number" step="any" id="restLngInput" placeholder="-3.7038">
+      </div>
+      <div class="form-group">
+        <button type="button" class="btn btn-green" style="width:100%; height:37px;" onclick="fillCurrentGpsForRest()">📍 Mi GPS</button>
       </div>
     </div>
     <div class="form-group">
-      <label>PIN de seguridad para Modo Staff:</label>
-      <input type="text" id="restPinInput" value="2026" placeholder="2026">
+      <label>Logo del Restaurante (subir desde galería):</label>
+      <input type="file" id="restLogoFile" accept="image/*" onchange="handleLogoUpload(event)">
+      <div style="margin-top:8px; display:flex; align-items:center; gap:10px;">
+        <img id="restLogoPreview" src="" style="width:56px; height:56px; border-radius:10px; object-fit:cover; background:#fff; display:none; border:1px solid var(--border);">
+        <span style="font-size:0.73rem; color:var(--muted);">Se mostrará en la cabecera, en el mapa y junto al código Bidi.</span>
+      </div>
     </div>
-    <button class="btn btn-primary" style="width:100%; padding:12px; margin-top:8px;" onclick="saveRestaurantMeta()">💾 Guardar Restaurante</button>
+    <button class="btn btn-primary" style="width:100%; padding:12px; margin-top:6px;" onclick="saveRestaurantMeta()">💾 Guardar Restaurante</button>
   </div>
 </div>
 
-<!-- MODAL IMPORTADOR MASIVO (TEXTO / CSV / IA / JSON) -->
+<!-- MODAL IMPORTADOR MASIVO -->
 <div class="modal" id="bulkModal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -285,37 +465,27 @@
       <select id="bulkTargetRest"></select>
     </div>
 
-    <!-- OPCIÓN A: TEXTO RÁPIDO -->
     <div class="ing-editor-card">
-      <h3 style="margin:0 0 6px; font-size:0.88rem; color:var(--accent);">Opción 1: Pegado Rápido por Líneas (El más sencillo)</h3>
+      <h3 style="margin:0 0 6px; font-size:0.88rem; color:var(--accent);">Opción 1: Pegado Rápido por Líneas</h3>
       <p style="font-size:0.74rem; color:var(--muted); margin:0 0 8px;">
-        Escribe o pega un plato por línea separando con barras <b>|</b>:<br>
-        <code>Nombre del plato | Categoría | Alérgenos | Otros ingredientes | Adaptable (SI/NO)</code>
+        Pega un plato por línea separado por barras <b>|</b>:<br>
+        <code>Nombre del plato | Categoría | Alérgenos | Ingredientes | Adaptable (SI/NO)</code>
       </p>
-      <textarea id="bulkTextArea" rows="5" placeholder="Ensalada César | Entrantes | Gluten, Lácteo, Huevo | lechuga, pollo, parmesano, nueces, ajo | SI&#10;Croquetas de Jamón | Compartir | Gluten, Lácteo, Huevo | leche, harina, jamón ibérico, cebolla | NO&#10;Arroz a Banda | Arroces | Pescado, Crustáceos, Moluscos | arroz, gamba, calamar, ajo, ñora, tomate | SI"></textarea>
-      <button class="btn btn-amber" style="width:100%; margin-top:6px;" onclick="processBulkText()">⚡ Procesar y Añadir Platos</button>
+      <textarea id="bulkTextArea" rows="4" placeholder="Ensalada Templada | Entrantes | Frutos con cáscara, Lácteo | brotes, queso de cabra, nueces, miel, manzana | SI&#10;Solomillo al Pedro Ximénez | Carnes | Sulfitos, Lácteo | ternera, vino dulce, mantequilla, patata | SI"></textarea>
+      <button class="btn btn-amber" style="width:100%; margin-top:6px;" onclick="processBulkText()">⚡ Procesar Platos y Generar Bidi</button>
     </div>
 
-    <!-- OPCIÓN B: ARCHIVO EXCEL / CSV -->
     <div class="ing-editor-card">
       <h3 style="margin:0 0 6px; font-size:0.88rem; color:var(--green);">Opción 2: Subir archivo Excel (.CSV)</h3>
-      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-        <button class="btn btn-outline" onclick="downloadCsvTemplate()">📥 Descargar Plantilla Excel (.CSV)</button>
-      </div>
+      <button class="btn btn-outline" style="margin-bottom:8px;" onclick="downloadCsvTemplate()">📥 Descargar Plantilla Excel (.CSV)</button>
       <input type="file" accept=".csv,.txt" onchange="handleCsvFileUpload(event)">
     </div>
 
-    <!-- OPCIÓN C: ASISTENTE IA / JSON -->
     <div class="ing-editor-card">
-      <h3 style="margin:0 0 6px; font-size:0.88rem; color:var(--purple);">Opción 3: Volcado desde IA (ChatGPT / Gemini) o Copia JSON</h3>
-      <p style="font-size:0.74rem; color:var(--muted); margin:0 0 8px;">
-        1. Pulsa el botón morado para copiar la instrucción.<br>
-        2. Pégala en tu IA junto con una foto o documento de tu carta.<br>
-        3. Pega aquí debajo el código que te devuelva.
-      </p>
+      <h3 style="margin:0 0 6px; font-size:0.88rem; color:var(--purple);">Opción 3: Volcado con IA (ChatGPT / Gemini) o JSON</h3>
       <button class="btn btn-purple" style="width:100%; margin-bottom:8px;" onclick="copyAiPrompt()">🤖 1. Copiar Instrucción para IA</button>
-      <textarea id="bulkJsonArea" rows="3" placeholder="Pega aquí el bloque JSON generado por la IA o exportado de otro teléfono..."></textarea>
-      <button class="btn btn-primary" style="width:100%; margin-top:6px;" onclick="processBulkJson()">📥 2. Importar Bloque JSON</button>
+      <textarea id="bulkJsonArea" rows="3" placeholder="Pega aquí el bloque JSON devuelto por la IA..."></textarea>
+      <button class="btn btn-primary" style="width:100%; margin-top:6px;" onclick="processBulkJson()">📥 2. Importar Carta y Ver Código Bidi</button>
     </div>
   </div>
 </div>
@@ -335,12 +505,12 @@
       </div>
       <div class="form-group">
         <label>Categoría:</label>
-        <input type="text" id="editCat" placeholder="Ej. ENTRANTES">
+        <input type="text" id="editCat" placeholder="ENTRANTES">
       </div>
     </div>
     <div class="form-group">
-      <label>👩‍🍳 Protocolo de cocina / contaminación cruzada:</label>
-      <input type="text" id="editProtocol" placeholder="Ej. Freír en freidora limpia sin gluten">
+      <label>👩‍🍳 Protocolo en cocina / prevención de trazas:</label>
+      <input type="text" id="editProtocol" placeholder="Ej. Utensilios exclusivos y plancha limpia">
     </div>
     <div class="form-group">
       <label>Trazas generales del plato:</label>
@@ -348,8 +518,8 @@
     </div>
     <hr style="border-color:var(--border); margin:12px 0;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <span class="section-title" style="margin:0;">Componentes / Ingredientes:</span>
-      <button class="btn btn-primary" onclick="addIngredientCard()">+ Añadir Componente</button>
+      <span class="section-title" style="margin:0;">Componentes del plato:</span>
+      <button class="btn btn-primary" onclick="addIngredientCard()">+ Componente</button>
     </div>
     <div id="ingredientsEditor"></div>
     <div style="display:flex; gap:10px; margin-top:16px;">
@@ -372,24 +542,23 @@
   </div>
 </div>
 
-<!-- MODAL PRIVACIDAD Y CUMPLIMIENTO PLAY STORE -->
+<!-- MODAL LEGAL Y SELLO DE GARANTÍA -->
 <div class="modal" id="legalModal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;">⚖️ Política de Privacidad y Aviso Legal</h2>
+      <h2 style="margin:0; font-size:1rem;">⚖️ Garantía TusAlergias y Privacidad</h2>
       <button class="btn btn-outline" onclick="document.getElementById('legalModal').style.display='none'">✕</button>
     </div>
     <div style="font-size:0.8rem; color:var(--muted); line-height:1.5;">
-      <p><b>1. Privacidad y Tratamiento de Datos (Cumplimiento Google Play):</b><br>
-      La aplicación <b>TusAlergias</b> funciona bajo arquitectura 100% local (<i>Local-First</i>). No recopila, almacena ni transmite datos personales, ubicaciones ni identificadores de usuario a servidores externos. Toda la información de cartas, recetas y logotipos permanece guardada exclusivamente en la memoria interna del dispositivo del usuario.</p>
-      <p><b>2. Normativa de Alérgenos (Reglamento UE 1169/2011):</b><br>
-      Esta herramienta asiste al personal de hostelería y a los consumidores en el filtrado de los 14 alérgenos de declaración obligatoria e ingredientes adicionales. En caso de alergias severas o riesgo de anafilaxia, el consumidor debe confirmar siempre en sala el protocolo de trazas en cocina.</p>
+      <p><b>🛡️ Estándar de Calidad TusAlergias:</b><br>
+      Los establecimientos adheridos desglosan sus cartas por componentes, salsas base y protocolos de cocina conforme al Reglamento (UE) Nº 1169/2011 para ofrecer transparencia real a personas con alergias e intolerancias.</p>
+      <p><b>🔒 Privacidad del Usuario (Google Play Compliance):</b><br>
+      TusAlergias almacena tus preferencias y restaurantes favoritos directamente en tu dispositivo. El permiso de ubicación se emplea únicamente bajo petición del usuario para centrar el mapa de restaurantes cercanos.</p>
     </div>
   </div>
 </div>
 
 <script>
-// 14 ALÉRGENOS OFICIALES UE 1169/2011
 const ALLERGENS = [
   "GLUTEN", "CRUSTÁCEOS", "HUEVO", "PESCADO", "CACAHUETES", 
   "SOJA", "LÁCTEO", "FRUTOS CON CÁSCARA", "APIO", "MOSTAZA", 
@@ -409,32 +578,119 @@ const QUICK_CUSTOM_INGS = ["Ajo", "Cebolla", "Manzana", "Maíz", "Aguacate", "To
 const SYNONYM_MAP = {
   "cítricos/limón": ["limón", "limon", "lima", "yuzu", "mandarina", "cítrico", "naranja"],
   "pimiento/ñora": ["pimiento", "ñora", "pimentón", "pimenton", "guindilla", "chile", "cayena"],
-  "setas/hongos": ["seta", "shiitake", "champiñón", "champiñon", "hongo", "trufa", "cogumelo", "tartufo"],
+  "setas/hongos": ["seta", "shiitake", "champiñón", "champiñon", "hongo", "trufa", "boletus"],
   "cebolla": ["cebolla", "cebolleta", "chalota", "cebollino"]
 };
 
-const DEFAULT_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231e293b'/><text x='50' y='64' font-size='48' text-anchor='middle'>🍽️</text></svg>";
+const DEFAULT_REST_LOGO = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231c2541'/><text x='50' y='64' font-size='45' text-anchor='middle'>🍽️</text></svg>";
 
-let appState = JSON.parse(localStorage.getItem("tusalergias_store_v1")) || { restaurants: [] };
+// RESTAURANTES DE EJEMPLO CON NOMBRES AL AZAR EN EL DIRECTORIO/MAPA
+const CERTIFIED_DIRECTORY = [
+  {
+    id: "dir_olivo_mar",
+    name: "Bistró Olivo & Mar",
+    city: "Madrid · Centro",
+    lat: 40.4195,
+    lng: -3.6992,
+    pin: "2026",
+    logo: DEFAULT_REST_LOGO,
+    bases: {
+      "base_pesto": { name: "Pesto Genovés Casero", a: ["FRUTOS CON CÁSCARA", "LÁCTEO"], tags: ["NO_VEGANO"], sub: "albahaca, piñones, ajo, queso parmesano, aceite de oliva" },
+      "base_reduccion": { name: "Reducción Pedro Ximénez", a: ["SULFITOS"], tags: [], sub: "vino dulce, pasas, caldo de verduras" }
+    },
+    menu: [
+      { id: 201, cat: "ENTRANTES", name: "BURRATA TOSCANA ASADA", traces: [], protocol: "Se puede servir sin pesto para alérgicos a frutos secos.", ings: [
+        { n: "Burrata fresca y tomate cherry", a: ["LÁCTEO"], tags: ["NO_VEGANO"], sub: "leche de vaca, tomate, rúcula", mod: false, note: "" },
+        { n: "Aliño de Pesto", baseId: "base_pesto", a: [], tags: [], sub: "", mod: true, note: "Servir solo con aceite de oliva virgen extra" }
+      ]},
+      { id: 202, cat: "PRINCIPALES", name: "CORVINA SALVAJE A LA BRASA", traces: ["CRUSTÁCEOS"], protocol: "Cocinar en parrilla limpia para celíacos y alérgicos a marisco.", ings: [
+        { n: "Lomo de corvina y verduras", a: ["PESCADO"], tags: ["NO_VEGANO", "NO_VEGETARIANO"], sub: "corvina, calabacín, espárragos, limón", mod: false, note: "" },
+        { n: "Refrito de ajo y guindilla", a: [], tags: ["PICANTE"], sub: "ajo, guindilla, aceite", mod: true, note: "Hacer a la plancha sin refrito de ajo" }
+      ]},
+      { id: 203, cat: "CARNES", name: "SOLOMILLO IBÉRICO AL VINO", traces: [], protocol: "Pasar bien la carne en caso de embarazo.", ings: [
+        { n: "Solomillo y patata panadera", a: [], tags: ["CERDO", "NO_VEGANO", "NO_VEGETARIANO"], sub: "cerdo ibérico, patata, cebolla", mod: false, note: "" },
+        { n: "Salsa Pedro Ximénez", baseId: "base_reduccion", a: [], tags: [], sub: "", mod: true, note: "Servir a la plancha sin salsa" }
+      ]}
+    ]
+  },
+  {
+    id: "dir_brisa_norte",
+    name: "Restaurante Brisa del Norte",
+    city: "Valencia · Zona Puerto",
+    lat: 39.4699,
+    lng: -0.3360,
+    pin: "2026",
+    logo: DEFAULT_REST_LOGO,
+    bases: {
+      "base_alioli": { name: "Alioli Suave", a: ["HUEVO"], tags: ["CRUDO_EMBARAZO", "NO_VEGANO"], sub: "ajo, huevo pasteurizado, aceite, limón" }
+    },
+    menu: [
+      { id: 301, cat: "ARROCES", name: "ARROZ DEL SEÑORET", traces: ["GLUTEN"], protocol: "Caldo 100% natural sin colorantes ni harinas.", ings: [
+        { n: "Arroz bomba, sepia y gamba pelada", a: ["CRUSTÁCEOS", "MOLUSCOS", "PESCADO"], tags: ["NO_VEGANO", "NO_VEGETARIANO"], sub: "arroz, gamba, sepia, rape, tomate, ñora, ajo, azafrán", mod: false, note: "" },
+        { n: "Alioli en salsera", baseId: "base_alioli", a: [], tags: [], sub: "", mod: true, note: "No sacar salsera de alioli" }
+      ]},
+      { id: 302, cat: "ENTRANTES", name: "ALCACHOFAS CRUJIENTES DE LA HUERTA", traces: [], protocol: "Freidora exclusiva para vegetales.", ings: [
+        { n: "Corazones de alcachofa confitados", a: [], tags: [], sub: "alcachofa, aceite de oliva, escamas de sal", mod: false, note: "" },
+        { n: "Virutas de jamón ibérico", a: [], tags: ["CERDO", "NO_VEGANO", "NO_VEGETARIANO"], sub: "jamón de bellota", mod: true, note: "Omitir jamón (opción 100% vegana)" }
+      ]}
+    ]
+  },
+  {
+    id: "dir_cupula_verde",
+    name: "La Cúpula Gastronómica",
+    city: "Sevilla · Casco Antiguo",
+    lat: 37.3891,
+    lng: -5.9845,
+    pin: "2026",
+    logo: DEFAULT_REST_LOGO,
+    bases: {},
+    menu: [
+      { id: 401, cat: "COMPARTIR", name: "SALMOREJO TRADICIONAL SIN GLUTEN", traces: [], protocol: "Espesado con patata asada en lugar de pan (100% apto celíacos).", ings: [
+        { n: "Crema de tomate, aceite y patata", a: [], tags: [], sub: "tomate, aceite de oliva, ajo, vinagre", mod: false, note: "" },
+        { n: "Huevo duro picado", a: ["HUEVO"], tags: ["NO_VEGANO"], sub: "huevo cocido", mod: true, note: "Servir sin huevo picado" }
+      ]}
+    ]
+  }
+];
+
+let appState = JSON.parse(localStorage.getItem("tusalergias_v2_store")) || {
+  restaurants: [],
+  favoriteIds: ["dir_olivo_mar"]
+};
+
 let activeRestId = null;
 let tempLogoBase64 = "";
+let leafletMap = null;
+let markersLayer = null;
 
 let selectedAllergens = new Set();
 let selectedDiets = new Set();
 let customAvoidSet = new Set();
 let currentTab = "aptos";
 let isStaffUnlocked = false;
-let isKioskLocked = false;
 let currentModalTraces = new Set();
 let secretTapCount = 0;
 let secretTapTimer = null;
 
 function saveAppState() {
-  localStorage.setItem("tusalergias_store_v1", JSON.stringify(appState));
+  localStorage.setItem("tusalergias_v2_store", JSON.stringify(appState));
+}
+
+function getAllAvailableRestaurants() {
+  const customIds = new Set(appState.restaurants.map(r => r.id));
+  const merged = [...appState.restaurants];
+  CERTIFIED_DIRECTORY.forEach(d => {
+    if (!customIds.has(d.id)) merged.push(d);
+  });
+  return merged;
+}
+
+function getRestById(id) {
+  return getAllAvailableRestaurants().find(r => r.id === id);
 }
 
 function getActiveRest() {
-  return appState.restaurants.find(r => r.id === activeRestId);
+  return getRestById(activeRestId);
 }
 
 function normalizeStr(s) {
@@ -442,45 +698,310 @@ function normalizeStr(s) {
 }
 
 // ==========================================
-// GESTIÓN DEL HUB PRINCIPAL Y RESTAURANTES
+// NAVEGACIÓN, DRAWER Y CABECERA GLOBAL
 // ==========================================
-function renderHomeHub() {
-  document.getElementById("homeView").style.display = "block";
-  document.getElementById("appView").style.display = "none";
-  const container = document.getElementById("restaurantsList");
-
-  if (appState.restaurants.length === 0) {
-    container.innerHTML = `
-      <div style="background:var(--card); border:1px dashed var(--border); border-radius:12px; padding:20px; text-align:center; color:var(--muted);">
-        Todavía no has creado ningún restaurante.<br>Pulsa <b>"➕ Crear Nuevo Restaurante"</b> o <b>"🍣 Cargar Restaurante Demo"</b> para empezar.
-      </div>`;
-    return;
+function toggleDrawer(open) {
+  const dr = document.getElementById("mainDrawer");
+  const bd = document.getElementById("drawerBackdrop");
+  if (open) {
+    dr.classList.add("open");
+    bd.style.display = "block";
+  } else {
+    dr.classList.remove("open");
+    bd.style.display = "none";
   }
-
-  container.innerHTML = appState.restaurants.map(r => `
-    <div class="rest-list-card">
-      <div class="rest-info" onclick="openRestaurant('${r.id}')">
-        <img src="${r.logo || DEFAULT_LOGO}" alt="Logo">
-        <div>
-          <div style="font-weight:800; font-size:1rem; color:var(--text);">${r.name}</div>
-          <div style="font-size:0.75rem; color:var(--muted);">${(r.menu || []).length} platos registrados · ${Object.keys(r.bases || {}).length} salsas base</div>
-        </div>
-      </div>
-      <div style="display:flex; gap:6px;">
-        <button class="btn btn-primary" onclick="openRestaurant('${r.id}')">Abrir Carta</button>
-        <button class="btn btn-outline" onclick="openEditRestModal('${r.id}')">⚙️</button>
-        <button class="btn btn-danger" onclick="deleteRestaurant('${r.id}')">🗑️</button>
-      </div>
-    </div>
-  `).join("");
 }
 
+function showView(viewName) {
+  document.getElementById("homeView").style.display = viewName === "home" ? "block" : "none";
+  document.getElementById("mapView").style.display = viewName === "map" ? "block" : "none";
+  document.getElementById("appView").style.display = viewName === "app" ? "block" : "none";
+
+  const mainTitle = document.getElementById("headerMainTitle");
+  const subTitle = document.getElementById("headerSubTitle");
+  const restLogo = document.getElementById("activeRestLogo");
+  const rightActions = document.getElementById("headerRightActions");
+
+  if (viewName === "home") {
+    mainTitle.innerText = "TusAlergias";
+    subTitle.innerText = "Tus restaurantes seguros";
+    restLogo.style.display = "none";
+    rightActions.innerHTML = `<button class="btn btn-primary" onclick="showView('map')">🗺️ Mapa</button>`;
+    renderHomeHub();
+  } else if (viewName === "map") {
+    mainTitle.innerText = "TusAlergias";
+    subTitle.innerText = "Mapa Mundial de Garantía";
+    restLogo.style.display = "none";
+    rightActions.innerHTML = `<button class="btn btn-outline" onclick="showView('home')">🏠 Inicio</button>`;
+    setTimeout(initOrRefreshMap, 100);
+  } else if (viewName === "app") {
+    const r = getActiveRest();
+    if (!r) { showView("home"); return; }
+    mainTitle.innerText = r.name;
+    subTitle.innerText = "Toca 5 veces aquí para Modo Staff";
+    if (r.logo && r.logo !== DEFAULT_REST_LOGO) {
+      restLogo.src = r.logo;
+      restLogo.style.display = "block";
+    } else {
+      restLogo.style.display = "none";
+    }
+    rightActions.innerHTML = `
+      <button class="btn btn-outline" onclick="openQrModal('${r.id}')">📱 Bidi</button>
+      <button class="btn btn-outline" onclick="showView('home')">🏠 Salir</button>`;
+  }
+}
+
+function handleHeaderTap() {
+  if (document.getElementById("appView").style.display === "block") {
+    handleSecretTap();
+  } else {
+    showView("home");
+  }
+}
+
+// ==========================================
+// PÁGINA PRINCIPAL DEL CLIENTE (MIS RESTAURANTES)
+// ==========================================
+function renderHomeHub() {
+  const query = normalizeStr(document.getElementById("homeSearchInput")?.value || "");
+  const allRests = getAllAvailableRestaurants();
+  const favSet = new Set(appState.favoriteIds || []);
+
+  const myRests = allRests.filter(r => (favSet.has(r.id) || r.id.startsWith("rest_")) &&
+    (!query || normalizeStr(r.name).includes(query) || normalizeStr(r.city).includes(query)));
+
+  const dirRests = allRests.filter(r => !favSet.has(r.id) && !r.id.startsWith("rest_") &&
+    (!query || normalizeStr(r.name).includes(query) || normalizeStr(r.city).includes(query)));
+
+  const myContainer = document.getElementById("myRestaurantsList");
+  if (myRests.length === 0) {
+    myContainer.innerHTML = `
+      <div style="background:var(--card); border:1px dashed var(--border); border-radius:12px; padding:18px; text-align:center; color:var(--muted); font-size:0.84rem;">
+        No tienes restaurantes guardados con ese criterio.<br>Añade cualquiera desde el <b>Directorio</b>, el <b>Mapa Mundial</b> o pulsa <b>➕ Añadir Restaurante</b>.
+      </div>`;
+  } else {
+    myContainer.innerHTML = myRests.map(r => buildRestaurantCardHtml(r, true)).join("");
+  }
+
+  const dirContainer = document.getElementById("directoryRestaurantsList");
+  dirContainer.innerHTML = dirRests.length
+    ? dirRests.map(r => buildRestaurantCardHtml(r, false)).join("")
+    : `<div style="font-size:0.8rem; color:var(--muted);">Todos los restaurantes disponibles ya están en tu lista de favoritos.</div>`;
+}
+
+function buildRestaurantCardHtml(r, isSaved) {
+  const isCustom = r.id.startsWith("rest_");
+  return `
+    <div class="rest-list-card">
+      <div class="rest-info" onclick="openRestaurant('${r.id}')">
+        <img src="${r.logo || DEFAULT_REST_LOGO}" alt="Logo">
+        <div>
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <span style="font-weight:800; font-size:0.98rem; color:var(--text);">${r.name}</span>
+            <span class="verified-badge">🛡️ Verificado</span>
+          </div>
+          <div style="font-size:0.75rem; color:var(--muted); margin-top:3px;">
+            📍 ${r.city || "Ubicación registrada"} · ${(r.menu || []).length} platos interactivos
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="openRestaurant('${r.id}')">🍽️ Abrir Carta</button>
+        <button class="btn btn-outline" onclick="openQrModal('${r.id}')" title="Ver Código Bidi">📱 Bidi</button>
+        ${!isSaved
+          ? `<button class="btn btn-green" onclick="toggleFavoriteRest('${r.id}')">⭐ Guardar</button>`
+          : `<button class="btn btn-outline" onclick="toggleFavoriteRest('${r.id}')" title="Quitar de Mis Restaurantes">★</button>`}
+        ${isCustom ? `<button class="btn btn-outline" onclick="openEditRestModal('${r.id}')">⚙️</button>` : ""}
+      </div>
+    </div>`;
+}
+
+function toggleFavoriteRest(id) {
+  if (!appState.favoriteIds) appState.favoriteIds = [];
+  const idx = appState.favoriteIds.indexOf(id);
+  if (idx > -1) {
+    appState.favoriteIds.splice(idx, 1);
+  } else {
+    appState.favoriteIds.push(id);
+  }
+  saveAppState();
+  updateFavButtonState();
+  renderHomeHub();
+}
+
+function updateFavButtonState() {
+  const btn = document.getElementById("btnToggleFavorite");
+  if (!btn || !activeRestId) return;
+  const isFav = (appState.favoriteIds || []).includes(activeRestId) || activeRestId.startsWith("rest_");
+  btn.innerText = isFav ? "★ Guardado en Mis Restaurantes" : "⭐ Añadir a Mis Restaurantes";
+  btn.className = isFav ? "btn btn-green" : "btn btn-outline";
+}
+
+// ==========================================
+// MAPA MUNDIAL INTERACTIVO (LEAFLET)
+// ==========================================
+function initOrRefreshMap() {
+  if (!leafletMap) {
+    leafletMap = L.map("mapContainer").setView([40.0, -3.7], 5);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap"
+    }).addTo(leafletMap);
+    markersLayer = L.layerGroup().addTo(leafletMap);
+  } else {
+    leafletMap.invalidateSize();
+    markersLayer.clearLayers();
+  }
+
+  const allRests = getAllAvailableRestaurants();
+  let listHtml = "";
+
+  allRests.forEach(r => {
+    const lat = parseFloat(r.lat) || 40.4168;
+    const lng = parseFloat(r.lng) || -3.7038;
+    const marker = L.marker([lat, lng]).addTo(markersLayer);
+
+    const popupHtml = `
+      <div style="min-width:190px; text-align:center; padding:4px;">
+        <div style="font-weight:800; font-size:0.95rem; margin-bottom:2px;">${r.name}</div>
+        <div style="font-size:0.73rem; color:#94a3b8; margin-bottom:8px;">📍 ${r.city || "Restaurante Verificado"}</div>
+        <button class="btn btn-primary" style="width:100%; margin-bottom:6px;" onclick="openRestaurant('${r.id}')">🍽️ Abrir Carta y Filtrar Alérgenos</button>
+        <button class="btn btn-green" style="width:100%;" onclick="addRestFromMap('${r.id}')">⭐ Añadir a Mis Restaurantes</button>
+      </div>`;
+    marker.bindPopup(popupHtml);
+
+    listHtml += buildRestaurantCardHtml(r, (appState.favoriteIds || []).includes(r.id));
+  });
+
+  document.getElementById("mapCardsList").innerHTML = listHtml;
+}
+
+function addRestFromMap(id) {
+  if (!appState.favoriteIds.includes(id)) {
+    appState.favoriteIds.push(id);
+    saveAppState();
+  }
+  alert("✅ Restaurante añadido a tu página principal (Mis Restaurantes).");
+}
+
+function locateUserOnMap() {
+  if (!navigator.geolocation) {
+    alert("Tu navegador no soporta geolocalización.");
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { latitude, longitude } = pos.coords;
+      if (leafletMap) {
+        leafletMap.setView([latitude, longitude], 13);
+        L.circleMarker([latitude, longitude], { radius: 8, color: "#38bdf8", fillOpacity: 0.9 })
+          .addTo(markersLayer)
+          .bindPopup("<b>📍 Estás aquí</b>").openPopup();
+      }
+    },
+    () => alert("Activa el GPS de tu móvil para centrar el mapa en tu zona.")
+  );
+}
+
+// ==========================================
+// GENERADOR Y LECTOR DE CÓDIGO BIDI (QR) PROPIO
+// ==========================================
+function generateShareUrlForRestaurant(r) {
+  const baseUrl = window.location.origin + window.location.pathname;
+  if (r.id.startsWith("dir_")) {
+    return `${baseUrl}?restId=${encodeURIComponent(r.id)}`;
+  }
+  // Comprime los datos esenciales de la carta para que el enlace Bidi sea autónomo
+  const compactData = {
+    n: r.name,
+    c: r.city || "",
+    b: r.bases || {},
+    m: (r.menu || []).slice(0, 35)
+  };
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(compactData))));
+  return `${baseUrl}?carta=${encodeURIComponent(encoded)}`;
+}
+
+function openQrModal(restId) {
+  const r = getRestById(restId || activeRestId);
+  if (!r) return;
+  const shareUrl = generateShareUrlForRestaurant(r);
+  // Si el enlace es muy largo por tener muchos platos, usamos enlace corto de referencia para el gráfico QR
+  const qrTargetUrl = shareUrl.length > 1200
+    ? `${window.location.origin}${window.location.pathname}?restName=${encodeURIComponent(r.name)}`
+    : shareUrl;
+
+  document.getElementById("qrRestName").innerText = r.name;
+  document.getElementById("qrDirectLink").value = shareUrl;
+  document.getElementById("qrImageDisplay").src =
+    `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=10&data=${encodeURIComponent(qrTargetUrl)}`;
+  document.getElementById("qrModal").style.display = "block";
+}
+
+function copyQrLink() {
+  const input = document.getElementById("qrDirectLink");
+  navigator.clipboard.writeText(input.value).then(() => {
+    alert("✅ Enlace directo del restaurante copiado al portapapeles.");
+  });
+}
+
+function openScanOrCodeModal() {
+  document.getElementById("pasteBidiInput").value = "";
+  document.getElementById("scanModal").style.display = "block";
+}
+
+function importFromBidiInput() {
+  const val = document.getElementById("pasteBidiInput").value.trim();
+  if (!val) return;
+  document.getElementById("scanModal").style.display = "none";
+  processIncomingUrlOrCode(val);
+}
+
+function processIncomingUrlOrCode(rawString) {
+  try {
+    const urlObj = rawString.startsWith("http") ? new URL(rawString) : new URL(window.location.origin + "/" + rawString);
+    const restIdParam = urlObj.searchParams.get("restId");
+    const cartaParam = urlObj.searchParams.get("carta");
+
+    if (restIdParam && getRestById(restIdParam)) {
+      if (!appState.favoriteIds.includes(restIdParam)) appState.favoriteIds.push(restIdParam);
+      saveAppState();
+      openRestaurant(restIdParam);
+      return;
+    }
+
+    if (cartaParam) {
+      const decoded = JSON.parse(decodeURIComponent(escape(atob(cartaParam))));
+      const newId = "rest_qr_" + Date.now();
+      appState.restaurants.push({
+        id: newId,
+        name: decoded.n || "Restaurante Importado",
+        city: decoded.c || "",
+        pin: "2026",
+        logo: DEFAULT_REST_LOGO,
+        bases: decoded.b || {},
+        menu: decoded.m || []
+      });
+      appState.favoriteIds.push(newId);
+      saveAppState();
+      openRestaurant(newId);
+    }
+  } catch (e) {
+    alert("No se pudo leer el código. Asegúrate de pegar el enlace completo generado por la app.");
+  }
+}
+
+// ==========================================
+// CREAR / EDITAR RESTAURANTE Y LOGO
+// ==========================================
 function openNewRestaurantModal() {
-  document.getElementById("restModalTitle").innerText = "➕ Nuevo Restaurante";
+  document.getElementById("restModalTitle").innerText = "➕ Añadir / Crear Restaurante";
   document.getElementById("restEditId").value = "";
   document.getElementById("restNameInput").value = "";
+  document.getElementById("restCityInput").value = "";
+  document.getElementById("restLatInput").value = "40.4168";
+  document.getElementById("restLngInput").value = "-3.7038";
   document.getElementById("restPinInput").value = "2026";
-  tempLogoBase64 = DEFAULT_LOGO;
+  tempLogoBase64 = DEFAULT_REST_LOGO;
   const prev = document.getElementById("restLogoPreview");
   prev.src = tempLogoBase64;
   prev.style.display = "block";
@@ -488,13 +1009,16 @@ function openNewRestaurantModal() {
 }
 
 function openEditRestModal(id = activeRestId) {
-  const r = appState.restaurants.find(x => x.id === id);
+  const r = getRestById(id);
   if (!r) return;
-  document.getElementById("restModalTitle").innerText = "⚙️ Editar Restaurante";
+  document.getElementById("restModalTitle").innerText = "⚙️ Configurar Restaurante";
   document.getElementById("restEditId").value = r.id;
   document.getElementById("restNameInput").value = r.name;
+  document.getElementById("restCityInput").value = r.city || "";
+  document.getElementById("restLatInput").value = r.lat || 40.4168;
+  document.getElementById("restLngInput").value = r.lng || -3.7038;
   document.getElementById("restPinInput").value = r.pin || "2026";
-  tempLogoBase64 = r.logo || DEFAULT_LOGO;
+  tempLogoBase64 = r.logo || DEFAULT_REST_LOGO;
   const prev = document.getElementById("restLogoPreview");
   prev.src = tempLogoBase64;
   prev.style.display = "block";
@@ -505,7 +1029,14 @@ function closeRestModal() {
   document.getElementById("restModal").style.display = "none";
 }
 
-// Compresión automática de logo en Canvas para no saturar LocalStorage
+function fillCurrentGpsForRest() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(pos => {
+    document.getElementById("restLatInput").value = pos.coords.latitude.toFixed(5);
+    document.getElementById("restLngInput").value = pos.coords.longitude.toFixed(5);
+  });
+}
+
 function handleLogoUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -519,8 +1050,7 @@ function handleLogoUpload(event) {
       if (w > h) { if (w > maxDim) { h *= maxDim / w; w = maxDim; } }
       else { if (h > maxDim) { w *= maxDim / h; h = maxDim; } }
       canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, w, h);
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
       tempLogoBase64 = canvas.toDataURL("image/jpeg", 0.82);
       const prev = document.getElementById("restLogoPreview");
       prev.src = tempLogoBase64;
@@ -534,91 +1064,70 @@ function handleLogoUpload(event) {
 function saveRestaurantMeta() {
   const id = document.getElementById("restEditId").value;
   const name = document.getElementById("restNameInput").value.trim();
+  const city = document.getElementById("restCityInput").value.trim();
+  const lat = parseFloat(document.getElementById("restLatInput").value) || 40.4168;
+  const lng = parseFloat(document.getElementById("restLngInput").value) || -3.7038;
   const pin = document.getElementById("restPinInput").value.trim() || "2026";
-  if (!name) { alert("Escribe el nombre del restaurante"); return; }
+  if (!name) { alert("Indica el nombre del restaurante."); return; }
 
-  if (id) {
-    const r = appState.restaurants.find(x => x.id === id);
-    if (r) {
-      r.name = name;
-      r.pin = pin;
-      if (tempLogoBase64) r.logo = tempLogoBase64;
-    }
+  let targetId = id;
+  let existing = appState.restaurants.find(x => x.id === id);
+
+  if (existing) {
+    existing.name = name;
+    existing.city = city;
+    existing.lat = lat;
+    existing.lng = lng;
+    existing.pin = pin;
+    if (tempLogoBase64) existing.logo = tempLogoBase64;
   } else {
-    const newId = "rest_" + Date.now();
+    targetId = "rest_" + Date.now();
     appState.restaurants.push({
-      id: newId,
+      id: targetId,
       name,
+      city,
+      lat,
+      lng,
       pin,
-      logo: tempLogoBase64 || DEFAULT_LOGO,
+      logo: tempLogoBase64 || DEFAULT_REST_LOGO,
       bases: {},
       menu: []
     });
-    activeRestId = newId;
+    if (!appState.favoriteIds.includes(targetId)) appState.favoriteIds.push(targetId);
   }
 
   saveAppState();
   closeRestModal();
-  if (document.getElementById("appView").style.display === "block") {
-    openRestaurant(activeRestId);
-  } else {
-    renderHomeHub();
-  }
-}
-
-function deleteRestaurant(id) {
-  if (!confirm("¿Seguro que quieres eliminar este restaurante y toda su carta?")) return;
-  appState.restaurants = appState.restaurants.filter(r => r.id !== id);
-  saveAppState();
-  renderHomeHub();
+  openRestaurant(targetId);
 }
 
 function openRestaurant(id) {
   activeRestId = id;
   const r = getActiveRest();
   if (!r) return;
-  document.getElementById("homeView").style.display = "none";
-  document.getElementById("appView").style.display = "block";
-  document.getElementById("activeRestTitle").innerText = r.name.toUpperCase();
-  document.getElementById("activeRestLogo").src = r.logo || DEFAULT_LOGO;
+  document.getElementById("activeRestCity").innerText = r.city ? `📍 ${r.city}` : "";
   document.getElementById("currentPinDisplay").innerText = r.pin || "2026";
   isStaffUnlocked = false;
   document.getElementById("staffBar").classList.remove("show");
+  updateFavButtonState();
+  showView("app");
   clearAllFilters();
 }
 
-function tryExitToHub() {
-  const r = getActiveRest();
-  if (isKioskLocked) {
-    const pin = prompt("🔒 Modo Mesa Activo. Introduce el PIN de Staff para salir al menú principal:");
-    if (pin !== (r?.pin || "2026")) {
-      if (pin !== null) alert("PIN incorrecto");
-      return;
-    }
-    isKioskLocked = false;
-  }
-  renderHomeHub();
-}
-
-function toggleKioskMode() {
-  isKioskLocked = !isKioskLocked;
-  document.getElementById("kioskBtn").innerText = isKioskLocked ? "🔓 Desbloquear Modo Mesa" : "🔒 Modo Mesa (Kiosco)";
-  if (isKioskLocked) {
-    lockStaffMode();
-    alert("🔒 Modo Mesa Activado: El cliente puede filtrar alérgenos libremente pero no podrá salir al menú principal sin el PIN.");
-  }
-}
-
 // ==========================================
-// IMPORTADOR MASIVO (TEXTO / CSV / IA)
+// IMPORTADOR MASIVO + GENERACIÓN AUTOMÁTICA DE BIDI
 // ==========================================
 function openBulkImportModal(fromActiveRest = false) {
   if (appState.restaurants.length === 0) {
+    const defaultId = "rest_" + Date.now();
     appState.restaurants.push({
-      id: "rest_" + Date.now(),
-      name: "Mi Restaurante",
+      id: defaultId,
+      name: "Restaurante Aura Gastronómica",
+      city: "Madrid",
+      lat: 40.4168,
+      lng: -3.7038,
       pin: "2026",
-      logo: DEFAULT_LOGO,
+      logo: DEFAULT_REST_LOGO,
       bases: {},
       menu: []
     });
@@ -635,8 +1144,8 @@ function detectAllergensFromString(str) {
   const map = {
     "GLUTEN": ["gluten", "trigo", "cebada", "centeno", "avena", "harina", "pan", "panko"],
     "CRUSTÁCEOS": ["crustaceo", "crustaceos", "gamba", "gambon", "langostino", "cangrejo", "cigala"],
-    "HUEVO": ["huevo", "huevos", "yema", "clara", "mayonesa", "lisozima"],
-    "PESCADO": ["pescado", "salmon", "atun", "bonito", "anchoa", "bacalao", "merluza", "anguila"],
+    "HUEVO": ["huevo", "huevos", "yema", "clara", "mayonesa"],
+    "PESCADO": ["pescado", "salmon", "atun", "bonito", "anchoa", "bacalao", "merluza", "corvina"],
     "CACAHUETES": ["cacahuete", "cacahuetes", "mani"],
     "SOJA": ["soja", "edamame", "tofu", "miso"],
     "LÁCTEO": ["lacteo", "lacteos", "leche", "queso", "nata", "mantequilla", "yogur", "lactosa", "burrata"],
@@ -644,9 +1153,9 @@ function detectAllergensFromString(str) {
     "APIO": ["apio"],
     "MOSTAZA": ["mostaza"],
     "SÉSAMO": ["sesamo", "ajonjoli", "tahini"],
-    "SULFITOS": ["sulfitos", "sulfito", "vino", "vinagre", "sidra", "vermouth"],
+    "SULFITOS": ["sulfitos", "sulfito", "vino", "vinagre", "sidra"],
     "ALTRAMUCES": ["altramuz", "altramuces"],
-    "MOLUSCOS": ["molusco", "moluscos", "pulpo", "calamar", "sepia", "mejillon", "almeja", "vieira", "ostra"]
+    "MOLUSCOS": ["molusco", "moluscos", "pulpo", "calamar", "sepia", "mejillon", "almeja", "vieira"]
   };
   Object.keys(map).forEach(alKey => {
     if (map[alKey].some(keyword => norm.includes(keyword))) found.push(alKey);
@@ -658,18 +1167,15 @@ function parseLinesToDishes(rawText, targetRest) {
   const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   let count = 0;
   lines.forEach(line => {
-    if (line.toLowerCase().startsWith("nombre del plato") || line.toLowerCase().startsWith("plato;")) return;
+    if (line.toLowerCase().startsWith("nombre del plato")) return;
     const parts = line.includes("|") ? line.split("|") : line.split(";");
     if (parts.length < 2) return;
-
     const dishName = (parts[0] || "").trim().toUpperCase();
-    const catName = (parts[1] || "GENERAL").trim().toUpperCase();
+    const catName = (parts[1] || "CARTA").trim().toUpperCase();
     const alRaw = parts[2] || "";
     const subRaw = parts[3] || "";
     const isMod = normalizeStr(parts[4] || "si").includes("si");
-
     if (!dishName) return;
-    const detectedAls = detectAllergensFromString(alRaw + " " + subRaw);
 
     targetRest.menu.push({
       id: Date.now() + Math.floor(Math.random() * 10000),
@@ -677,16 +1183,14 @@ function parseLinesToDishes(rawText, targetRest) {
       name: dishName,
       traces: [],
       protocol: "",
-      ings: [
-        {
-          n: subRaw ? subRaw.trim() : "Ingredientes del plato",
-          a: detectedAls,
-          tags: [],
-          sub: subRaw.trim(),
-          mod: isMod,
-          note: isMod ? "Adaptable en cocina" : ""
-        }
-      ]
+      ings: [{
+        n: subRaw ? subRaw.trim() : "Ingredientes principales",
+        a: detectAllergensFromString(alRaw + " " + subRaw),
+        tags: [],
+        sub: subRaw.trim(),
+        mod: isMod,
+        note: isMod ? "Adaptable en cocina" : ""
+      }]
     });
     count++;
   });
@@ -697,25 +1201,23 @@ function processBulkText() {
   const targetId = document.getElementById("bulkTargetRest").value;
   const r = appState.restaurants.find(x => x.id === targetId);
   const raw = document.getElementById("bulkTextArea").value.trim();
-  if (!r || !raw) { alert("Pega al menos una línea de plato."); return; }
+  if (!r || !raw) { alert("Pega al menos un plato."); return; }
 
   const added = parseLinesToDishes(raw, r);
   saveAppState();
   document.getElementById("bulkTextArea").value = "";
   document.getElementById("bulkModal").style.display = "none";
-  alert(`✅ Se han añadido ${added} platos automáticamente a "${r.name}".`);
   openRestaurant(r.id);
+  openQrModal(r.id);
 }
 
 function downloadCsvTemplate() {
-  const csvContent = "Nombre del plato;Categoria;Alergenos Oficiales;Ingredientes libres;Adaptable (SI/NO)\n" +
-    "Ensalada Cesar;Entrantes;Gluten, Lacteo, Huevo;lechuga, pollo, queso parmesano, picatostes, ajo;SI\n" +
-    "Croquetas Caseras;Compartir;Gluten, Lacteo, Huevo;leche, mantequilla, harina de trigo, jamon, cebolla;NO\n" +
-    "Salmorejo Cordobes;Entrantes;Gluten, Huevo;tomate, ajo, pan, aceite de oliva, jamon;SI";
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
+  const csv = "Nombre del plato;Categoria;Alergenos Oficiales;Ingredientes libres;Adaptable (SI/NO)\n" +
+    "Risotto de Setas;Arroces;Lacteo, Sulfitos;arroz, boletus, trufa, parmesano, mantequilla, vino blanco;SI\n" +
+    "Tartar de Atun Rojo;Entrantes;Pescado, Soja, Sesamo;atun, aguacate, soja, aceite de sesamo, lima;SI";
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const a = document.createElement("a");
-  a.href = url;
+  a.href = URL.createObjectURL(blob);
   a.download = "plantilla_tusalergias.csv";
   a.click();
 }
@@ -727,43 +1229,20 @@ function handleCsvFileUpload(event) {
   const r = appState.restaurants.find(x => x.id === targetId);
   const reader = new FileReader();
   reader.onload = function(e) {
-    const added = parseLinesToDishes(e.target.result, r);
+    parseLinesToDishes(e.target.result, r);
     saveAppState();
     document.getElementById("bulkModal").style.display = "none";
-    alert(`✅ Archivo CSV importado: ${added} platos añadidos a "${r.name}".`);
     openRestaurant(r.id);
+    openQrModal(r.id);
   };
   reader.readAsText(file);
 }
 
 function copyAiPrompt() {
-  const promptText = `Actúa como un experto en seguridad alimentaria. Te voy a adjuntar la carta de mi restaurante. Extrae TODOS los platos y devuélveme ÚNICAMENTE un bloque JSON válido con esta estructura exacta (sin texto adicional):
-{
-  "bases": {},
-  "menu": [
-    {
-      "id": 1,
-      "cat": "ENTRANTES",
-      "name": "NOMBRE DEL PLATO",
-      "traces": [],
-      "protocol": "Nota de cocina opcional",
-      "ings": [
-        {
-          "n": "Nombre del componente o salsa",
-          "a": ["GLUTEN", "LÁCTEO"],
-          "tags": ["NO_VEGANO"],
-          "sub": "ajo, cebolla, tomate, manzana",
-          "mod": true,
-          "note": "Sin salsa / Adaptable"
-        }
-      ]
-    }
-  ]
-}
-Usa solo estos nombres de alérgenos: GLUTEN, CRUSTÁCEOS, HUEVO, PESCADO, CACAHUETES, SOJA, LÁCTEO, FRUTOS CON CÁSCARA, APIO, MOSTAZA, SÉSAMO, SULFITOS, ALTRAMUCES, MOLUSCOS. Y estos tags: CRUDO_EMBARAZO, NO_VEGANO, NO_VEGETARIANO, CERDO, PICANTE.`;
-
+  const promptText = `Actúa como experto en seguridad alimentaria. Extrae todos los platos de esta carta y devuélveme ÚNICAMENTE un JSON válido con esta estructura:
+{"bases":{},"menu":[{"id":1,"cat":"ENTRANTES","name":"NOMBRE PLATO","traces":[],"protocol":"","ings":[{"n":"Componente","a":["GLUTEN"],"tags":[],"sub":"ajo, cebolla","mod":true,"note":"Adaptable"}]}]}`;
   navigator.clipboard.writeText(promptText).then(() => {
-    alert("✅ Instrucción para IA copiada al portapapeles.\n\nAhora abre ChatGPT o Gemini, pega la instrucción junto con la foto o texto de tu carta, y pega el resultado en la Opción 3.");
+    alert("✅ Instrucción copiada. Pégala en ChatGPT o Gemini junto a la foto de tu carta.");
   });
 }
 
@@ -780,18 +1259,20 @@ function processBulkJson() {
       saveAppState();
       document.getElementById("bulkJsonArea").value = "";
       document.getElementById("bulkModal").style.display = "none";
-      alert(`✅ Se han importado ${parsed.menu.length} platos correctamente.`);
       openRestaurant(r.id);
-    } else {
-      alert("El JSON no contiene una lista 'menu' válida.");
+      openQrModal(r.id);
     }
   } catch (e) {
-    alert("Error al leer el código JSON. Asegúrate de copiar solo el bloque entre llaves { ... }.");
+    alert("Formato JSON no válido.");
   }
 }
 
+function loadSampleRestaurant() {
+  openRestaurant("dir_olivo_mar");
+}
+
 // ==========================================
-// LÓGICA DE FILTRADO Y PLATOS DEL RESTAURANTE
+// FILTRADO INTERACTIVO DE ALÉRGENOS
 // ==========================================
 function handleSecretTap() {
   secretTapCount++;
@@ -802,7 +1283,7 @@ function handleSecretTap() {
     if (isStaffUnlocked) {
       lockStaffMode();
     } else {
-      const pin = prompt("🔒 Modo Staff - Introduce el PIN:");
+      const pin = prompt("🔒 Modo Staff - Introduce el PIN del restaurante:");
       if (pin === (r?.pin || "2026")) {
         isStaffUnlocked = true;
         document.getElementById("staffBar").classList.add("show");
@@ -835,11 +1316,9 @@ function updateCategoryDropdown() {
   const r = getActiveRest();
   if (!r) return;
   const sel = document.getElementById("catFilter");
-  const currentVal = sel.value || "ALL";
   const cats = Array.from(new Set((r.menu || []).map(d => d.cat))).filter(Boolean);
   sel.innerHTML = `<option value="ALL">Todas las categorías (${(r.menu || []).length})</option>` +
     cats.map(c => `<option value="${c}">${c}</option>`).join("");
-  if (cats.includes(currentVal)) sel.value = currentVal;
 }
 
 function initFilterButtons() {
@@ -930,7 +1409,7 @@ function evaluateDish(dish, bases, strictTraces) {
     customAvoidSet.forEach(term => {
       const synonyms = SYNONYM_MAP[term] || [term];
       if (synonyms.some(syn => fullTextNorm.includes(normalizeStr(syn)))) {
-        customHits.push(`contiene "${term.toUpperCase()}"`);
+        customHits.push(`lleva "${term.toUpperCase()}"`);
       }
     });
 
@@ -959,9 +1438,6 @@ function quickToggleMod(dishId, ingIndex) {
   if (!dish || !dish.ings[ingIndex]) return;
   const ing = dish.ings[ingIndex];
   ing.mod = !ing.mod;
-  if (ing.mod && !ing.note) {
-    ing.note = prompt(`¿Cómo se adapta "${ing.n}" en cocina?`, "Sin " + ing.n.toLowerCase()) || "Omitir";
-  }
   saveAppState();
   renderDishes();
 }
@@ -986,10 +1462,10 @@ function renderDishes() {
 
     if (evalRes.status === currentTab) {
       let badge = "";
-      if (evalRes.status === "mod") badge = `<div class="mod-box warn">🔄 ADAPTABLE EN COCINA:<br>• ${evalRes.removeList.join("<br>• ")}</div>`;
-      else if (evalRes.status === "proh") badge = `<div class="mod-box danger">⛔ NO APTO (En base fija):<br>• ${evalRes.blockers.join("<br>• ")}</div>`;
-      if (evalRes.traceWarn.length > 0 && evalRes.status !== "proh") badge += `<div class="mod-box trace">ℹ️ Trazas: ${evalRes.traceWarn.join(", ")}</div>`;
-      if (dish.protocol) badge += `<div class="mod-box protocol">👩‍🍳 <b>Protocolo:</b> ${dish.protocol}</div>`;
+      if (evalRes.status === "mod") badge = `<div class="mod-box warn">🔄 ADAPTABLE PEDIR EN MESA:<br>• ${evalRes.removeList.join("<br>• ")}</div>`;
+      else if (evalRes.status === "proh") badge = `<div class="mod-box danger">⛔ NO APTO:<br>• ${evalRes.blockers.join("<br>• ")}</div>`;
+      if (evalRes.traceWarn.length > 0 && evalRes.status !== "proh") badge += `<div class="mod-box trace">ℹ️ Posibles trazas: ${evalRes.traceWarn.join(", ")}</div>`;
+      if (dish.protocol) badge += `<div class="mod-box protocol">👩‍🍳 <b>Garantía en cocina:</b> ${dish.protocol}</div>`;
 
       const pillsHtml = (dish.ings || []).map((ing, idx) => {
         const resolved = resolveIngData(ing, r.bases);
@@ -1023,12 +1499,12 @@ function renderDishes() {
 
   document.getElementById("tab-aptos").innerText = `APTOS (${counts.aptos})`;
   document.getElementById("tab-mod").innerText = `ADAPTABLES (${counts.mod})`;
-  document.getElementById("tab-proh").innerText = `PROHIBIDOS (${counts.proh})`;
-  document.getElementById("dishList").innerHTML = html || `<p style="text-align:center; color:#94a3b8; margin-top:30px;">No hay platos en esta sección. Usa el botón <b>⚡ Volcar Platos</b> en Modo Staff para añadir tu carta.</p>`;
+  document.getElementById("tab-proh").innerText = `NO APTOS (${counts.proh})`;
+  document.getElementById("dishList").innerHTML = html || `<p style="text-align:center; color:#94a3b8; margin-top:30px;">No hay platos en este apartado.</p>`;
 }
 
 // ==========================================
-// EDITOR DE PLATO Y BASES
+// MODALES DE EDICIÓN DE PLATOS Y BASES
 // ==========================================
 function openDishModal(dishId = null) {
   const r = getActiveRest();
@@ -1049,10 +1525,10 @@ function openDishModal(dishId = null) {
     (dish.traces || []).forEach(t => currentModalTraces.add(t));
     (dish.ings || []).forEach(ing => addIngredientCard(ing.n, ing.a || [], ing.tags || [], ing.mod, ing.note || "", ing.baseId || "", ing.sub || ""));
   } else {
-    document.getElementById("modalTitle").innerText = "➕ Nuevo Plato";
+    document.getElementById("modalTitle").innerText = "➕ Añadir Plato";
     document.getElementById("editId").value = "";
     document.getElementById("editName").value = "";
-    document.getElementById("editCat").value = "SUGERENCIAS";
+    document.getElementById("editCat").value = "ENTRANTES";
     document.getElementById("editProtocol").value = "";
     document.getElementById("deleteDishBtn").style.display = "none";
     addIngredientCard();
@@ -1061,9 +1537,7 @@ function openDishModal(dishId = null) {
   document.getElementById("dishModal").style.display = "block";
 }
 
-function closeDishModal() {
-  document.getElementById("dishModal").style.display = "none";
-}
+function closeDishModal() { document.getElementById("dishModal").style.display = "none"; }
 
 function renderModalTraces() {
   document.getElementById("editTracesChips").innerHTML = ALLERGENS.map(a => `
@@ -1093,20 +1567,20 @@ function addIngredientCard(name = "", allergens = [], tags = [], mod = true, not
 
   card.innerHTML = `
     <div style="display:flex; gap:8px; margin-bottom:6px;">
-      <input type="text" class="ing-name" placeholder="Componente (ej. Salsa de la casa)" value="${name}" style="flex:1; padding:8px; border-radius:6px; border:1px solid #475569; background:#1e293b; color:#fff; font-weight:700;">
+      <input type="text" class="ing-name" placeholder="Componente (ej. Salsa de reducción)" value="${name}" style="flex:1; padding:8px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-weight:700;">
       <button class="btn btn-danger" onclick="this.parentElement.parentElement.remove()">✕</button>
     </div>
     <div style="margin-bottom:6px;">
-      <input type="text" class="ing-sub" placeholder="Sub-ingredientes libres (ej. ajo, manzana, cebolla, maíz...)" value="${sub}" style="width:100%; padding:6px 8px; border-radius:6px; border:1px solid #475569; background:#1e293b; color:#cbd5e1; font-size:0.76rem;">
+      <input type="text" class="ing-sub" placeholder="Ingredientes detallados (ej. ajo, manzana, cebolla...)" value="${sub}" style="width:100%; padding:6px 8px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#cbd5e1; font-size:0.76rem;">
     </div>
     <div style="margin-bottom:6px;">
-      <select class="ing-base" onchange="this.parentElement.parentElement.querySelector('.custom-al-zone').style.display = this.value ? 'none' : 'block'" style="width:100%; padding:6px; border-radius:6px; background:#1e293b; color:#93c5fd; border:1px solid #3b82f6; font-size:0.78rem;">${baseOptions}</select>
+      <select class="ing-base" onchange="this.parentElement.parentElement.querySelector('.custom-al-zone').style.display = this.value ? 'none' : 'block'" style="width:100%; padding:6px; border-radius:6px; background:#1c2541; color:#93c5fd; border:1px solid #3b82f6; font-size:0.78rem;">${baseOptions}</select>
     </div>
     <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:6px;">
       <label style="font-size:0.78rem; color:#fcd34d; display:flex; align-items:center; gap:5px; cursor:pointer; font-weight:700;">
         <input type="checkbox" class="ing-mod" ${mod ? "checked" : ""}> 🔄 Adaptable
       </label>
-      <input type="text" class="ing-note" placeholder="Indicación cocina (ej. Servir sin salsa)" value="${note}" style="flex:1; padding:6px 8px; border-radius:6px; border:1px solid #475569; background:#1e293b; color:#fff; font-size:0.76rem;">
+      <input type="text" class="ing-note" placeholder="Cómo se adapta (ej. Servir sin salsa)" value="${note}" style="flex:1; padding:6px 8px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.76rem;">
     </div>
     <div class="custom-al-zone" style="display:${baseId ? 'none' : 'block'};">
       <div class="mini-chips ing-allergens">${chipsHtml}</div>
@@ -1120,24 +1594,24 @@ function saveDishFromModal() {
   if (!r) return;
   const id = document.getElementById("editId").value;
   const name = document.getElementById("editName").value.trim().toUpperCase();
-  const cat = document.getElementById("editCat").value.trim().toUpperCase() || "GENERAL";
+  const cat = document.getElementById("editCat").value.trim().toUpperCase() || "CARTA";
   const protocol = document.getElementById("editProtocol").value.trim();
-  if (!name) { alert("Indica el nombre del plato"); return; }
+  if (!name) return;
 
   const traces = Array.from(currentModalTraces);
-  const cards = document.querySelectorAll("#ingredientsEditor .ing-editor-card");
   const ings = [];
-
-  cards.forEach(c => {
+  document.querySelectorAll("#ingredientsEditor .ing-editor-card").forEach(c => {
     const n = c.querySelector(".ing-name").value.trim();
     if (!n) return;
-    const sub = c.querySelector(".ing-sub").value.trim();
-    const baseId = c.querySelector(".ing-base").value;
-    const mod = c.querySelector(".ing-mod").checked;
-    const note = c.querySelector(".ing-note").value.trim();
-    const a = Array.from(c.querySelectorAll(".ing-allergens .mini-chip.selected")).map(el => el.getAttribute("data-al"));
-    const tags = Array.from(c.querySelectorAll(".ing-diets .mini-chip.diet-sel")).map(el => el.getAttribute("data-diet"));
-    ings.push({ n, sub, baseId: baseId || undefined, a, tags, mod, note });
+    ings.push({
+      n,
+      sub: c.querySelector(".ing-sub").value.trim(),
+      baseId: c.querySelector(".ing-base").value || undefined,
+      mod: c.querySelector(".ing-mod").checked,
+      note: c.querySelector(".ing-note").value.trim(),
+      a: Array.from(c.querySelectorAll(".ing-allergens .mini-chip.selected")).map(el => el.getAttribute("data-al")),
+      tags: Array.from(c.querySelectorAll(".ing-diets .mini-chip.diet-sel")).map(el => el.getAttribute("data-diet"))
+    });
   });
 
   if (id) {
@@ -1146,7 +1620,6 @@ function saveDishFromModal() {
   } else {
     r.menu.unshift({ id: Date.now(), cat, name, protocol, traces, ings });
   }
-
   saveAppState();
   closeDishModal();
   updateCategoryDropdown();
@@ -1156,7 +1629,7 @@ function saveDishFromModal() {
 function deleteCurrentDish() {
   const r = getActiveRest();
   const id = document.getElementById("editId").value;
-  if (!r || !id || !confirm("¿Eliminar este plato?")) return;
+  if (!r || !id || !confirm("¿Borrar plato?")) return;
   r.menu = r.menu.filter(d => d.id != id);
   saveAppState();
   closeDishModal();
@@ -1187,8 +1660,8 @@ function addBaseCard(baseId = "base_" + Date.now(), name = "", allergens = [], t
   const dietChips = DIETS.map(d => `<div class="mini-chip ${tagSet.has(d.id) ? 'diet-sel' : ''}" data-diet="${d.id}" onclick="this.classList.toggle('diet-sel')">${d.label}</div>`).join("");
 
   div.innerHTML = `
-    <input type="text" class="base-name" value="${name}" placeholder="Nombre de Salsa o Base" style="width:100%; padding:8px; margin-bottom:6px; border-radius:6px; border:1px solid #475569; background:#1e293b; color:#fff; font-weight:700;">
-    <input type="text" class="base-sub" value="${sub}" placeholder="Sub-ingredientes (ajo, manzana, cebolla...)" style="width:100%; padding:7px; margin-bottom:6px; border-radius:6px; border:1px solid #475569; background:#1e293b; color:#cbd5e1; font-size:0.78rem;">
+    <input type="text" class="base-name" value="${name}" placeholder="Nombre de la Salsa o Base" style="width:100%; padding:8px; margin-bottom:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-weight:700;">
+    <input type="text" class="base-sub" value="${sub}" placeholder="Ingredientes (ajo, manzana, cebolla...)" style="width:100%; padding:7px; margin-bottom:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#cbd5e1; font-size:0.78rem;">
     <div class="mini-chips base-al">${alChips}</div>
     <div class="mini-chips base-diet" style="margin-top:6px;">${dietChips}</div>`;
   document.getElementById("basesEditorList").appendChild(div);
@@ -1197,16 +1670,17 @@ function addBaseCard(baseId = "base_" + Date.now(), name = "", allergens = [], t
 function saveBasesFromModal() {
   const r = getActiveRest();
   if (!r) return;
-  const cards = document.querySelectorAll("#basesEditorList .base-item");
   const newBases = {};
-  cards.forEach(c => {
+  document.querySelectorAll("#basesEditorList .base-item").forEach(c => {
     const id = c.getAttribute("data-id");
     const name = c.querySelector(".base-name").value.trim();
     if (!name) return;
-    const sub = c.querySelector(".base-sub").value.trim();
-    const a = Array.from(c.querySelectorAll(".base-al .mini-chip.selected")).map(el => el.getAttribute("data-al"));
-    const tags = Array.from(c.querySelectorAll(".base-diet .mini-chip.diet-sel")).map(el => el.getAttribute("data-diet"));
-    newBases[id] = { name, a, tags, sub };
+    newBases[id] = {
+      name,
+      sub: c.querySelector(".base-sub").value.trim(),
+      a: Array.from(c.querySelectorAll(".base-al .mini-chip.selected")).map(el => el.getAttribute("data-al")),
+      tags: Array.from(c.querySelectorAll(".base-diet .mini-chip.diet-sel")).map(el => el.getAttribute("data-diet"))
+    };
   });
   r.bases = newBases;
   saveAppState();
@@ -1214,79 +1688,37 @@ function saveBasesFromModal() {
   renderDishes();
 }
 
-function exportRestaurantData() {
-  const r = getActiveRest();
-  if (!r) return;
-  navigator.clipboard.writeText(JSON.stringify({ bases: r.bases, menu: r.menu })).then(() => {
-    alert("✅ Carta copiada al portapapeles. Puedes pegarla en otro dispositivo desde el Importador Masivo (Opción 3).");
-  });
-}
-
 function shareWhatsApp() {
   const r = getActiveRest();
   if (!r) return;
   const strictTraces = document.getElementById("strictTraces").checked;
-  const activeFilters = [
-    ...Array.from(selectedAllergens),
-    ...Array.from(selectedDiets).map(d => DIETS.find(x => x.id === d)?.label || d),
-    ...Array.from(customAvoidSet).map(c => `SIN ${c.toUpperCase()}`)
-  ];
   let aptosList = [], modList = [];
   (r.menu || []).forEach(dish => {
     const res = evaluateDish(dish, r.bases, strictTraces);
-    if (res.status === "aptos") aptosList.push(`• ${dish.name} (${dish.cat})`);
+    if (res.status === "aptos") aptosList.push(`• ${dish.name}`);
     if (res.status === "mod") modList.push(`• ${dish.name}: ${res.removeList.map(m => m.replace(/<[^>]*>/g, "")).join(" + ")}`);
   });
-  let text = `🛡️ *${r.name.toUpperCase()} - TUSALERGIAS*\n`;
-  text += `🔍 *Filtro:* ${activeFilters.length ? activeFilters.join(", ") : "Ninguno"}\n\n`;
-  text += `✅ *APTOS (${aptosList.length}):*\n${aptosList.length ? aptosList.join("\n") : "Ninguno"}\n\n`;
-  text += `🔄 *ADAPTABLES (${modList.length}):*\n${modList.length ? modList.join("\n") : "Ninguno"}`;
+  let text = `🛡️ *${r.name.toUpperCase()} - TUSALERGIAS*\n\n`;
+  text += `✅ *PLATOS APTOS (${aptosList.length}):*\n${aptosList.join("\n") || "Ninguno"}\n\n`;
+  text += `🔄 *PLATOS ADAPTABLES (${modList.length}):*\n${modList.join("\n") || "Ninguno"}`;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
 }
 
-function openLegalModal() {
-  document.getElementById("legalModal").style.display = "block";
-}
+function openLegalModal() { document.getElementById("legalModal").style.display = "block"; }
 
-function loadDemoRestaurant() {
-  const demoId = "rest_demo_" + Date.now();
-  appState.restaurants.push({
-    id: demoId,
-    name: "Manduka Fusión (Demo)",
-    pin: "2026",
-    logo: DEFAULT_LOGO,
-    bases: {
-      "base_kimchi": { name: "Kimchi de ñora", a: ["PESCADO", "SOJA"], tags: ["NO_VEGANO", "NO_VEGETARIANO", "PICANTE"], sub: "ajo, manzana, jengibre, ñora, col, cebollino" },
-      "base_yakiniku": { name: "Salsa Yakiniku", a: ["GLUTEN", "SOJA", "SÉSAMO"], tags: [], sub: "trigo, soja, sésamo, manzana, ajo, jengibre" }
-    },
-    menu: [
-      { id: 101, cat: "URAMAKIS", name: "MANDUKA ORIGINAL", traces: [], protocol: "Se puede montar con atún natural sin marinado.", ings: [
-        { n: "Arroz de sushi y alga nori", a: [], tags: [], sub: "arroz, vinagre, alga nori", mod: false, note: "" },
-        { n: "Atún crudo", a: ["PESCADO"], tags: ["CRUDO_EMBARAZO", "NO_VEGANO", "NO_VEGETARIANO"], sub: "atún", mod: false, note: "" },
-        { n: "Marinado Kimchi", baseId: "base_kimchi", a: [], tags: [], sub: "", mod: true, note: "Usar atún limpio sin marinar" }
-      ]},
-      { id: 102, cat: "COMPARTIR", name: "PATATAS BRAVAS COREANAS", traces: ["MOLUSCOS"], protocol: "Freír patata en aceite limpio para celíacos.", ings: [
-        { n: "Patata guarnición", a: ["GLUTEN"], tags: [], sub: "patata", mod: true, note: "Freír en freidora limpia sin gluten" },
-        { n: "Kimchi", baseId: "base_kimchi", a: [], tags: [], sub: "", mod: true, note: "Sin kimchi" }
-      ]},
-      { id: 103, cat: "COMPARTIR", name: "TATAKI DE VACA", traces: [], protocol: "En embarazadas pasar bien la carne en plancha.", ings: [
-        { n: "Ternera", a: [], tags: ["CRUDO_EMBARAZO", "NO_VEGANO", "NO_VEGETARIANO"], sub: "ternera", mod: true, note: "Pasar bien la carne" },
-        { n: "Salsa Yakiniku", baseId: "base_yakiniku", a: [], tags: [], sub: "", mod: true, note: "Sin salsa yakiniku" }
-      ]}
-    ]
-  });
-  saveAppState();
-  renderHomeHub();
-}
+// Detectar si el cliente entra escaneando un código Bidi con parámetros en la URL
+window.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has("restId") || params.has("carta")) {
+    processIncomingUrlOrCode(window.location.href);
+  } else {
+    showView("home");
+  }
+});
 
-// Registro de Service Worker para Play Store / PWABuilder
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
-  });
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
 }
-
-renderHomeHub();
 </script>
 </body>
 </html>
