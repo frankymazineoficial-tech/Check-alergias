@@ -17,10 +17,9 @@
   .menu-btn { background:var(--card); border:1px solid var(--border); color:var(--text); width:38px; height:38px; border-radius:9px; font-size:1.2rem; display:flex; align-items:center; justify-content:center; cursor:pointer; }
   .brand-header { display:flex; align-items:center; gap:9px; cursor:pointer; }
   .app-logo-svg { width:34px; height:34px; flex-shrink:0; }
-  h1 { margin:0; font-size:1rem; font-weight:800; color:#fff; }
+  h1 { margin:0; font-size:0.96rem; font-weight:800; color:#fff; }
   .header-sub { font-size:0.65rem; color:var(--accent); display:block; font-weight:600; }
 
-  /* MENÚ LATERAL CONTEXTUAL */
   .drawer-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:2000; }
   .drawer { position:fixed; top:0; left:-290px; width:275px; height:100%; background:var(--card-alt); border-right:1px solid var(--border); z-index:2001; transition:left 0.25s ease; display:flex; flex-direction:column; }
   .drawer.open { left:0; }
@@ -32,15 +31,16 @@
   .drawer-badge { font-size:0.68rem; text-transform:uppercase; padding:4px 8px; border-radius:8px; font-weight:800; margin-bottom:4px; display:inline-block; }
 
   .container { padding:14px; max-width:820px; margin:auto; }
-  .section-title { font-size:0.74rem; text-transform:uppercase; color:var(--muted); margin:16px 0 8px; font-weight:800; }
+  .section-title { font-size:0.74rem; text-transform:uppercase; color:var(--muted); margin:15px 0 7px; font-weight:800; }
   .role-grid { display:grid; grid-template-columns:1fr; gap:14px; margin-top:12px; }
   @media(min-width:600px){ .role-grid { grid-template-columns:1fr 1fr; } }
   .role-card { background:linear-gradient(145deg,#1c2541 0%,#0f172a 100%); border:2px solid var(--border); border-radius:18px; padding:22px 18px; text-align:center; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:12px; }
   .role-card.diner { border-color:var(--green); }
   .role-card.owner { border-color:var(--accent); }
-  .role-icon { width:60px; height:60px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:2rem; background:var(--card-alt); border:1px solid var(--border); }
+  .role-icon { width:58px; height:58px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:1.9rem; background:var(--card-alt); border:1px solid var(--border); }
 
-  .btn { padding:9px 12px; border-radius:9px; border:none; font-weight:700; cursor:pointer; font-size:0.76rem; display:inline-flex; align-items:center; justify-content:center; gap:5px; text-decoration:none; }
+  .btn { padding:8px 11px; border-radius:9px; border:none; font-weight:700; cursor:pointer; font-size:0.75rem; display:inline-flex; align-items:center; justify-content:center; gap:5px; text-decoration:none; }
+  .btn:disabled { opacity:0.55; cursor:not-allowed; }
   .btn-primary { background:var(--accent); color:#020617; }
   .btn-green { background:var(--green); color:#020617; }
   .btn-amber { background:var(--amber); color:#000; }
@@ -49,41 +49,41 @@
   .btn-danger { background:var(--red); color:#fff; }
   .btn-outline { background:transparent; border:1px solid #64748b; color:var(--text); }
 
-  .action-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
-  .action-box { background:var(--card); border:1.5px solid var(--border); border-radius:14px; padding:14px 10px; text-align:center; cursor:pointer; font-weight:800; font-size:0.82rem; display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .action-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+  .action-box { background:var(--card); border:1.5px solid var(--border); border-radius:13px; padding:12px 6px; text-align:center; cursor:pointer; font-weight:800; font-size:0.76rem; display:flex; flex-direction:column; align-items:center; gap:5px; }
   .rest-list-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
-  .rest-info { display:flex; align-items:center; gap:10px; cursor:pointer; flex:1; min-width:180px; }
-  .verified-badge { background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.35); font-size:0.64rem; padding:2px 7px; border-radius:20px; font-weight:800; }
-  .community-badge { background:rgba(245,158,11,0.15); color:var(--amber); border:1px solid rgba(245,158,11,0.35); font-size:0.64rem; padding:2px 7px; border-radius:20px; font-weight:800; }
+  .rest-info { display:flex; align-items:center; gap:10px; cursor:pointer; flex:1; min-width:170px; }
+  .verified-badge { background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.35); font-size:0.63rem; padding:2px 7px; border-radius:20px; font-weight:800; display:inline-block; }
+  .community-badge { background:rgba(245,158,11,0.15); color:var(--amber); border:1px solid rgba(245,158,11,0.35); font-size:0.63rem; padding:2px 7px; border-radius:20px; font-weight:800; display:inline-block; }
 
-  #mapContainer { width:100%; height:360px; border-radius:14px; border:1.5px solid var(--border); overflow:hidden; margin-bottom:12px; }
+  #mapContainer { width:100%; height:350px; border-radius:14px; border:1.5px solid var(--border); overflow:hidden; margin-bottom:12px; }
   .geo-results-list { margin-top:6px; background:var(--card-alt); border:1px solid var(--accent); border-radius:10px; overflow:hidden; display:none; }
-  .geo-result-item { padding:8px 10px; font-size:0.75rem; color:var(--text); border-bottom:1px solid var(--border); cursor:pointer; }
+  .geo-result-item { padding:8px 10px; font-size:0.74rem; color:var(--text); border-bottom:1px solid var(--border); cursor:pointer; }
 
   .staff-bar { display:none; background:#172554; border-bottom:2px solid var(--amber); padding:12px 14px; gap:10px; flex-direction:column; }
   .staff-bar.show { display:flex; }
   .roi-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
   .roi-box { background:rgba(0,0,0,0.35); border-radius:8px; padding:6px; text-align:center; }
-  .roi-num { font-size:1rem; font-weight:900; color:var(--accent); display:block; }
-  .roi-label { font-size:0.6rem; color:#cbd5e1; text-transform:uppercase; }
+  .roi-num { font-size:0.95rem; font-weight:900; color:var(--accent); display:block; }
+  .roi-label { font-size:0.58rem; color:#cbd5e1; text-transform:uppercase; }
 
-  .allergen-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(95px,1fr)); gap:6px; }
-  .diet-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:6px; margin-top:6px; }
-  .chip { background:var(--card); border:1.5px solid var(--border); color:var(--text); padding:9px 4px; border-radius:10px; font-size:0.72rem; font-weight:700; text-align:center; cursor:pointer; user-select:none; }
+  .allergen-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(92px,1fr)); gap:6px; }
+  .diet-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(118px,1fr)); gap:6px; margin-top:6px; }
+  .chip { background:var(--card); border:1.5px solid var(--border); color:var(--text); padding:8px 4px; border-radius:10px; font-size:0.71rem; font-weight:700; text-align:center; cursor:pointer; user-select:none; }
   .chip.active { background:rgba(239,68,68,0.25); border-color:var(--red); color:#fca5a5; }
   .chip.diet.active { background:rgba(168,85,247,0.25); border-color:var(--purple); color:#e9d5ff; }
   .custom-avoid-box { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px; margin-top:6px; }
-  .quick-ing { font-size:0.7rem; padding:4px 8px; border-radius:6px; background:var(--bg); border:1px solid var(--border); color:var(--muted); cursor:pointer; display:inline-block; margin:2px; }
+  .quick-ing { font-size:0.69rem; padding:4px 8px; border-radius:6px; background:var(--bg); border:1px solid var(--border); color:var(--muted); cursor:pointer; display:inline-block; margin:2px; }
   .quick-ing.active { background:rgba(249,115,22,0.25); border-color:var(--orange); color:#fdba74; }
-  .custom-tag-Badge { background:var(--orange); color:#000; font-weight:800; font-size:0.72rem; padding:4px 8px; border-radius:20px; display:inline-flex; margin:3px; cursor:pointer; }
+  .custom-tag-Badge { background:var(--orange); color:#000; font-weight:800; font-size:0.71rem; padding:4px 8px; border-radius:20px; display:inline-flex; margin:3px; cursor:pointer; }
 
   .controls-bar { display:flex; gap:8px; margin:12px 0; flex-wrap:wrap; }
   .search-input { flex:1; min-width:140px; padding:9px 12px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:#fff; }
   .cat-filter { padding:9px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:#fff; }
-  .legal-banner { background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.35); color:#fde68a; padding:8px 10px; border-radius:10px; font-size:0.72rem; margin-bottom:10px; line-height:1.35; }
+  .legal-banner { background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.35); color:#fde68a; padding:8px 10px; border-radius:10px; font-size:0.71rem; margin-bottom:10px; line-height:1.35; }
 
   .tabs { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:12px; }
-  .tab { padding:10px 4px; border-radius:10px; text-align:center; font-weight:800; font-size:0.74rem; cursor:pointer; border:2px solid transparent; background:var(--card); color:var(--muted); }
+  .tab { padding:10px 4px; border-radius:10px; text-align:center; font-weight:800; font-size:0.73rem; cursor:pointer; border:2px solid transparent; background:var(--card); color:var(--muted); }
   .tab.aptos.active { border-color:var(--green); color:var(--green); background:rgba(16,185,129,0.12); }
   .tab.mod.active { border-color:var(--amber); color:var(--amber); background:rgba(245,158,11,0.12); }
   .tab.proh.active { border-color:var(--red); color:var(--red); background:rgba(239,68,68,0.12); }
@@ -93,26 +93,32 @@
   .dish-card.mod { border-left-color:var(--amber); }
   .dish-card.proh { border-left-color:var(--red); }
   .dish-header { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
-  .dish-name { font-weight:800; font-size:0.93rem; margin:0; }
-  .dish-cat { font-size:0.66rem; background:var(--card-alt); color:var(--accent); padding:3px 7px; border-radius:6px; font-weight:700; }
-  .mod-box { margin-top:7px; padding:7px 9px; border-radius:8px; font-size:0.78rem; font-weight:600; }
+  .dish-name { font-weight:800; font-size:0.92rem; margin:0; }
+  .dish-cat { font-size:0.65rem; background:var(--card-alt); color:var(--accent); padding:3px 7px; border-radius:6px; font-weight:700; }
+  .mod-box { margin-top:7px; padding:7px 9px; border-radius:8px; font-size:0.77rem; font-weight:600; }
   .mod-box.warn { background:rgba(245,158,11,0.16); color:#fcd34d; }
   .mod-box.danger { background:rgba(239,68,68,0.16); color:#fca5a5; }
   .mod-box.trace { background:rgba(56,189,248,0.12); color:#7dd3fc; }
   .mod-box.protocol { background:rgba(168,85,247,0.15); color:#e9d5ff; }
   .ing-pills { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
-  .ing-pill { font-size:0.72rem; padding:4px 7px; border-radius:6px; background:var(--bg); color:#cbd5e1; border:1px solid var(--border); }
+  .ing-pill { font-size:0.71rem; padding:4px 7px; border-radius:6px; background:var(--bg); color:#cbd5e1; border:1px solid var(--border); }
 
   .review-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:11px; margin-bottom:8px; }
   .review-card.twin-match { border:1.5px solid var(--green); background:rgba(16,185,129,0.06); }
   .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:3000; overflow-y:auto; padding:12px; }
-  .modal-content { background:var(--card); max-width:620px; margin:15px auto; padding:16px; border-radius:16px; border:1px solid var(--border); }
+  .modal-content { background:var(--card); max-width:640px; margin:15px auto; padding:16px; border-radius:16px; border:1px solid var(--border); }
   .form-group { margin-bottom:9px; }
-  .form-group label { display:block; font-size:0.75rem; color:var(--muted); margin-bottom:3px; font-weight:700; }
+  .form-group label { display:block; font-size:0.74rem; color:var(--muted); margin-bottom:3px; font-weight:700; }
   .form-group input, .form-group select, .form-group textarea { width:100%; padding:8px 10px; border-radius:8px; border:1px solid #475569; background:var(--bg); color:#fff; font-size:0.84rem; }
-  .folder-bar { display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:10px; }
-  .folder-pill { padding:6px 11px; border-radius:20px; background:var(--card); border:1px solid var(--border); color:var(--muted); font-size:0.75rem; font-weight:800; cursor:pointer; white-space:nowrap; }
+  .folder-bar { display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:10px; align-items:center; }
+  .folder-pill { padding:6px 11px; border-radius:20px; background:var(--card); border:1px solid var(--border); color:var(--muted); font-size:0.74rem; font-weight:800; cursor:pointer; white-space:nowrap; }
   .folder-pill.active { background:var(--green); color:#020617; border-color:var(--green); }
+  .ing-editor-card { background:var(--bg); padding:10px; border-radius:10px; margin-bottom:8px; border:1px solid var(--border); }
+  .mini-chips { display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
+  .mini-chip { font-size:0.65rem; padding:4px 7px; border-radius:5px; background:var(--card); border:1px solid #475569; color:var(--muted); cursor:pointer; font-weight:700; user-select:none; }
+  .mini-chip.selected { background:var(--red); color:#fff; border-color:var(--red); }
+  .mini-chip.diet-sel { background:var(--purple); color:#fff; border-color:var(--purple); }
+  .mini-chip.trace-sel { background:var(--accent); color:#000; border-color:var(--accent); }
 </style>
 </head>
 <body>
@@ -141,11 +147,11 @@
   <div class="drawer-nav" id="drawerNavContent"></div>
 </aside>
 
-<!-- CABECERA -->
+<!-- CABECERA GLOBAL CON BOTÓN VOLVER SIEMPRE DISPONIBLE -->
 <header>
   <div class="header-left">
     <button class="menu-btn" onclick="toggleDrawer(true)">☰</button>
-    <div class="brand-header" onclick="showView('landing')">
+    <div class="brand-header" onclick="goBackView()">
       <svg class="app-logo-svg"><use href="#tusalergias-logo"></use></svg>
       <div><h1 id="headerMainTitle">TusAlergias</h1><span class="header-sub" id="headerSubTitle">Red de Zonas Seguras</span></div>
     </div>
@@ -164,13 +170,13 @@
     <div class="role-card diner" onclick="showView('diner')">
       <div class="role-icon">🥗</div>
       <h3 style="margin:0; color:var(--green);">PARA COMENSALES</h3>
-      <p style="margin:0; font-size:0.8rem; color:var(--muted);">Filtra cartas por tus alérgenos, explora el mapa mundial de restaurantes seguros, organiza tus rutas de viaje y usa la tarjeta multi-idioma para el camarero.</p>
+      <p style="margin:0; font-size:0.8rem; color:var(--muted);">Escanea el código Bidi de tu mesa, descubre restaurantes seguros en el mapa, organiza tus rutas de viaje y muestra la tarjeta multi-idioma al camarero.</p>
       <button class="btn btn-green" style="width:100%; padding:11px;">Entrar como Comensal →</button>
     </div>
     <div class="role-card owner" onclick="showView('owner')">
       <div class="role-icon">👨‍🍳</div>
       <h3 style="margin:0; color:var(--accent);">PARA RESTAURANTES</h3>
-      <p style="margin:0; font-size:0.8rem; color:var(--muted);">Registra tu local con contraseña, gestiona tu carta interactiva, genera tu Bidi de mesa, recibe reservas con pre-aviso por WhatsApp y mide tus visitas.</p>
+      <p style="margin:0; font-size:0.8rem; color:var(--muted);">Registra tu local con contraseña, gestiona tu carta interactiva con alérgenos, genera tu Bidi de mesa y recibe reservas con pre-aviso en cocina.</p>
       <button class="btn btn-primary" style="width:100%; padding:11px;">Entrar como Restaurante →</button>
     </div>
   </div>
@@ -179,16 +185,20 @@
 <!-- VISTA 2: COMENSALES -->
 <div id="dinerView" class="container" style="display:none;">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-    <h2 style="margin:0; font-size:1.1rem; color:var(--green);">🥗 Zona para Comensales</h2>
-    <button class="btn btn-outline" onclick="showView('landing')">← Inicio</button>
+    <h2 style="margin:0; font-size:1.08rem; color:var(--green);">🥗 Zona para Comensales</h2>
   </div>
-  <div class="action-grid-2">
-    <div class="action-box" onclick="showView('map')"><span style="font-size:1.6rem;">🗺️</span><span>Explorar Mapa de Zonas Seguras</span></div>
-    <div class="action-box" onclick="openSuggestRestModal()"><span style="font-size:1.6rem;">💡</span><span>Sugerir Local Seguro</span></div>
+  <div class="action-grid-3">
+    <div class="action-box" onclick="showView('map')"><span style="font-size:1.5rem;">🗺️</span><span>Mapa de Zonas Seguras</span></div>
+    <div class="action-box" onclick="openScanModal()"><span style="font-size:1.5rem;">📷</span><span>Abrir / Pegar Código Bidi</span></div>
+    <div class="action-box" onclick="openSuggestRestModal()"><span style="font-size:1.5rem;">💡</span><span>Sugerir Local Seguro</span></div>
   </div>
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
     <span class="section-title" style="margin:0;">🎒 Mis Rutas, Favoritos y Sugeridos:</span>
-    <button class="btn btn-outline" onclick="createNewRouteFolder()">+ Nueva Ruta</button>
+    <div style="display:flex; gap:5px;">
+      <button class="btn btn-outline" onclick="createNewRouteFolder()">+ Nueva Ruta</button>
+      <button class="btn btn-outline" id="btnRenameFolder" style="display:none;" onclick="renameActiveFolder()">✏️</button>
+      <button class="btn btn-danger" id="btnDeleteFolder" style="display:none;" onclick="deleteActiveFolder()">🗑️</button>
+    </div>
   </div>
   <div class="folder-bar" id="routeFoldersBar"></div>
   <div id="myRestaurantsList"></div>
@@ -197,14 +207,13 @@
 <!-- VISTA 3: PROPIETARIOS -->
 <div id="ownerView" class="container" style="display:none;">
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-    <h2 style="margin:0; font-size:1.1rem; color:var(--accent);">👨‍🍳 Zona para Restaurantes</h2>
-    <button class="btn btn-outline" onclick="showView('landing')">← Inicio</button>
+    <h2 style="margin:0; font-size:1.08rem; color:var(--accent);">👨‍🍳 Zona para Restaurantes</h2>
   </div>
   <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:15px; margin-bottom:14px; text-align:center;">
-    <p style="margin:0 0 10px; font-size:0.8rem; color:var(--muted);">Registra tu restaurante oficial para subir tu carta verificada y recibir pre-avisos de reserva.</p>
+    <p style="margin:0 0 10px; font-size:0.8rem; color:var(--muted);">Registra tu restaurante oficial para gestionar tu carta verificada, generar tu código Bidi y recibir pre-avisos de alergias.</p>
     <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="openNewRestaurantModal()">➕ Dar de Alta mi Restaurante Oficial</button>
   </div>
-  <div class="section-title">🏪 Mis Locales Oficiales Registrados (Demo: 2026):</div>
+  <div class="section-title">🏪 Mis Locales Oficiales Registrados (Contraseña Demo: 2026):</div>
   <div id="ownerRestaurantsList"></div>
 </div>
 
@@ -215,19 +224,17 @@
     <div style="display:flex; gap:6px;">
       <button class="btn btn-amber" onclick="openSuggestRestModal()">➕ Sugerir Local</button>
       <button class="btn btn-green" onclick="locateUserOnMap()">📍 Mi GPS</button>
-      <button class="btn btn-outline" onclick="showView('diner')">← Volver</button>
     </div>
   </div>
   <div id="mapContainer"></div>
   <div id="mapCardsList"></div>
 </div>
 
-<!-- VISTA 5: CARTA INTERACTIVA -->
+<!-- VISTA 5: FICHA Y CARTA DEL RESTAURANTE -->
 <div id="appView" style="display:none;">
-  <!-- BARRA EXCLUSIVA PROPIETARIO -->
   <div class="staff-bar" id="staffBar">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-      <span style="font-size:0.75rem; font-weight:800; color:#fde047;">🔓 PANEL PROPIETARIO (Toca cualquier ingrediente para cambiar entre Fijo 🔒 o Adaptable 🔄)</span>
+      <span style="font-size:0.74rem; font-weight:800; color:#fde047;">🔓 MODO PROPIETARIO — Toca un ingrediente abajo para cambiar entre Fijo (🔒) y Adaptable (🔄)</span>
       <button class="btn btn-green" onclick="confirmMenuUpdatedToday()">✅ Verificar Carta Hoy</button>
     </div>
     <div class="roi-metrics" id="ownerRoiMetrics"></div>
@@ -235,13 +242,12 @@
       <button class="btn btn-amber" onclick="openDishModal()">+ Añadir Plato</button>
       <button class="btn btn-orange" onclick="loadSampleMenuIntoActive()">📥 Cargar 12 Platos Muestra</button>
       <button class="btn btn-green" onclick="openQrModal(activeRestId)">📱 Código Bidi</button>
-      <button class="btn btn-outline" onclick="openEditRestModal()">⚙️ Datos / Teléfono</button>
+      <button class="btn btn-outline" onclick="openEditRestModal(activeRestId)">⚙️ Datos / Teléfono</button>
       <button class="btn btn-primary" style="margin-left:auto;" onclick="lockStaffMode()">🔒 Salir de Gestión</button>
     </div>
   </div>
 
   <div class="container">
-    <!-- CABECERA DEL RESTAURANTE -->
     <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:12px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
         <div>
@@ -249,25 +255,26 @@
           <span id="activeRestLastVerified" style="font-size:0.7rem; color:var(--green); margin-left:6px; font-weight:700;"></span>
           <div id="activeRestCity" style="font-size:0.76rem; color:var(--muted); margin-top:3px;"></div>
         </div>
-        <!-- ACCIONES SOLO VISIBLES PARA EL COMENSAL -->
         <div id="dinerHeaderActions" style="display:flex; gap:6px; flex-wrap:wrap;">
-          <button class="btn btn-outline" id="btnToggleFav" onclick="toggleActiveFavorite()">⭐ Guardar</button>
+          <button class="btn btn-outline" id="btnToggleFav" onclick="openSaveToRouteModal(activeRestId)">⭐ Guardar en Ruta</button>
           <button class="btn btn-purple" onclick="openWaiterCardModal()">🗣️ Tarjeta Camarero</button>
-          <button class="btn btn-green" onclick="openBookingModal()">📅 Pre-aviso Reserva</button>
+          <button class="btn btn-green" id="btnBookingAction" onclick="openBookingModal()">📅 Pre-aviso Reserva</button>
         </div>
       </div>
 
-      <!-- BANNER DE CONVERSIÓN PARA LOCALES SUGERIDOS AÚN SIN CARTA OFICIAL -->
+      <!-- BANNER PARA LOCALES SUGERIDOS (SIN CARTA OFICIAL) -->
       <div id="unclaimedBanner" style="display:none; margin-top:12px; padding:12px; border-radius:10px; background:rgba(245,158,11,0.14); border:1px solid rgba(245,158,11,0.4); color:#fde68a;">
-        <div style="font-size:0.82rem; font-weight:800; margin-bottom:4px;">💡 Local recomendado por la comunidad (Sin carta oficial verificada)</div>
-        <p style="margin:0 0 10px; font-size:0.75rem; color:#cbd5e1;">El propietario aún no ha subido el desglose oficial de alérgenos. Puedes solicitar que se una o dejar tu reseña abajo.</p>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <div style="font-size:0.82rem; font-weight:800; margin-bottom:4px;">💡 Local sugerido por la comunidad (Sin carta oficial verificada)</div>
+        <p style="margin:0 0 10px; font-size:0.74rem; color:#cbd5e1;">Este restaurante aún no ha subido su carta oficial de alérgenos. Puedes usar arriba la <b>🗣️ Tarjeta Camarero</b> para mostrar tus alergias en mesa, dejar una reseña o pedir que suban su carta:</p>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
           <button class="btn btn-amber" id="btnRequestMenu" onclick="requestOfficialMenu()">🔥 Solicitar que suba su carta (1)</button>
-          <button class="btn btn-outline" onclick="claimCommunityRestaurant()">🔑 Soy el propietario: Reclamar Local</button>
+          <button class="btn btn-outline" onclick="claimCommunityRestaurant()">🔑 Soy el propietario: Reclamar (Cód: ALTA2026)</button>
+          <button class="btn btn-danger" onclick="deleteRestaurant(activeRestId, true)">🗑️ Borrar Sugerencia</button>
         </div>
       </div>
     </div>
 
+    <!-- ZONA DE FILTRADO DE PLATOS (SE OCULTA SI ES UN LOCAL SUGERIDO SIN CARTA) -->
     <div id="menuInteractiveZone">
       <div class="section-title">1. Toca tus alérgenos a evitar:</div>
       <div class="allergen-grid" id="allergenGrid"></div>
@@ -291,7 +298,7 @@
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:6px;">
-        <label style="font-size:0.76rem; color:#fcd34d; font-weight:700; cursor:pointer;">
+        <label style="font-size:0.75rem; color:#fcd34d; font-weight:700; cursor:pointer;">
           <input type="checkbox" id="strictTraces" checked onchange="renderDishes()"> 🛡️ Bloquear también trazas (Recomendado)
         </label>
         <div style="display:flex; gap:6px;">
@@ -314,7 +321,7 @@
     </div>
 
     <!-- MURO SOCIAL DE OPINIONES -->
-    <hr style="border-color:var(--border); margin:22px 0 12px;">
+    <hr style="border-color:var(--border); margin:20px 0 12px;">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
       <div>
         <h3 style="margin:0; font-size:0.95rem;">💬 Experiencias de la Comunidad Alérgica</h3>
@@ -322,14 +329,14 @@
       </div>
       <div style="display:flex; gap:6px;">
         <button class="btn btn-green" onclick="openReviewModal()">✍️ Valorar</button>
-        <button class="btn btn-outline" style="color:#fca5a5; border-color:#ef4444;" onclick="reportMenuDiscrepancy()">⚠️ Aviso Carta</button>
+        <button class="btn btn-outline" id="btnReportDiscrepancy" style="color:#fca5a5; border-color:#ef4444;" onclick="reportMenuDiscrepancy()">⚠️ Aviso Carta</button>
       </div>
     </div>
     <div id="reviewsListContainer"></div>
   </div>
 </div>
 
-<!-- MODAL ALTA / SUGERIR LOCAL CON MAPA -->
+<!-- MODAL ALTA / EDICIÓN / SUGERENCIA DE LOCAL -->
 <div class="modal" id="restModal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -338,18 +345,21 @@
     </div>
     <input type="hidden" id="restEditId">
     <input type="hidden" id="restIsSuggest">
+    <div class="form-group">
+      <label style="color:#fff;">1. Nombre Comercial del Restaurante (no se borrará al buscar la calle):</label>
+      <input type="text" id="restNameInput" placeholder="Ej. Restaurante El Puerto">
+    </div>
     <div class="form-group" style="background:var(--bg); padding:10px; border-radius:10px; border:1px solid var(--accent);">
-      <label style="color:var(--accent);">🔍 Buscar calle, paseo o localidad en España:</label>
+      <label style="color:var(--accent);">2. 🔍 Buscar calle, paseo o localidad para ubicar en el Mapa:</label>
       <div style="display:flex; gap:6px;">
         <input type="text" id="geoSearchInput" placeholder="Ej. Paseo Marítimo Puerto de Mazarrón..." onkeydown="if(event.key==='Enter') searchPlaceCoords()">
         <button type="button" class="btn btn-primary" onclick="searchPlaceCoords()">Buscar</button>
       </div>
       <div id="geoResults" class="geo-results-list"></div>
     </div>
-    <div class="form-group"><label>Nombre del Restaurante:</label><input type="text" id="restNameInput" placeholder="Ej. Restaurante El Puerto"></div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
       <div class="form-group"><label>Ciudad / Dirección:</label><input type="text" id="restCityInput" placeholder="Ej. Puerto de Mazarrón"></div>
-      <div class="form-group"><label>WhatsApp Reservas (opcional):</label><input type="text" id="restPhoneInput" placeholder="Ej. 34600000000"></div>
+      <div class="form-group" id="phoneGroup"><label>WhatsApp Reservas (opcional):</label><input type="text" id="restPhoneInput" placeholder="Ej. 34600000000"></div>
     </div>
     <div class="form-group" id="passGroup"><label>🔑 Contraseña de Propietario:</label><input type="password" id="restPassInput" placeholder="Elige tu contraseña"></div>
     <div style="display:grid; grid-template-columns:1fr 1fr 95px; gap:8px; align-items:end;">
@@ -361,12 +371,29 @@
   </div>
 </div>
 
-<!-- MODAL TARJETA CAMARERO MULTI-IDIOMA -->
+<!-- MODAL GUARDAR EN CARPETA DE RUTA -->
+<div class="modal" id="saveRouteModal">
+  <div class="modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h2 style="margin:0; font-size:1rem;">🎒 Guardar en Mis Rutas de Viaje</h2>
+      <button class="btn btn-outline" onclick="closeModal('saveRouteModal')">✕</button>
+    </div>
+    <p style="font-size:0.78rem; color:var(--muted); margin-top:0;">Toca las carpetas donde quieras guardar o quitar este restaurante:</p>
+    <div id="routeFolderSelectorList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;"></div>
+    <button class="btn btn-outline" style="width:100%;" onclick="createNewRouteFolder(true)">+ Crear Nueva Carpeta de Viaje</button>
+  </div>
+</div>
+
+<!-- MODAL TARJETA CAMARERO MULTI-IDIOMA (CON SELECTOR RÁPIDO INTEGRADO) -->
 <div class="modal" id="waiterCardModal">
   <div class="modal-content" style="border:2px solid var(--purple);">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
       <h2 style="margin:0; font-size:1rem;">🗣️ Tarjeta de Seguridad para el Camarero</h2>
       <button class="btn btn-outline" onclick="closeModal('waiterCardModal')">✕</button>
+    </div>
+    <div style="margin-bottom:8px;">
+      <span style="font-size:0.7rem; color:var(--muted); font-weight:700;">Toca para añadir o quitar tus alergias en la tarjeta:</span>
+      <div class="mini-chips" id="waiterModalChips"></div>
     </div>
     <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
       <button class="btn btn-primary" onclick="renderWaiterCardLang('es')">🇪🇸 Español</button>
@@ -378,6 +405,45 @@
   </div>
 </div>
 
+<!-- MODAL EDITOR COMPLETO DE PLATO (CON CHIPS CERRADOS DE ALÉRGENOS Y COMPONENTES) -->
+<div class="modal" id="dishModal">
+  <div class="modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h2 style="margin:0; font-size:1rem;" id="dishModalTitle">✏️ Plato de la Carta</h2>
+      <button class="btn btn-outline" onclick="closeModal('dishModal')">✕</button>
+    </div>
+    <input type="hidden" id="editDishId">
+    <div style="display:grid; grid-template-columns:1fr 130px; gap:8px;">
+      <div class="form-group"><label>Nombre del Plato:</label><input type="text" id="editName" placeholder="Ej. ARROZ DEL SEÑORET"></div>
+      <div class="form-group"><label>Categoría:</label><input type="text" id="editCat" value="ENTRANTES"></div>
+    </div>
+    <div class="form-group"><label>👩‍🍳 Protocolo en cocina:</label><input type="text" id="editProtocol" placeholder="Ej. Freidora o sartén limpia exclusiva"></div>
+    <div class="form-group">
+      <label>Trazas generales en cocina (toca para marcar):</label>
+      <div class="mini-chips" id="editDishTraces"></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin:10px 0 6px;">
+      <span class="section-title" style="margin:0;">Componentes / Ingredientes del Plato:</span>
+      <button type="button" class="btn btn-primary" onclick="addIngRow()">+ Añadir Componente</button>
+    </div>
+    <div id="ingredientsEditor"></div>
+    <button class="btn btn-green" style="width:100%; padding:12px; margin-top:8px;" onclick="saveDishFromModal()">💾 Guardar Plato en la Carta</button>
+  </div>
+</div>
+
+<!-- MODAL ESCANEAR / PEGAR BIDI -->
+<div class="modal" id="scanModal">
+  <div class="modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h2 style="margin:0; font-size:1rem;">📷 Abrir Restaurante por Código Bidi</h2>
+      <button class="btn btn-outline" onclick="closeModal('scanModal')">✕</button>
+    </div>
+    <p style="font-size:0.78rem; color:var(--muted); margin-top:0;">Escanea el QR de la mesa con tu cámara o pega aquí el enlace Bidi del restaurante para cargar su carta:</p>
+    <div class="form-group"><input type="text" id="pasteBidiInput" placeholder="Pega aquí el enlace Bidi..."></div>
+    <button class="btn btn-green" style="width:100%; padding:11px;" onclick="importFromBidiInput()">🍽️ Abrir Carta y Guardar</button>
+  </div>
+</div>
+
 <!-- MODAL PRE-AVISO RESERVA -->
 <div class="modal" id="bookingModal">
   <div class="modal-content">
@@ -386,9 +452,9 @@
       <button class="btn btn-outline" onclick="closeModal('bookingModal')">✕</button>
     </div>
     <div class="form-group"><label>Nombre y Nº de Comensales:</label><input type="text" id="bookName" placeholder="Ej. Laura (4 personas)"></div>
-    <div class="form-group"><label>Día y Hora de llegada:</label><input type="text" id="bookTime" placeholder="Ej. Sábado a las 14:30"></div>
-    <div class="form-group"><label>Observaciones para cocina:</label><input type="text" id="bookNotes" placeholder="Ej. Alergia severa a trazas en freidora"></div>
-    <button class="btn btn-green" style="width:100%; padding:12px;" onclick="sendBookingPreAlert()">📲 Enviar Pre-aviso por WhatsApp</button>
+    <div class="form-group"><label>Día y Hora:</label><input type="text" id="bookTime" placeholder="Ej. Sábado 14:30"></div>
+    <div class="form-group"><label>Notas para cocina:</label><input type="text" id="bookNotes" placeholder="Ej. Alergia severa a trazas"></div>
+    <button class="btn btn-green" style="width:100%; padding:12px;" onclick="sendBookingPreAlert()">📲 Enviar por WhatsApp al Restaurante</button>
   </div>
 </div>
 
@@ -415,25 +481,6 @@
   </div>
 </div>
 
-<!-- MODAL AÑADIR PLATO -->
-<div class="modal" id="dishModal">
-  <div class="modal-content">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;">➕ Añadir Plato a la Carta</h2>
-      <button class="btn btn-outline" onclick="closeModal('dishModal')">✕</button>
-    </div>
-    <div class="form-group"><label>Nombre del Plato:</label><input type="text" id="editName" placeholder="Ej. ARROZ DEL SEÑORET"></div>
-    <div class="form-group"><label>Categoría:</label><input type="text" id="editCat" value="ENTRANTES"></div>
-    <div class="form-group"><label>Componente / Ingredientes:</label><input type="text" id="editIngs" placeholder="Ej. Arroz, sepia, gamba roja, ajo, ñora"></div>
-    <div class="form-group"><label>Alérgenos (separados por coma):</label><input type="text" id="editAls" placeholder="Ej. CRUSTÁCEOS, MOLUSCOS, PESCADO"></div>
-    <div class="form-group"><label>Protocolo en cocina:</label><input type="text" id="editProtocol" placeholder="Ej. Sartén limpia exclusiva"></div>
-    <label style="font-size:0.8rem; color:#fcd34d; display:block; margin-bottom:12px;">
-      <input type="checkbox" id="editMod" checked> 🔄 Este componente es adaptable en cocina
-    </label>
-    <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="saveQuickDish()">💾 Guardar Plato</button>
-  </div>
-</div>
-
 <!-- MODAL CÓDIGO BIDI -->
 <div class="modal" id="qrModal">
   <div class="modal-content" style="text-align:center;">
@@ -441,12 +488,12 @@
       <h2 style="margin:0; font-size:1rem;">📱 Código Bidi Oficial de Mesa</h2>
       <button class="btn btn-outline" onclick="closeModal('qrModal')">✕</button>
     </div>
-    <p style="font-size:0.76rem; color:var(--muted); margin-top:0;">Al escanearlo se abrirá directamente la carta de este restaurante:</p>
+    <p style="font-size:0.75rem; color:var(--muted); margin-top:0;">Escanea o comparte este enlace para abrir directamente la carta en cualquier teléfono:</p>
     <div style="background:#fff; padding:14px; border-radius:14px; display:inline-block; margin-bottom:10px;">
       <img id="qrImageDisplay" src="" alt="QR" style="width:200px; height:200px;">
     </div>
     <input type="text" id="qrDirectLink" readonly style="width:100%; padding:8px; border-radius:8px; background:var(--bg); color:#fff; border:1px solid var(--border); margin-bottom:10px;">
-    <button class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('qrDirectLink').value).then(()=>alert('✅ Enlace copiado'))">📋 Copiar Enlace Directo</button>
+    <button class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('qrDirectLink').value).then(()=>alert('✅ Enlace Bidi copiado'))">📋 Copiar Enlace Bidi</button>
   </div>
 </div>
 
@@ -473,21 +520,20 @@ const SAMPLE_12_DISHES = [
 const PILOT_REST = {
   id: "pilot_1", name: "Restaurante Piloto (Muestra 12 Platos)", city: "Puerto de Mazarrón", phone: "34600000000", pass: "2026", lat: 37.5630, lng: -1.3090, unclaimed: false, lastVerified: "Hoy",
   stats: { views: 145, saves: 36, bookings: 12, alerts: 0, requests: 0 },
-  reviews: [{ author: "Elena G.", stars: 5, allergens: "GLUTEN, LÁCTEO", comment: "Controlan perfectamente las trazas y adaptaron la burrata y el arroz.", date: "Hoy" }],
+  reviews: [{ author: "Elena G.", stars: 5, allergens: "GLUTEN, LÁCTEO", comment: "Controlan perfectamente las trazas y adaptaron la burrata y el arroz.", date: "Hoy", isAlert: false }],
   menu: JSON.parse(JSON.stringify(SAMPLE_12_DISHES))
 };
 
-// SANITIZADOR XSS
-function esc(s) {
-  return String(s || "").replace(/[&<>"']/g, m => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[m]));
-}
+function esc(s) { return String(s || "").replace(/[&<>"']/g, m => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[m])); }
+function normalizeStr(s) { return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
 let appState = null;
-try { appState = JSON.parse(localStorage.getItem("tusalergias_v9_audit")); } catch(e){}
+try { appState = JSON.parse(localStorage.getItem("tusalergias_v10_final")); } catch(e){}
 if (!appState || !Array.isArray(appState.restaurants) || !appState.restaurants.length) {
   appState = {
     restaurants: [PILOT_REST],
-    favoriteIds: ["pilot_1"],
+    votedRequests: [],
     routeFolders: [
       { id: "f_fav", name: "⭐ Mis Favoritos y Sugeridos", restIds: ["pilot_1"] },
       { id: "f_trip", name: "✈️ Próximos Viajes", restIds: [] }
@@ -495,17 +541,16 @@ if (!appState || !Array.isArray(appState.restaurants) || !appState.restaurants.l
     activeFolderId: "f_fav"
   };
 }
+if (!appState.votedRequests) appState.votedRequests = [];
 
 let activeRestId = appState.restaurants[0].id;
 let isStaffUnlocked = false;
-let currentView = "landing";
+let currentView = "landing", previousView = "landing", currentWaiterLang = "es";
 let leafletMap = null, markersLayer = null, lastGeoPlaces = [];
 let selectedAllergens = new Set(), selectedDiets = new Set(), customAvoidSet = new Set(), currentTab = "aptos";
 
-function saveAppState() { localStorage.setItem("tusalergias_v9_audit", JSON.stringify(appState)); }
+function saveAppState() { localStorage.setItem("tusalergias_v10_final", JSON.stringify(appState)); }
 function getActiveRest() { return appState.restaurants.find(r => r.id === activeRestId) || appState.restaurants[0]; }
-function normalizeStr(s) { return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
-function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
 function toggleDrawer(open) {
   if (open) updateDrawerMenu();
@@ -519,13 +564,12 @@ function updateDrawerMenu() {
     c.innerHTML = `
       <span class="drawer-badge" style="background:rgba(16,185,129,0.2); color:var(--green);">Sección Comensales 🥗</span>
       <div class="drawer-item" onclick="showView('diner'); toggleDrawer(false);">🎒 Mis Rutas y Favoritos</div>
-      <div class="drawer-item" onclick="showView('map'); toggleDrawer(false);">🗺️ Mapa Mundial de Zonas Seguras</div>
+      <div class="drawer-item" onclick="showView('map'); toggleDrawer(false);">🗺️ Mapa de Zonas Seguras</div>
+      <div class="drawer-item" onclick="openScanModal(); toggleDrawer(false);">📷 Abrir / Pegar Código Bidi</div>
       <div class="drawer-item" onclick="openSuggestRestModal(); toggleDrawer(false);">💡 Sugerir Local Seguro</div>
-      <div class="drawer-item" onclick="openRestaurantForDiner(appState.restaurants[0].id); toggleDrawer(false);">🍽️ Ver Carta Piloto (12 Platos)</div>
       <div class="drawer-divider"></div>
       <div class="drawer-item" style="color:var(--accent); font-weight:800;" onclick="showView('owner'); toggleDrawer(false);">🔄 Ir a Zona para Restaurantes 👨‍🍳</div>
-      <div class="drawer-item" onclick="showView('landing'); toggleDrawer(false);">🏠 Volver a Portada</div>
-    `;
+      <div class="drawer-item" onclick="showView('landing'); toggleDrawer(false);">🏠 Volver a Portada</div>`;
   } else if (currentView === "owner" || (currentView === "app" && isStaffUnlocked)) {
     c.innerHTML = `
       <span class="drawer-badge" style="background:rgba(56,189,248,0.2); color:var(--accent);">Sección Restaurantes 👨‍🍳</span>
@@ -534,33 +578,43 @@ function updateDrawerMenu() {
       <div class="drawer-item" onclick="showView('map'); toggleDrawer(false);">🗺️ Ver Mapa de la Red</div>
       <div class="drawer-divider"></div>
       <div class="drawer-item" style="color:var(--green); font-weight:800;" onclick="showView('diner'); toggleDrawer(false);">🔄 Ir a Zona para Comensales 🥗</div>
-      <div class="drawer-item" onclick="showView('landing'); toggleDrawer(false);">🏠 Volver a Portada</div>
-    `;
+      <div class="drawer-item" onclick="showView('landing'); toggleDrawer(false);">🏠 Volver a Portada</div>`;
   } else {
     c.innerHTML = `
-      <div class="drawer-item" onclick="showView('diner'); toggleDrawer(false);">🥗 Entrar a Zona Comensales</div>
-      <div class="drawer-item" onclick="showView('owner'); toggleDrawer(false);">👨‍🍳 Entrar a Zona Restaurantes</div>
-      <div class="drawer-item" onclick="showView('map'); toggleDrawer(false);">🗺️ Explorar Mapa Mundial</div>
-    `;
+      <div class="drawer-item" onclick="showView('diner'); toggleDrawer(false);">🥗 Entrar como Comensal</div>
+      <div class="drawer-item" onclick="showView('owner'); toggleDrawer(false);">👨‍🍳 Entrar como Restaurante</div>
+      <div class="drawer-item" onclick="showView('map'); toggleDrawer(false);">🗺️ Explorar Mapa Mundial</div>`;
   }
 }
 
+function goBackView() {
+  if (currentView === "app") showView(isStaffUnlocked ? "owner" : (previousView === "map" ? "map" : "diner"));
+  else if (currentView === "map") showView("diner");
+  else showView("landing");
+}
+
 function showView(v) {
+  if (currentView !== v) previousView = currentView;
   currentView = v;
   ["landingView","dinerView","ownerView","mapView","appView"].forEach(id => {
     document.getElementById(id).style.display = (id === v + "View") ? "block" : "none";
   });
   document.getElementById("headerMainTitle").innerText = "TusAlergias";
+  document.getElementById("headerRightActions").innerHTML = v === "landing" ? "" : `<button class="btn btn-outline" onclick="goBackView()">← Volver</button>`;
   if (v === "diner") renderDinerView();
   if (v === "owner") renderOwnerView();
   if (v === "map") setTimeout(initOrRefreshMap, 100);
   if (v === "app") renderRestaurantApp();
 }
 
-// 1. ZONA COMENSALES (Carpetas + Favoritos + Sugeridos)
+// 1. ZONA COMENSALES Y GESTIÓN COMPLETA DE CARPETAS
 function renderDinerView() {
   const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId) || appState.routeFolders[0];
   appState.activeFolderId = folder.id;
+
+  const isSecondary = folder.id !== "f_fav";
+  document.getElementById("btnRenameFolder").style.display = isSecondary ? "inline-flex" : "none";
+  document.getElementById("btnDeleteFolder").style.display = isSecondary ? "inline-flex" : "none";
 
   document.getElementById("routeFoldersBar").innerHTML = appState.routeFolders.map(f =>
     `<div class="folder-pill ${f.id === folder.id ? 'active' : ''}" onclick="appState.activeFolderId='${esc(f.id)}';saveAppState();renderDinerView();">${esc(f.name)} (${(f.restIds||[]).length})</div>`
@@ -577,24 +631,70 @@ function renderDinerView() {
       <div class="rest-info" onclick="openRestaurantForDiner('${esc(r.id)}')">
         <div>
           <b>${esc(r.name)}</b> ${r.unclaimed ? '<span class="community-badge">💡 Sugerido (Sin carta oficial)</span>' : '<span class="verified-badge">🛡️ Verificado</span>'}<br>
-          <span style="font-size:0.75rem; color:var(--muted);">📍 ${esc(r.city || 'En el mapa')} · ${r.unclaimed ? '🔥 '+(r.stats?.requests||1)+' solicitudes de carta' : (r.menu||[]).length+' platos'}</span>
+          <span style="font-size:0.74rem; color:var(--muted);">📍 ${esc(r.city || 'En el mapa')} · ${r.unclaimed ? '🔥 '+(r.stats?.requests||1)+' peticiones de carta' : (r.menu||[]).length+' platos'}</span>
         </div>
       </div>
-      <button class="btn btn-green" onclick="openRestaurantForDiner('${esc(r.id)}')">🍽️ Abrir</button>
+      <div style="display:flex; gap:5px;">
+        <button class="btn btn-green" onclick="openRestaurantForDiner('${esc(r.id)}')">🍽️ Abrir</button>
+        <button class="btn btn-outline" onclick="openSaveToRouteModal('${esc(r.id)}')" title="Gestionar carpetas">🎒</button>
+        ${r.unclaimed ? `<button class="btn btn-danger" onclick="deleteRestaurant('${esc(r.id)}', true)" title="Borrar sugerencia">🗑️</button>` : ''}
+      </div>
     </div>
   `).join("");
 }
 
-function createNewRouteFolder() {
+function createNewRouteFolder(fromModal = false) {
   const n = prompt("✈️ Nombre de tu nueva carpeta o ruta de viaje (ej. Vacaciones en Granada):");
   if (!n || !n.trim()) return;
   const newId = "f_" + Date.now();
-  appState.routeFolders.push({ id: newId, name: "📍 " + n.trim(), restIds: [] });
+  appState.routeFolders.push({ id: newId, name: "📍 " + n.trim(), restIds: fromModal ? [activeRestId] : [] });
   appState.activeFolderId = newId;
+  saveAppState();
+  if (fromModal) openSaveToRouteModal(activeRestId);
+  else renderDinerView();
+}
+
+function renameActiveFolder() {
+  const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId);
+  if (!folder || folder.id === "f_fav") return;
+  const n = prompt("Nuevo nombre para la carpeta:", folder.name.replace("📍 ", ""));
+  if (n && n.trim()) { folder.name = "📍 " + n.trim(); saveAppState(); renderDinerView(); }
+}
+
+function deleteActiveFolder() {
+  const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId);
+  if (!folder || folder.id === "f_fav") return;
+  if (!confirm(`¿Eliminar la carpeta "${folder.name}"?`)) return;
+  appState.routeFolders = appState.routeFolders.filter(f => f.id !== folder.id);
+  appState.activeFolderId = "f_fav";
   saveAppState(); renderDinerView();
 }
 
-// 2. ZONA RESTAURANTES (Solo locales oficiales !unclaimed)
+function openSaveToRouteModal(restId) {
+  const targetId = restId || activeRestId;
+  document.getElementById("routeFolderSelectorList").innerHTML = appState.routeFolders.map(f => {
+    const has = (f.restIds || []).includes(targetId);
+    return `<button class="btn ${has ? 'btn-green' : 'btn-outline'}" style="width:100%; justify-content:space-between; padding:11px;" onclick="toggleRestInFolder('${esc(f.id)}','${esc(targetId)}')">
+      <span>${esc(f.name)}</span><span>${has ? '✅ Guardado (Quitar)' : '+ Añadir aquí'}</span>
+    </button>`;
+  }).join("");
+  document.getElementById("saveRouteModal").style.display = "block";
+}
+
+function toggleRestInFolder(folderId, restId) {
+  const f = appState.routeFolders.find(x => x.id === folderId);
+  const r = appState.restaurants.find(x => x.id === restId);
+  if (!f || !r) return;
+  const idx = f.restIds.indexOf(restId);
+  if (idx > -1) f.restIds.splice(idx, 1);
+  else { f.restIds.push(restId); if (r.stats) r.stats.saves = (r.stats.saves || 0) + 1; }
+  saveAppState();
+  openSaveToRouteModal(restId);
+  if (currentView === "app") renderRestaurantApp();
+  if (currentView === "diner") renderDinerView();
+}
+
+// 2. ZONA RESTAURANTES (Solo oficiales, con editar y borrar)
 function renderOwnerView() {
   const officialRests = appState.restaurants.filter(r => !r.unclaimed);
   if (!officialRests.length) {
@@ -610,12 +710,31 @@ function renderOwnerView() {
           <span style="font-size:0.74rem; color:var(--muted);">📍 ${esc(r.city||'')} · 👁️ ${r.stats?.views||0} visitas · 📅 ${r.stats?.bookings||0} reservas</span>
         </div>
       </div>
-      <div style="display:flex; gap:6px;">
+      <div style="display:flex; gap:5px;">
         <button class="btn btn-primary" onclick="promptOwnerPassword('${esc(r.id)}')">🔐 Gestionar</button>
         <button class="btn btn-green" onclick="openQrModal('${esc(r.id)}')">📱 Bidi</button>
+        <button class="btn btn-danger" onclick="deleteRestaurant('${esc(r.id)}', false)">🗑️</button>
       </div>
     </div>
   `).join("");
+}
+
+function deleteRestaurant(id, isSuggested) {
+  const r = appState.restaurants.find(x => x.id === id);
+  if (!r) return;
+  if (!isSuggested) {
+    const p = prompt(`🔐 Introduce la contraseña de propietario para eliminar "${r.name}":`);
+    if (p === null) return;
+    if (p !== (r.pass || "2026")) { alert("❌ Contraseña incorrecta."); return; }
+  } else {
+    if (!confirm(`¿Eliminar el restaurante sugerido "${r.name}" de tu lista y del mapa?`)) return;
+  }
+  appState.restaurants = appState.restaurants.filter(x => x.id !== id);
+  appState.routeFolders.forEach(f => { f.restIds = (f.restIds || []).filter(rid => rid !== id); });
+  if (!appState.restaurants.length) appState.restaurants.push(PILOT_REST);
+  activeRestId = appState.restaurants[0].id;
+  saveAppState();
+  showView(isSuggested ? "diner" : "owner");
 }
 
 function openRestaurantForDiner(id) {
@@ -650,6 +769,7 @@ function loadSampleMenuIntoActive() {
   alert("✅ Se han cargado los 12 platos de muestra en este restaurante.");
 }
 
+// 3. RENDERIZADO DE LA FICHA / CARTA CON SEPARACIÓN COHERENTE
 function renderRestaurantApp() {
   const r = getActiveRest();
   document.getElementById("headerMainTitle").innerText = r.name;
@@ -658,22 +778,34 @@ function renderRestaurantApp() {
   document.getElementById("activeRestBadge").innerText = r.unclaimed ? "💡 Sugerido por Viajeros" : "🛡️ Zona Segura Verificada";
   document.getElementById("activeRestLastVerified").innerText = r.unclaimed ? "" : `✓ Revisado: ${r.lastVerified || 'Hoy'}`;
 
-  // SEPARACIÓN ESTRICTA DE BOTONES: Comensal vs Propietario
   document.getElementById("dinerHeaderActions").style.display = isStaffUnlocked ? "none" : "flex";
   document.getElementById("staffBar").classList.toggle("show", isStaffUnlocked);
 
-  // BANNER DE CONVERSIÓN EN SUGERIDOS
-  const unclaimedBox = document.getElementById("unclaimedBanner");
-  unclaimedBox.style.display = r.unclaimed ? "block" : "none";
+  // Ocultar botón Pre-aviso Reserva si el local es sugerido o no tiene teléfono
+  const hasPhone = !r.unclaimed && r.phone && r.phone.trim() !== "";
+  document.getElementById("btnBookingAction").style.display = hasPhone ? "inline-flex" : "none";
+
+  // Ocultar aviso de cambio en carta si ni siquiera tiene carta
+  const hasMenu = Array.isArray(r.menu) && r.menu.length > 0;
+  document.getElementById("btnReportDiscrepancy").style.display = (!r.unclaimed && hasMenu) ? "inline-flex" : "none";
+
+  // Si es sugerido y no está en modo propietario, ocultar toda la zona vacía de filtros de platos
+  document.getElementById("unclaimedBanner").style.display = (r.unclaimed && !isStaffUnlocked) ? "block" : "none";
+  document.getElementById("menuInteractiveZone").style.display = (r.unclaimed && !isStaffUnlocked && !hasMenu) ? "none" : "block";
+
   if (r.unclaimed) {
-    document.getElementById("btnRequestMenu").innerText = `🔥 Solicitar que suba su carta (${r.stats?.requests || 1} peticiones)`;
+    const alreadyVoted = (appState.votedRequests || []).includes(r.id);
+    const reqBtn = document.getElementById("btnRequestMenu");
+    reqBtn.disabled = alreadyVoted;
+    reqBtn.innerText = alreadyVoted
+      ? `✅ Solicitud registrada (${r.stats?.requests || 1} peticiones)`
+      : `🔥 Solicitar que suba su carta (${r.stats?.requests || 1})`;
   }
 
-  const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId) || appState.routeFolders[0];
-  const isFav = (folder.restIds || []).includes(r.id);
+  const inAnyFolder = appState.routeFolders.some(f => (f.restIds || []).includes(r.id));
   const favBtn = document.getElementById("btnToggleFav");
-  favBtn.innerText = isFav ? "★ En mi ruta" : "⭐ Guardar";
-  favBtn.className = isFav ? "btn btn-green" : "btn btn-outline";
+  favBtn.innerText = inAnyFolder ? "★ En mis rutas" : "⭐ Guardar en Ruta";
+  favBtn.className = inAnyFolder ? "btn btn-green" : "btn btn-outline";
 
   if (isStaffUnlocked) {
     document.getElementById("ownerRoiMetrics").innerHTML = `
@@ -690,35 +822,31 @@ function renderRestaurantApp() {
 
 function requestOfficialMenu() {
   const r = getActiveRest();
+  if ((appState.votedRequests || []).includes(r.id)) return;
   if (!r.stats) r.stats = { views:1, saves:1, bookings:0, alerts:0, requests:1 };
   r.stats.requests = (r.stats.requests || 1) + 1;
-  saveAppState();
-  renderRestaurantApp();
-  alert("🔥 ¡Solicitud registrada! Cuantas más peticiones acumule este restaurante, antes contactaremos con el propietario para verificar su carta.");
+  appState.votedRequests.push(r.id);
+  saveAppState(); renderRestaurantApp();
 }
 
 function claimCommunityRestaurant() {
   const r = getActiveRest();
-  const newPass = prompt(`🔑 Vas a reclamar la gestión oficial de "${r.name}".\nElige tu contraseña de propietario:`);
+  const code = prompt(`🛡️ VERIFICACIÓN DE TITULARIDAD ("${r.name}")\n\nIntroduce el código de activación facilitado por TusAlergias tras verificar el CIF/titularidad del local.\n(Para probar ahora mismo escribe: ALTA2026):`);
+  if (!code) return;
+  if (code.trim().toUpperCase() !== "ALTA2026") {
+    alert("❌ Código de verificación no válido.");
+    return;
+  }
+  const newPass = prompt("🔑 Elige tu contraseña privada de propietario:", "2026");
   if (!newPass || !newPass.trim()) return;
-  const phone = prompt("📞 Introduce el teléfono de WhatsApp del restaurante para recibir reservas (ej. 34600000000):", r.phone || "");
+  const phone = prompt("📞 Teléfono WhatsApp para recibir pre-avisos de reserva (ej. 34600000000):", r.phone || "");
   r.pass = newPass.trim();
   if (phone !== null) r.phone = phone.trim();
   r.unclaimed = false;
   r.lastVerified = new Date().toLocaleDateString("es-ES");
   isStaffUnlocked = true;
-  saveAppState();
-  renderRestaurantApp();
-  alert("🎉 ¡Local reclamado con éxito! Ya estás en tu Panel de Propietario. Puedes añadir tus platos con '+ Añadir Plato' o probar con '📥 Cargar 12 Platos Muestra'.");
-}
-
-function toggleActiveFavorite() {
-  const r = getActiveRest();
-  const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId) || appState.routeFolders[0];
-  const idx = folder.restIds.indexOf(r.id);
-  if (idx > -1) folder.restIds.splice(idx, 1);
-  else { folder.restIds.push(r.id); if (r.stats) r.stats.saves = (r.stats.saves||0) + 1; }
   saveAppState(); renderRestaurantApp();
+  alert("🎉 ¡Local verificado! Ahora puedes añadir tus platos o cargar los 12 platos de muestra.");
 }
 
 function initFilterButtons() {
@@ -742,10 +870,10 @@ function evaluateDish(dish, strict) {
   if (!selectedAllergens.size && !selectedDiets.size && !customAvoidSet.size) return { status:"aptos", rem:[], blk:[], tr:[] };
   let rem = [], blk = [], tr = [];
   (dish.ings || []).forEach(ing => {
-    const alHits = (ing.a || []).filter(a => selectedAllergens.has(a));
-    const dHits = (ing.tags || []).filter(t => selectedDiets.has(t));
+    const alHits = (ing.a || []).filter(a => selectedAllergens.has(al => al === a) || selectedAllergens.has(a));
+    const dHits = (ing.tags || []).filter(t => selectedDiets.has(t)).map(t => DIETS.find(x => x.id === t)?.label || t);
     const norm = normalizeStr(ing.n + " " + (ing.sub || ""));
-    const cHits = Array.from(customAvoidSet).filter(c => norm.includes(normalizeStr(c)));
+    const cHits = Array.from(customAvoidSet).filter(c => norm.includes(normalizeStr(c))).map(c => `lleva ${c.toUpperCase()}`);
     const all = [...alHits, ...dHits, ...cHits];
     if (all.length) {
       if (ing.mod) rem.push(`${esc(ing.note || 'Omitir '+ing.n)} (${esc(all.join(', '))})`);
@@ -781,7 +909,7 @@ function renderDishes() {
     document.getElementById("tab-mod").innerText = "ADAPTABLES (0)";
     document.getElementById("tab-proh").innerText = "NO APTOS (0)";
     document.getElementById("dishList").innerHTML = `
-      <div style="text-align:center; padding:24px 14px; background:var(--card); border-radius:12px; color:var(--muted); font-size:0.82rem;">
+      <div style="text-align:center; padding:22px 14px; background:var(--card); border-radius:12px; color:var(--muted); font-size:0.82rem;">
         📋 Este restaurante aún no tiene platos cargados en su carta digital.
         ${isStaffUnlocked ? '<br><br><button class="btn btn-amber" onclick="openDishModal()">+ Añadir Primer Plato</button> <button class="btn btn-orange" onclick="loadSampleMenuIntoActive()">📥 Cargar 12 Platos Muestra</button>' : ''}
       </div>`;
@@ -808,13 +936,17 @@ function renderDishes() {
     if (d.protocol) badge += `<div class="mod-box protocol">👩‍🍳 ${esc(d.protocol)}</div>`;
 
     const pills = (d.ings || []).map((i, idx) => {
-      const btn = isStaffUnlocked ? `<b style="cursor:pointer;color:${i.mod?'#fcd34d':'#94a3b8'};" onclick="quickToggleMod(${d.id},${idx})">[${i.mod?'🔄 Adaptable':'🔒 Fijo'}]</b>` : "";
-      return `<span class="ing-pill"><b>${esc(i.n)}</b> ${i.a?.length?'['+esc(i.a.join(','))+']':''} ${btn}</span>`;
+      const subTxt = i.sub ? ` <i style="color:var(--muted);">(${esc(i.sub)})</i>` : "";
+      const btn = isStaffUnlocked ? ` <b style="cursor:pointer;color:${i.mod?'#fcd34d':'#94a3b8'};" onclick="quickToggleMod(${d.id},${idx})">[${i.mod?'🔄 Adaptable':'🔒 Fijo'}]</b>` : "";
+      return `<span class="ing-pill"><b>${esc(i.n)}</b>${subTxt} ${i.a?.length?'<span style="color:var(--accent);">['+esc(i.a.join(','))+']</span>':''}${btn}</span>`;
     }).join("");
 
-    const delBtn = isStaffUnlocked ? `<button class="btn btn-danger" style="padding:3px 7px;font-size:0.68rem;" onclick="deleteDishById(${d.id})">🗑️</button>` : "";
+    const staffBtns = isStaffUnlocked
+      ? `<button class="btn btn-outline" style="padding:3px 7px;font-size:0.68rem;" onclick="openDishModal(${d.id})">✏️</button>
+         <button class="btn btn-danger" style="padding:3px 7px;font-size:0.68rem;" onclick="deleteDishById(${d.id})">🗑️</button>`
+      : "";
 
-    html += `<div class="dish-card ${res.status}"><div class="dish-header"><h3 class="dish-name">${esc(d.name)}</h3><div style="display:flex;gap:6px;align-items:center;">${delBtn}<span class="dish-cat">${esc(d.cat)}</span></div></div>${badge}<div class="ing-pills">${pills}</div></div>`;
+    html += `<div class="dish-card ${res.status}"><div class="dish-header"><h3 class="dish-name">${esc(d.name)}</h3><div style="display:flex;gap:5px;align-items:center;">${staffBtns}<span class="dish-cat">${esc(d.cat)}</span></div></div>${badge}<div class="ing-pills">${pills}</div></div>`;
   });
 
   document.getElementById("tab-aptos").innerText = `COMPATIBLES (${counts.aptos})`;
@@ -823,17 +955,111 @@ function renderDishes() {
   document.getElementById("dishList").innerHTML = html || `<p style="text-align:center;color:var(--muted);">No hay platos en este apartado.</p>`;
 }
 
-// BÚSQUEDA NOMINATIM ESPAÑA
+// 4. EDITOR MULTICOMPONENTE DE PLATOS CON CHIPS CERRADOS (SIN TEXTO LIBRE)
+function openDishModal(dishId = null) {
+  const r = getActiveRest();
+  const box = document.getElementById("ingredientsEditor");
+  box.innerHTML = "";
+  let tracesSet = new Set();
+
+  if (dishId) {
+    const d = (r.menu || []).find(x => x.id === dishId);
+    if (!d) return;
+    document.getElementById("dishModalTitle").innerText = "✏️ Editar Plato";
+    document.getElementById("editDishId").value = d.id;
+    document.getElementById("editName").value = d.name;
+    document.getElementById("editCat").value = d.cat;
+    document.getElementById("editProtocol").value = d.protocol || "";
+    (d.traces || []).forEach(t => tracesSet.add(t));
+    (d.ings || []).forEach(ing => addIngRow(ing));
+  } else {
+    document.getElementById("dishModalTitle").innerText = "➕ Nuevo Plato";
+    document.getElementById("editDishId").value = "";
+    document.getElementById("editName").value = "";
+    document.getElementById("editCat").value = "ENTRANTES";
+    document.getElementById("editProtocol").value = "";
+    addIngRow();
+  }
+
+  document.getElementById("editDishTraces").innerHTML = ALLERGENS.map(a =>
+    `<div class="mini-chip ${tracesSet.has(a)?'trace-sel':''}" data-tr="${a}" onclick="this.classList.toggle('trace-sel')">${a}</div>`
+  ).join("");
+
+  document.getElementById("dishModal").style.display = "block";
+}
+
+function addIngRow(ing = { n:"", sub:"", mod:true, note:"", a:[], tags:[] }) {
+  const div = document.createElement("div");
+  div.className = "ing-editor-card";
+  const aSet = new Set(ing.a || []);
+  const tSet = new Set(ing.tags || []);
+
+  const alChips = ALLERGENS.map(a => `<div class="mini-chip ${aSet.has(a)?'selected':''}" data-al="${a}" onclick="this.classList.toggle('selected')">${a}</div>`).join("");
+  const dietChips = DIETS.map(d => `<div class="mini-chip ${tSet.has(d.id)?'diet-sel':''}" data-diet="${d.id}" onclick="this.classList.toggle('diet-sel')">${d.label}</div>`).join("");
+
+  div.innerHTML = `
+    <div style="display:flex; gap:6px; margin-bottom:6px;">
+      <input type="text" class="ing-n" value="${esc(ing.n)}" placeholder="Componente (ej. Salsa Brava o Base de arroz)" style="flex:1; padding:7px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-weight:700;">
+      <button type="button" class="btn btn-danger" onclick="this.parentElement.parentElement.remove()">✕</button>
+    </div>
+    <input type="text" class="ing-sub" value="${esc(ing.sub||'')}" placeholder="Sub-ingredientes (ej. ajo, cebolla, ñora, manzana...)" style="width:100%; padding:6px; margin-bottom:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#cbd5e1; font-size:0.75rem;">
+    <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
+      <label style="font-size:0.74rem; color:#fcd34d; font-weight:700;"><input type="checkbox" class="ing-mod" ${ing.mod ? 'checked' : ''}> 🔄 Adaptable</label>
+      <input type="text" class="ing-note" value="${esc(ing.note||'')}" placeholder="Cómo adaptar (ej. Servir sin salsa)" style="flex:1; padding:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.75rem;">
+    </div>
+    <div style="font-size:0.68rem; color:var(--muted); font-weight:700;">Toca los alérgenos de este componente:</div>
+    <div class="mini-chips ing-al-box">${alChips}</div>
+    <div class="mini-chips ing-diet-box" style="margin-top:5px;">${dietChips}</div>`;
+  document.getElementById("ingredientsEditor").appendChild(div);
+}
+
+function saveDishFromModal() {
+  const r = getActiveRest();
+  const editId = document.getElementById("editDishId").value;
+  const name = document.getElementById("editName").value.trim().toUpperCase();
+  const cat = document.getElementById("editCat").value.trim().toUpperCase() || "CARTA";
+  const protocol = document.getElementById("editProtocol").value.trim();
+  if (!name) { alert("Escribe el nombre del plato."); return; }
+
+  const traces = Array.from(document.querySelectorAll("#editDishTraces .mini-chip.trace-sel")).map(el => el.getAttribute("data-tr"));
+  const ings = [];
+  document.querySelectorAll("#ingredientsEditor .ing-editor-card").forEach(card => {
+    const n = card.querySelector(".ing-n").value.trim();
+    if (!n) return;
+    ings.push({
+      n,
+      sub: card.querySelector(".ing-sub").value.trim(),
+      mod: card.querySelector(".ing-mod").checked,
+      note: card.querySelector(".ing-note").value.trim(),
+      a: Array.from(card.querySelectorAll(".ing-al-box .mini-chip.selected")).map(el => el.getAttribute("data-al")),
+      tags: Array.from(card.querySelectorAll(".ing-diet-box .mini-chip.diet-sel")).map(el => el.getAttribute("data-diet"))
+    });
+  });
+
+  if (!ings.length) { alert("Añade al menos un componente al plato."); return; }
+
+  if (editId) {
+    const idx = r.menu.findIndex(d => d.id == editId);
+    if (idx > -1) r.menu[idx] = { id: Number(editId), cat, name, protocol, traces, ings };
+  } else {
+    r.menu.unshift({ id: Date.now(), cat, name, protocol, traces, ings });
+  }
+  r.unclaimed = false;
+  r.lastVerified = new Date().toLocaleDateString("es-ES");
+  saveAppState(); closeModal("dishModal"); renderRestaurantApp();
+}
+
+// 5. BUSCADOR NOMINATIM (NUNCA PISA EL NOMBRE DEL RESTAURANTE)
 async function searchPlaceCoords() {
   const q = document.getElementById("geoSearchInput").value.trim();
   const box = document.getElementById("geoResults");
   if (!q) return;
   box.style.display = "block";
-  box.innerHTML = `<div class="geo-result-item">🔎 Buscando en España...</div>`;
+  box.innerHTML = `<div class="geo-result-item">🔎 Buscando calle o localidad en España...</div>`;
   try {
     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=es&q=${encodeURIComponent(q)}&limit=4`, { headers:{"Accept-Language":"es"} });
     lastGeoPlaces = await res.json();
-    if (!lastGeoPlaces.length) { box.innerHTML = `<div class="geo-result-item">No encontrado. Busca por calle o paseo + municipio.</div>`; return; }
+    if (!lastGeoPlaces.length) { box.innerHTML = `<div class="geo-result-item">No encontrado. Busca por calle + municipio.</div>`; return; }
     selectGeoPlace(0, false);
     box.innerHTML = lastGeoPlaces.map((p, i) => `<div class="geo-result-item" onclick="selectGeoPlace(${i}, true)">📍 <b>${esc(p.display_name.split(',')[0])}</b> — ${esc(p.display_name.split(',').slice(1,3).join(','))}</div>`).join("");
   } catch(e) { box.innerHTML = `<div class="geo-result-item">Error de red.</div>`; }
@@ -844,10 +1070,8 @@ function selectGeoPlace(idx, closeList) {
   if (!p) return;
   document.getElementById("restLatInput").value = parseFloat(p.lat).toFixed(5);
   document.getElementById("restLngInput").value = parseFloat(p.lon).toFixed(5);
-  if (!document.getElementById("restNameInput").value || closeList) {
-    document.getElementById("restNameInput").value = p.display_name.split(",")[0];
-  }
-  document.getElementById("restCityInput").value = p.display_name.split(",").slice(1, 3).join(",").trim();
+  // Solo rellena la dirección/ciudad; respeta siempre el nombre comercial escrito en #restNameInput
+  document.getElementById("restCityInput").value = p.display_name.split(",").slice(0, 3).join(",").trim();
   if (closeList) document.getElementById("geoResults").style.display = "none";
 }
 
@@ -863,22 +1087,26 @@ function openNewRestaurantModal() {
   document.getElementById("restEditId").value = "";
   document.getElementById("restIsSuggest").value = "";
   document.getElementById("restNameInput").value = "";
+  document.getElementById("geoSearchInput").value = "";
+  document.getElementById("geoResults").style.display = "none";
   document.getElementById("restCityInput").value = "";
   document.getElementById("restPhoneInput").value = "";
   document.getElementById("restPassInput").value = "";
   document.getElementById("passGroup").style.display = "block";
+  document.getElementById("phoneGroup").style.display = "block";
   document.getElementById("restModal").style.display = "block";
 }
 
 function openSuggestRestModal() {
   openNewRestaurantModal();
-  document.getElementById("restModalTitle").innerText = "💡 Sugerir Restaurante Seguro (Comunidad)";
+  document.getElementById("restModalTitle").innerText = "💡 Sugerir Local Seguro (Comunidad)";
   document.getElementById("restIsSuggest").value = "1";
   document.getElementById("passGroup").style.display = "none";
+  document.getElementById("phoneGroup").style.display = "none";
 }
 
-function openEditRestModal() {
-  const r = getActiveRest();
+function openEditRestModal(id) {
+  const r = appState.restaurants.find(x => x.id === id) || getActiveRest();
   openNewRestaurantModal();
   document.getElementById("restModalTitle").innerText = "⚙️ Configurar Datos del Restaurante";
   document.getElementById("restEditId").value = r.id;
@@ -899,7 +1127,7 @@ function saveRestaurantMeta() {
   const pass = document.getElementById("restPassInput").value.trim() || "2026";
   const lat = parseFloat(document.getElementById("restLatInput").value) || 37.5630;
   const lng = parseFloat(document.getElementById("restLngInput").value) || -1.3090;
-  if (!name) { alert("Escribe el nombre del restaurante."); return; }
+  if (!name) { alert("Escribe primero el nombre comercial del restaurante en la casilla 1."); return; }
 
   if (id) {
     const r = getActiveRest();
@@ -913,18 +1141,14 @@ function saveRestaurantMeta() {
       lastVerified: isSug ? "Pendiente" : new Date().toLocaleDateString("es-ES"),
       stats: { views:1, saves:1, bookings:0, alerts:0, requests:1 },
       reviews: [],
-      menu: [] // CORREGIDO: Los restaurantes nuevos o sugeridos nunca cargan platos falsos por defecto
+      menu: []
     });
     const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId) || appState.routeFolders[0];
     if (isSug && !folder.restIds.includes(newId)) folder.restIds.push(newId);
     activeRestId = newId;
     saveAppState(); closeModal("restModal");
-    if (isSug) {
-      showView("diner");
-    } else {
-      isStaffUnlocked = true;
-      showView("app");
-    }
+    if (isSug) showView("diner");
+    else { isStaffUnlocked = true; showView("app"); }
   }
 }
 
@@ -937,13 +1161,13 @@ function initOrRefreshMap() {
 
   document.getElementById("mapCardsList").innerHTML = appState.restaurants.map(r => {
     L.marker([r.lat||37.563, r.lng||-1.309]).addTo(markersLayer)
-      .bindPopup(`<b>${esc(r.name)}</b><br><span style="font-size:0.72rem;">${r.unclaimed?'💡 Sugerido':'🛡️ Verificado'}</span><br><button class="btn btn-green" style="margin-top:5px;" onclick="openRestaurantForDiner('${esc(r.id)}')">Ver Ficha</button>`);
+      .bindPopup(`<b>${esc(r.name)}</b><br><span style="font-size:0.72rem;">${r.unclaimed?'💡 Sugerido':'🛡️ Verificado'}</span><br><button class="btn btn-green" style="margin-top:5px;" onclick="openRestaurantForDiner('${esc(r.id)}')">Abrir Ficha</button>`);
     return `
       <div class="rest-list-card">
         <div class="rest-info" onclick="openRestaurantForDiner('${esc(r.id)}')">
           <div>
             <b>${esc(r.name)}</b> ${r.unclaimed?'<span class="community-badge">💡 Sugerido</span>':'<span class="verified-badge">🛡️ Verificado</span>'}<br>
-            <span style="font-size:0.75rem;color:var(--muted);">📍 ${esc(r.city||'')} · ${(r.menu||[]).length} platos</span>
+            <span style="font-size:0.74rem;color:var(--muted);">📍 ${esc(r.city||'')} · ${r.unclaimed ? 'Sin carta oficial' : (r.menu||[]).length+' platos'}</span>
           </div>
         </div>
         <button class="btn btn-primary" onclick="openRestaurantForDiner('${esc(r.id)}')">🍽️ Ver</button>
@@ -955,12 +1179,32 @@ function locateUserOnMap() {
   navigator.geolocation?.getCurrentPosition(p => leafletMap?.setView([p.coords.latitude, p.coords.longitude], 14));
 }
 
-// TARJETA CAMARERO MULTI-IDIOMA CON PLATOS COMPATIBLES Y ADAPTABLES
-function openWaiterCardModal() { renderWaiterCardLang("es"); document.getElementById("waiterCardModal").style.display = "block"; }
+// 6. TARJETA CAMARERO CON CHIPS INTEGRADOS Y 4 IDIOMAS
+function openWaiterCardModal() {
+  renderWaiterModalChips();
+  renderWaiterCardLang("es");
+  document.getElementById("waiterCardModal").style.display = "block";
+}
+
+function renderWaiterModalChips() {
+  document.getElementById("waiterModalChips").innerHTML = ALLERGENS.map(a =>
+    `<div class="mini-chip ${selectedAllergens.has(a)?'selected':''}" onclick="toggleWaiterAl('${a}')">${a}</div>`
+  ).join("");
+}
+
+function toggleWaiterAl(a) {
+  selectedAllergens.has(a) ? selectedAllergens.delete(a) : selectedAllergens.add(a);
+  renderWaiterModalChips();
+  initFilterButtons();
+  renderDishes();
+  renderWaiterCardLang(currentWaiterLang);
+}
+
 function renderWaiterCardLang(lang) {
+  currentWaiterLang = lang;
   const r = getActiveRest();
   const strict = document.getElementById("strictTraces").checked;
-  const als = [...Array.from(selectedAllergens), ...Array.from(customAvoidSet).map(x=>x.toUpperCase())].join(", ") || "Ninguno seleccionado";
+  const als = [...Array.from(selectedAllergens), ...Array.from(customAvoidSet).map(x=>x.toUpperCase())].join(", ") || "Selecciona arriba tus alérgenos";
   let aptos = [], mod = [];
   (r.menu || []).forEach(d => {
     const res = evaluateDish(d, strict);
@@ -975,18 +1219,20 @@ function renderWaiterCardLang(lang) {
     it: { h:"⚠️ AVVISO CUCINA: GRAVE ALLERGIA", a:"Non posso consumare:", p:"Si prega di evitare la contaminazione crociata su piastre e friggitrici.", ok:"✅ Piatti idonei:", m:"🔄 Piatti adattabili:" }
   }[lang];
 
-  document.getElementById("waiterCardBody").innerHTML = `
-    <div style="font-weight:900; color:#f87171; font-size:0.98rem; margin-bottom:6px;">${dict.h}</div>
-    <div style="font-size:0.88rem; margin-bottom:6px;">${dict.a} <b style="color:#fde047;">${esc(als)}</b></div>
-    <div style="font-size:0.78rem; color:#7dd3fc; margin-bottom:10px;">🛡️ ${dict.p}</div>
+  const menuSummaryHtml = (r.menu && r.menu.length > 0) ? `
     <div style="font-size:0.78rem; color:#10b981; font-weight:800;">${dict.ok}</div>
     <div style="font-size:0.75rem; color:#cbd5e1; margin-bottom:8px;">${aptos.slice(0,8).join(" · ") || "—"}</div>
     <div style="font-size:0.78rem; color:#f59e0b; font-weight:800;">${dict.m}</div>
     <div style="font-size:0.75rem; color:#cbd5e1;">${mod.slice(0,8).join("<br>• ") || "—"}</div>
-  `;
+  ` : "";
+
+  document.getElementById("waiterCardBody").innerHTML = `
+    <div style="font-weight:900; color:#f87171; font-size:0.96rem; margin-bottom:6px;">${dict.h}</div>
+    <div style="font-size:0.88rem; margin-bottom:6px;">${dict.a} <b style="color:#fde047;">${esc(als)}</b></div>
+    <div style="font-size:0.78rem; color:#7dd3fc; margin-bottom:10px;">🛡️ ${dict.p}</div>
+    ${menuSummaryHtml}`;
 }
 
-// PRE-AVISO WHATSAPP DIRECTO AL TELÉFONO DEL RESTAURANTE
 function openBookingModal() { document.getElementById("bookingModal").style.display = "block"; }
 function sendBookingPreAlert() {
   const r = getActiveRest();
@@ -997,26 +1243,29 @@ function sendBookingPreAlert() {
   const txt = `📅 *PRE-AVISO DE RESERVA CON ALERGIAS (TusAlergias)*\n🏪 *Restaurante:* ${r.name}\n👤 *Cliente:* ${document.getElementById("bookName").value || 'Comensal'}\n🕒 *Fecha/Hora:* ${document.getElementById("bookTime").value || 'Hoy'}\n🛡️ *Alergias a prever en cocina:* ${als}${notes ? '\n📝 *Nota:* '+notes : ''}`;
   closeModal("bookingModal");
   const cleanPhone = (r.phone || "").replace(/\D/g, "");
-  window.open(cleanPhone ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(txt)}` : `https://wa.me/?text=${encodeURIComponent(txt)}`, "_blank");
+  window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(txt)}`, "_blank");
 }
 
-// RESEÑAS CON PRIORIDAD POR ALERGIA GEMELA
+// 7. RESEÑAS Y RESOLUCIÓN DE ALERTAS POR EL PROPIETARIO
 function openReviewModal() {
   document.getElementById("revAllergens").value = [...Array.from(selectedAllergens), ...Array.from(customAvoidSet).map(x=>x.toUpperCase())].join(", ");
   document.getElementById("revComment").value = "";
   document.getElementById("reviewModal").style.display = "block";
 }
+
 function saveUserReview() {
   const r = getActiveRest();
   if (!r.reviews) r.reviews = [];
   const comment = document.getElementById("revComment").value.trim();
   if (!comment) { alert("Escribe tu experiencia."); return; }
   r.reviews.unshift({
+    id: Date.now(),
     author: document.getElementById("revAuthor").value.trim() || "Comensal Verificado",
     stars: parseInt(document.getElementById("revStars").value) || 5,
     allergens: (document.getElementById("revAllergens").value.trim() || "GENERAL").toUpperCase(),
     comment,
-    date: new Date().toLocaleDateString("es-ES")
+    date: new Date().toLocaleDateString("es-ES"),
+    isAlert: false
   });
   saveAppState(); closeModal("reviewModal"); renderReviews();
 }
@@ -1028,9 +1277,17 @@ function reportMenuDiscrepancy() {
   if (!r.stats) r.stats = { views:1, saves:0, bookings:0, alerts:0 };
   r.stats.alerts = (r.stats.alerts || 0) + 1;
   if (!r.reviews) r.reviews = [];
-  r.reviews.unshift({ author:"⚠️ AVISO A COCINA", stars:3, allergens:"REVISIÓN CARTA", comment:msg.trim(), date:new Date().toLocaleDateString("es-ES") });
-  saveAppState(); renderReviews();
+  r.reviews.unshift({ id:Date.now(), author:"⚠️ AVISO A COCINA", stars:3, allergens:"REVISIÓN CARTA", comment:msg.trim(), date:new Date().toLocaleDateString("es-ES"), isAlert:true });
+  saveAppState(); renderRestaurantApp();
   alert("✅ Aviso publicado y enviado al panel del propietario.");
+}
+
+function deleteReviewById(revId) {
+  const r = getActiveRest();
+  const rev = (r.reviews || []).find(x => x.id === revId);
+  if (rev && rev.isAlert && r.stats && r.stats.alerts > 0) r.stats.alerts--;
+  r.reviews = (r.reviews || []).filter(x => x.id !== revId);
+  saveAppState(); renderRestaurantApp();
 }
 
 function renderReviews() {
@@ -1043,65 +1300,80 @@ function renderReviews() {
 
   document.getElementById("reviewsListContainer").innerHTML = sorted.map(rv => `
     <div class="review-card ${rv.isTwin ? 'twin-match' : ''}">
-      <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px;">
+      <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px; align-items:center;">
         <div><b>${esc(rv.author)}</b> ${"⭐".repeat(rv.stars||5)} ${rv.isTwin ? '<span class="verified-badge">🎯 Tu misma alergia</span>' : ''}</div>
-        <span class="verified-badge">🛡️ ${esc(rv.allergens)}</span>
+        <div style="display:flex; gap:5px; align-items:center;">
+          <span class="verified-badge">🛡️ ${esc(rv.allergens)}</span>
+          ${isStaffUnlocked ? `<button class="btn btn-danger" style="padding:2px 6px;font-size:0.65rem;" onclick="deleteReviewById(${rv.id||0})" title="Resolver / Borrar">✕</button>` : ''}
+        </div>
       </div>
       <div style="font-size:0.8rem; margin-top:5px; color:#cbd5e1;">"${esc(rv.comment)}"</div>
     </div>
   `).join("") || `<div style="font-size:0.78rem; color:var(--muted);">Aún no hay opiniones en este local.</div>`;
 }
 
-function openDishModal() {
-  document.getElementById("editName").value = "";
-  document.getElementById("editIngs").value = "";
-  document.getElementById("editAls").value = "";
-  document.getElementById("editProtocol").value = "";
-  document.getElementById("dishModal").style.display = "block";
+// 8. CÓDIGO BIDI PORTÁTIL ENTRE TELÉFONOS (?carta=... Y ?restId=...)
+function buildPortableBidiLink(r) {
+  const base = window.location.origin + window.location.pathname;
+  const payload = { id:r.id, n:r.name, c:r.city||"", p:r.phone||"", lat:r.lat||37.563, lng:r.lng||-1.309, m:(r.menu||[]).slice(0,25) };
+  const enc = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  return `${base}?restId=${encodeURIComponent(r.id)}&carta=${encodeURIComponent(enc)}`;
 }
 
-function saveQuickDish() {
-  const r = getActiveRest();
-  const name = document.getElementById("editName").value.trim().toUpperCase();
-  if (!name) return;
-  const als = document.getElementById("editAls").value.split(",").map(s=>s.trim().toUpperCase()).filter(Boolean);
-  const mod = document.getElementById("editMod").checked;
-  r.menu.unshift({
-    id: Date.now(),
-    cat: document.getElementById("editCat").value.trim().toUpperCase() || "CARTA",
-    name,
-    traces: [],
-    protocol: document.getElementById("editProtocol").value.trim(),
-    ings: [{ n: document.getElementById("editIngs").value.trim() || "Ingredientes base", a: als, tags: [], sub: "", mod, note: mod ? "Adaptable en cocina" : "" }]
-  });
-  r.unclaimed = false;
-  saveAppState(); closeModal("dishModal"); renderRestaurantApp();
-}
-
-// CÓDIGO BIDI CON ENLACE PROFUNDO (?restId=...)
 function openQrModal(id) {
   const r = appState.restaurants.find(x => x.id === id) || getActiveRest();
-  const link = `${window.location.origin}${window.location.pathname}?restId=${encodeURIComponent(r.id)}`;
-  document.getElementById("qrDirectLink").value = link;
-  document.getElementById("qrImageDisplay").src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=${encodeURIComponent(link)}`;
+  const fullLink = buildPortableBidiLink(r);
+  const qrUrl = fullLink.length > 1100 ? `${window.location.origin}${window.location.pathname}?restId=${encodeURIComponent(r.id)}` : fullLink;
+  document.getElementById("qrDirectLink").value = fullLink;
+  document.getElementById("qrImageDisplay").src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=${encodeURIComponent(qrUrl)}`;
   document.getElementById("qrModal").style.display = "block";
+}
+
+function openScanModal() {
+  document.getElementById("pasteBidiInput").value = "";
+  document.getElementById("scanModal").style.display = "block";
+}
+
+function importFromBidiInput() {
+  const val = document.getElementById("pasteBidiInput").value.trim();
+  if (!val) return;
+  closeModal("scanModal");
+  processIncomingUrl(val);
+}
+
+function processIncomingUrl(rawUrl) {
+  try {
+    const u = rawUrl.startsWith("http") ? new URL(rawUrl) : new URL(window.location.origin + "/" + rawUrl);
+    const carta = u.searchParams.get("carta");
+    const rId = u.searchParams.get("restId");
+    if (carta) {
+      const d = JSON.parse(decodeURIComponent(escape(atob(carta))));
+      let existing = appState.restaurants.find(x => x.id === d.id);
+      if (!existing) {
+        existing = { id:d.id||("qr_"+Date.now()), name:d.n||"Restaurante Bidi", city:d.c||"", phone:d.p||"", pass:"2026", lat:d.lat||37.563, lng:d.lng||-1.309, unclaimed:false, lastVerified:"Verificado", stats:{views:1,saves:1,bookings:0,alerts:0}, reviews:[], menu:d.m||[] };
+        appState.restaurants.push(existing);
+      }
+      if (!appState.routeFolders[0].restIds.includes(existing.id)) appState.routeFolders[0].restIds.push(existing.id);
+      saveAppState(); openRestaurantForDiner(existing.id);
+      return;
+    }
+    if (rId && appState.restaurants.some(x => x.id === rId)) {
+      openRestaurantForDiner(rId);
+      return;
+    }
+    alert("Código o enlace Bidi no encontrado.");
+  } catch(e) { alert("Enlace Bidi no válido."); }
 }
 
 function shareWhatsApp() {
   const r = getActiveRest();
-  const link = `${window.location.origin}${window.location.pathname}?restId=${encodeURIComponent(r.id)}`;
-  window.open(`https://wa.me/?text=${encodeURIComponent("🛡️ Consulta la carta de alérgenos de " + r.name + " en TusAlergias: " + link)}`, "_blank");
+  window.open(`https://wa.me/?text=${encodeURIComponent("🛡️ Consulta la carta de alérgenos de " + r.name + " en TusAlergias: " + buildPortableBidiLink(r))}`, "_blank");
 }
 
-// DETECTOR DE CÓDIGO BIDI AL ARRANCAR LA APP
 window.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
-  const restIdParam = params.get("restId");
-  if (restIdParam && appState.restaurants.some(r => r.id === restIdParam)) {
-    openRestaurantForDiner(restIdParam);
-  } else {
-    showView("landing");
-  }
+  if (params.has("carta") || params.has("restId")) processIncomingUrl(window.location.href);
+  else showView("landing");
 });
 
 if ("serviceWorker" in navigator) {
