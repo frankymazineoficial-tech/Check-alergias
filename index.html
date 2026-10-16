@@ -19,13 +19,18 @@
   .app-logo-svg { width:34px; height:34px; flex-shrink:0; }
   h1 { margin:0; font-size:1rem; font-weight:800; color:#fff; }
   .header-sub { font-size:0.65rem; color:var(--accent); display:block; font-weight:600; }
+  
+  /* MENÚ LATERAL DINÁMICO */
   .drawer-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:2000; }
   .drawer { position:fixed; top:0; left:-290px; width:275px; height:100%; background:var(--card-alt); border-right:1px solid var(--border); z-index:2001; transition:left 0.25s ease; display:flex; flex-direction:column; }
   .drawer.open { left:0; }
   .drawer-header { padding:14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-  .drawer-nav { padding:10px; display:flex; flex-direction:column; gap:5px; overflow-y:auto; }
-  .drawer-item { padding:11px 12px; border-radius:10px; color:var(--text); font-weight:700; font-size:0.84rem; cursor:pointer; }
+  .drawer-nav { padding:12px; display:flex; flex-direction:column; gap:6px; overflow-y:auto; }
+  .drawer-item { padding:11px 12px; border-radius:10px; color:var(--text); font-weight:700; font-size:0.84rem; cursor:pointer; display:flex; align-items:center; gap:8px; }
   .drawer-item:hover { background:var(--card); color:var(--accent); }
+  .drawer-divider { height:1px; background:var(--border); margin:6px 0; }
+  .drawer-badge { font-size:0.68rem; text-transform:uppercase; padding:3px 8px; border-radius:12px; font-weight:800; margin-bottom:4px; display:inline-block; }
+
   .container { padding:14px; max-width:820px; margin:auto; }
   .section-title { font-size:0.74rem; text-transform:uppercase; color:var(--muted); margin:16px 0 8px; font-weight:800; }
   .role-grid { display:grid; grid-template-columns:1fr; gap:14px; margin-top:12px; }
@@ -34,7 +39,7 @@
   .role-card.diner { border-color:var(--green); }
   .role-card.owner { border-color:var(--accent); }
   .role-icon { width:60px; height:60px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:2rem; background:var(--card-alt); border:1px solid var(--border); }
-  .btn { padding:9px 12px; border-radius:9px; border:none; font-weight:700; cursor:pointer; font-size:0.76rem; display:inline-flex; align-items:center; justify-content:center; gap:5px; }
+  .btn { padding:9px 12px; border-radius:9px; border:none; font-weight:700; cursor:pointer; font-size:0.76rem; display:inline-flex; align-items:center; justify-content:center; gap:5px; text-decoration:none; }
   .btn-primary { background:var(--accent); color:#020617; }
   .btn-green { background:var(--green); color:#020617; }
   .btn-amber { background:var(--amber); color:#000; }
@@ -87,8 +92,6 @@
   .mod-box.protocol { background:rgba(168,85,247,0.15); color:#e9d5ff; }
   .ing-pills { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
   .ing-pill { font-size:0.72rem; padding:4px 7px; border-radius:6px; background:var(--bg); color:#cbd5e1; border:1px solid var(--border); }
-  .review-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:11px; margin-bottom:8px; }
-  .review-card.twin-match { border:1.5px solid var(--green); }
   .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:3000; overflow-y:auto; padding:12px; }
   .modal-content { background:var(--card); max-width:620px; margin:15px auto; padding:16px; border-radius:16px; border:1px solid var(--border); }
   .form-group { margin-bottom:9px; }
@@ -112,25 +115,20 @@
   </symbol>
 </svg>
 
+<!-- MENÚ LATERAL CONTEXTUAL -->
 <div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleDrawer(false)"></div>
 <aside class="drawer" id="mainDrawer">
   <div class="drawer-header">
     <div class="brand-header" onclick="showView('landing'); toggleDrawer(false);">
       <svg class="app-logo-svg"><use href="#tusalergias-logo"></use></svg>
-      <div><h1>TusAlergias</h1><span class="header-sub">Red de Zonas Seguras</span></div>
+      <div><h1>TusAlergias</h1><span class="header-sub">Menú Principal</span></div>
     </div>
     <button class="btn btn-outline" onclick="toggleDrawer(false)">✕</button>
   </div>
-  <div class="drawer-nav">
-    <div class="drawer-item" onclick="showView('landing'); toggleDrawer(false);">🏠 Portada Principal</div>
-    <div class="drawer-item" onclick="openRestaurantForDiner(appState.restaurants[0].id); toggleDrawer(false);">🍽️ Ver Carta Interactiva</div>
-    <div class="drawer-item" onclick="showView('diner'); toggleDrawer(false);">🎒 Mis Rutas y Favoritos</div>
-    <div class="drawer-item" onclick="showView('map'); toggleDrawer(false);">🗺️ Mapa Mundial de Locales</div>
-    <div class="drawer-item" onclick="showView('owner'); toggleDrawer(false);">👨‍🍳 Panel para Restaurantes</div>
-    <div class="drawer-item" onclick="openNewRestaurantModal(); toggleDrawer(false);">➕ Dar de Alta mi Restaurante</div>
-  </div>
+  <div class="drawer-nav" id="drawerNavContent"></div>
 </aside>
 
+<!-- CABECERA -->
 <header>
   <div class="header-left">
     <button class="menu-btn" onclick="toggleDrawer(true)">☰</button>
@@ -142,7 +140,7 @@
   <div id="headerRightActions" style="display:flex; gap:6px;"></div>
 </header>
 
-<!-- VISTA 1: PORTADA -->
+<!-- VISTA 1: PORTADA PRINCIPAL -->
 <div id="landingView" class="container">
   <div style="text-align:center; margin:10px 0 14px;">
     <svg style="width:56px; height:56px;"><use href="#tusalergias-logo"></use></svg>
@@ -153,13 +151,13 @@
     <div class="role-card diner" onclick="showView('diner')">
       <div class="role-icon">🥗</div>
       <h3 style="margin:0; color:var(--green);">PARA COMENSALES</h3>
-      <p style="margin:0; font-size:0.8rem; color:var(--muted);">Filtra cartas por tus alérgenos, explora el mapa mundial de restaurantes seguros, crea tus rutas de viaje y usa la tarjeta multi-idioma para el camarero.</p>
+      <p style="margin:0; font-size:0.8rem; color:var(--muted);">Escanea el código Bidi de tu mesa, descubre restaurantes seguros a cualquier distancia en el mapa, organiza tus listas de viaje y lee opiniones de otros alérgicos.</p>
       <button class="btn btn-green" style="width:100%; padding:11px;">Entrar como Comensal →</button>
     </div>
     <div class="role-card owner" onclick="showView('owner')">
       <div class="role-icon">👨‍🍳</div>
       <h3 style="margin:0; color:var(--accent);">PARA RESTAURANTES</h3>
-      <p style="margin:0; font-size:0.8rem; color:var(--muted);">Registra tu local con contraseña, ubica tu dirección exacta en el mapa, gestiona tu carta interactiva, genera tu Bidi y recibe pre-avisos de reserva.</p>
+      <p style="margin:0; font-size:0.8rem; color:var(--muted);">Registra tu local con contraseña, gestiona tu carta interactiva, recibe pre-avisos de reservas con alergias y consulta las estadísticas de visitas de tu restaurante.</p>
       <button class="btn btn-primary" style="width:100%; padding:11px;">Entrar como Restaurante →</button>
     </div>
   </div>
@@ -173,11 +171,11 @@
   </div>
   <div class="action-grid-2">
     <div class="action-box" onclick="showView('map')"><span style="font-size:1.6rem;">🗺️</span><span>Mapa Mundial de Zonas Seguras</span></div>
-    <div class="action-box" onclick="openRestaurantForDiner(appState.restaurants[0].id)"><span style="font-size:1.6rem;">🍽️</span><span>Abrir Carta Piloto (12 Platos)</span></div>
+    <div class="action-box" onclick="openSuggestRestModal()"><span style="font-size:1.6rem;">💡</span><span>Sugerir Local Seguro al Mapa</span></div>
   </div>
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-    <span class="section-title" style="margin:0;">🎒 Mis Rutas de Viaje:</span>
-    <button class="btn btn-outline" onclick="createNewRouteFolder()">+ Nueva Ruta</button>
+    <span class="section-title" style="margin:0;">🎒 Mis Restaurantes Guardados y Sugeridos:</span>
+    <button class="btn btn-outline" onclick="createNewRouteFolder()">+ Nueva Carpeta</button>
   </div>
   <div class="folder-bar" id="routeFoldersBar"></div>
   <div id="myRestaurantsList"></div>
@@ -192,7 +190,7 @@
   <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:15px; margin-bottom:14px; text-align:center;">
     <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="openNewRestaurantModal()">➕ Dar de Alta Nuevo Restaurante</button>
   </div>
-  <div class="section-title">🏪 Locales Registrados (Contraseña Demo: 2026):</div>
+  <div class="section-title">🏪 Locales Registrados Oficialmente:</div>
   <div id="ownerRestaurantsList"></div>
 </div>
 
@@ -214,14 +212,13 @@
 <div id="appView" style="display:none;">
   <div class="staff-bar" id="staffBar">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <span style="font-size:0.76rem; font-weight:800; color:#fde047;">🔓 PANEL PROPIETARIO (Toca un ingrediente para hacerlo Fijo/Adaptable)</span>
+      <span style="font-size:0.76rem; font-weight:800; color:#fde047;">🔓 PANEL PROPIETARIO</span>
       <button class="btn btn-green" onclick="confirmMenuUpdatedToday()">✅ Verificar Hoy</button>
     </div>
     <div class="roi-metrics" id="ownerRoiMetrics"></div>
     <div style="display:flex; gap:6px; flex-wrap:wrap;">
       <button class="btn btn-amber" onclick="openDishModal()">+ Añadir Plato</button>
       <button class="btn btn-green" onclick="openQrModal(activeRestId)">📱 Código Bidi</button>
-      <button class="btn btn-outline" onclick="openEditRestModal(activeRestId)">⚙️ Editar Local</button>
       <button class="btn btn-primary" onclick="lockStaffMode()">🔒 Cerrar Edición</button>
     </div>
   </div>
@@ -235,8 +232,9 @@
           <div id="activeRestCity" style="font-size:0.76rem; color:var(--muted); margin-top:3px;"></div>
         </div>
         <div style="display:flex; gap:5px; flex-wrap:wrap;">
-          <button class="btn btn-purple" onclick="openWaiterCardModal()">🗣️ Tarjeta Camarero</button>
-          <button class="btn btn-green" onclick="openBookingModal()">📅 Pre-aviso Reserva</button>
+          <button class="btn btn-outline" id="btnToggleFav" onclick="toggleActiveFavorite()">⭐ Guardar</button>
+          <button class="btn btn-purple" onclick="openWaiterCardModal()">🗣️ Camarero</button>
+          <button class="btn btn-green" onclick="openBookingModal()">📅 Pre-aviso</button>
           <button class="btn btn-outline" id="btnOwnerAccessInApp" onclick="promptOwnerPassword(activeRestId)">🔐 Propietario</button>
         </div>
       </div>
@@ -278,41 +276,34 @@
     </div>
 
     <div id="dishList"></div>
-
-    <hr style="border-color:var(--border); margin:20px 0 12px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h3 style="margin:0; font-size:0.95rem;">💬 Experiencias de la Comunidad</h3>
-      <button class="btn btn-green" onclick="openReviewModal()">✍️ Valorar</button>
-    </div>
-    <div id="reviewsListContainer"></div>
   </div>
 </div>
 
-<!-- MODAL SUGERIR / ALTA CON BUSCADOR DE MAPAS NOMINATIM -->
+<!-- MODAL ALTA / SUGERIR LOCAL CON MAPA -->
 <div class="modal" id="restModal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;" id="restModalTitle">🏪 Datos del Restaurante</h2>
+      <h2 style="margin:0; font-size:1rem;" id="restModalTitle">🏪 Registro</h2>
       <button class="btn btn-outline" onclick="closeModal('restModal')">✕</button>
     </div>
     <input type="hidden" id="restEditId">
     <input type="hidden" id="restIsSuggest">
     <div class="form-group" style="background:var(--bg); padding:10px; border-radius:10px; border:1px solid var(--accent);">
-      <label style="color:var(--accent);">🔍 Buscar restaurante o dirección exacta en el Mapa:</label>
+      <label style="color:var(--accent);">🔍 Buscar calle, plaza o zona en el Mapa:</label>
       <div style="display:flex; gap:6px;">
-        <input type="text" id="geoSearchInput" placeholder="Ej. Nombre del local y ciudad..." onkeydown="if(event.key==='Enter') searchPlaceCoords()">
+        <input type="text" id="geoSearchInput" placeholder="Ej. Calle Mayor Mazarrón o Paseo Marítimo..." onkeydown="if(event.key==='Enter') searchPlaceCoords()">
         <button type="button" class="btn btn-primary" onclick="searchPlaceCoords()">Buscar</button>
       </div>
       <div id="geoResults" class="geo-results-list"></div>
     </div>
-    <div class="form-group"><label>Nombre del Restaurante:</label><input type="text" id="restNameInput"></div>
-    <div class="form-group"><label>Ciudad / Dirección:</label><input type="text" id="restCityInput"></div>
+    <div class="form-group"><label>Nombre del Restaurante:</label><input type="text" id="restNameInput" placeholder="Ej. Restaurante Bolnuevo"></div>
+    <div class="form-group"><label>Ciudad / Ubicación:</label><input type="text" id="restCityInput" placeholder="Ej. Puerto de Mazarrón"></div>
     <div class="form-group" id="passGroup"><label>🔑 Contraseña de Propietario:</label><input type="password" id="restPassInput" placeholder="Ej. 2026"></div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
       <div class="form-group"><label>Latitud:</label><input type="number" step="any" id="restLatInput" value="37.5630"></div>
       <div class="form-group"><label>Longitud:</label><input type="number" step="any" id="restLngInput" value="-1.3090"></div>
     </div>
-    <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="saveRestaurantMeta()">💾 Guardar en el Mapa</button>
+    <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="saveRestaurantMeta()">💾 Guardar Restaurante</button>
   </div>
 </div>
 
@@ -323,55 +314,20 @@
       <h2 style="margin:0; font-size:1rem;">🗣️ Tarjeta para el Camarero</h2>
       <button class="btn btn-outline" onclick="closeModal('waiterCardModal')">✕</button>
     </div>
-    <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
-      <button class="btn btn-primary" onclick="renderWaiterCardLang('es')">🇪🇸 ES</button>
-      <button class="btn btn-outline" onclick="renderWaiterCardLang('en')">🇬🇧 EN</button>
-      <button class="btn btn-outline" onclick="renderWaiterCardLang('fr')">🇫🇷 FR</button>
-      <button class="btn btn-outline" onclick="renderWaiterCardLang('it')">🇮🇹 IT</button>
-    </div>
     <div id="waiterCardBody" style="background:#060b19; border:2px solid var(--red); border-radius:12px; padding:14px;"></div>
   </div>
 </div>
 
-<!-- MODAL RESERVA PRE-AVISO -->
+<!-- MODAL PRE-AVISO RESERVAS -->
 <div class="modal" id="bookingModal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;">📅 Pre-aviso de Alergias a Cocina</h2>
+      <h2 style="margin:0; font-size:1rem;">📅 Pre-aviso de Alergias</h2>
       <button class="btn btn-outline" onclick="closeModal('bookingModal')">✕</button>
     </div>
-    <div class="form-group"><label>Nombre y Comensales:</label><input type="text" id="bookName" placeholder="Ej. Laura (4 personas)"></div>
-    <div class="form-group"><label>Día y Hora:</label><input type="text" id="bookTime" placeholder="Ej. Sábado 14:30"></div>
+    <div class="form-group"><label>Nombre y Comensales:</label><input type="text" id="bookName" placeholder="Ej. Francisco (2 personas)"></div>
+    <div class="form-group"><label>Día y Hora:</label><input type="text" id="bookTime" placeholder="Ej. Hoy 14:30"></div>
     <button class="btn btn-green" style="width:100%; padding:12px;" onclick="sendBookingPreAlert()">📲 Enviar por WhatsApp</button>
-  </div>
-</div>
-
-<!-- MODAL RESEÑA -->
-<div class="modal" id="reviewModal">
-  <div class="modal-content">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;">✍️ Valorar Seguridad</h2>
-      <button class="btn btn-outline" onclick="closeModal('reviewModal')">✕</button>
-    </div>
-    <div class="form-group"><label>Tu Nombre:</label><input type="text" id="revAuthor"></div>
-    <div class="form-group"><label>Alergias con las que comiste:</label><input type="text" id="revAllergens"></div>
-    <div class="form-group"><label>Experiencia:</label><textarea id="revComment" rows="3"></textarea></div>
-    <button class="btn btn-green" style="width:100%; padding:12px;" onclick="saveUserReview()">Publicar Opinión</button>
-  </div>
-</div>
-
-<!-- MODAL PLATO -->
-<div class="modal" id="dishModal">
-  <div class="modal-content">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;">➕ Añadir Plato</h2>
-      <button class="btn btn-outline" onclick="closeModal('dishModal')">✕</button>
-    </div>
-    <div class="form-group"><label>Nombre del Plato:</label><input type="text" id="editName"></div>
-    <div class="form-group"><label>Categoría:</label><input type="text" id="editCat" value="ENTRANTES"></div>
-    <div class="form-group"><label>Ingredientes (separados por coma):</label><input type="text" id="editIngs" placeholder="Ej. arroz, gamba roja, ajo"></div>
-    <div class="form-group"><label>Alérgenos (ej. GLUTEN, LÁCTEO, HUEVO):</label><input type="text" id="editAls"></div>
-    <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="saveQuickDish()">💾 Guardar Plato</button>
   </div>
 </div>
 
@@ -379,7 +335,7 @@
 <div class="modal" id="qrModal">
   <div class="modal-content" style="text-align:center;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;">📱 Código Bidi Oficial</h2>
+      <h2 style="margin:0; font-size:1rem;">📱 Código Bidi</h2>
       <button class="btn btn-outline" onclick="closeModal('qrModal')">✕</button>
     </div>
     <div style="background:#fff; padding:14px; border-radius:14px; display:inline-block; margin-bottom:10px;">
@@ -395,50 +351,86 @@ const DIETS = [{id:"CRUDO_EMBARAZO",label:"🤰 Embarazada"},{id:"NO_VEGANO",lab
 const QUICK_CUSTOM_INGS = ["Ajo","Cebolla","Manzana","Maíz","Aguacate","Tomate","Cilantro","Jengibre","Limón","Ñora","Setas"];
 
 const PILOT_REST = {
-  id: "pilot_1", name: "Restaurante Piloto (Muestra 12 Platos)", city: "Bolnuevo, Murcia", pass: "2026", lat: 37.5630, lng: -1.3090, unclaimed: false, lastVerified: "Hoy",
+  id: "pilot_1", name: "Restaurante Piloto (Muestra 12 Platos)", city: "Puerto de Mazarrón", pass: "2026", lat: 37.5630, lng: -1.3090, unclaimed: false, lastVerified: "Hoy",
   stats: { views: 142, saves: 34, bookings: 11, alerts: 0 },
-  reviews: [{ author: "Elena G.", stars: 5, allergens: "GLUTEN, LÁCTEO", comment: "Controlan genial la contaminación cruzada en cocina.", date: "Hoy" }],
   menu: [
-    { id:1, cat:"ENTRANTES", name:"BURRATA ARTESANA CON PESTO", traces:[], protocol:"Se emplata sin pesto ni picatostes bajo pedido.", ings:[{n:"Burrata y rúcula",a:["LÁCTEO"],tags:["NO_VEGANO"],sub:"leche, rúcula, tomate",mod:false},{n:"Pesto casero",a:["FRUTOS CON CÁSCARA","LÁCTEO"],tags:["NO_VEGANO"],sub:"albahaca, piñones, ajo, parmesano",mod:true,note:"Servir solo con AOVE"},{n:"Picatostes",a:["GLUTEN"],tags:[],sub:"pan de trigo, ajo",mod:true,note:"Sin picatostes"}] },
-    { id:2, cat:"COMPARTIR", name:"PATATAS BRAVAS TRADICIONALES", traces:["GLUTEN"], protocol:"Freidora limpia exclusiva para celíacos.", ings:[{n:"Patata agria",a:[],tags:[],sub:"patata, aceite, sal",mod:false},{n:"Salsa Brava velouté",a:["GLUTEN","SULFITOS"],tags:["PICANTE","NO_VEGANO"],sub:"caldo de ave, harina, pimentón, cayena, ajo",mod:true,note:"Sin salsa brava"},{n:"Alioli",a:["HUEVO"],tags:["NO_VEGANO"],sub:"ajo, huevo, aceite, limón",mod:true,note:"Sin alioli"}] },
-    { id:3, cat:"COMPARTIR", name:"CROQUETAS CREMOSAS DE IBÉRICO", traces:[], protocol:"Bechamel tradicional no adaptable.", ings:[{n:"Masa bechamel y panko",a:["GLUTEN","LÁCTEO","HUEVO"],tags:["CERDO","NO_VEGANO","NO_VEGETARIANO"],sub:"leche, harina, mantequilla, jamón ibérico, cebolla",mod:false}] },
-    { id:4, cat:"ENTRANTES", name:"TARTAR DE ATÚN ROJO Y AGUACATE", traces:[], protocol:"Se aliña con AOVE sin salsa teriyaki.", ings:[{n:"Atún rojo y aguacate",a:["PESCADO"],tags:["CRUDO_EMBARAZO","NO_VEGANO","NO_VEGETARIANO"],sub:"atún, aguacate, lima, cebolleta",mod:false},{n:"Salsa Teriyaki",a:["GLUTEN","SOJA","SÉSAMO"],tags:[],sub:"soja, trigo, jengibre, sésamo",mod:true,note:"Aliñar solo con AOVE"}] },
-    { id:5, cat:"ENTRANTES", name:"ALCACHOFAS CONFITADAS A LA PLANCHA", traces:[], protocol:"Plancha limpia.", ings:[{n:"Alcachofa natural",a:[],tags:[],sub:"alcachofa, aceite",mod:false},{n:"Virutas de jamón",a:[],tags:["CERDO","NO_VEGANO","NO_VEGETARIANO"],sub:"jamón",mod:true,note:"Sin jamón"},{n:"Piñones",a:["FRUTOS CON CÁSCARA"],tags:[],sub:"piñones",mod:true,note:"Sin piñones"}] },
-    { id:6, cat:"ENTRANTES", name:"ENSALADA DE CABRA Y MANZANA", traces:[], protocol:"Bol limpio.", ings:[{n:"Brotes y manzana",a:[],tags:[],sub:"lechuga, manzana, cherry",mod:false},{n:"Queso de cabra",a:["LÁCTEO"],tags:["NO_VEGANO"],sub:"leche de cabra",mod:true,note:"Sin queso"},{n:"Nueces",a:["FRUTOS CON CÁSCARA"],tags:[],sub:"nueces",mod:true,note:"Sin nueces"}] },
-    { id:7, cat:"ARROCES", name:"ARROZ DEL SEÑORET MEDITERRÁNEO", traces:[], protocol:"Caldo natural sin harinas.", ings:[{n:"Arroz, sepia y gamba roja",a:["CRUSTÁCEOS","MOLUSCOS","PESCADO"],tags:["NO_VEGANO","NO_VEGETARIANO"],sub:"arroz, gamba roja, sepia, rape, ñora, ajo, tomate",mod:false},{n:"Alioli en salsera",a:["HUEVO"],tags:["NO_VEGANO"],sub:"ajo, huevo",mod:true,note:"Sin salsera de alioli"}] },
-    { id:8, cat:"ARROCES", name:"RISOTTO DE BOLETUS Y TRUFA", traces:[], protocol:"Se puede terminar con AOVE sin lácteos.", ings:[{n:"Arroz con setas",a:["SULFITOS"],tags:[],sub:"arroz, boletus, trufa, cebolla, ajo, vino",mod:false},{n:"Mantequilla y parmesano",a:["LÁCTEO"],tags:["NO_VEGANO"],sub:"mantequilla, queso",mod:true,note:"Sin mantecar con lácteos"}] },
-    { id:9, cat:"PRINCIPALES", name:"CORVINA SALVAJE A LA BRASA", traces:[], protocol:"Parrilla limpia.", ings:[{n:"Lomo de corvina y verdura",a:["PESCADO"],tags:["NO_VEGANO","NO_VEGETARIANO"],sub:"corvina, calabacín, pimiento",mod:false},{n:"Refrito de ajo y guindilla",a:[],tags:["PICANTE"],sub:"ajo, guindilla",mod:true,note:"Sin refrito de ajo ni guindilla"}] },
-    { id:10, cat:"PRINCIPALES", name:"PRESA IBÉRICA GLASEADA", traces:[], protocol:"Bien pasada para embarazadas.", ings:[{n:"Presa ibérica y patata",a:[],tags:["CERDO","NO_VEGANO","NO_VEGETARIANO"],sub:"cerdo, patata",mod:false},{n:"Glaseado Teriyaki",a:["GLUTEN","SOJA","SÉSAMO"],tags:[],sub:"soja, trigo, sésamo",mod:true,note:"Asar solo con sal en escamas"}] },
-    { id:11, cat:"POSTRES", name:"TARTA DE QUESO AL HORNO", traces:["FRUTOS CON CÁSCARA"], protocol:"Lácteos pasteurizados.", ings:[{n:"Crema de queso y galleta",a:["GLUTEN","LÁCTEO","HUEVO"],tags:["NO_VEGANO"],sub:"queso, nata, huevo, harina",mod:false}] },
-    { id:12, cat:"POSTRES", name:"CARPACCIO DE PIÑA Y COCO", traces:[], protocol:"Postre 100% vegetal y sin gluten.", ings:[{n:"Piña y sorbete de coco",a:[],tags:[],sub:"piña, coco, lima, menta",mod:false},{n:"Garrapiñado de cacahuete y sésamo",a:["CACAHUETES","SÉSAMO"],tags:[],sub:"cacahuete, sésamo",mod:true,note:"Sin garrapiñado"}] }
+    { id:1, cat:"ENTRANTES", name:"BURRATA ARTESANA CON PESTO", traces:[], protocol:"Sin pesto ni picatostes bajo pedido.", ings:[{n:"Burrata",a:["LÁCTEO"],tags:["NO_VEGANO"],sub:"leche",mod:false},{n:"Pesto",a:["FRUTOS CON CÁSCARA","LÁCTEO"],tags:["NO_VEGANO"],sub:"piñones, ajo, queso",mod:true,note:"Servir con AOVE"},{n:"Picatostes",a:["GLUTEN"],tags:[],sub:"trigo",mod:true,note:"Sin picatostes"}] },
+    { id:2, cat:"COMPARTIR", name:"PATATAS BRAVAS TRADICIONALES", traces:["GLUTEN"], protocol:"Freidora limpia.", ings:[{n:"Patata agria",a:[],tags:[],sub:"patata",mod:false},{n:"Salsa Brava",a:["GLUTEN","SULFITOS"],tags:["PICANTE","NO_VEGANO"],sub:"harina, pimentón, cayena",mod:true,note:"Sin salsa brava"},{n:"Alioli",a:["HUEVO"],tags:["NO_VEGANO"],sub:"ajo, huevo",mod:true,note:"Sin alioli"}] },
+    { id:3, cat:"COMPARTIR", name:"CROQUETAS CREMOSAS DE IBÉRICO", traces:[], protocol:"No adaptable.", ings:[{n:"Bechamel y jamón",a:["GLUTEN","LÁCTEO","HUEVO"],tags:["CERDO","NO_VEGANO","NO_VEGETARIANO"],sub:"harina, leche, jamón",mod:false}] },
+    { id:4, cat:"ENTRANTES", name:"TARTAR DE ATÚN Y AGUACATE", traces:[], protocol:"Aliñar al natural con AOVE.", ings:[{n:"Atún rojo y aguacate",a:["PESCADO"],tags:["CRUDO_EMBARAZO","NO_VEGANO","NO_VEGETARIANO"],sub:"atún, aguacate",mod:false},{n:"Teriyaki",a:["GLUTEN","SOJA","SÉSAMO"],tags:[],sub:"soja, trigo",mod:true,note:"Aliñar solo con AOVE"}] },
+    { id:5, cat:"ENTRANTES", name:"ALCACHOFAS A LA PLANCHA", traces:[], protocol:"Plancha limpia.", ings:[{n:"Alcachofa",a:[],tags:[],sub:"alcachofa",mod:false},{n:"Jamón",a:[],tags:["CERDO","NO_VEGANO","NO_VEGETARIANO"],sub:"jamón",mod:true,note:"Sin jamón"},{n:"Piñones",a:["FRUTOS CON CÁSCARA"],tags:[],sub:"piñones",mod:true,note:"Sin piñones"}] },
+    { id:6, cat:"ENTRANTES", name:"ENSALADA DE CABRA Y MANZANA", traces:[], protocol:"Bol limpio.", ings:[{n:"Brotes y manzana",a:[],tags:[],sub:"lechuga, manzana",mod:false},{n:"Queso cabra",a:["LÁCTEO"],tags:["NO_VEGANO"],sub:"leche",mod:true,note:"Sin queso"},{n:"Nueces",a:["FRUTOS CON CÁSCARA"],tags:[],sub:"nueces",mod:true,note:"Sin nueces"}] },
+    { id:7, cat:"ARROCES", name:"ARROZ DEL SEÑORET", traces:[], protocol:"Caldo limpio sin harinas.", ings:[{n:"Arroz y marisco",a:["CRUSTÁCEOS","MOLUSCOS","PESCADO"],tags:["NO_VEGANO","NO_VEGETARIANO"],sub:"arroz, gamba, sepia",mod:false},{n:"Alioli",a:["HUEVO"],tags:["NO_VEGANO"],sub:"ajo, huevo",mod:true,note:"Sin alioli"}] },
+    { id:8, cat:"ARROCES", name:"RISOTTO DE BOLETUS Y TRUFA", traces:[], protocol:"Sin mantecar bajo petición.", ings:[{n:"Arroz y setas",a:["SULFITOS"],tags:[],sub:"arroz, boletus, vino",mod:false},{n:"Mantequilla y queso",a:["LÁCTEO"],tags:["NO_VEGANO"],sub:"leche",mod:true,note:"Terminar con AOVE sin lácteos"}] },
+    { id:9, cat:"PRINCIPALES", name:"CORVINA SALVAJE A LA BRASA", traces:[], protocol:"Parrilla limpia.", ings:[{n:"Corvina y verduras",a:["PESCADO"],tags:["NO_VEGANO","NO_VEGETARIANO"],sub:"corvina",mod:false},{n:"Refrito de ajo",a:[],tags:["PICANTE"],sub:"ajo, guindilla",mod:true,note:"A la brasa sin ajo ni picante"}] },
+    { id:10, cat:"PRINCIPALES", name:"PRESA IBÉRICA", traces:[], protocol:"Bien pasada para embarazadas.", ings:[{n:"Presa y patatas",a:[],tags:["CERDO","NO_VEGANO","NO_VEGETARIANO"],sub:"cerdo, patata",mod:false},{n:"Glaseado",a:["GLUTEN","SOJA","SÉSAMO"],tags:[],sub:"soja, trigo",mod:true,note:"Solo con sal en escamas"}] },
+    { id:11, cat:"POSTRES", name:"TARTA DE QUESO AL HORNO", traces:["FRUTOS CON CÁSCARA"], protocol:"Lácteos pasteurizados.", ings:[{n:"Crema queso y galleta",a:["GLUTEN","LÁCTEO","HUEVO"],tags:["NO_VEGANO"],sub:"queso, huevo, harina",mod:false}] },
+    { id:12, cat:"POSTRES", name:"CARPACCIO DE PIÑA Y COCO", traces:[], protocol:"100% vegetal sin gluten.", ings:[{n:"Piña y coco",a:[],tags:[],sub:"piña, coco",mod:false},{n:"Cacahuete garrapiñado",a:["CACAHUETES","SÉSAMO"],tags:[],sub:"cacahuete",mod:true,note:"Sin garrapiñado"}] }
   ]
 };
 
 let appState = null;
-try { appState = JSON.parse(localStorage.getItem("tusalergias_v7_clean")); } catch(e){}
+try { appState = JSON.parse(localStorage.getItem("tusalergias_v8_app")); } catch(e){}
 if (!appState || !appState.restaurants || !appState.restaurants.length) {
   appState = {
     restaurants: [PILOT_REST],
-    routeFolders: [{ id:"f1", name:"⭐ Mis Favoritos", restIds:["pilot_1"] }, { id:"f2", name:"✈️ Viajes", restIds:[] }],
-    activeFolderId: "f1"
+    favoriteIds: ["pilot_1"]
   };
 }
 
 let activeRestId = appState.restaurants[0].id;
 let isStaffUnlocked = false;
+let currentView = "landing";
 let leafletMap = null, markersLayer = null, lastGeoPlaces = [];
 let selectedAllergens = new Set(), selectedDiets = new Set(), customAvoidSet = new Set(), currentTab = "aptos";
 
-function saveAppState() { localStorage.setItem("tusalergias_v7_clean", JSON.stringify(appState)); }
+function saveAppState() { localStorage.setItem("tusalergias_v8_app", JSON.stringify(appState)); }
 function getActiveRest() { return appState.restaurants.find(r => r.id === activeRestId) || appState.restaurants[0]; }
 function normalizeStr(s) { return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
 function closeModal(id) { document.getElementById(id).style.display = "none"; }
+
 function toggleDrawer(open) {
+  if (open) updateDrawerMenu();
   document.getElementById("mainDrawer").classList.toggle("open", open);
   document.getElementById("drawerBackdrop").style.display = open ? "block" : "none";
 }
 
+// MENÚ LATERAL CONTEXTUAL SEGÚN LA SECCIÓN
+function updateDrawerMenu() {
+  const container = document.getElementById("drawerNavContent");
+  if (currentView === "diner" || (currentView === "app" && !isStaffUnlocked)) {
+    container.innerHTML = `
+      <span class="drawer-badge" style="background:rgba(16,185,129,0.2); color:var(--green);">Modo Comensal 🥗</span>
+      <div class="drawer-item" onclick="showView('landing'); toggleDrawer(false);">🏠 Inicio</div>
+      <div class="drawer-item" onclick="showView('diner'); toggleDrawer(false);">🎒 Mis Restaurantes y Favoritos</div>
+      <div class="drawer-item" onclick="showView('map'); toggleDrawer(false);">🗺️ Mapa Mundial de Zonas Seguras</div>
+      <div class="drawer-item" onclick="openSuggestRestModal(); toggleDrawer(false);">💡 Sugerir Restaurante al Mapa</div>
+      <div class="drawer-item" onclick="openRestaurantForDiner(appState.restaurants[0].id); toggleDrawer(false);">🍽️ Ver Carta Piloto (12 Platos)</div>
+      <div class="drawer-divider"></div>
+      <div class="drawer-item" style="color:var(--accent); font-weight:800;" onclick="showView('owner'); toggleDrawer(false);">🔄 Cambiar a Zona Restaurantes 👨‍🍳</div>
+    `;
+  } else if (currentView === "owner" || (currentView === "app" && isStaffUnlocked)) {
+    container.innerHTML = `
+      <span class="drawer-badge" style="background:rgba(56,189,248,0.2); color:var(--accent);">Modo Propietario 👨‍🍳</span>
+      <div class="drawer-item" onclick="showView('landing'); toggleDrawer(false);">🏠 Inicio</div>
+      <div class="drawer-item" onclick="showView('owner'); toggleDrawer(false);">🏪 Mis Locales Registrados</div>
+      <div class="drawer-item" onclick="openNewRestaurantModal(); toggleDrawer(false);">➕ Dar de Alta Nuevo Restaurante</div>
+      <div class="drawer-item" onclick="showView('map'); toggleDrawer(false);">🗺️ Ver Mapa Mundial</div>
+      <div class="drawer-divider"></div>
+      <div class="drawer-item" style="color:var(--green); font-weight:800;" onclick="showView('diner'); toggleDrawer(false);">🔄 Cambiar a Zona Comensales 🥗</div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="drawer-item" onclick="showView('landing'); toggleDrawer(false);">🏠 Portada Principal</div>
+      <div class="drawer-item" onclick="showView('diner'); toggleDrawer(false);">🥗 Entrar como Comensal</div>
+      <div class="drawer-item" onclick="showView('owner'); toggleDrawer(false);">👨‍🍳 Entrar como Restaurante</div>
+      <div class="drawer-item" onclick="showView('map'); toggleDrawer(false);">🗺️ Ver Mapa de Zonas Seguras</div>
+    `;
+  }
+}
+
 function showView(v) {
+  currentView = v;
   ["landingView","dinerView","ownerView","mapView","appView"].forEach(id => {
     document.getElementById(id).style.display = (id === v + "View") ? "block" : "none";
   });
@@ -448,37 +440,50 @@ function showView(v) {
   if (v === "app") renderRestaurantApp();
 }
 
+// 1. ZONA COMENSALES: Muestra favoritos y locales sugeridos por clientes
 function renderDinerView() {
-  const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId) || appState.routeFolders[0];
-  document.getElementById("routeFoldersBar").innerHTML = appState.routeFolders.map(f =>
-    `<div class="folder-pill ${f.id===folder.id?'active':''}" onclick="appState.activeFolderId='${f.id}';renderDinerView()">${f.name}</div>`
-  ).join("");
-  document.getElementById("myRestaurantsList").innerHTML = appState.restaurants.map(r => `
+  const allDinerRests = appState.restaurants.filter(r => (appState.favoriteIds || []).includes(r.id) || r.unclaimed);
+  document.getElementById("routeFoldersBar").innerHTML = `<div class="folder-pill active">⭐ Mis Restaurantes y Sugeridos (${allDinerRests.length})</div>`;
+  
+  if (!allDinerRests.length) {
+    document.getElementById("myRestaurantsList").innerHTML = `<div style="text-align:center; padding:20px; color:var(--muted); font-size:0.8rem;">No tienes locales guardados aún. Usa "Sugerir Local Seguro" o guárdalos desde el mapa.</div>`;
+    return;
+  }
+
+  document.getElementById("myRestaurantsList").innerHTML = allDinerRests.map(r => `
     <div class="rest-list-card">
       <div class="rest-info" onclick="openRestaurantForDiner('${r.id}')">
-        <div><b>${r.name}</b> <span class="verified-badge">🛡️ ${r.lastVerified||'Verificado'}</span><br><span style="font-size:0.75rem;color:var(--muted);">📍 ${r.city||''} · ${(r.menu||[]).length} platos</span></div>
+        <div>
+          <b>${r.name}</b> ${r.unclaimed ? '<span class="community-badge">💡 Sugerido</span>' : '<span class="verified-badge">🛡️ Verificado</span>'}<br>
+          <span style="font-size:0.75rem; color:var(--muted);">📍 ${r.city || 'En el mapa'} · ${(r.menu||[]).length} platos</span>
+        </div>
       </div>
       <button class="btn btn-green" onclick="openRestaurantForDiner('${r.id}')">🍽️ Ver Carta</button>
     </div>
   `).join("");
 }
 
-function createNewRouteFolder() {
-  const n = prompt("Nombre de la nueva ruta (ej. Vacaciones Granada):");
-  if (!n) return;
-  const id = "f_" + Date.now();
-  appState.routeFolders.push({ id, name: "📍 " + n.trim(), restIds: [] });
-  appState.activeFolderId = id;
-  saveAppState(); renderDinerView();
-}
-
+// 2. ZONA RESTAURANTES: Solo muestra locales oficiales (!unclaimed)
 function renderOwnerView() {
-  document.getElementById("ownerRestaurantsList").innerHTML = appState.restaurants.map(r => `
+  const officialRests = appState.restaurants.filter(r => !r.unclaimed);
+  
+  if (!officialRests.length) {
+    document.getElementById("ownerRestaurantsList").innerHTML = `
+      <div style="text-align:center; padding:16px; color:var(--muted); font-size:0.8rem;">
+        No tienes ningún restaurante oficial registrado. Pulsa el botón superior para dar de alta tu local.
+      </div>`;
+    return;
+  }
+
+  document.getElementById("ownerRestaurantsList").innerHTML = officialRests.map(r => `
     <div class="rest-list-card">
       <div class="rest-info" onclick="promptOwnerPassword('${r.id}')">
-        <div><b>${r.name}</b><br><span style="font-size:0.74rem;color:var(--muted);">📍 ${r.city||''} · 👁️ ${r.stats?.views||0} visitas · 📅 ${r.stats?.bookings||0} reservas</span></div>
+        <div>
+          <b>${r.name}</b> <span class="verified-badge">🛡️ Oficial</span><br>
+          <span style="font-size:0.74rem; color:var(--muted);">📍 ${r.city||''} · 👁️ ${r.stats?.views||0} visitas · 📅 ${r.stats?.bookings||0} reservas</span>
+        </div>
       </div>
-      <div style="display:flex;gap:6px;">
+      <div style="display:flex; gap:6px;">
         <button class="btn btn-primary" onclick="promptOwnerPassword('${r.id}')">🔐 Gestionar</button>
         <button class="btn btn-green" onclick="openQrModal('${r.id}')">📱 Bidi</button>
       </div>
@@ -504,7 +509,7 @@ function lockStaffMode() { isStaffUnlocked = false; renderRestaurantApp(); }
 
 function confirmMenuUpdatedToday() {
   const r = getActiveRest();
-  r.lastVerified = new Date().toLocaleDateString("es-ES");
+  r.lastVerified = "Hoy";
   saveAppState(); renderRestaurantApp();
   alert("✅ Carta verificada con fecha de hoy.");
 }
@@ -513,21 +518,38 @@ function renderRestaurantApp() {
   const r = getActiveRest();
   document.getElementById("headerMainTitle").innerText = r.name;
   document.getElementById("activeRestCity").innerText = r.city ? `📍 ${r.city}` : "";
+  document.getElementById("activeRestBadge").className = r.unclaimed ? "community-badge" : "verified-badge";
+  document.getElementById("activeRestBadge").innerText = r.unclaimed ? "💡 Sugerido por Comunidad" : "🛡️ Zona Segura Verificada";
   document.getElementById("activeRestLastVerified").innerText = `✓ Revisado: ${r.lastVerified || 'Hoy'}`;
+  
+  const isFav = (appState.favoriteIds || []).includes(r.id);
+  const favBtn = document.getElementById("btnToggleFav");
+  favBtn.innerText = isFav ? "★ Guardado" : "⭐ Guardar";
+  favBtn.className = isFav ? "btn btn-green" : "btn btn-outline";
+
   document.getElementById("staffBar").classList.toggle("show", isStaffUnlocked);
   document.getElementById("btnOwnerAccessInApp").style.display = isStaffUnlocked ? "none" : "inline-flex";
 
   if (isStaffUnlocked) {
     document.getElementById("ownerRoiMetrics").innerHTML = `
       <div class="roi-box"><span class="roi-num">${r.stats?.views||0}</span><span class="roi-label">Visitas</span></div>
-      <div class="roi-box"><span class="roi-num">${r.stats?.saves||0}</span><span class="roi-label">Favoritos</span></div>
+      <div class="roi-box"><span class="roi-num">${r.stats?.saves||0}</span><span class="roi-label">Guardados</span></div>
       <div class="roi-box"><span class="roi-num">${r.stats?.bookings||0}</span><span class="roi-label">Reservas</span></div>
       <div class="roi-box"><span class="roi-num">ACTIVO</span><span class="roi-label">Estado</span></div>`;
   }
 
   const cats = Array.from(new Set((r.menu || []).map(d => d.cat)));
   document.getElementById("catFilter").innerHTML = `<option value="ALL">Todas las categorías (${(r.menu||[]).length})</option>` + cats.map(c => `<option value="${c}">${c}</option>`).join("");
-  initFilterButtons(); renderDishes(); renderReviews();
+  initFilterButtons(); renderDishes();
+}
+
+function toggleActiveFavorite() {
+  const r = getActiveRest();
+  if (!appState.favoriteIds) appState.favoriteIds = [];
+  const idx = appState.favoriteIds.indexOf(r.id);
+  if (idx > -1) appState.favoriteIds.splice(idx, 1);
+  else { appState.favoriteIds.push(r.id); r.stats.saves = (r.stats.saves||0) + 1; }
+  saveAppState(); renderRestaurantApp();
 }
 
 function initFilterButtons() {
@@ -537,9 +559,9 @@ function initFilterButtons() {
   document.getElementById("activeCustomTags").innerHTML = Array.from(customAvoidSet).map(t => `<span class="custom-tag-Badge" onclick="toggleCustom('${t}')">Sin ${t.toUpperCase()} ✕</span>`).join("");
 }
 
-function toggleAl(a) { selectedAllergens.has(a) ? selectedAllergens.delete(a) : selectedAllergens.add(a); initFilterButtons(); renderDishes(); renderReviews(); }
+function toggleAl(a) { selectedAllergens.has(a) ? selectedAllergens.delete(a) : selectedAllergens.add(a); initFilterButtons(); renderDishes(); }
 function toggleDiet(d) { selectedDiets.has(d) ? selectedDiets.delete(d) : selectedDiets.add(d); initFilterButtons(); renderDishes(); }
-function toggleCustom(t) { customAvoidSet.has(t) ? customAvoidSet.delete(t) : customAvoidSet.add(t); initFilterButtons(); renderDishes(); renderReviews(); }
+function toggleCustom(t) { customAvoidSet.has(t) ? customAvoidSet.delete(t) : customAvoidSet.add(t); initFilterButtons(); renderDishes(); }
 function addCustomIngFromInput() {
   const el = document.getElementById("customIngInput");
   if (el.value.trim()) { customAvoidSet.add(el.value.trim().toLowerCase()); el.value = ""; initFilterButtons(); renderDishes(); }
@@ -593,7 +615,7 @@ function renderDishes() {
     if (d.protocol) badge += `<div class="mod-box protocol">👩‍🍳 ${d.protocol}</div>`;
 
     const pills = (d.ings || []).map((i, idx) => {
-      const btn = isStaffUnlocked ? `<b style="cursor:pointer;color:${i.mod?'#fcd34d':'#94a3b8'};" onclick="quickToggleMod(${d.id},${idx})">[${i.mod?'🔄 Adaptable':'🔒 Fijo'}]</b>` : "";
+      const btn = isStaffUnlocked ? `<b style="cursor:pointer;color:${i.mod?'#fcd34d':'#94a3b8'};" onclick="quickToggleMod(${d.id},${idx})">[${i.mod?'🔄':'🔒'}]</b>` : "";
       return `<span class="ing-pill"><b>${i.n}</b> ${i.a?.length?'['+i.a.join(',')+']':''} ${btn}</span>`;
     }).join("");
 
@@ -606,17 +628,17 @@ function renderDishes() {
   document.getElementById("dishList").innerHTML = html || `<p style="text-align:center;color:var(--muted);">No hay platos en este apartado.</p>`;
 }
 
-// BUSCADOR AUTOMÁTICO DE DIRECCIONES (NOMINATIM)
+// BÚSQUEDA NOMINATIM PRIORIZANDO ESPAÑA
 async function searchPlaceCoords() {
   const q = document.getElementById("geoSearchInput").value.trim();
   const box = document.getElementById("geoResults");
   if (!q) return;
   box.style.display = "block";
-  box.innerHTML = `<div class="geo-result-item">🔎 Buscando ubicación...</div>`;
+  box.innerHTML = `<div class="geo-result-item">🔎 Buscando ubicación en España...</div>`;
   try {
-    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=4`, { headers:{"Accept-Language":"es"} });
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=es&q=${encodeURIComponent(q)}&limit=4`, { headers:{"Accept-Language":"es"} });
     lastGeoPlaces = await res.json();
-    if (!lastGeoPlaces.length) { box.innerHTML = `<div class="geo-result-item">Sin resultados. Añade la ciudad.</div>`; return; }
+    if (!lastGeoPlaces.length) { box.innerHTML = `<div class="geo-result-item">Sin resultados en España. Prueba con la calle o localidad.</div>`; return; }
     selectGeoPlace(0, false);
     box.innerHTML = lastGeoPlaces.map((p, i) => `<div class="geo-result-item" onclick="selectGeoPlace(${i}, true)">📍 <b>${p.display_name.split(',')[0]}</b> — ${p.display_name.split(',').slice(1,3).join(',')}</div>`).join("");
   } catch(e) { box.innerHTML = `<div class="geo-result-item">Error al conectar con el mapa.</div>`; }
@@ -627,13 +649,15 @@ function selectGeoPlace(idx, closeList) {
   if (!p) return;
   document.getElementById("restLatInput").value = parseFloat(p.lat).toFixed(5);
   document.getElementById("restLngInput").value = parseFloat(p.lon).toFixed(5);
-  document.getElementById("restNameInput").value = p.display_name.split(",")[0];
+  if (!document.getElementById("restNameInput").value || closeList) {
+    document.getElementById("restNameInput").value = p.display_name.split(",")[0];
+  }
   document.getElementById("restCityInput").value = p.display_name.split(",").slice(1, 3).join(",").trim();
   if (closeList) document.getElementById("geoResults").style.display = "none";
 }
 
 function openNewRestaurantModal() {
-  document.getElementById("restModalTitle").innerText = "➕ Alta de Restaurante";
+  document.getElementById("restModalTitle").innerText = "➕ Alta de Restaurante Oficial";
   document.getElementById("restEditId").value = "";
   document.getElementById("restIsSuggest").value = "";
   document.getElementById("restNameInput").value = "";
@@ -644,19 +668,9 @@ function openNewRestaurantModal() {
 
 function openSuggestRestModal() {
   openNewRestaurantModal();
-  document.getElementById("restModalTitle").innerText = "💡 Sugerir Local Seguro";
+  document.getElementById("restModalTitle").innerText = "💡 Sugerir Restaurante Seguro al Mapa";
   document.getElementById("restIsSuggest").value = "1";
   document.getElementById("passGroup").style.display = "none";
-}
-
-function openEditRestModal(id) {
-  const r = getActiveRest();
-  openNewRestaurantModal();
-  document.getElementById("restEditId").value = r.id;
-  document.getElementById("restNameInput").value = r.name;
-  document.getElementById("restCityInput").value = r.city || "";
-  document.getElementById("restLatInput").value = r.lat || 37.5630;
-  document.getElementById("restLngInput").value = r.lng || -1.3090;
 }
 
 function saveRestaurantMeta() {
@@ -674,23 +688,32 @@ function saveRestaurantMeta() {
     r.name = name; r.city = city; r.lat = lat; r.lng = lng;
   } else {
     const newId = "r_" + Date.now();
-    appState.restaurants.push({ id:newId, name, city, pass, lat, lng, unclaimed:isSug, lastVerified:isSug?"Sugerido":"Hoy", stats:{views:1,saves:1,bookings:0}, reviews:[], menu:PILOT_REST.menu });
+    appState.restaurants.push({ 
+      id: newId, name, city, pass, lat, lng, 
+      unclaimed: isSug, 
+      lastVerified: isSug ? "Sugerido por cliente" : "Hoy", 
+      stats: { views:1, saves:1, bookings:0 }, 
+      menu: PILOT_REST.menu 
+    });
+    if (isSug && !appState.favoriteIds.includes(newId)) {
+      appState.favoriteIds.push(newId);
+    }
     activeRestId = newId;
   }
   saveAppState(); closeModal("restModal");
-  isSug ? showView("map") : openRestaurantForDiner(activeRestId);
+  isSug ? showView("diner") : openRestaurantForDiner(activeRestId);
 }
 
 function initOrRefreshMap() {
   if (!leafletMap) {
-    leafletMap = L.map("mapContainer").setView([37.5630, -1.3090], 11);
+    leafletMap = L.map("mapContainer").setView([37.5630, -1.3090], 12);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(leafletMap);
     markersLayer = L.layerGroup().addTo(leafletMap);
   } else { leafletMap.invalidateSize(); markersLayer.clearLayers(); }
 
   document.getElementById("mapCardsList").innerHTML = appState.restaurants.map(r => {
     L.marker([r.lat||37.563, r.lng||-1.309]).addTo(markersLayer).bindPopup(`<b>${r.name}</b><br><button class="btn btn-green" onclick="openRestaurantForDiner('${r.id}')">Ver Carta</button>`);
-    return `<div class="rest-list-card"><div class="rest-info" onclick="openRestaurantForDiner('${r.id}')"><div><b>${r.name}</b><br><span style="font-size:0.75rem;color:var(--muted);">📍 ${r.city||''}</span></div></div><button class="btn btn-primary" onclick="openRestaurantForDiner('${r.id}')">🍽️ Carta</button></div>`;
+    return `<div class="rest-list-card"><div class="rest-info" onclick="openRestaurantForDiner('${r.id}')"><div><b>${r.name}</b> ${r.unclaimed?'<span class="community-badge">💡 Sugerido</span>':'<span class="verified-badge">🛡️ Verificado</span>'}<br><span style="font-size:0.75rem;color:var(--muted);">📍 ${r.city||''}</span></div></div><button class="btn btn-primary" onclick="openRestaurantForDiner('${r.id}')">🍽️ Carta</button></div>`;
   }).join("");
 }
 
@@ -698,52 +721,22 @@ function locateUserOnMap() {
   navigator.geolocation?.getCurrentPosition(p => leafletMap?.setView([p.coords.latitude, p.coords.longitude], 14));
 }
 
-function openWaiterCardModal() { renderWaiterCardLang("es"); document.getElementById("waiterCardModal").style.display = "block"; }
-function renderWaiterCardLang(lang) {
-  const als = [...Array.from(selectedAllergens), ...Array.from(customAvoidSet).map(x=>x.toUpperCase())].join(", ") || "Ninguno seleccionado";
-  const msg = {
-    es: `⚠️ ALERTA COCINA: Tengo alergia severa a: <b>${als}</b>. Por favor, eviten trazas y contaminación cruzada en plancha y freidora.`,
-    en: `⚠️ KITCHEN ALERT: I have a severe allergy to: <b>${als}</b>. Please avoid cross-contamination on grills and fryers.`,
-    fr: `⚠️ ALERTE CUISINE : J'ai une allergie sévère à : <b>${als}</b>. Merci d'éviter toute contamination croisée.`,
-    it: `⚠️ AVVISO CUCINA: Ho una grave allergia a: <b>${als}</b>. Si prega di evitare la contaminazione crociata.`
-  }[lang];
-  document.getElementById("waiterCardBody").innerHTML = msg;
+function openWaiterCardModal() {
+  const als = [...Array.from(selectedAllergens), ...Array.from(customAvoidSet).map(x=>x.toUpperCase())].join(", ") || "Ninguno marcado";
+  document.getElementById("waiterCardBody").innerHTML = `
+    <div style="font-weight:900; color:#f87171; font-size:1.05rem; margin-bottom:8px;">⚠️ ALERTA ALERGIA ALIMENTARIA</div>
+    <p style="margin:0 0 8px; font-size:0.9rem;">Tengo alergia severa a: <b style="color:#fde047;">${als}</b>.</p>
+    <p style="margin:0; font-size:0.8rem; color:#7dd3fc;">🛡️ Por favor, eviten cualquier contaminación cruzada en plancha, freidoras o utensilios.</p>
+  `;
+  document.getElementById("waiterCardModal").style.display = "block";
 }
 
 function openBookingModal() { document.getElementById("bookingModal").style.display = "block"; }
 function sendBookingPreAlert() {
   const r = getActiveRest();
-  r.stats.bookings = (r.stats.bookings || 0) + 1; saveAppState();
   const als = Array.from(selectedAllergens).join(", ") || "A consultar";
   const txt = `📅 *RESERVA PRE-AVISO ALERGIAS (${r.name})*\n👤 ${document.getElementById("bookName").value}\n🕒 ${document.getElementById("bookTime").value}\n🛡️ Alergias: ${als}`;
   closeModal("bookingModal"); window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, "_blank");
-}
-
-function openReviewModal() {
-  document.getElementById("revAllergens").value = Array.from(selectedAllergens).join(", ");
-  document.getElementById("reviewModal").style.display = "block";
-}
-function saveUserReview() {
-  const r = getActiveRest();
-  if (!r.reviews) r.reviews = [];
-  r.reviews.unshift({ author: document.getElementById("revAuthor").value||"Comensal", stars:5, allergens: document.getElementById("revAllergens").value||"GENERAL", comment: document.getElementById("revComment").value, date:"Hoy" });
-  saveAppState(); closeModal("reviewModal"); renderReviews();
-}
-function renderReviews() {
-  const r = getActiveRest();
-  document.getElementById("reviewsListContainer").innerHTML = (r.reviews || []).map(rv => `
-    <div class="review-card"><b>${rv.author}</b> ⭐⭐⭐⭐⭐ <span class="verified-badge">🛡️ ${rv.allergens}</span><div style="font-size:0.8rem;margin-top:4px;">"${rv.comment}"</div></div>
-  `).join("");
-}
-
-function openDishModal() { document.getElementById("dishModal").style.display = "block"; }
-function saveQuickDish() {
-  const r = getActiveRest();
-  const name = document.getElementById("editName").value.trim().toUpperCase();
-  if (!name) return;
-  const als = document.getElementById("editAls").value.split(",").map(s=>s.trim().toUpperCase()).filter(Boolean);
-  r.menu.unshift({ id:Date.now(), cat:document.getElementById("editCat").value.toUpperCase(), name, traces:[], protocol:"", ings:[{ n:document.getElementById("editIngs").value||"Ingredientes base", a:als, tags:[], sub:"", mod:true, note:"Adaptable" }] });
-  saveAppState(); closeModal("dishModal"); renderRestaurantApp();
 }
 
 function openQrModal(id) {
@@ -754,7 +747,7 @@ function openQrModal(id) {
 }
 
 function shareWhatsApp() {
-  window.open(`https://wa.me/?text=${encodeURIComponent("Descubre la carta segura de " + getActiveRest().name + " en TusAlergias: " + window.location.href)}`, "_blank");
+  window.open(`https://wa.me/?text=${encodeURIComponent("Consulta la carta de " + getActiveRest().name + " en TusAlergias: " + window.location.href)}`, "_blank");
 }
 </script>
 </body>
