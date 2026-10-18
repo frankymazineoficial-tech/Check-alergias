@@ -7,6 +7,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <title>TusAlergias - Red Social y Control en Casa</title>
 <style>
@@ -122,6 +123,7 @@
   .mini-chip.selected { background:var(--red); color:#fff; border-color:var(--red); }
   .mini-chip.diet-sel { background:var(--purple); color:#fff; border-color:var(--purple); }
   .mini-chip.trace-sel { background:var(--accent); color:#000; border-color:var(--accent); }
+  #barcodeReader { width:100%; border-radius:10px; overflow:hidden; background:#000; }
 </style>
 </head>
 <body>
@@ -183,7 +185,7 @@
       <div class="role-icon">🏠</div>
       <div>
         <h3 style="margin:0 0 6px; color:var(--amber);">PARA CASA</h3>
-        <p style="margin:0; font-size:0.78rem; color:var(--muted);">Controla tus alérgenos en casa: haz una foto a la etiqueta de cualquier producto, recibe alertas si contiene tu alérgeno y crea tus listas de platos caseros.</p>
+        <p style="margin:0; font-size:0.78rem; color:var(--muted);">Controla tus alérgenos en casa: escanea el código de barras o la etiqueta de cualquier producto, recibe alertas si contiene tu alérgeno y crea tus platos caseros.</p>
       </div>
       <button class="btn btn-amber" style="width:100%; padding:11px;">Entrar a Para Casa →</button>
     </div>
@@ -199,14 +201,14 @@
   </div>
 </div>
 
-<!-- VISTA 2: SECCIÓN PARA CASA (CONTROL DE ALÉRGENOS Y ESCÁNER DE ETIQUETAS) -->
+<!-- VISTA 2: SECCIÓN PARA CASA -->
 <div id="homeView" class="container" style="display:none;">
   <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
     <div>
       <h2 style="margin:0; font-size:1.1rem; color:var(--amber);">🏠 Para Casa: Controla tus Alérgenos</h2>
-      <span style="font-size:0.74rem; color:var(--muted);">Marca primero tus alergias abajo para recibir avisos automáticos al escanear etiquetas</span>
+      <span style="font-size:0.74rem; color:var(--muted);">Marca primero tus alergias abajo para recibir alertas automáticas al escanear productos</span>
     </div>
-    <button class="btn btn-amber" style="padding:10px 14px; font-size:0.8rem;" onclick="openHomeDishModal()">📸 + Crear Plato / Escanear Etiqueta</button>
+    <button class="btn btn-amber" style="padding:10px 14px; font-size:0.8rem;" onclick="openHomeDishModal()">📊 + Crear Plato / Escanear Producto</button>
   </div>
 
   <div class="section-title">1. Selecciona tus alérgenos a evitar antes de escanear:</div>
@@ -227,14 +229,13 @@
 
   <div style="display:flex; justify-content:space-between; align-items:center; margin:10px 0;">
     <label style="font-size:0.75rem; color:#fcd34d; font-weight:700; cursor:pointer;">
-      <input type="checkbox" id="homeStrictTraces" checked onchange="syncStrictTraces(this.checked)"> 🛡️ Avisar y bloquear también si la etiqueta indica trazas
+      <input type="checkbox" id="homeStrictTraces" checked onchange="syncStrictTraces(this.checked)"> 🛡️ Avisar también si el envase declara trazas
     </label>
     <button class="btn btn-outline" onclick="clearAllFilters()">🧹 Limpiar Filtros</button>
   </div>
 
   <hr style="border-color:var(--border); margin:16px 0 12px;">
 
-  <!-- GESTOR DE LISTAS DE PLATOS CASEROS -->
   <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
     <span class="section-title" style="margin:0;">🍲 Mis Listas de Platos Caseros:</span>
     <div style="display:flex; gap:5px;">
@@ -404,12 +405,12 @@
   </div>
 </div>
 
-<!-- MODAL CONSTRUCTOR DE PLATO CASERO Y ESCÁNER DE ETIQUETAS (PARA CASA) -->
+<!-- MODAL CONSTRUCTOR DE PLATO CASERO + ESCÁNER DE CÓDIGO DE BARRAS Y ETIQUETAS -->
 <div class="modal" id="homeDishModal">
   <div class="modal-content" style="border:2px solid var(--amber);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <h2 style="margin:0; font-size:1rem; color:var(--amber);" id="homeDishModalTitle">🍲 Crear / Editar Plato en Casa</h2>
-      <button class="btn btn-outline" onclick="closeModal('homeDishModal')">✕</button>
+      <button class="btn btn-outline" onclick="closeHomeDishModal()">✕</button>
     </div>
     <input type="hidden" id="editHomeDishId">
 
@@ -418,23 +419,41 @@
       <input type="text" id="homeDishNameInput" placeholder="Ej. Arroz con tomate y cebolla">
     </div>
 
-    <!-- PANEL PARA AÑADIR PRODUCTO POR FOTO DE ETIQUETA, BUSCADOR SÚPER O MANUAL -->
     <div class="ing-editor-card" style="border-color:var(--accent);">
       <div style="font-size:0.8rem; font-weight:800; color:var(--accent); margin-bottom:8px;">
         ➕ Añadir Producto o Ingrediente a este Plato:
       </div>
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
-        <label class="btn btn-amber" style="cursor:pointer; margin:0; padding:10px;">
-          📸 1. Foto a la Etiqueta
+      <!-- 3 MÉTODOS DIRECTOS: CÓDIGO DE BARRAS, FOTO OCR Y MANUAL -->
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:8px;">
+        <button type="button" class="btn btn-green" style="padding:10px 4px; font-size:0.72rem;" onclick="startBarcodeScanner()">
+          📊 1. Código Barras
+        </button>
+        <label class="btn btn-amber" style="cursor:pointer; margin:0; padding:10px 4px; font-size:0.72rem;">
+          📸 2. Foto Etiqueta
           <input type="file" id="labelCameraInput" accept="image/*" capture="environment" style="display:none;" onchange="handleLabelPhotoScan(event)">
         </label>
-        <button type="button" class="btn btn-outline" onclick="focusManualProductInput()">🧅 2. Ingrediente sin Etiqueta</button>
+        <button type="button" class="btn btn-outline" style="padding:10px 4px; font-size:0.72rem;" onclick="focusManualProductInput()">
+          🧅 3. Sin Etiqueta
+        </button>
       </div>
 
-      <!-- BUSCADOR DE PRODUCTOS DE SUPERMERCADO (OPENFOODFACTS) -->
+      <!-- VISOR EN VIVO DEL ESCÁNER DE CÓDIGO DE BARRAS -->
+      <div id="barcodeScannerContainer" style="display:none; margin-bottom:10px; background:#000; padding:8px; border-radius:10px; border:1px solid var(--green);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <span style="font-size:0.74rem; color:var(--green); font-weight:800;">📷 Apunta al código de barras del envase...</span>
+          <button type="button" class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="stopBarcodeScanner()">✕ Cerrar Cámara</button>
+        </div>
+        <div id="barcodeReader"></div>
+        <div style="display:flex; gap:6px; margin-top:8px;">
+          <input type="text" id="manualBarcodeInput" placeholder="O escribe el nº del código de barras (EAN)..." style="flex:1; padding:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.75rem;">
+          <button type="button" class="btn btn-primary" onclick="lookupBarcodeNumber(document.getElementById('manualBarcodeInput').value)">Consultar</button>
+        </div>
+      </div>
+
+      <!-- BUSCADOR POR TEXTO DE SUPERMERCADO -->
       <div style="display:flex; gap:6px; margin-bottom:8px;">
-        <input type="text" id="supermarketSearchInput" placeholder="🛒 O busca producto de súper (ej. Tomate frito, Arroz...)" style="flex:1; padding:7px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.78rem;" onkeydown="if(event.key==='Enter') searchSupermarketProduct()">
+        <input type="text" id="supermarketSearchInput" placeholder="🛒 O busca producto por nombre (ej. Tomate frito, Arroz...)" style="flex:1; padding:7px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.78rem;" onkeydown="if(event.key==='Enter') searchSupermarketProduct()">
         <button type="button" class="btn btn-primary" onclick="searchSupermarketProduct()">Buscar</button>
       </div>
       <div id="supermarketResults" class="geo-results-list" style="margin-bottom:8px;"></div>
@@ -442,15 +461,15 @@
       <div id="ocrStatusBox" style="display:none; padding:8px; border-radius:8px; background:rgba(56,189,248,0.15); color:var(--accent); font-size:0.75rem; margin-bottom:8px; font-weight:700;"></div>
 
       <div class="form-group">
-        <label>Producto / Ingrediente que vas a añadir:</label>
+        <label>Producto / Ingrediente detectado o escrito:</label>
         <input type="text" id="tempProdName" placeholder="Ej. Paquete de arroz / Brick de tomate / Cebolla fresca">
       </div>
       <div class="form-group">
-        <label>Ingredientes leídos en la etiqueta (o escribe los componentes):</label>
+        <label>Ingredientes de la etiqueta (o componentes):</label>
         <textarea id="tempProdSub" rows="2" placeholder="Ej. tomate, aceite de girasol, azúcar, sal, almidón modificado, cebolla, ajo..." oninput="autoMarkAllergensFromLabelText()"></textarea>
       </div>
       <div class="form-group">
-        <label>Alérgenos detectados en este producto (toca para marcar/desmarcar):</label>
+        <label>Alérgenos en este producto (toca para marcar/desmarcar):</label>
         <div class="mini-chips" id="tempProdAllergens"></div>
       </div>
 
@@ -466,7 +485,7 @@
   </div>
 </div>
 
-<!-- MODAL DE ALERTA DE CONFLICTO DE ALÉRGENO AL ESCANEAR (AVISO DE CONFIRMACIÓN) -->
+<!-- MODAL DE ALERTA DE CONFLICTO DE ALÉRGENO AL ESCANEAR -->
 <div class="modal" id="allergenWarningModal" style="z-index:4000;">
   <div class="modal-content" style="border:3px solid var(--red); background:#1a0b12; text-align:center;">
     <div style="font-size:2.4rem; margin-bottom:4px;">⚠️</div>
@@ -676,8 +695,8 @@ const SAMPLE_HOME_LISTS = [
         id: 901,
         name: "ARROZ CON TOMATE Y CEBOLLA (EJEMPLO)",
         ings: [
-          { n: "📸 Paquete Arroz Redondo", sub: "arroz 100%", a: [], tags: [] },
-          { n: "📸 Brick Tomate Frito", sub: "tomate, aceite de girasol, azúcar, sal, almidón de maíz", a: [], tags: [] },
+          { n: "📊 Paquete Arroz Redondo", sub: "arroz 100%", a: [], tags: [] },
+          { n: "📊 Brick Tomate Frito", sub: "tomate, aceite de girasol, azúcar, sal, almidón de maíz", a: [], tags: [] },
           { n: "🧅 Cebolla fresca (Manual)", sub: "cebolla", a: [], tags: [] }
         ]
       }
@@ -691,7 +710,7 @@ function normalizeStr(s) { return (s || "").toLowerCase().normalize("NFD").repla
 function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
 let appState = null;
-try { appState = JSON.parse(localStorage.getItem("tusalergias_v12_home")); } catch(e){}
+try { appState = JSON.parse(localStorage.getItem("tusalergias_v13_barcode")); } catch(e){}
 if (!appState || !Array.isArray(appState.restaurants) || !appState.restaurants.length) {
   appState = {
     restaurants: [PILOT_REST],
@@ -719,8 +738,9 @@ let selectedAllergens = new Set(), selectedDiets = new Set(), customAvoidSet = n
 let currentTab = "aptos", currentHomeTab = "aptos";
 let tempHomeDishIngs = [];
 let pendingUnsafeProduct = null;
+let html5QrScanner = null;
 
-function saveAppState() { localStorage.setItem("tusalergias_v12_home", JSON.stringify(appState)); }
+function saveAppState() { localStorage.setItem("tusalergias_v13_barcode", JSON.stringify(appState)); }
 function getActiveRest() { return appState.restaurants.find(r => r.id === activeRestId) || appState.restaurants[0]; }
 function getActiveHomeList() { return appState.homeLists.find(l => l.id === appState.activeHomeListId) || appState.homeLists[0]; }
 
@@ -736,7 +756,7 @@ function updateDrawerMenu() {
     c.innerHTML = `
       <span class="drawer-badge" style="background:rgba(245,158,11,0.2); color:var(--amber);">Sección Para Casa 🏠</span>
       <div class="drawer-item" onclick="showView('home'); toggleDrawer(false);">🍲 Mis Listas de Platos en Casa</div>
-      <div class="drawer-item" onclick="openHomeDishModal(); toggleDrawer(false);">📸 Escanear Etiqueta / Crear Plato</div>
+      <div class="drawer-item" onclick="openHomeDishModal(); toggleDrawer(false);">📊 Escanear Código Barras / Etiqueta</div>
       <div class="drawer-item" onclick="createNewHomeList(); toggleDrawer(false);">➕ Crear Nueva Lista Casera</div>
       <div class="drawer-divider"></div>
       <div class="drawer-item" style="color:var(--green); font-weight:800;" onclick="showView('diner'); toggleDrawer(false);">🔄 Ir a Para Comensales 🥗</div>
@@ -801,7 +821,7 @@ function syncStrictTraces(checked) {
 }
 
 // ==========================================================
-// SECCIÓN "PARA CASA": ESCÁNER DE ETIQUETAS Y PLATOS CASEROS
+// SECCIÓN "PARA CASA": ESCÁNER DE CÓDIGO DE BARRAS, OCR Y PLATOS
 // ==========================================================
 function renderHomeView() {
   initFilterButtons();
@@ -851,25 +871,25 @@ function deleteActiveHomeList() {
   saveAppState(); renderHomeView();
 }
 
-// DETECTOR AUTOMÁTICO DE ALÉRGENOS DESDE EL TEXTO DE LA ETIQUETA
+// DETECTOR DE ALÉRGENOS (ESPAÑOL + ETIQUETAS INTERNACIONALES OPENFOODFACTS)
 function detectAllergensFromString(str) {
   const norm = normalizeStr(str);
   const found = [];
   const map = {
-    "GLUTEN": ["gluten", "trigo", "cebada", "centeno", "avena", "espelta", "kamut", "harina", "pan", "galleta", "pasta"],
-    "CRUSTÁCEOS": ["crustaceo", "crustaceos", "gamba", "gambon", "langostino", "cangrejo", "cigala", "camaron"],
-    "HUEVO": ["huevo", "huevos", "yema", "clara", "albumina", "lecitina de huevo", "mayonesa"],
-    "PESCADO": ["pescado", "salmon", "atun", "bonito", "anchoa", "bacalao", "merluza", "corvina"],
-    "CACAHUETES": ["cacahuete", "cacahuetes", "mani"],
-    "SOJA": ["soja", "edamame", "tofu", "lecitina de soja", "miso"],
-    "LÁCTEO": ["lacteo", "lacteos", "leche", "lactosa", "queso", "nata", "mantequilla", "yogur", "suero de leche", "caseina"],
-    "FRUTOS CON CÁSCARA": ["frutos de cascara", "frutos secos", "almendra", "avellana", "nuez", "nueces", "pistacho", "anacardo", "pinones", "macadamia"],
-    "APIO": ["apio"],
-    "MOSTAZA": ["mostaza"],
-    "SÉSAMO": ["sesamo", "ajonjoli", "tahini"],
-    "SULFITOS": ["sulfitos", "sulfito", "dioxido de azufre", "vino", "vinagre", "e220", "e221", "e222", "e223", "e224"],
-    "ALTRAMUCES": ["altramuz", "altramuces"],
-    "MOLUSCOS": ["molusco", "moluscos", "pulpo", "calamar", "sepia", "mejillon", "almeja", "ostra"]
+    "GLUTEN": ["gluten", "wheat", "trigo", "cebada", "barley", "centeno", "rye", "avena", "oats", "espelta", "kamut", "harina", "pan", "galleta", "pasta"],
+    "CRUSTÁCEOS": ["crustaceo", "crustaceans", "gamba", "gambon", "langostino", "cangrejo", "cigala", "camaron", "shrimp", "prawn"],
+    "HUEVO": ["huevo", "huevos", "egg", "eggs", "yema", "clara", "albumina", "lecitina de huevo", "mayonesa"],
+    "PESCADO": ["pescado", "fish", "salmon", "atun", "bonito", "anchoa", "bacalao", "merluza", "corvina"],
+    "CACAHUETES": ["cacahuete", "cacahuetes", "peanuts", "peanut", "mani"],
+    "SOJA": ["soja", "soybeans", "soy", "edamame", "tofu", "lecitina de soja", "miso"],
+    "LÁCTEO": ["lacteo", "lacteos", "milk", "leche", "lactosa", "queso", "nata", "mantequilla", "yogur", "suero", "caseina", "whey"],
+    "FRUTOS CON CÁSCARA": ["frutos de cascara", "frutos secos", "nuts", "tree-nuts", "almendra", "avellana", "nuez", "nueces", "pistacho", "anacardo", "pinones", "macadamia"],
+    "APIO": ["apio", "celery"],
+    "MOSTAZA": ["mostaza", "mustard"],
+    "SÉSAMO": ["sesamo", "sesame", "ajonjoli", "tahini"],
+    "SULFITOS": ["sulfitos", "sulfito", "sulphites", "sulphur-dioxide", "dioxido de azufre", "vino", "vinagre", "e220", "e221", "e222", "e223", "e224"],
+    "ALTRAMUCES": ["altramuz", "altramuces", "lupin"],
+    "MOLUSCOS": ["molusco", "moluscos", "molluscs", "pulpo", "calamar", "sepia", "mejillon", "almeja", "ostra"]
   };
   Object.keys(map).forEach(alKey => {
     if (map[alKey].some(k => norm.includes(k))) found.push(alKey);
@@ -885,6 +905,7 @@ function openHomeDishModal(dishId = null) {
   document.getElementById("supermarketSearchInput").value = "";
   document.getElementById("supermarketResults").style.display = "none";
   document.getElementById("ocrStatusBox").style.display = "none";
+  stopBarcodeScanner();
   renderTempProdAllergenChips([]);
 
   if (dishId) {
@@ -904,6 +925,11 @@ function openHomeDishModal(dishId = null) {
   document.getElementById("homeDishModal").style.display = "block";
 }
 
+function closeHomeDishModal() {
+  stopBarcodeScanner();
+  closeModal("homeDishModal");
+}
+
 function renderTempProdAllergenChips(selectedArray = []) {
   const sel = new Set(selectedArray);
   document.getElementById("tempProdAllergens").innerHTML = ALLERGENS.map(a =>
@@ -918,6 +944,7 @@ function autoMarkAllergensFromLabelText() {
 }
 
 function focusManualProductInput() {
+  stopBarcodeScanner();
   const nameInput = document.getElementById("tempProdName");
   nameInput.value = "";
   document.getElementById("tempProdSub").value = "";
@@ -926,8 +953,86 @@ function focusManualProductInput() {
   nameInput.focus();
 }
 
-// 1. ESCÁNER OCR DE FOTO DE ETIQUETA
+// 1. ESCÁNER DE CÓDIGO DE BARRAS EN VIVO (HTML5-QRCODE + OPENFOODFACTS)
+function startBarcodeScanner() {
+  const container = document.getElementById("barcodeScannerContainer");
+  container.style.display = "block";
+  document.getElementById("manualBarcodeInput").value = "";
+
+  if (html5QrScanner) {
+    stopBarcodeScanner();
+    container.style.display = "block";
+  }
+
+  try {
+    html5QrScanner = new Html5Qrcode("barcodeReader");
+    html5QrScanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 240, height: 110 } },
+      (decodedText) => {
+        stopBarcodeScanner();
+        lookupBarcodeNumber(decodedText);
+      },
+      () => {}
+    ).catch(() => {
+      document.getElementById("ocrStatusBox").style.display = "block";
+      document.getElementById("ocrStatusBox").innerText = "ℹ️ Permiso de cámara denegado o no disponible. Puedes escribir el número del código de barras en la caja de arriba.";
+    });
+  } catch (e) {}
+}
+
+function stopBarcodeScanner() {
+  const container = document.getElementById("barcodeScannerContainer");
+  if (container) container.style.display = "none";
+  if (html5QrScanner) {
+    html5QrScanner.stop().then(() => {
+      html5QrScanner.clear();
+      html5QrScanner = null;
+    }).catch(() => { html5QrScanner = null; });
+  }
+}
+
+async function lookupBarcodeNumber(rawCode) {
+  const code = String(rawCode || "").replace(/\D/g, "");
+  if (!code) { alert("Introduce o escanea un código de barras válido."); return; }
+  stopBarcodeScanner();
+
+  const statusBox = document.getElementById("ocrStatusBox");
+  statusBox.style.display = "block";
+  statusBox.innerText = `📊 Código ${code} leído. Consultando ingredientes y alérgenos...`;
+
+  try {
+    const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${encodeURIComponent(code)}.json`);
+    const data = await res.json();
+
+    if (data.status !== 1 || !data.product) {
+      statusBox.innerText = `⚠️ El código ${code} no figura en la base de datos pública. Haz una foto a su etiqueta con el botón "📸 2. Foto Etiqueta".`;
+      return;
+    }
+
+    const p = data.product;
+    const prodName = p.product_name_es || p.product_name || ("Producto " + code);
+    const brand = p.brands ? ` (${p.brands.split(",")[0]})` : "";
+    const ingText = p.ingredients_text_es || p.ingredients_text || "";
+    const strictTraces = document.getElementById("homeStrictTraces").checked;
+    const alTags = (p.allergens_tags || []).join(" ") + " " + (p.allergens || "");
+    const trTags = strictTraces ? ((p.traces_tags || []).join(" ") + " " + (p.traces || "")) : "";
+
+    document.getElementById("tempProdName").value = `📊 ${prodName}${brand}`;
+    document.getElementById("tempProdSub").value = ingText || "Ingredientes verificados por código de barras";
+    const detected = detectAllergensFromString(`${prodName} ${ingText} ${alTags} ${trTags}`);
+    renderTempProdAllergenChips(detected);
+
+    statusBox.innerText = `✅ "${prodName}" identificado. Alérgenos detectados: ${detected.length ? detected.join(", ") : "Ninguno"}.`;
+    verifyAndAddProductToHomeDish();
+  } catch (e) {
+    statusBox.innerText = "⚠️ Error de conexión al consultar el código de barras.";
+  }
+}
+
+// 2. ESCÁNER OCR DE FOTO DE ETIQUETA
 async function handleLabelPhotoScan(event) {
+  stopBarcodeScanner();
   const file = event.target.files[0];
   if (!file) return;
   const statusBox = document.getElementById("ocrStatusBox");
@@ -938,29 +1043,30 @@ async function handleLabelPhotoScan(event) {
     const result = await Tesseract.recognize(file, "spa");
     const rawText = (result?.data?.text || "").replace(/\s+/g, " ").trim();
     if (!rawText) {
-      statusBox.innerText = "⚠️ No se pudo leer texto claro en la foto. Puedes escribir o corregir los ingredientes abajo.";
+      statusBox.innerText = "⚠️ No se pudo leer texto claro en la foto. Puedes escribir los ingredientes abajo.";
       return;
     }
     if (!document.getElementById("tempProdName").value) {
-      document.getElementById("tempProdName").value = "📸 Producto Escaneado";
+      document.getElementById("tempProdName").value = "📸 Producto Escaneado (Etiqueta)";
     }
     document.getElementById("tempProdSub").value = rawText;
     const detected = detectAllergensFromString(rawText);
     renderTempProdAllergenChips(detected);
-    statusBox.innerText = `✅ Etiqueta leída. Alérgenos detectados automáticamente: ${detected.length ? detected.join(", ") : "Ninguno de los 14 oficiales"}. Pulsa abajo para añadirlo al plato.`;
+    statusBox.innerText = `✅ Etiqueta leída. Alérgenos detectados: ${detected.length ? detected.join(", ") : "Ninguno"}.`;
+    verifyAndAddProductToHomeDish();
   } catch (err) {
     statusBox.innerText = "⚠️ Error al procesar la imagen. Escribe los ingredientes manualmente abajo.";
   }
   event.target.value = "";
 }
 
-// 2. BUSCADOR DE PRODUCTOS DE SUPERMERCADO (OPENFOODFACTS ESPAÑA)
+// 3. BUSCADOR DE PRODUCTOS DE SUPERMERCADO
 async function searchSupermarketProduct() {
   const q = document.getElementById("supermarketSearchInput").value.trim();
   const box = document.getElementById("supermarketResults");
   if (!q) return;
   box.style.display = "block";
-  box.innerHTML = `<div class="geo-result-item">🛒 Buscando etiquetas oficiales en supermercados...</div>`;
+  box.innerHTML = `<div class="geo-result-item">🛒 Buscando en catálogo de supermercados...</div>`;
 
   try {
     const url = `https://es.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=5`;
@@ -969,7 +1075,7 @@ async function searchSupermarketProduct() {
     lastSupermarketProducts = (data.products || []).filter(p => p.product_name);
 
     if (!lastSupermarketProducts.length) {
-      box.innerHTML = `<div class="geo-result-item">No encontrado. Haz foto a la etiqueta o escríbelo abajo.</div>`;
+      box.innerHTML = `<div class="geo-result-item">No encontrado. Escanea el código de barras o haz foto a la etiqueta.</div>`;
       return;
     }
 
@@ -979,7 +1085,7 @@ async function searchSupermarketProduct() {
       </div>
     `).join("");
   } catch (e) {
-    box.innerHTML = `<div class="geo-result-item">Sin conexión con el catálogo. Usa la cámara o escritura manual.</div>`;
+    box.innerHTML = `<div class="geo-result-item">Sin conexión con el catálogo.</div>`;
   }
 }
 
@@ -989,14 +1095,16 @@ function selectSupermarketProduct(idx) {
   document.getElementById("supermarketResults").style.display = "none";
   const prodTitle = `🛒 ${p.product_name}${p.brands ? ' (' + p.brands + ')' : ''}`;
   const ingText = p.ingredients_text_es || p.ingredients_text || "";
-  const allergensTags = (p.allergens_tags || []).join(" ");
+  const strictTraces = document.getElementById("homeStrictTraces").checked;
+  const alTags = (p.allergens_tags || []).join(" ") + " " + (strictTraces ? (p.traces_tags || []).join(" ") : "");
   document.getElementById("tempProdName").value = prodTitle;
   document.getElementById("tempProdSub").value = ingText;
-  const detected = detectAllergensFromString(prodTitle + " " + ingText + " " + allergensTags);
+  const detected = detectAllergensFromString(prodTitle + " " + ingText + " " + alTags);
   renderTempProdAllergenChips(detected);
+  verifyAndAddProductToHomeDish();
 }
 
-// 3. VERIFICACIÓN DE ALÉRGENOS Y DISPARO DE ALERTA SI HAY CONFLICTO
+// 4. VERIFICACIÓN DE ALÉRGENOS Y DISPARO DE ALERTA SI HAY CONFLICTO
 function checkProductConflicts(prod) {
   const alHits = (prod.a || []).filter(a => selectedAllergens.has(a));
   const norm = normalizeStr(prod.n + " " + (prod.sub || ""));
@@ -1010,7 +1118,7 @@ function verifyAndAddProductToHomeDish() {
   const name = document.getElementById("tempProdName").value.trim();
   const sub = document.getElementById("tempProdSub").value.trim();
   if (!name && !sub) {
-    alert("Escanea una etiqueta o escribe el nombre del producto/ingrediente primero.");
+    alert("Escanea un código de barras, haz foto a la etiqueta o escribe el ingrediente primero.");
     return;
   }
 
@@ -1040,6 +1148,9 @@ function verifyAndAddProductToHomeDish() {
 
 function cancelAddUnsafeProduct() {
   pendingUnsafeProduct = null;
+  document.getElementById("tempProdName").value = "";
+  document.getElementById("tempProdSub").value = "";
+  renderTempProdAllergenChips([]);
   closeModal("allergenWarningModal");
 }
 
@@ -1055,7 +1166,6 @@ function commitAddProductToHomeDish(prod) {
   tempHomeDishIngs.push(prod);
   document.getElementById("tempProdName").value = "";
   document.getElementById("tempProdSub").value = "";
-  document.getElementById("ocrStatusBox").style.display = "none";
   renderTempProdAllergenChips([]);
   renderTempHomeDishIngs();
 }
@@ -1069,7 +1179,7 @@ function renderTempHomeDishIngs() {
   document.getElementById("homeDishIngCount").innerText = tempHomeDishIngs.length;
   const container = document.getElementById("homeDishCurrentIngsList");
   if (!tempHomeDishIngs.length) {
-    container.innerHTML = `<div style="font-size:0.76rem; color:var(--muted); padding:10px; background:var(--bg); border-radius:8px; text-align:center;">Aún no has añadido productos a este plato. Escanea una etiqueta o añade un ingrediente arriba.</div>`;
+    container.innerHTML = `<div style="font-size:0.76rem; color:var(--muted); padding:10px; background:var(--bg); border-radius:8px; text-align:center;">Aún no has añadido productos a este plato. Escanea un código de barras, haz foto a la etiqueta o añade un ingrediente arriba.</div>`;
     return;
   }
   container.innerHTML = tempHomeDishIngs.map((ing, i) => {
@@ -1101,7 +1211,7 @@ function saveHomeDish() {
   }
 
   saveAppState();
-  closeModal("homeDishModal");
+  closeHomeDishModal();
   renderHomeView();
 }
 
@@ -1159,7 +1269,7 @@ function renderHomeDishes() {
   document.getElementById("homeDishesContainer").innerHTML = html || `
     <div style="text-align:center; padding:24px 14px; background:var(--card); border-radius:12px; color:var(--muted); font-size:0.82rem;">
       No hay platos en este apartado.<br><br>
-      <button class="btn btn-amber" onclick="openHomeDishModal()">📸 + Crear Nuevo Plato / Escanear Producto</button>
+      <button class="btn btn-amber" onclick="openHomeDishModal()">📊 + Crear Nuevo Plato / Escanear Producto</button>
     </div>`;
 }
 
@@ -1398,7 +1508,6 @@ function claimCommunityRestaurant() {
   saveAppState(); renderRestaurantApp();
 }
 
-// PANELES DE ALÉRGENOS SINCRONIZADOS ENTRE RESTAURANTES Y "PARA CASA"
 function initFilterButtons() {
   const alHtml = ALLERGENS.map(a => `<div class="chip ${selectedAllergens.has(a)?'active':''}" onclick="toggleAl('${a}')">${a}</div>`).join("");
   const dietHtml = DIETS.map(d => `<div class="chip diet ${selectedDiets.has(d.id)?'active':''}" onclick="toggleDiet('${d.id}')">${d.label}</div>`).join("");
