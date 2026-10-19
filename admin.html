@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>TusAlergias · Administración</title>
+<link rel="icon" type="image/png" href="favicon-32.png">
+<style>
+  :root { --bg:#0b132b; --card:#1c2541; --card-alt:#060b19; --text:#f8fafc; --muted:#94a3b8; --green:#10b981; --amber:#f59e0b; --red:#ef4444; --accent:#38bdf8; --border:#2d3a5d; }
+  * { box-sizing:border-box; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  body { margin:0; background:var(--bg); color:var(--text); }
+  header { background:var(--card-alt); border-bottom:1px solid var(--border); padding:12px 16px; position:sticky; top:0; z-index:5; }
+  header h1 { margin:0; font-size:1rem; }
+  header span { display:block; font-size:0.72rem; color:var(--accent); font-weight:600; }
+  main { max-width:900px; margin:0 auto; padding:16px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:14px; }
+  .card h2 { margin:0 0 10px; font-size:0.98rem; color:var(--accent); }
+  .muted { color:var(--muted); font-size:0.8rem; line-height:1.45; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .btn { padding:9px 12px; border-radius:9px; border:none; font-weight:700; cursor:pointer; font-size:0.8rem; }
+  .btn[disabled] { opacity:0.5; cursor:not-allowed; }
+  .btn-primary { background:var(--accent); color:#020617; }
+  .btn-green { background:var(--green); color:#020617; }
+  .btn-danger { background:var(--red); color:#fff; }
+  .btn-outline { background:transparent; border:1px solid #64748b; color:var(--text); }
+  label { display:block; font-size:0.78rem; color:var(--muted); font-weight:700; margin:8px 0 4px; }
+  input[type=email], input[type=password], input[type=date], textarea { width:100%; padding:9px 10px; border-radius:8px; border:1px solid #475569; background:var(--bg); color:#fff; font-size:0.88rem; }
+  textarea { min-height:90px; resize:vertical; }
+  .check { display:flex; gap:8px; align-items:center; color:var(--text); font-weight:600; font-size:0.84rem; margin:6px 0; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px; }
+  .stat { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px; }
+  .stat b { display:block; font-size:1.4rem; }
+  .stat span { font-size:0.74rem; color:var(--muted); }
+  table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+  th, td { text-align:left; padding:7px 6px; border-bottom:1px solid var(--border); vertical-align:top; }
+  th { color:var(--muted); font-weight:700; }
+  .scroll { overflow-x:auto; }
+  .msg { font-size:0.82rem; margin-top:8px; }
+  .msg.ok { color:#6ee7b7; } .msg.err { color:#fca5a5; }
+  .pill { display:inline-block; padding:2px 8px; border-radius:20px; font-size:0.72rem; font-weight:700; background:rgba(56,189,248,0.15); color:var(--accent); }
+  [hidden] { display:none !important; }
+</style>
+<script src="firebase-config.js"></script>
+</head>
+<body>
+<header><h1>TusAlergias · Administración</h1><span id="whoami">Panel privado</span></header>
+<main>
+  <section class="card" id="noConfig" hidden>
+    <h2>Falta conectar el servidor</h2>
+    <p class="muted">Rellena <b>firebase-config.js</b> con los datos de tu proyecto de Firebase (paso 1 de la guía) y vuelve a abrir esta página.</p>
+  </section>
+
+  <section class="card" id="loginCard" hidden>
+    <h2>Entrar</h2>
+    <p class="muted">Usa el email de administración que pusiste en las reglas de Firestore. Si es la primera vez, pulsa «Crear cuenta».</p>
+    <label for="email">Email</label><input type="email" id="email" autocomplete="username">
+    <label for="pass">Contraseña</label><input type="password" id="pass" autocomplete="current-password">
+    <div class="row" style="margin-top:12px;">
+      <button class="btn btn-primary" id="btnLogin">Entrar</button>
+      <button class="btn btn-outline" id="btnSignup">Crear cuenta</button>
+      <button class="btn btn-outline" id="btnGoogle">Continuar con Google</button>
+    </div>
+    <div class="msg" id="loginMsg"></div>
+  </section>
+
+  <section class="card" id="verifyCard" hidden>
+    <h2>Verifica tu email</h2>
+    <p class="muted">Por seguridad, la administración solo funciona con el email verificado. Te enviamos un enlace: púlsalo y vuelve aquí.</p>
+    <div class="row">
+      <button class="btn btn-primary" id="btnSendVerify">Enviar el email de verificación</button>
+      <button class="btn btn-green" id="btnVerified">Ya he pulsado el enlace</button>
+      <button class="btn btn-outline" data-logout>Salir</button>
+    </div>
+    <div class="msg" id="verifyMsg"></div>
+  </section>
+
+  <section class="card" id="notAdmin" hidden>
+    <h2>Esta cuenta no es de administración</h2>
+    <p class="muted">Has entrado como <b id="naEmail"></b>. Solo puede usar este panel el email que aparece en las reglas de Firestore, en la línea <code>function adminEmail()</code>. Si lo has cambiado allí, publica las reglas y vuelve a entrar.</p>
+    <button class="btn btn-outline" data-logout>Salir</button>
+  </section>
+
+  <div id="dash" hidden>
+    <section class="card">
+      <div class="row" style="justify-content:space-between;"><h2 style="margin:0;">Resumen</h2>
+        <div class="row"><button class="btn btn-outline" id="btnRefresh">Actualizar</button><button class="btn btn-outline" data-logout>Salir</button></div></div>
+      <div class="stats" id="stats" style="margin-top:12px;"></div>
+      <p class="muted" id="statsNote" style="margin-bottom:0;"></p>
+    </section>
+
+    <section class="card">
+      <h2>Inicio del cobro</h2>
+      <p class="muted" id="planState"></p>
+      <label for="planDate">Fecha de inicio del cobro (al menos 30 días desde hoy)</label>
+      <input type="date" id="planDate">
+      <label for="planText">Texto del aviso que verán los restaurantes en la app (opcional)</label>
+      <textarea id="planText" maxlength="600" placeholder="Ej.: Gracias por acompañarnos en el lanzamiento. Si tienes dudas, escríbenos a…"></textarea>
+      <label class="check"><input type="checkbox" id="planPlay"> Cobro con Google Play activado (app de Android)</label>
+      <label class="check"><input type="checkbox" id="planWeb"> Cobro con tarjeta en la web activado</label>
+      <p class="muted">Activa cada forma de pago solo cuando el servidor de cobro esté funcionando (guía: «Activar el cobro»). Si no hay ninguna activada, los restaurantes verán «Muy pronto podrás suscribirte desde aquí».</p>
+      <div class="row">
+        <button class="btn btn-primary" id="btnSavePlan">Guardar</button>
+        <button class="btn btn-outline" id="btnClearPlan">Quitar la fecha (seguir gratis)</button>
+      </div>
+      <div class="msg" id="planMsg"></div>
+    </section>
+
+    <section class="card">
+      <h2>Cuentas de restaurante y aviso por email</h2>
+      <p class="muted">Las condiciones prometen avisar por email con 30 días de antelación. Copia los emails en el campo <b>CCO</b> (copia oculta) de tu correo, nunca en «Para».</p>
+      <div class="row"><button class="btn btn-primary" id="btnOwners">Cargar cuentas</button>
+        <button class="btn btn-outline" id="btnCopyEmails" disabled>Copiar emails</button>
+        <button class="btn btn-outline" id="btnCsv" disabled>Descargar CSV</button></div>
+      <div class="msg" id="ownersMsg"></div>
+      <div class="scroll"><table id="ownersTable" hidden><thead><tr><th>Email</th><th>Fundador</th><th>Alta</th><th>Suscripción</th></tr></thead><tbody></tbody></table></div>
+      <label for="mailText">Texto del email de aviso</label>
+      <textarea id="mailText" readonly style="min-height:220px;"></textarea>
+      <div class="row" style="margin-top:8px;"><button class="btn btn-outline" id="btnCopyMail">Copiar texto del email</button></div>
+    </section>
+
+    <section class="card">
+      <h2>Moderación</h2>
+      <p class="muted">Puedes borrar opiniones ofensivas o falsas, sugerencias de locales que no existen y, si hace falta, retirar un local falso o ilegal (se borran su carta, opiniones y estadísticas).</p>
+      <div class="row"><button class="btn btn-primary" id="btnRests">Cargar locales publicados</button><button class="btn btn-outline" id="btnSuggs">Cargar sugerencias</button></div>
+      <div class="msg" id="modMsg"></div>
+      <div class="scroll"><table id="modTable" hidden><thead><tr id="modHead"></tr></thead><tbody></tbody></table></div>
+      <div id="reviewsBox" hidden style="margin-top:12px;"><h2 id="reviewsTitle" style="font-size:0.9rem;"></h2><div class="scroll"><table><thead><tr><th>Autor</th><th>Opinión</th><th></th></tr></thead><tbody id="reviewsBody"></tbody></table></div></div>
+    </section>
+
+    <section class="card">
+      <h2>Uso de las cartas</h2>
+      <p class="muted">Suma las visitas, guardados, pre-avisos y avisos de todos los locales. Gasta una lectura por local, así que úsalo de vez en cuando.</p>
+      <button class="btn btn-primary" id="btnUsage">Calcular</button>
+      <div class="msg" id="usageMsg"></div>
+      <div class="stats" id="usage" style="margin-top:10px;"></div>
+      <div class="scroll"><table id="topTable" hidden style="margin-top:10px;"><thead><tr><th>Local</th><th>Visitas</th><th>Guardados</th><th>Pre-avisos</th></tr></thead><tbody></tbody></table></div>
+    </section>
+  </div>
+</main>
+
+<script type="module">
+const FB_VERSION = "10.12.2";
+const PRICES = { monthly: "19,99 €", yearly: "199,99 €", founderMonthly: "9,99 €", founderYearly: "99,99 €" };
+const DAY = 86400000;
+const $ = id => document.getElementById(id);
+const show = (id, on = true) => { $(id).hidden = !on; };
+const msg = (id, text, kind = "") => { const el = $(id); el.textContent = text; el.className = "msg " + kind; };
+const fmtDate = ms => new Date(ms).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+const tsMs = v => v && typeof v.toMillis === "function" ? v.toMillis() : 0;
+function cell(tr, text) { const td = document.createElement("td"); td.textContent = text == null ? "" : String(text); tr.appendChild(td); return td; }
+function button(td, text, cls, onclick) { const b = document.createElement("button"); b.className = "btn " + cls; b.textContent = text; b.style.padding = "5px 8px"; b.onclick = onclick; td.appendChild(b); return b; }
+function errText(e) {
+  const c = String(e && e.code || "");
+  if (/permission-denied/.test(c)) return "Permiso denegado por las reglas.";
+  if (/invalid-credential|wrong-password|user-not-found/.test(c)) return "Email o contraseña incorrectos.";
+  if (/email-already-in-use/.test(c)) return "Ya existe una cuenta con ese email: pulsa «Entrar».";
+  if (/weak-password/.test(c)) return "La contraseña debe tener al menos 6 caracteres.";
+  if (/too-many-requests/.test(c)) return "Demasiados intentos. Espera unos minutos.";
+  if (/network/.test(c)) return "Sin conexión a internet.";
+  return "Error: " + (c || (e && e.message) || e);
+}
+
+const cfg = window.TUSALERGIAS_FIREBASE_CONFIG;
+const okVal = v => typeof v === "string" && v.trim() && !/^PEGA|^TU_/i.test(v.trim());
+if (!cfg || !okVal(cfg.apiKey) || !okVal(cfg.projectId) || !okVal(cfg.appId)) {
+  show("noConfig");
+} else {
+  const base = `https://www.gstatic.com/firebasejs/${FB_VERSION}/`;
+  const [appM, A, F] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js")]);
+  const app = appM.initializeApp(cfg);
+  const auth = A.getAuth(app);
+  try { auth.languageCode = "es"; } catch (e) {}
+  const db = F.getFirestore(app);
+  let planDoc = null, owners = [];
+
+  const route = async () => {
+    const u = auth.currentUser;
+    ["loginCard", "verifyCard", "notAdmin", "dash"].forEach(id => show(id, false));
+    $("whoami").textContent = u ? "Conectado como " + (u.email || "") : "Panel privado";
+    if (!u || u.isAnonymous) { show("loginCard"); return; }
+    if (!u.emailVerified) { show("verifyCard"); return; }
+    try { await F.getCountFromServer(F.collection(db, "owners")); }
+    catch (e) { $("naEmail").textContent = u.email || ""; show("notAdmin"); return; }
+    show("dash");
+    loadSummary(); loadPlan();
+  };
+  A.onAuthStateChanged(auth, () => { route(); });
+
+  $("btnLogin").onclick = async () => {
+    try { await A.signInWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value); $("pass").value = ""; await route(); }
+    catch (e) { msg("loginMsg", errText(e), "err"); }
+  };
+  $("btnSignup").onclick = async () => {
+    try { await A.createUserWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value); $("pass").value = ""; await route(); }
+    catch (e) { msg("loginMsg", errText(e), "err"); }
+  };
+  $("btnGoogle").onclick = async () => {
+    try { await A.signInWithPopup(auth, new A.GoogleAuthProvider()); await route(); }
+    catch (e) { msg("loginMsg", errText(e), "err"); }
+  };
+  $("btnSendVerify").onclick = async () => {
+    try { await A.sendEmailVerification(auth.currentUser); msg("verifyMsg", "Enviado. Revisa tu correo (y la carpeta de spam).", "ok"); }
+    catch (e) { msg("verifyMsg", errText(e), "err"); }
+  };
+  $("btnVerified").onclick = async () => {
+    try {
+      await A.reload(auth.currentUser);
+      if (!auth.currentUser.emailVerified) { msg("verifyMsg", "Todavía no consta como verificado. Pulsa el enlace del email y vuelve a intentarlo.", "err"); return; }
+      await auth.currentUser.getIdToken(true);
+      await route();
+    } catch (e) { msg("verifyMsg", errText(e), "err"); }
+  };
+  document.querySelectorAll("[data-logout]").forEach(b => b.onclick = async () => { await A.signOut(auth); await route(); });
+  $("btnRefresh").onclick = () => { loadSummary(); loadPlan(); };
+
+  // ---------- Resumen ----------
+  async function loadSummary() {
+    const box = $("stats");
+    box.textContent = "Cargando…";
+    const count = async q => (await F.getCountFromServer(q)).data().count;
+    try {
+      const now = F.Timestamp.fromMillis(Date.now());
+      const [nOwners, nRests, nPublished, nSuggs, nPaying, founders] = await Promise.all([
+        count(F.collection(db, "owners")),
+        count(F.collection(db, "restaurants")),
+        count(F.query(F.collection(db, "restaurants"), F.where("published", "==", true))),
+        count(F.query(F.collection(db, "suggestions"), F.where("claimed", "==", false))),
+        count(F.query(F.collection(db, "owners"), F.where("paidUntil", ">", now), F.orderBy("paidUntil"))).catch(() => null),
+        F.getDoc(F.doc(db, "meta", "founders"))
+      ]);
+      const nFounders = founders.exists() ? Number(founders.data().count) || 0 : 0;
+      box.textContent = "";
+      [[nOwners, "cuentas de restaurante"], [`${nFounders} / 30`, "Fundadores"], [nPublished, "locales con carta publicada"], [nRests, "locales creados"], [nSuggs, "sugerencias sin reclamar"], [nPaying == null ? "—" : nPaying, "cuentas con suscripción activa"]]
+        .forEach(([n, label]) => { const d = document.createElement("div"); d.className = "stat"; const b = document.createElement("b"); b.textContent = n; const s = document.createElement("span"); s.textContent = label; d.append(b, s); box.appendChild(d); });
+      $("statsNote").textContent = `Actualizado: ${new Date().toLocaleString("es-ES")}. Una idea para decidir cuándo cobrar: que haya al menos 50 locales con carta publicada y que los clientes las abran cada semana (mira «Uso de las cartas»).`;
+    } catch (e) { box.textContent = errText(e); }
+  }
+
+  // ---------- Inicio del cobro ----------
+  function minDateStr() { const d = new Date(Date.now() + 31 * DAY); return d.toISOString().slice(0, 10); }
+  async function loadPlan() {
+    $("planDate").min = minDateStr();
+    try {
+      const s = await F.getDoc(F.doc(db, "meta", "plan"));
+      planDoc = s.exists() ? s.data() : null;
+    } catch (e) { msg("planMsg", errText(e), "err"); return; }
+    const b = planDoc ? tsMs(planDoc.billingStartsAt) : 0;
+    $("planText").value = (planDoc && planDoc.noticeText) || "";
+    $("planPlay").checked = !!(planDoc && planDoc.playBilling);
+    $("planWeb").checked = !!(planDoc && planDoc.webBilling);
+    if (b) {
+      const d = new Date(b);
+      $("planDate").value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const days = Math.ceil((b - Date.now()) / DAY);
+      $("planState").textContent = b > Date.now()
+        ? `📣 El cobro empieza el ${fmtDate(b)} (dentro de ${days} días). Los restaurantes ya ven el aviso en la app. Los Fundadores no pagan hasta el ${fmtDate(b + 365 * DAY)}.`
+        : `💶 El cobro empezó el ${fmtDate(b)}. Las cartas de las cuentas sin suscripción se ocultan 7 días después de esa fecha (los Fundadores, 7 días después del ${fmtDate(b + 365 * DAY)}).`;
+    } else {
+      $("planDate").value = "";
+      $("planState").textContent = "🚀 Fase de lanzamiento: gratis. No hay fecha de cobro.";
+    }
+    buildMailText(b);
+  }
+  async function savePlan(clear) {
+    let billingStartsAt = null;
+    if (!clear) {
+      const v = $("planDate").value;
+      if (!v) { msg("planMsg", "Elige una fecha o pulsa «Quitar la fecha».", "err"); return; }
+      const [y, m, d] = v.split("-").map(Number);
+      const ms = new Date(y, m - 1, d, 0, 0, 0).getTime();
+      const prev = planDoc ? tsMs(planDoc.billingStartsAt) : 0;
+      if (ms !== prev && ms < Date.now() + 30 * DAY) { msg("planMsg", "La fecha debe estar al menos a 30 días: las condiciones prometen ese aviso.", "err"); return; }
+      billingStartsAt = F.Timestamp.fromMillis(ms);
+      if (ms !== prev && !confirm(`¿Fijar el inicio del cobro el ${fmtDate(ms)}? Todos los restaurantes verán el aviso en la app. Recuerda enviarles también el email.`)) return;
+    } else if (!confirm("¿Quitar la fecha de cobro? La app volverá a mostrar «Plan Lanzamiento: gratis».")) return;
+    try {
+      await F.setDoc(F.doc(db, "meta", "plan"), {
+        billingStartsAt, noticeText: $("planText").value.slice(0, 600),
+        playBilling: $("planPlay").checked, webBilling: $("planWeb").checked, updatedAt: F.serverTimestamp()
+      });
+      msg("planMsg", "✅ Guardado. Los restaurantes lo verán la próxima vez que abran la app.", "ok");
+      await loadPlan();
+    } catch (e) { msg("planMsg", /permission/.test(e && e.code || "") ? "Las reglas no lo permiten: comprueba que la fecha esté al menos a 30 días." : errText(e), "err"); }
+  }
+  $("btnSavePlan").onclick = () => savePlan(false);
+  $("btnClearPlan").onclick = () => savePlan(true);
+
+  function buildMailText(b) {
+    const fecha = b ? fmtDate(b) : "[FECHA]";
+    const finFundador = b ? fmtDate(b + 365 * DAY) : "[FECHA + 1 AÑO]";
+    $("mailText").value = `Asunto: TusAlergias: el ${fecha} termina la fase gratuita
+
+Hola:
+
+Gracias por publicar tu carta de alérgenos en TusAlergias durante la fase de lanzamiento.
+
+Te escribimos, como prometen las condiciones, con al menos 30 días de antelación: a partir del ${fecha}, el servicio para restaurantes costará ${PRICES.monthly} al mes o ${PRICES.yearly} al año (IVA incluido) por cuenta, con hasta 3 locales.
+
+• No se te cobrará nada sin que te suscribas. Si quieres seguir publicando tu carta, entra en la app (pestaña Hostelería) y suscríbete a partir de esa fecha. La suscripción se renueva sola y puedes cancelarla cuando quieras.
+• Tendrás 7 días de margen: hasta entonces tu carta seguirá viéndose aunque no te hayas suscrito.
+• Si eres Restaurante Fundador, no pagarás nada hasta el ${finFundador}. Después, ${PRICES.founderMonthly} al mes o ${PRICES.founderYearly} al año mientras mantengas la suscripción sin interrupciones.
+• Si prefieres no continuar, no tienes que hacer nada. También puedes eliminar tu cuenta desde la app en cualquier momento.
+
+Si tienes cualquier duda, responde a este email.
+
+Un saludo,
+El equipo de TusAlergias`;
+  }
+  $("btnCopyMail").onclick = async () => { try { await navigator.clipboard.writeText($("mailText").value); msg("ownersMsg", "✅ Texto copiado.", "ok"); } catch (e) { $("mailText").select(); } };
+
+  // ---------- Cuentas ----------
+  $("btnOwners").onclick = async () => {
+    msg("ownersMsg", "Cargando…");
+    try {
+      const qs = await F.getDocs(F.collection(db, "owners"));
+      owners = qs.docs.map(d => ({ uid: d.id, ...d.data() })).sort((a, b) => tsMs(a.createdAt) - tsMs(b.createdAt));
+      const tb = $("ownersTable").querySelector("tbody");
+      tb.textContent = "";
+      owners.forEach(o => {
+        const tr = document.createElement("tr");
+        cell(tr, o.email);
+        cell(tr, o.founderNumber > 0 ? "nº " + o.founderNumber : "—");
+        cell(tr, tsMs(o.createdAt) ? new Date(tsMs(o.createdAt)).toLocaleDateString("es-ES") : "");
+        const paid = tsMs(o.paidUntil);
+        cell(tr, paid > Date.now() ? `Activa hasta ${new Date(paid).toLocaleDateString("es-ES")} (${o.sub && o.sub.channel === "play" ? "Google Play" : "tarjeta"})` : (paid ? "Caducada" : "—"));
+        tb.appendChild(tr);
+      });
+      show("ownersTable", owners.length > 0);
+      $("btnCopyEmails").disabled = $("btnCsv").disabled = !owners.length;
+      msg("ownersMsg", `${owners.length} cuentas.`, "ok");
+    } catch (e) { msg("ownersMsg", errText(e), "err"); }
+  };
+  $("btnCopyEmails").onclick = async () => {
+    const list = owners.map(o => o.email).filter(Boolean).join(", ");
+    try { await navigator.clipboard.writeText(list); msg("ownersMsg", `✅ ${owners.length} emails copiados. Pégalos en CCO.`, "ok"); }
+    catch (e) { msg("ownersMsg", list); }
+  };
+  $("btnCsv").onclick = () => {
+    const q = v => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
+    const rows = [["email", "fundador", "alta", "suscripcion_hasta"]].concat(owners.map(o => [o.email, o.founderNumber || "", tsMs(o.createdAt) ? new Date(tsMs(o.createdAt)).toISOString().slice(0, 10) : "", tsMs(o.paidUntil) ? new Date(tsMs(o.paidUntil)).toISOString().slice(0, 10) : ""]));
+    const blob = new Blob(["﻿" + rows.map(r => r.map(q).join(";")).join("\r\n")], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `tusalergias_cuentas_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+
+  // ---------- Moderación ----------
+  function modTable(heads) {
+    const tr = $("modHead"); tr.textContent = "";
+    heads.forEach(h => { const th = document.createElement("th"); th.textContent = h; tr.appendChild(th); });
+    const tb = $("modTable").querySelector("tbody"); tb.textContent = "";
+    show("modTable"); show("reviewsBox", false);
+    return tb;
+  }
+  $("btnRests").onclick = async () => {
+    msg("modMsg", "Cargando…");
+    try {
+      const qs = await F.getDocs(F.query(F.collection(db, "restaurants"), F.where("published", "==", true), F.limit(500)));
+      const tb = modTable(["Local", "Localidad", "Platos", ""]);
+      qs.docs.forEach(d => {
+        const r = d.data(), tr = document.createElement("tr");
+        cell(tr, r.name); cell(tr, r.city); cell(tr, r.dishCount);
+        const td = cell(tr, "");
+        button(td, "Opiniones", "btn-outline", () => loadReviews(d.id, r.name));
+        td.append(" ");
+        button(td, "Retirar local", "btn-danger", () => removeRestaurant(d.id, r.name, tr));
+        tb.appendChild(tr);
+      });
+      msg("modMsg", `${qs.docs.length} locales publicados.`, "ok");
+    } catch (e) { msg("modMsg", errText(e), "err"); }
+  };
+  async function loadReviews(rid, name) {
+    $("reviewsTitle").textContent = "Opiniones de " + name;
+    const tb = $("reviewsBody"); tb.textContent = "";
+    show("reviewsBox");
+    try {
+      const qs = await F.getDocs(F.query(F.collection(db, "restaurants", rid, "reviews"), F.orderBy("createdAt", "desc"), F.limit(100)));
+      if (!qs.docs.length) { const tr = document.createElement("tr"); cell(tr, "Sin opiniones."); tb.appendChild(tr); return; }
+      qs.docs.forEach(d => {
+        const v = d.data(), tr = document.createElement("tr");
+        cell(tr, `${v.author || "Anónimo"} · ${"★".repeat(Math.max(1, Math.min(5, v.stars || 1)))}${v.isAlert ? " · aviso" : ""}`);
+        cell(tr, v.comment);
+        button(cell(tr, ""), "Borrar", "btn-danger", async () => {
+          if (!confirm("¿Borrar esta opinión?")) return;
+          try { await F.deleteDoc(d.ref); tr.remove(); } catch (e) { alert(errText(e)); }
+        });
+        tb.appendChild(tr);
+      });
+    } catch (e) { const tr = document.createElement("tr"); cell(tr, errText(e)); tb.appendChild(tr); }
+  }
+  async function removeRestaurant(rid, name, tr) {
+    if (!confirm(`¿Retirar «${name}»? Se borran su carta, sus opiniones y sus estadísticas, y sus QR dejarán de funcionar. No se puede deshacer.`)) return;
+    try {
+      const rv = await F.getDocs(F.collection(db, "restaurants", rid, "reviews"));
+      for (let i = 0; i < rv.docs.length; i += 400) { const b = F.writeBatch(db); rv.docs.slice(i, i + 400).forEach(d => b.delete(d.ref)); await b.commit(); }
+      const b = F.writeBatch(db);
+      b.delete(F.doc(db, "menus", rid)); b.delete(F.doc(db, "stats", rid)); b.delete(F.doc(db, "restaurants", rid));
+      await b.commit();
+      tr.remove(); msg("modMsg", `✅ «${name}» retirado.`, "ok");
+    } catch (e) { msg("modMsg", errText(e), "err"); }
+  }
+  $("btnSuggs").onclick = async () => {
+    msg("modMsg", "Cargando…");
+    try {
+      const qs = await F.getDocs(F.query(F.collection(db, "suggestions"), F.where("claimed", "==", false), F.limit(300)));
+      const tb = modTable(["Sugerencia", "Localidad", "Peticiones", ""]);
+      qs.docs.forEach(d => {
+        const v = d.data(), tr = document.createElement("tr");
+        cell(tr, v.name); cell(tr, v.city); cell(tr, v.requests);
+        button(cell(tr, ""), "Borrar", "btn-danger", async () => {
+          if (!confirm(`¿Borrar la sugerencia «${v.name}»?`)) return;
+          try { await F.deleteDoc(d.ref); tr.remove(); } catch (e) { alert(errText(e)); }
+        });
+        tb.appendChild(tr);
+      });
+      msg("modMsg", `${qs.docs.length} sugerencias sin reclamar.`, "ok");
+    } catch (e) { msg("modMsg", errText(e), "err"); }
+  };
+
+  // ---------- Uso ----------
+  $("btnUsage").onclick = async () => {
+    msg("usageMsg", "Calculando…");
+    try {
+      const [st, rs] = await Promise.all([F.getDocs(F.collection(db, "stats")), F.getDocs(F.query(F.collection(db, "restaurants"), F.where("published", "==", true), F.limit(500)))]);
+      const names = {}; rs.docs.forEach(d => { names[d.id] = d.data().name; });
+      const tot = { views: 0, saves: 0, bookings: 0, alerts: 0 };
+      const rows = st.docs.map(d => { const x = d.data(); Object.keys(tot).forEach(k => { tot[k] += Number(x[k]) || 0; }); return { id: d.id, ...x }; });
+      const box = $("usage"); box.textContent = "";
+      [[tot.views, "visitas a cartas"], [tot.saves, "veces guardadas en rutas"], [tot.bookings, "pre-avisos al restaurante"], [tot.alerts, "avisos de cambios en cartas"]]
+        .forEach(([n, label]) => { const d = document.createElement("div"); d.className = "stat"; const b = document.createElement("b"); b.textContent = n; const s = document.createElement("span"); s.textContent = label; d.append(b, s); box.appendChild(d); });
+      const tb = $("topTable").querySelector("tbody"); tb.textContent = "";
+      rows.sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 10).forEach(r => {
+        const tr = document.createElement("tr"); cell(tr, names[r.id] || "(sin publicar)"); cell(tr, r.views || 0); cell(tr, r.saves || 0); cell(tr, r.bookings || 0); tb.appendChild(tr);
+      });
+      show("topTable", rows.length > 0);
+      msg("usageMsg", `Datos de ${rows.length} locales (desde que se dieron de alta).`, "ok");
+    } catch (e) { msg("usageMsg", errText(e), "err"); }
+  };
+}
+</script>
+</body>
+</html>
