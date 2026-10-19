@@ -9,41 +9,34 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<title>TusAlergias - Red Social y Control en Casa</title>
+<title>TusAlergias - Seguridad en Restaurantes y en Casa</title>
 <style>
   :root { --bg:#0b132b; --card:#1c2541; --card-alt:#060b19; --text:#f8fafc; --muted:#94a3b8; --green:#10b981; --amber:#f59e0b; --red:#ef4444; --accent:#38bdf8; --purple:#a855f7; --orange:#f97316; --border:#2d3a5d; }
   * { box-sizing:border-box; font-family:system-ui,-apple-system,sans-serif; -webkit-tap-highlight-color:transparent; }
-  body { margin:0; background:var(--bg); color:var(--text); padding-bottom:80px; }
+  body { margin:0; background:var(--bg); color:var(--text); padding-bottom:92px; }
   header { background:var(--card-alt); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:1000; border-bottom:1px solid var(--border); }
-  .header-left { display:flex; align-items:center; gap:10px; }
-  .menu-btn { background:var(--card); border:1px solid var(--border); color:var(--text); width:38px; height:38px; border-radius:9px; font-size:1.2rem; display:flex; align-items:center; justify-content:center; cursor:pointer; }
   .brand-header { display:flex; align-items:center; gap:9px; cursor:pointer; }
-  .app-logo-svg { width:34px; height:34px; flex-shrink:0; }
+  .app-logo-svg { width:32px; height:32px; flex-shrink:0; }
   h1 { margin:0; font-size:0.96rem; font-weight:800; color:#fff; }
-  .header-sub { font-size:0.65rem; color:var(--accent); display:block; font-weight:600; }
+  .header-sub { font-size:0.64rem; color:var(--accent); display:block; font-weight:600; }
 
-  .drawer-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:2000; }
-  .drawer { position:fixed; top:0; left:-290px; width:275px; height:100%; background:var(--card-alt); border-right:1px solid var(--border); z-index:2001; transition:left 0.25s ease; display:flex; flex-direction:column; }
-  .drawer.open { left:0; }
-  .drawer-header { padding:14px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-  .drawer-nav { padding:12px; display:flex; flex-direction:column; gap:6px; overflow-y:auto; }
-  .drawer-item { padding:11px 12px; border-radius:10px; color:var(--text); font-weight:700; font-size:0.84rem; cursor:pointer; display:flex; align-items:center; gap:8px; }
-  .drawer-item:hover { background:var(--card); color:var(--accent); }
-  .drawer-divider { height:1px; background:var(--border); margin:6px 0; }
-  .drawer-badge { font-size:0.68rem; text-transform:uppercase; padding:4px 8px; border-radius:8px; font-weight:800; margin-bottom:4px; display:inline-block; }
+  /* BARRA SUPERIOR PERMANENTE DE PERFIL ALÉRGICO */
+  .profile-bar { background:#111a3a; border-bottom:1px solid var(--border); padding:8px 14px; display:flex; justify-content:space-between; align-items:center; gap:8px; position:sticky; top:53px; z-index:990; }
+  .profile-bar-info { font-size:0.74rem; color:#cbd5e1; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .profile-bar-info b { color:#fca5a5; }
 
-  .container { padding:14px; max-width:860px; margin:auto; }
-  .section-title { font-size:0.74rem; text-transform:uppercase; color:var(--muted); margin:15px 0 7px; font-weight:800; }
-  .role-grid { display:grid; grid-template-columns:1fr; gap:14px; margin-top:12px; }
-  @media(min-width:680px){ .role-grid { grid-template-columns:1fr 1fr 1fr; } }
-  .role-card { background:linear-gradient(145deg,#1c2541 0%,#0f172a 100%); border:2px solid var(--border); border-radius:18px; padding:20px 16px; text-align:center; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:10px; }
-  .role-card.diner { border-color:var(--green); }
-  .role-card.home { border-color:var(--amber); }
-  .role-card.owner { border-color:var(--accent); }
-  .role-icon { width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:1.85rem; background:var(--card-alt); border:1px solid var(--border); }
+  /* BARRA DE NAVEGACIÓN INFERIOR UNIFICADA */
+  .bottom-nav { position:fixed; bottom:0; left:0; right:0; height:66px; background:var(--card-alt); border-top:1px solid var(--border); display:grid; grid-template-columns:1fr 1fr 72px 1fr 1fr; align-items:center; z-index:1500; padding:0 4px; }
+  .nav-item { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; color:var(--muted); font-size:0.66rem; font-weight:700; cursor:pointer; height:100%; }
+  .nav-item.active { color:var(--accent); }
+  .nav-item span.ico { font-size:1.25rem; }
+  .fab-scan { width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg,var(--green),var(--accent)); color:#020617; border:3px solid var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:900; font-size:0.62rem; cursor:pointer; transform:translateY(-14px); box-shadow:0 6px 16px rgba(16,185,129,0.4); margin:auto; }
+  .fab-scan span { font-size:1.35rem; line-height:1; }
 
+  .container { padding:14px; max-width:840px; margin:auto; }
+  .section-title { font-size:0.73rem; text-transform:uppercase; color:var(--muted); margin:14px 0 7px; font-weight:800; }
   .btn { padding:8px 11px; border-radius:9px; border:none; font-weight:700; cursor:pointer; font-size:0.75rem; display:inline-flex; align-items:center; justify-content:center; gap:5px; text-decoration:none; }
-  .btn:disabled { opacity:0.55; cursor:not-allowed; }
+  .btn:disabled { opacity:0.5; cursor:not-allowed; }
   .btn-primary { background:var(--accent); color:#020617; }
   .btn-green { background:var(--green); color:#020617; }
   .btn-amber { background:var(--amber); color:#000; }
@@ -52,14 +45,12 @@
   .btn-danger { background:var(--red); color:#fff; }
   .btn-outline { background:transparent; border:1px solid #64748b; color:var(--text); }
 
-  .action-grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
-  .action-box { background:var(--card); border:1.5px solid var(--border); border-radius:13px; padding:12px 6px; text-align:center; cursor:pointer; font-weight:800; font-size:0.76rem; display:flex; flex-direction:column; align-items:center; gap:5px; }
   .rest-list-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
   .rest-info { display:flex; align-items:center; gap:10px; cursor:pointer; flex:1; min-width:170px; }
   .verified-badge { background:rgba(16,185,129,0.15); color:var(--green); border:1px solid rgba(16,185,129,0.35); font-size:0.63rem; padding:2px 7px; border-radius:20px; font-weight:800; display:inline-block; }
   .community-badge { background:rgba(245,158,11,0.15); color:var(--amber); border:1px solid rgba(245,158,11,0.35); font-size:0.63rem; padding:2px 7px; border-radius:20px; font-weight:800; display:inline-block; }
 
-  #mapContainer { width:100%; height:350px; border-radius:14px; border:1.5px solid var(--border); overflow:hidden; margin-bottom:12px; }
+  #mapContainer { width:100%; height:270px; border-radius:14px; border:1.5px solid var(--border); overflow:hidden; margin-bottom:12px; }
   .geo-results-list { margin-top:6px; background:var(--card-alt); border:1px solid var(--accent); border-radius:10px; overflow:hidden; display:none; }
   .geo-result-item { padding:8px 10px; font-size:0.74rem; color:var(--text); border-bottom:1px solid var(--border); cursor:pointer; }
 
@@ -75,12 +66,11 @@
   .chip { background:var(--card); border:1.5px solid var(--border); color:var(--text); padding:8px 4px; border-radius:10px; font-size:0.71rem; font-weight:700; text-align:center; cursor:pointer; user-select:none; }
   .chip.active { background:rgba(239,68,68,0.25); border-color:var(--red); color:#fca5a5; }
   .chip.diet.active { background:rgba(168,85,247,0.25); border-color:var(--purple); color:#e9d5ff; }
-  .custom-avoid-box { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px; margin-top:6px; }
   .quick-ing { font-size:0.69rem; padding:4px 8px; border-radius:6px; background:var(--bg); border:1px solid var(--border); color:var(--muted); cursor:pointer; display:inline-block; margin:2px; }
   .quick-ing.active { background:rgba(249,115,22,0.25); border-color:var(--orange); color:#fdba74; }
   .custom-tag-Badge { background:var(--orange); color:#000; font-weight:800; font-size:0.71rem; padding:4px 8px; border-radius:20px; display:inline-flex; margin:3px; cursor:pointer; }
 
-  .controls-bar { display:flex; gap:8px; margin:12px 0; flex-wrap:wrap; }
+  .controls-bar { display:flex; gap:8px; margin:10px 0; flex-wrap:wrap; }
   .search-input { flex:1; min-width:140px; padding:9px 12px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:#fff; }
   .cat-filter { padding:9px; border-radius:8px; border:1px solid var(--border); background:var(--card); color:#fff; }
   .legal-banner { background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.35); color:#fde68a; padding:8px 10px; border-radius:10px; font-size:0.71rem; margin-bottom:10px; line-height:1.35; }
@@ -110,7 +100,7 @@
   .review-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:11px; margin-bottom:8px; }
   .review-card.twin-match { border:1.5px solid var(--green); background:rgba(16,185,129,0.06); }
   .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:3000; overflow-y:auto; padding:12px; }
-  .modal-content { background:var(--card); max-width:640px; margin:15px auto; padding:16px; border-radius:16px; border:1px solid var(--border); }
+  .modal-content { background:var(--card); max-width:620px; margin:15px auto; padding:16px; border-radius:16px; border:1px solid var(--border); }
   .form-group { margin-bottom:9px; }
   .form-group label { display:block; font-size:0.74rem; color:var(--muted); margin-bottom:3px; font-weight:700; }
   .form-group input, .form-group select, .form-group textarea { width:100%; padding:8px 10px; border-radius:8px; border:1px solid #475569; background:var(--bg); color:#fff; font-size:0.84rem; }
@@ -128,7 +118,6 @@
 </head>
 <body>
 
-<!-- LECTOR OCULTO AUXILIAR PARA DECODIFICAR FOTOS DE CÓDIGOS DE BARRAS -->
 <div id="hiddenBarcodeFileReader" style="display:none;"></div>
 
 <svg style="display:none;">
@@ -142,105 +131,61 @@
   </symbol>
 </svg>
 
-<!-- MENÚ LATERAL CONTEXTUAL -->
-<div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleDrawer(false)"></div>
-<aside class="drawer" id="mainDrawer">
-  <div class="drawer-header">
-    <div class="brand-header" onclick="showView('landing'); toggleDrawer(false);">
-      <svg class="app-logo-svg"><use href="#tusalergias-logo"></use></svg>
-      <div><h1>TusAlergias</h1><span class="header-sub">Menú Contextual</span></div>
-    </div>
-    <button class="btn btn-outline" onclick="toggleDrawer(false)">✕</button>
-  </div>
-  <div class="drawer-nav" id="drawerNavContent"></div>
-</aside>
-
 <!-- CABECERA GLOBAL -->
 <header>
-  <div class="header-left">
-    <button class="menu-btn" onclick="toggleDrawer(true)">☰</button>
-    <div class="brand-header" onclick="goBackView()">
-      <svg class="app-logo-svg"><use href="#tusalergias-logo"></use></svg>
-      <div><h1 id="headerMainTitle">TusAlergias</h1><span class="header-sub" id="headerSubTitle">Red de Zonas Seguras</span></div>
-    </div>
+  <div class="brand-header" onclick="showView('discover')">
+    <svg class="app-logo-svg"><use href="#tusalergias-logo"></use></svg>
+    <div><h1 id="headerMainTitle">TusAlergias</h1><span class="header-sub" id="headerSubTitle">Zonas Seguras y Escáner</span></div>
   </div>
-  <div id="headerRightActions" style="display:flex; gap:6px;"></div>
+  <div style="display:flex; gap:6px;">
+    <button class="btn btn-purple" onclick="openWaiterCardModal()">🗣️ Camarero</button>
+    <div id="headerRightActions"></div>
+  </div>
 </header>
 
-<!-- VISTA 1: PORTADA INICIAL -->
-<div id="landingView" class="container">
-  <div style="text-align:center; margin:8px 0 14px;">
-    <svg style="width:54px; height:54px;"><use href="#tusalergias-logo"></use></svg>
-    <h2 style="margin:6px 0 4px; font-size:1.28rem;">Bienvenido a TusAlergias</h2>
-    <p style="margin:0; font-size:0.81rem; color:var(--muted);">Seguridad alimentaria en restaurantes, en tus viajes y en la cocina de tu casa.</p>
+<!-- BARRA SUPERIOR SIEMPRE VISIBLE CON TUS ALERGIAS ACTIVAS -->
+<div class="profile-bar" id="topAllergenBar">
+  <div class="profile-bar-info" id="activeProfileSummary" onclick="openAllergyProfileModal()" style="cursor:pointer;">
+    🛡️ <b>Sin alergias marcadas</b> (Toca para configurar tu perfil)
   </div>
-  <div class="role-grid">
-    <div class="role-card diner" onclick="showView('diner')">
-      <div class="role-icon">🥗</div>
-      <div>
-        <h3 style="margin:0 0 6px; color:var(--green);">PARA COMENSALES</h3>
-        <p style="margin:0; font-size:0.78rem; color:var(--muted);">Escanea el código Bidi de tu mesa, descubre restaurantes seguros en el mapa, organiza tus rutas y usa la tarjeta multi-idioma para el camarero.</p>
-      </div>
-      <button class="btn btn-green" style="width:100%; padding:11px;">Entrar a Comensales →</button>
-    </div>
-
-    <div class="role-card home" onclick="showView('home')">
-      <div class="role-icon">🏠</div>
-      <div>
-        <h3 style="margin:0 0 6px; color:var(--amber);">PARA CASA</h3>
-        <p style="margin:0; font-size:0.78rem; color:var(--muted);">Haz una foto al código de barras de cualquier producto para extraer sus ingredientes reales, recibe alertas de tus alérgenos y crea tus platos caseros.</p>
-      </div>
-      <button class="btn btn-amber" style="width:100%; padding:11px;">Entrar a Para Casa →</button>
-    </div>
-
-    <div class="role-card owner" onclick="showView('owner')">
-      <div class="role-icon">👨‍🍳</div>
-      <div>
-        <h3 style="margin:0 0 6px; color:var(--accent);">PARA RESTAURANTES</h3>
-        <p style="margin:0; font-size:0.78rem; color:var(--muted);">Registra tu local, crea platos escaneando el código de barras de tus materias primas en cocina, genera tu Bidi y recibe reservas con pre-aviso.</p>
-      </div>
-      <button class="btn btn-primary" style="width:100%; padding:11px;">Entrar a Restaurantes →</button>
-    </div>
-  </div>
+  <button class="btn btn-amber" style="padding:5px 9px; font-size:0.7rem;" onclick="openAllergyProfileModal()">⚙️ Mis Alergias</button>
 </div>
 
-<!-- VISTA 2: SECCIÓN PARA CASA -->
-<div id="homeView" class="container" style="display:none;">
-  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
-    <div>
-      <h2 style="margin:0; font-size:1.1rem; color:var(--amber);">🏠 Para Casa: Controla tus Alérgenos</h2>
-      <span style="font-size:0.74rem; color:var(--muted);">Marca tus alergias abajo antes de fotografiar el código de barras de tus productos</span>
-    </div>
-    <button class="btn btn-amber" style="padding:10px 14px; font-size:0.8rem;" onclick="openHomeDishModal()">📊 + Crear Plato / Escanear Producto</button>
-  </div>
-
-  <div class="section-title">1. Selecciona tus alérgenos a evitar antes de escanear:</div>
-  <div class="allergen-grid" id="homeAllergenGrid"></div>
-
-  <div class="section-title">2. Dietas y estilo de vida:</div>
-  <div class="diet-grid" id="homeDietGrid"></div>
-
-  <div class="section-title">3. 🚫 Otros ingredientes a evitar (ej. ajo, cebolla, manzana...):</div>
-  <div class="custom-avoid-box">
+<!-- PESTAÑA 1: DESCUBRIR (RESTAURANTES + MAPA + RUTAS) -->
+<div id="discoverView" class="container">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+    <h2 style="margin:0; font-size:1.02rem; color:var(--green);">🗺️ Mapa y Restaurantes Seguros</h2>
     <div style="display:flex; gap:6px;">
-      <input type="text" id="homeCustomIngInput" placeholder="Escribe un ingrediente a vigilar..." style="flex:1; padding:8px; border-radius:8px; border:1px solid #475569; background:var(--bg); color:#fff;" onkeydown="if(event.key==='Enter') addCustomIngFromInput('homeCustomIngInput')">
-      <button class="btn btn-orange" onclick="addCustomIngFromInput('homeCustomIngInput')">+ Vigilar</button>
+      <button class="btn btn-amber" onclick="openSuggestRestModal()">💡 Sugerir Local</button>
+      <button class="btn btn-green" onclick="locateUserOnMap()">📍 Mi GPS</button>
     </div>
-    <div id="homeQuickIngBar" style="margin-top:8px;"></div>
-    <div id="homeActiveCustomTags" style="margin-top:6px;"></div>
   </div>
+  <div id="mapContainer"></div>
 
-  <div style="display:flex; justify-content:space-between; align-items:center; margin:10px 0;">
-    <label style="font-size:0.75rem; color:#fcd34d; font-weight:700; cursor:pointer;">
-      <input type="checkbox" id="homeStrictTraces" checked onchange="syncStrictTraces(this.checked)"> 🛡️ Avisar también si el envase declara trazas
-    </label>
-    <button class="btn btn-outline" onclick="clearAllFilters()">🧹 Limpiar Filtros</button>
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin:12px 0 8px;">
+    <span class="section-title" style="margin:0;">🎒 Mis Rutas, Favoritos y Sugeridos:</span>
+    <div style="display:flex; gap:5px;">
+      <button class="btn btn-outline" onclick="createNewRouteFolder()">+ Nueva Ruta</button>
+      <button class="btn btn-outline" id="btnRenameFolder" style="display:none;" onclick="renameActiveFolder()">✏️</button>
+      <button class="btn btn-danger" id="btnDeleteFolder" style="display:none;" onclick="deleteActiveFolder()">🗑️</button>
+    </div>
   </div>
+  <div class="folder-bar" id="routeFoldersBar"></div>
+  <div id="myRestaurantsList"></div>
+</div>
 
-  <hr style="border-color:var(--border); margin:16px 0 12px;">
+<!-- PESTAÑA 2: EN CASA (DESPENSA Y PLATOS CASEROS) -->
+<div id="homeView" class="container" style="display:none;">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+    <div>
+      <h2 style="margin:0; font-size:1.05rem; color:var(--amber);">🏠 En Casa: Mis Platos y Productos</h2>
+      <span style="font-size:0.72rem; color:var(--muted);">Escanea los ingredientes de tus platos caseros; se validan solos con tu perfil superior</span>
+    </div>
+    <button class="btn btn-amber" style="padding:10px 13px;" onclick="openHomeDishModal()">🍲 + Crear Plato Casero</button>
+  </div>
 
   <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-    <span class="section-title" style="margin:0;">🍲 Mis Listas de Platos Caseros:</span>
+    <span class="section-title" style="margin:0;">📂 Listas de Platos en Casa:</span>
     <div style="display:flex; gap:5px;">
       <button class="btn btn-outline" onclick="createNewHomeList()">+ Nueva Lista</button>
       <button class="btn btn-outline" id="btnRenameHomeList" style="display:none;" onclick="renameActiveHomeList()">✏️</button>
@@ -253,63 +198,69 @@
     <div class="tab aptos active" id="home-tab-aptos" onclick="setHomeTab('aptos')">✅ PLATOS SEGUROS (0)</div>
     <div class="tab proh" id="home-tab-proh" onclick="setHomeTab('proh')">⚠️ CON ALÉRGENOS A EVITAR (0)</div>
   </div>
-
   <div id="homeDishesContainer"></div>
 </div>
 
-<!-- VISTA 3: COMENSALES -->
-<div id="dinerView" class="container" style="display:none;">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-    <h2 style="margin:0; font-size:1.08rem; color:var(--green);">🥗 Zona para Comensales</h2>
-  </div>
-  <div class="action-grid-3">
-    <div class="action-box" onclick="showView('map')"><span style="font-size:1.5rem;">🗺️</span><span>Mapa de Zonas Seguras</span></div>
-    <div class="action-box" onclick="openScanModal()"><span style="font-size:1.5rem;">📷</span><span>Abrir / Pegar Código Bidi</span></div>
-    <div class="action-box" onclick="openSuggestRestModal()"><span style="font-size:1.5rem;">💡</span><span>Sugerir Local Seguro</span></div>
-  </div>
-  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-    <span class="section-title" style="margin:0;">🎒 Mis Rutas, Favoritos y Sugeridos:</span>
-    <div style="display:flex; gap:5px;">
-      <button class="btn btn-outline" onclick="createNewRouteFolder()">+ Nueva Ruta</button>
-      <button class="btn btn-outline" id="btnRenameFolder" style="display:none;" onclick="renameActiveFolder()">✏️</button>
-      <button class="btn btn-danger" id="btnDeleteFolder" style="display:none;" onclick="deleteActiveFolder()">🗑️</button>
-    </div>
-  </div>
-  <div class="folder-bar" id="routeFoldersBar"></div>
-  <div id="myRestaurantsList"></div>
-</div>
-
-<!-- VISTA 4: PROPIETARIOS -->
+<!-- PESTAÑA 3: HOSTELERÍA (ACCESO CON GOOGLE / EMAIL Y GESTIÓN DE LOCALES) -->
 <div id="ownerView" class="container" style="display:none;">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-    <h2 style="margin:0; font-size:1.08rem; color:var(--accent);">👨‍🍳 Zona para Restaurantes</h2>
+  <!-- CAJA DE LOGIN CON GOOGLE Y EMAIL -->
+  <div id="ownerAuthCard" style="background:var(--card); border:1.5px solid var(--accent); border-radius:16px; padding:18px; max-width:460px; margin:8px auto;">
+    <h2 style="margin:0 0 6px; font-size:1.05rem; color:var(--accent);">👨‍🍳 Acceso Profesionales Hostelería</h2>
+    <p style="margin:0 0 14px; font-size:0.76rem; color:var(--muted);">Inicia sesión con tu cuenta de Google o con el correo de tu restaurante para gestionar tus cartas y códigos Bidi.</p>
+    <button class="btn" style="width:100%; padding:11px; background:#fff; color:#0f172a; font-weight:800; margin-bottom:10px;" onclick="loginWithGoogle()">
+      🌐 Continuar con Google
+    </button>
+    <div style="text-align:center; font-size:0.7rem; color:var(--muted); margin:6px 0;">— o accede con tu email —</div>
+    <div class="form-group"><label>Correo electrónico:</label><input type="email" id="authEmailInput" placeholder="restaurante@email.com"></div>
+    <div class="form-group"><label>Contraseña:</label><input type="password" id="authPassInput" placeholder="•••••••• (Demo: 2026)"></div>
+    <button class="btn btn-primary" style="width:100%; padding:11px;" onclick="loginWithEmail()">🔑 Iniciar Sesión / Registrarse</button>
   </div>
-  <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:15px; margin-bottom:14px; text-align:center;">
-    <p style="margin:0 0 10px; font-size:0.8rem; color:var(--muted);">Registra tu restaurante oficial para gestionar tu carta verificada, escanear productos en cocina y recibir pre-avisos de alergias.</p>
-    <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="openNewRestaurantModal()">➕ Dar de Alta mi Restaurante Oficial</button>
+
+  <!-- PANEL DE LOCALES UNA VEZ INICIADA SESIÓN -->
+  <div id="ownerLoggedPanel" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+      <div>
+        <h2 style="margin:0; font-size:1.05rem; color:var(--accent);">👨‍🍳 Panel de Mis Restaurantes</h2>
+        <span id="ownerAccountBadge" style="font-size:0.72rem; color:var(--green);"></span>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button class="btn btn-primary" onclick="openNewRestaurantModal()">➕ Alta Restaurante</button>
+        <button class="btn btn-outline" onclick="logoutOwnerSession()">Cerrar Sesión</button>
+      </div>
+    </div>
+    <div id="ownerRestaurantsList"></div>
   </div>
-  <div class="section-title">🏪 Mis Locales Oficiales Registrados (Contraseña Demo: 2026):</div>
-  <div id="ownerRestaurantsList"></div>
 </div>
 
-<!-- VISTA 5: MAPA MUNDIAL -->
-<div id="mapView" class="container" style="display:none;">
-  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
-    <h2 style="margin:0; font-size:1.05rem;">🗺️ Mapa de Zonas Seguras</h2>
+<!-- PESTAÑA 4: MI PERFIL, BACKUP Y LEGAL -->
+<div id="profileView" class="container" style="display:none;">
+  <h2 style="margin:0 0 12px; font-size:1.05rem;">👤 Mi Perfil y Herramientas</h2>
+  <div class="rest-list-card">
+    <div><b>🛡️ Configurar Mis Alergias, Dietas y Trazas</b><br><span style="font-size:0.74rem; color:var(--muted);">Personaliza qué ingredientes vigila la app en restaurantes y en casa</span></div>
+    <button class="btn btn-amber" onclick="openAllergyProfileModal()">⚙️ Editar Perfil</button>
+  </div>
+  <div class="rest-list-card">
+    <div><b>🗣️ Tarjeta Multi-idioma para el Camarero</b><br><span style="font-size:0.74rem; color:var(--muted);">Español, Inglés, Francés e Italiano lista para mostrar en mesa</span></div>
+    <button class="btn btn-purple" onclick="openWaiterCardModal()">Abrir Tarjeta</button>
+  </div>
+  <div class="rest-list-card">
+    <div><b>💾 Copia de Seguridad (.JSON)</b><br><span style="font-size:0.74rem; color:var(--muted);">Guarda o restaura tus cartas, platos caseros y rutas en tu teléfono</span></div>
     <div style="display:flex; gap:6px;">
-      <button class="btn btn-amber" onclick="openSuggestRestModal()">➕ Sugerir Local</button>
-      <button class="btn btn-green" onclick="locateUserOnMap()">📍 Mi GPS</button>
+      <button class="btn btn-primary" onclick="exportBackupJson()">📤 Exportar</button>
+      <label class="btn btn-outline" style="cursor:pointer; margin:0;">📥 Importar<input type="file" accept=".json" style="display:none;" onchange="importBackupJson(event)"></label>
     </div>
   </div>
-  <div id="mapContainer"></div>
-  <div id="mapCardsList"></div>
+  <div class="rest-list-card">
+    <div><b>⚖️ Normativa Sanitaria (Reglamento UE 1169/2011)</b><br><span style="font-size:0.74rem; color:var(--muted);">Condiciones legales de uso y exención de responsabilidad</span></div>
+    <button class="btn btn-outline" onclick="document.getElementById('legalModal').style.display='block'">Ver Aviso</button>
+  </div>
 </div>
 
-<!-- VISTA 6: CARTA DEL RESTAURANTE -->
+<!-- VISTA INTERNA: CARTA DEL RESTAURANTE -->
 <div id="appView" style="display:none;">
   <div class="staff-bar" id="staffBar">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-      <span style="font-size:0.74rem; font-weight:800; color:#fde047;">🔓 MODO PROPIETARIO — Toca un ingrediente abajo para cambiar entre Fijo (🔒) y Adaptable (🔄)</span>
+      <span style="font-size:0.74rem; font-weight:800; color:#fde047;">🔓 MODO PROPIETARIO — Toca un ingrediente para alternar entre Fijo (🔒) y Adaptable (🔄)</span>
       <button class="btn btn-green" onclick="confirmMenuUpdatedToday()">✅ Verificar Carta Hoy</button>
     </div>
     <div class="roi-metrics" id="ownerRoiMetrics"></div>
@@ -317,8 +268,8 @@
       <button class="btn btn-amber" onclick="openDishModal()">+ Añadir Plato (Con Escáner)</button>
       <button class="btn btn-orange" onclick="loadSampleMenuIntoActive()">📥 Cargar 12 Platos Muestra</button>
       <button class="btn btn-green" onclick="openQrModal(activeRestId)">📱 Código Bidi</button>
-      <button class="btn btn-outline" onclick="openEditRestModal(activeRestId)">⚙️ Datos / Teléfono</button>
-      <button class="btn btn-primary" style="margin-left:auto;" onclick="lockStaffMode()">🔒 Salir de Gestión</button>
+      <button class="btn btn-outline" onclick="openEditRestModal(activeRestId)">⚙️ Datos / WhatsApp</button>
+      <button class="btn btn-primary" style="margin-left:auto;" onclick="lockStaffMode()">🔒 Salir</button>
     </div>
   </div>
 
@@ -332,64 +283,35 @@
         </div>
         <div id="dinerHeaderActions" style="display:flex; gap:6px; flex-wrap:wrap;">
           <button class="btn btn-outline" id="btnToggleFav" onclick="openSaveToRouteModal(activeRestId)">⭐ Guardar en Ruta</button>
-          <button class="btn btn-purple" onclick="openWaiterCardModal()">🗣️ Tarjeta Camarero</button>
           <button class="btn btn-green" id="btnBookingAction" onclick="openBookingModal()">📅 Pre-aviso Reserva</button>
         </div>
       </div>
 
       <div id="unclaimedBanner" style="display:none; margin-top:12px; padding:12px; border-radius:10px; background:rgba(245,158,11,0.14); border:1px solid rgba(245,158,11,0.4); color:#fde68a;">
         <div style="font-size:0.82rem; font-weight:800; margin-bottom:4px;">💡 Local sugerido por la comunidad (Sin carta oficial verificada)</div>
-        <p style="margin:0 0 10px; font-size:0.74rem; color:#cbd5e1;">Este restaurante aún no ha subido su carta oficial. Puedes usar arriba la <b>🗣️ Tarjeta Camarero</b>, dejar una reseña o pedir que suban su carta:</p>
+        <p style="margin:0 0 10px; font-size:0.74rem; color:#cbd5e1;">Este restaurante aún no ha subido su carta oficial. Puedes usar arriba el botón <b>🗣️ Camarero</b>, dejar tu reseña o pedir que suban su carta:</p>
         <div style="display:flex; gap:6px; flex-wrap:wrap;">
           <button class="btn btn-amber" id="btnRequestMenu" onclick="requestOfficialMenu()">🔥 Solicitar que suba su carta (1)</button>
-          <button class="btn btn-outline" onclick="claimCommunityRestaurant()">🔑 Soy el propietario: Reclamar (Cód: ALTA2026)</button>
+          <button class="btn btn-outline" onclick="claimCommunityRestaurant()">🔑 Soy el propietario: Reclamar</button>
           <button class="btn btn-danger" onclick="deleteRestaurant(activeRestId, true)">🗑️ Borrar Sugerencia</button>
         </div>
       </div>
     </div>
 
     <div id="menuInteractiveZone">
-      <div class="section-title">1. Toca tus alérgenos a evitar:</div>
-      <div class="allergen-grid" id="allergenGrid"></div>
-
-      <div class="section-title">2. Dietas y estilo de vida:</div>
-      <div class="diet-grid" id="dietGrid"></div>
-
-      <div class="section-title">3. 🚫 Otros ingredientes a evitar:</div>
-      <div class="custom-avoid-box">
-        <div style="display:flex; gap:6px;">
-          <input type="text" id="customIngInput" placeholder="Ej. ajo, manzana, cebolla, maíz..." style="flex:1; padding:8px; border-radius:8px; border:1px solid #475569; background:var(--bg); color:#fff;" onkeydown="if(event.key==='Enter') addCustomIngFromInput('customIngInput')">
-          <button class="btn btn-orange" onclick="addCustomIngFromInput('customIngInput')">+ Evitar</button>
-        </div>
-        <div id="quickIngBar" style="margin-top:8px;"></div>
-        <div id="activeCustomTags" style="margin-top:6px;"></div>
-      </div>
-
       <div class="controls-bar">
         <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar plato o ingrediente..." oninput="renderDishes()">
         <select id="catFilter" class="cat-filter" onchange="renderDishes()"></select>
+        <button class="btn btn-green" onclick="shareWhatsApp()">📲 Compartir</button>
       </div>
-
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:6px;">
-        <label style="font-size:0.75rem; color:#fcd34d; font-weight:700; cursor:pointer;">
-          <input type="checkbox" id="strictTraces" checked onchange="syncStrictTraces(this.checked)"> 🛡️ Bloquear también trazas (Recomendado)
-        </label>
-        <div style="display:flex; gap:6px;">
-          <button class="btn btn-outline" onclick="clearAllFilters()">🧹 Limpiar</button>
-          <button class="btn btn-green" onclick="shareWhatsApp()">📲 Compartir</button>
-        </div>
-      </div>
-
       <div class="legal-banner">
-        ⚠️ <b>Seguridad Alimentaria:</b> Filtro orientativo basado en los datos del local. <b>Confirma siempre tus alergias con el camarero</b> antes de pedir por posibles cambios en cocina.
+        ⚠️ <b>Seguridad Alimentaria:</b> Filtro orientativo según datos del local. <b>Confirma siempre tus alergias con el camarero</b> antes de pedir.
       </div>
-
       <div class="tabs">
         <div class="tab aptos active" id="tab-aptos" onclick="setTab('aptos')">COMPATIBLES (0)</div>
         <div class="tab mod" id="tab-mod" onclick="setTab('mod')">ADAPTABLES (0)</div>
         <div class="tab proh" id="tab-proh" onclick="setTab('proh')">NO APTOS (0)</div>
       </div>
-
       <div id="dishList"></div>
     </div>
 
@@ -397,7 +319,7 @@
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
       <div>
         <h3 style="margin:0; font-size:0.95rem;">💬 Experiencias de la Comunidad Alérgica</h3>
-        <span style="font-size:0.7rem; color:var(--muted);">Las opiniones que coinciden con tus alergias aparecen destacadas primero</span>
+        <span style="font-size:0.7rem; color:var(--muted);">Priorizadas según tus alergias activas</span>
       </div>
       <div style="display:flex; gap:6px;">
         <button class="btn btn-green" onclick="openReviewModal()">✍️ Valorar</button>
@@ -408,110 +330,149 @@
   </div>
 </div>
 
-<!-- MODAL CONSTRUCTOR DE PLATO CASERO (PARA CASA) -->
+<!-- BARRA DE NAVEGACIÓN INFERIOR FIJA -->
+<nav class="bottom-nav">
+  <div class="nav-item active" id="nav-discover" onclick="showView('discover')"><span class="ico">🍽️</span><span>Restaurantes</span></div>
+  <div class="nav-item" id="nav-home" onclick="showView('home')"><span class="ico">🏠</span><span>En Casa</span></div>
+  <div class="fab-scan" onclick="openUniversalScanner()"><span>📷</span>ESCANEAR</div>
+  <div class="nav-item" id="nav-owner" onclick="showView('owner')"><span class="ico">👨‍🍳</span><span>Hostelería</span></div>
+  <div class="nav-item" id="nav-profile" onclick="showView('profile')"><span class="ico">👤</span><span>Mi Perfil</span></div>
+</nav>
+
+<!-- MODAL 1: CONFIGURADOR UNIFICADO DE MIS ALERGIAS, DIETAS Y TRAZAS -->
+<div class="modal" id="allergyProfileModal">
+  <div class="modal-content" style="border:2px solid var(--amber);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <h2 style="margin:0; font-size:1rem; color:var(--amber);">🛡️ Mi Perfil de Alergias y Dietas</h2>
+      <button class="btn btn-green" onclick="closeModal('allergyProfileModal')">✅ Listo</button>
+    </div>
+    <div class="section-title" style="margin-top:4px;">1. Toca los alérgenos que debes evitar:</div>
+    <div class="allergen-grid" id="allergenGrid"></div>
+    <div class="section-title">2. Dietas y estilo de vida:</div>
+    <div class="diet-grid" id="dietGrid"></div>
+    <div class="section-title">3. 🚫 Otros ingredientes a vigilar (ajo, cebolla, manzana...):</div>
+    <div class="custom-avoid-box">
+      <div style="display:flex; gap:6px;">
+        <input type="text" id="customIngInput" placeholder="Escribe ingrediente (ej. ajo, kiwi...)" style="flex:1; padding:8px; border-radius:8px; border:1px solid #475569; background:var(--bg); color:#fff;" onkeydown="if(event.key==='Enter') addCustomIngFromInput()">
+        <button class="btn btn-orange" onclick="addCustomIngFromInput()">+ Vigilar</button>
+      </div>
+      <div id="quickIngBar" style="margin-top:8px;"></div>
+      <div id="activeCustomTags" style="margin-top:6px;"></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+      <label style="font-size:0.76rem; color:#fcd34d; font-weight:700; cursor:pointer;">
+        <input type="checkbox" id="strictTraces" checked onchange="toggleStrictTraces(this.checked)"> 🛡️ Bloquear también trazas
+      </label>
+      <button class="btn btn-outline" onclick="clearAllFilters()">🧹 Limpiar Todo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL 2: ESCÁNER UNIVERSAL (SEMÁFORO DE PRODUCTOS + LECTOR BIDI) -->
+<div class="modal" id="universalScanModal">
+  <div class="modal-content" style="border:2px solid var(--green);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h2 style="margin:0; font-size:1rem; color:var(--green);">📷 Escáner Inteligente (Producto o Bidi)</h2>
+      <button class="btn btn-outline" onclick="closeUniversalScanner()">✕</button>
+    </div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:8px;">
+      <label class="btn btn-green" style="cursor:pointer; margin:0; padding:10px 4px; font-size:0.72rem;">
+        📊 Foto Cód. Barras
+        <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleBarcodePhotoScan(event, 'universal')">
+      </label>
+      <button type="button" class="btn btn-primary" style="padding:10px 4px; font-size:0.72rem;" onclick="startBarcodeScanner('universal')">
+        📷 Cámara en Vivo
+      </button>
+      <label class="btn btn-amber" style="cursor:pointer; margin:0; padding:10px 4px; font-size:0.72rem;">
+        📑 Foto Etiqueta
+        <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleLabelPhotoScan(event, 'universal')">
+      </label>
+    </div>
+    <div id="universalBarcodeScannerContainer" style="display:none; margin-bottom:8px; background:#000; padding:8px; border-radius:10px; border:1px solid var(--green);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span style="font-size:0.73rem; color:var(--green); font-weight:800;">📷 Apunta al código de barras o QR...</span>
+        <button type="button" class="btn btn-danger" style="padding:3px 8px;" onclick="stopBarcodeScanner()">✕ Parar</button>
+      </div>
+      <div id="universalBarcodeReader" class="barcode-live-box"></div>
+    </div>
+    <div style="display:flex; gap:6px; margin-bottom:8px;">
+      <input type="text" id="universalManualInput" placeholder="🔢 O escribe nº código barras (EAN) o pega enlace Bidi..." style="flex:1; padding:8px; border-radius:8px; border:1px solid #475569; background:var(--bg); color:#fff; font-size:0.78rem;">
+      <button class="btn btn-primary" onclick="handleUniversalManualInput()">Analizar</button>
+    </div>
+    <div id="universalScanStatus" style="display:none; padding:12px; border-radius:12px; margin-top:8px;"></div>
+  </div>
+</div>
+
+<!-- MODAL 3: CREAR / EDITAR PLATO EN CASA (SIN BOTONES DE ALÉRGENOS CONFUSOS) -->
 <div class="modal" id="homeDishModal">
   <div class="modal-content" style="border:2px solid var(--amber);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem; color:var(--amber);" id="homeDishModalTitle">🍲 Crear / Editar Plato en Casa</h2>
+      <h2 style="margin:0; font-size:1rem; color:var(--amber);" id="homeDishModalTitle">🍲 Plato en Casa</h2>
       <button class="btn btn-outline" onclick="closeHomeDishModal()">✕</button>
     </div>
     <input type="hidden" id="editHomeDishId">
-
     <div class="form-group">
-      <label style="color:#fff;">Nombre de tu Plato Casero:</label>
+      <label style="color:#fff;">1. Nombre de tu Plato Casero:</label>
       <input type="text" id="homeDishNameInput" placeholder="Ej. Arroz con tomate y cebolla">
     </div>
-
     <div class="ing-editor-card" style="border-color:var(--accent);">
-      <div style="font-size:0.8rem; font-weight:800; color:var(--accent); margin-bottom:8px;">
-        ➕ Añadir Producto por Código de Barras o Manual:
-      </div>
-
-      <!-- BOTONES SEPARADOS: FOTO CÓDIGO DE BARRAS vs ESCÁNER VIVO vs FOTO TEXTO vs MANUAL -->
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px;">
-        <label class="btn btn-green" style="cursor:pointer; margin:0; padding:10px 6px; font-size:0.74rem;">
-          📊 1. Foto Código Barras
+      <div style="font-size:0.78rem; font-weight:800; color:var(--accent); margin-bottom:8px;">2. Añadir productos o ingredientes al plato:</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:8px;">
+        <label class="btn btn-green" style="cursor:pointer; margin:0; padding:9px 4px; font-size:0.71rem;">
+          📊 Foto Cód. Barras
           <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleBarcodePhotoScan(event, 'home')">
         </label>
-        <button type="button" class="btn btn-primary" style="padding:10px 6px; font-size:0.74rem;" onclick="startBarcodeScanner('home')">
-          📷 2. Escáner en Vivo
+        <button type="button" class="btn btn-primary" style="padding:9px 4px; font-size:0.71rem;" onclick="startBarcodeScanner('home')">
+          📷 Escáner Vivo
         </button>
-      </div>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
-        <label class="btn btn-amber" style="cursor:pointer; margin:0; padding:8px 6px; font-size:0.72rem;">
-          📑 3. Foto Texto Etiqueta
+        <label class="btn btn-amber" style="cursor:pointer; margin:0; padding:9px 4px; font-size:0.71rem;">
+          📑 Foto Etiqueta
           <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleLabelPhotoScan(event, 'home')">
         </label>
-        <button type="button" class="btn btn-outline" style="padding:8px 6px; font-size:0.72rem;" onclick="focusManualProductInput()">
-          🧅 4. Sin Etiqueta (Manual)
-        </button>
       </div>
-
-      <!-- VISOR EN VIVO DEL ESCÁNER DE CÓDIGO DE BARRAS (CASA) -->
-      <div id="homeBarcodeScannerContainer" style="display:none; margin-bottom:10px; background:#000; padding:8px; border-radius:10px; border:1px solid var(--green);">
+      <div id="homeBarcodeScannerContainer" style="display:none; margin-bottom:8px; background:#000; padding:8px; border-radius:10px; border:1px solid var(--green);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-          <span style="font-size:0.74rem; color:var(--green); font-weight:800;">📷 Apunta al código de barras...</span>
-          <button type="button" class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="stopBarcodeScanner()">✕ Cerrar</button>
+          <span style="font-size:0.73rem; color:var(--green); font-weight:800;">📷 Apunta al código de barras...</span>
+          <button type="button" class="btn btn-danger" style="padding:3px 8px;" onclick="stopBarcodeScanner()">✕ Cerrar</button>
         </div>
         <div id="homeBarcodeReader" class="barcode-live-box"></div>
       </div>
-
-      <!-- INTRODUCIR NÚMERO DE CÓDIGO DE BARRAS O BUSCAR POR NOMBRE -->
       <div style="display:flex; gap:6px; margin-bottom:6px;">
-        <input type="text" id="homeManualBarcodeInput" placeholder="🔢 O escribe nº código barras (ej. 8480000170804)..." style="flex:1; padding:7px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.76rem;" onkeydown="if(event.key==='Enter') lookupBarcodeNumber(this.value, 'home')">
+        <input type="text" id="homeManualBarcodeInput" placeholder="🔢 O escribe código de barras (EAN)..." style="flex:1; padding:7px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.75rem;">
         <button type="button" class="btn btn-green" onclick="lookupBarcodeNumber(document.getElementById('homeManualBarcodeInput').value, 'home')">Leer EAN</button>
       </div>
-
-      <div style="display:flex; gap:6px; margin-bottom:8px;">
-        <input type="text" id="supermarketSearchInput" placeholder="🛒 O busca producto por nombre (ej. Tomate frito, Arroz...)" style="flex:1; padding:7px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.76rem;" onkeydown="if(event.key==='Enter') searchSupermarketProduct('home')">
+      <div style="display:flex; gap:6px; margin-bottom:6px;">
+        <input type="text" id="supermarketSearchInput" placeholder="🛒 O busca producto de súper (ej. Tomate frito)..." style="flex:1; padding:7px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.75rem;" onkeydown="if(event.key==='Enter') searchSupermarketProduct('home')">
         <button type="button" class="btn btn-primary" onclick="searchSupermarketProduct('home')">Buscar</button>
       </div>
-      <div id="supermarketResults" class="geo-results-list" style="margin-bottom:8px;"></div>
-
-      <div id="ocrStatusBox" style="display:none; padding:8px; border-radius:8px; background:rgba(56,189,248,0.15); color:var(--accent); font-size:0.75rem; margin-bottom:8px; font-weight:700;"></div>
-
-      <div class="form-group">
-        <label>Producto / Ingrediente detectado o escrito:</label>
-        <input type="text" id="tempProdName" placeholder="Ej. Paquete de arroz / Brick de tomate / Cebolla fresca">
+      <div id="supermarketResults" class="geo-results-list" style="margin-bottom:6px;"></div>
+      <div style="display:flex; gap:6px;">
+        <input type="text" id="homeFreshIngInput" placeholder="🧅 O escribe ingrediente sin etiqueta (ej. Cebolla, Ajo)..." style="flex:1; padding:7px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.75rem;" onkeydown="if(event.key==='Enter') addFreshIngToHomeDish()">
+        <button type="button" class="btn btn-orange" onclick="addFreshIngToHomeDish()">+ Añadir</button>
       </div>
-      <div class="form-group">
-        <label>Ingredientes extraídos del producto:</label>
-        <textarea id="tempProdSub" rows="2" placeholder="Ej. tomate, aceite de girasol, azúcar, sal, almidón de maíz..." oninput="autoMarkAllergensFromLabelText()"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Alérgenos en este producto (toca para marcar/desmarcar):</label>
-        <div class="mini-chips" id="tempProdAllergens"></div>
-      </div>
-
-      <button type="button" class="btn btn-green" style="width:100%; padding:10px; margin-top:4px;" onclick="verifyAndAddProductToHomeDish()">
-        ➕ Verificar Alérgenos e Incluir en el Plato
-      </button>
+      <div id="ocrStatusBox" style="display:none; padding:8px; border-radius:8px; background:rgba(56,189,248,0.15); color:var(--accent); font-size:0.74rem; margin-top:8px; font-weight:700;"></div>
     </div>
-
-    <div class="section-title">Ingredientes incluidos en este plato (<span id="homeDishIngCount">0</span>):</div>
+    <div class="section-title">Productos e ingredientes en este plato (<span id="homeDishIngCount">0</span>):</div>
     <div id="homeDishCurrentIngsList" style="margin-bottom:12px;"></div>
-
-    <button class="btn btn-amber" style="width:100%; padding:12px; font-size:0.85rem;" onclick="saveHomeDish()">💾 Guardar Plato en Mi Lista de Casa</button>
+    <button class="btn btn-amber" style="width:100%; padding:12px; font-size:0.85rem;" onclick="saveHomeDish()">💾 Guardar Plato en Casa</button>
   </div>
 </div>
 
-<!-- MODAL DE ALERTA DE CONFLICTO DE ALÉRGENO AL ESCANEAR -->
+<!-- MODAL 4: ALERTA ROJA DE CONFLICTO AL ESCANEAR UN PRODUCTO -->
 <div class="modal" id="allergenWarningModal" style="z-index:4000;">
   <div class="modal-content" style="border:3px solid var(--red); background:#1a0b12; text-align:center;">
-    <div style="font-size:2.4rem; margin-bottom:4px;">⚠️</div>
-    <h2 style="margin:0 0 8px; font-size:1.1rem; color:#fca5a5;">¡ATENCIÓN! ALÉRGENO DETECTADO</h2>
-    <p id="allergenWarningText" style="font-size:0.86rem; color:#fff; line-height:1.45; margin:0 0 14px;"></p>
-    <p style="font-size:0.8rem; color:#fde047; font-weight:700; margin:0 0 16px;">
-      ¿Deseas seguir añadiendo este producto a tu nuevo plato de todos modos?
-    </p>
+    <div style="font-size:2.3rem; margin-bottom:4px;">⛔</div>
+    <h2 style="margin:0 0 8px; font-size:1.08rem; color:#fca5a5;">¡NO APTO SEGÚN TU PERFIL!</h2>
+    <p id="allergenWarningText" style="font-size:0.85rem; color:#fff; line-height:1.45; margin:0 0 14px;"></p>
+    <p style="font-size:0.78rem; color:#fde047; font-weight:700; margin:0 0 14px;">¿Deseas seguir añadiendo este producto al plato de todos modos?</p>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-      <button class="btn btn-outline" style="padding:12px;" onclick="cancelAddUnsafeProduct()">❌ No, descartar producto</button>
-      <button class="btn btn-danger" style="padding:12px;" onclick="confirmAddUnsafeProductAnyway()">⚠️ Sí, añadir de todos modos</button>
+      <button class="btn btn-outline" style="padding:11px;" onclick="cancelAddUnsafeProduct()">❌ No, descartar</button>
+      <button class="btn btn-danger" style="padding:11px;" onclick="confirmAddUnsafeProductAnyway()">⚠️ Sí, añadir igual</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL EDITOR DE PLATO DE RESTAURANTE (AHORA CON ESCÁNER DE CÓDIGO DE BARRAS EN COCINA) -->
+<!-- MODAL 5: EDITOR DE PLATO DE RESTAURANTE -->
 <div class="modal" id="dishModal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -523,73 +484,45 @@
       <div class="form-group"><label>Nombre del Plato:</label><input type="text" id="editName" placeholder="Ej. ARROZ DEL SEÑORET"></div>
       <div class="form-group"><label>Categoría:</label><input type="text" id="editCat" value="ENTRANTES"></div>
     </div>
-    <div class="form-group"><label>👩‍🍳 Protocolo en cocina:</label><input type="text" id="editProtocol" placeholder="Ej. Freidora o sartén limpia exclusiva"></div>
-    <div class="form-group">
-      <label>Trazas generales en cocina:</label>
-      <div class="mini-chips" id="editDishTraces"></div>
-    </div>
-
-    <!-- NUEVO BLOQUE: ESCANEAR CÓDIGO DE BARRAS PARA AÑADIR INGREDIENTES AL PLATO DEL RESTAURANTE -->
-    <div class="ing-editor-card" style="border-color:var(--accent); margin-top:10px;">
-      <div style="font-size:0.78rem; font-weight:800; color:var(--accent); margin-bottom:6px;">
-        📊 Añadir Ingrediente Escaneando Envase de Cocina o Manual:
-      </div>
+    <div class="form-group"><label>👩‍🍳 Protocolo en cocina:</label><input type="text" id="editProtocol" placeholder="Ej. Sartén o freidora limpia exclusiva"></div>
+    <div class="form-group"><label>Trazas en cocina:</label><div class="mini-chips" id="editDishTraces"></div></div>
+    <div class="ing-editor-card" style="border-color:var(--accent);">
+      <div style="font-size:0.76rem; font-weight:800; color:var(--accent); margin-bottom:6px;">📊 Escanear Materia Prima en Cocina o Añadir Componente:</div>
       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:6px;">
-        <label class="btn btn-green" style="cursor:pointer; margin:0; padding:9px 4px; font-size:0.71rem;">
-          📊 Foto Cód. Barras
-          <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleBarcodePhotoScan(event, 'rest')">
-        </label>
-        <button type="button" class="btn btn-primary" style="padding:9px 4px; font-size:0.71rem;" onclick="startBarcodeScanner('rest')">
-          📷 Escáner Vivo
-        </button>
-        <button type="button" class="btn btn-amber" style="padding:9px 4px; font-size:0.71rem;" onclick="addIngRow()">
-          ➕ Manual
-        </button>
+        <label class="btn btn-green" style="cursor:pointer; margin:0; padding:8px 4px; font-size:0.7rem;">📊 Foto Cód. Barras<input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleBarcodePhotoScan(event, 'rest')"></label>
+        <button type="button" class="btn btn-primary" style="padding:8px 4px; font-size:0.7rem;" onclick="startBarcodeScanner('rest')">📷 Escáner Vivo</button>
+        <button type="button" class="btn btn-amber" style="padding:8px 4px; font-size:0.7rem;" onclick="addIngRow()">➕ Componente Manual</button>
       </div>
-
-      <!-- VISOR EN VIVO DEL ESCÁNER DE CÓDIGO DE BARRAS (RESTAURANTE) -->
       <div id="restBarcodeScannerContainer" style="display:none; margin-bottom:8px; background:#000; padding:8px; border-radius:10px; border:1px solid var(--green);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-          <span style="font-size:0.74rem; color:var(--green); font-weight:800;">📷 Apunta al código de barras del producto...</span>
-          <button type="button" class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="stopBarcodeScanner()">✕ Cerrar</button>
+          <span style="font-size:0.73rem; color:var(--green); font-weight:800;">📷 Apunta al código del envase...</span>
+          <button type="button" class="btn btn-danger" style="padding:3px 8px;" onclick="stopBarcodeScanner()">✕ Cerrar</button>
         </div>
         <div id="restBarcodeReader" class="barcode-live-box"></div>
       </div>
-
-      <div style="display:flex; gap:6px; margin-bottom:6px;">
-        <input type="text" id="restManualBarcodeInput" placeholder="🔢 Nº código de barras (EAN)..." style="flex:1; padding:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.75rem;" onkeydown="if(event.key==='Enter') lookupBarcodeNumber(this.value, 'rest')">
-        <button type="button" class="btn btn-green" onclick="lookupBarcodeNumber(document.getElementById('restManualBarcodeInput').value, 'rest')">Leer EAN</button>
-      </div>
-
       <div style="display:flex; gap:6px;">
-        <input type="text" id="restSupermarketSearchInput" placeholder="🛒 O busca materia prima por nombre/marca..." style="flex:1; padding:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.75rem;" onkeydown="if(event.key==='Enter') searchSupermarketProduct('rest')">
+        <input type="text" id="restSupermarketSearchInput" placeholder="🛒 O busca producto/marca..." style="flex:1; padding:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.75rem;" onkeydown="if(event.key==='Enter') searchSupermarketProduct('rest')">
         <button type="button" class="btn btn-primary" onclick="searchSupermarketProduct('rest')">Buscar</button>
       </div>
       <div id="restSupermarketResults" class="geo-results-list" style="margin-top:6px;"></div>
-      <div id="restOcrStatusBox" style="display:none; padding:7px; border-radius:8px; background:rgba(16,185,129,0.15); color:var(--green); font-size:0.74rem; margin-top:6px; font-weight:700;"></div>
+      <div id="restOcrStatusBox" style="display:none; padding:7px; border-radius:8px; background:rgba(16,185,129,0.15); color:var(--green); font-size:0.73rem; margin-top:6px; font-weight:700;"></div>
     </div>
-
-    <div class="section-title" style="margin:10px 0 6px;">Componentes del Plato:</div>
     <div id="ingredientsEditor"></div>
     <button class="btn btn-green" style="width:100%; padding:12px; margin-top:8px;" onclick="saveDishFromModal()">💾 Guardar Plato en la Carta</button>
   </div>
 </div>
 
-<!-- MODAL ALTA / EDICIÓN / SUGERENCIA DE LOCAL -->
+<!-- MODAL 6: ALTA / EDICIÓN / SUGERENCIA DE RESTAURANTE -->
 <div class="modal" id="restModal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <h2 style="margin:0; font-size:1rem;" id="restModalTitle">🏪 Datos del Restaurante</h2>
       <button class="btn btn-outline" onclick="closeModal('restModal')">✕</button>
     </div>
-    <input type="hidden" id="restEditId">
-    <input type="hidden" id="restIsSuggest">
-    <div class="form-group">
-      <label style="color:#fff;">1. Nombre Comercial del Restaurante:</label>
-      <input type="text" id="restNameInput" placeholder="Ej. Restaurante El Puerto">
-    </div>
+    <input type="hidden" id="restEditId"><input type="hidden" id="restIsSuggest">
+    <div class="form-group"><label style="color:#fff;">1. Nombre Comercial del Restaurante:</label><input type="text" id="restNameInput" placeholder="Ej. Restaurante El Puerto"></div>
     <div class="form-group" style="background:var(--bg); padding:10px; border-radius:10px; border:1px solid var(--accent);">
-      <label style="color:var(--accent);">2. 🔍 Buscar calle, paseo o localidad para ubicar en el Mapa:</label>
+      <label style="color:var(--accent);">2. 🔍 Buscar calle o localidad en España:</label>
       <div style="display:flex; gap:6px;">
         <input type="text" id="geoSearchInput" placeholder="Ej. Paseo Marítimo Puerto de Mazarrón..." onkeydown="if(event.key==='Enter') searchPlaceCoords()">
         <button type="button" class="btn btn-primary" onclick="searchPlaceCoords()">Buscar</button>
@@ -597,11 +530,11 @@
       <div id="geoResults" class="geo-results-list"></div>
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-      <div class="form-group"><label>Ciudad / Dirección:</label><input type="text" id="restCityInput" placeholder="Ej. Puerto de Mazarrón"></div>
-      <div class="form-group" id="phoneGroup"><label>WhatsApp Reservas (opcional):</label><input type="text" id="restPhoneInput" placeholder="Ej. 34600000000"></div>
+      <div class="form-group"><label>Ciudad / Dirección:</label><input type="text" id="restCityInput"></div>
+      <div class="form-group" id="phoneGroup"><label>WhatsApp Reservas:</label><input type="text" id="restPhoneInput" placeholder="34600000000"></div>
     </div>
-    <div class="form-group" id="passGroup"><label>🔑 Contraseña de Propietario:</label><input type="password" id="restPassInput" placeholder="Elige tu contraseña"></div>
-    <div style="display:grid; grid-template-columns:1fr 1fr 95px; gap:8px; align-items:end;">
+    <div class="form-group" id="passGroup"><label>🔑 Contraseña del Local:</label><input type="password" id="restPassInput" placeholder="Elige contraseña"></div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 90px; gap:8px; align-items:end;">
       <div class="form-group"><label>Latitud:</label><input type="number" step="any" id="restLatInput" value="37.5630"></div>
       <div class="form-group"><label>Longitud:</label><input type="number" step="any" id="restLngInput" value="-1.3090"></div>
       <div class="form-group"><button type="button" class="btn btn-green" style="width:100%; height:35px;" onclick="fillGpsForModal()">📍 GPS</button></div>
@@ -610,28 +543,23 @@
   </div>
 </div>
 
-<!-- MODAL GUARDAR EN CARPETA DE RUTA -->
+<!-- MODALES AUXILIARES: RUTAS, CAMARERO, RESERVA, RESEÑA, QR Y AVISO LEGAL OBLIGATORIO -->
 <div class="modal" id="saveRouteModal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;">🎒 Guardar en Mis Rutas de Viaje</h2>
+      <h2 style="margin:0; font-size:1rem;">🎒 Guardar en Mis Rutas</h2>
       <button class="btn btn-outline" onclick="closeModal('saveRouteModal')">✕</button>
     </div>
     <div id="routeFolderSelectorList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;"></div>
-    <button class="btn btn-outline" style="width:100%;" onclick="createNewRouteFolder(true)">+ Crear Nueva Carpeta de Viaje</button>
+    <button class="btn btn-outline" style="width:100%;" onclick="createNewRouteFolder(true)">+ Nueva Carpeta de Ruta</button>
   </div>
 </div>
 
-<!-- MODAL TARJETA CAMARERO MULTI-IDIOMA -->
 <div class="modal" id="waiterCardModal">
   <div class="modal-content" style="border:2px solid var(--purple);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <h2 style="margin:0; font-size:1rem;">🗣️ Tarjeta de Seguridad para el Camarero</h2>
+      <h2 style="margin:0; font-size:1rem;">🗣️ Tarjeta para el Camarero</h2>
       <button class="btn btn-outline" onclick="closeModal('waiterCardModal')">✕</button>
-    </div>
-    <div style="margin-bottom:8px;">
-      <span style="font-size:0.7rem; color:var(--muted); font-weight:700;">Toca para añadir o quitar tus alergias en la tarjeta:</span>
-      <div class="mini-chips" id="waiterModalChips"></div>
     </div>
     <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
       <button class="btn btn-primary" onclick="renderWaiterCardLang('es')">🇪🇸 Español</button>
@@ -643,70 +571,55 @@
   </div>
 </div>
 
-<!-- MODAL ESCANEAR / PEGAR BIDI -->
-<div class="modal" id="scanModal">
-  <div class="modal-content">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;">📷 Abrir Restaurante por Código Bidi</h2>
-      <button class="btn btn-outline" onclick="closeModal('scanModal')">✕</button>
-    </div>
-    <div class="form-group"><input type="text" id="pasteBidiInput" placeholder="Pega aquí el enlace Bidi..."></div>
-    <button class="btn btn-green" style="width:100%; padding:11px;" onclick="importFromBidiInput()">🍽️ Abrir Carta y Guardar</button>
-  </div>
-</div>
-
-<!-- MODAL PRE-AVISO RESERVA -->
 <div class="modal" id="bookingModal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <h2 style="margin:0; font-size:1rem;">📅 Pre-aviso de Alergias a Cocina</h2>
       <button class="btn btn-outline" onclick="closeModal('bookingModal')">✕</button>
     </div>
-    <div class="form-group"><label>Nombre y Nº de Comensales:</label><input type="text" id="bookName" placeholder="Ej. Laura (4 personas)"></div>
+    <div class="form-group"><label>Nombre y Comensales:</label><input type="text" id="bookName" placeholder="Ej. Laura (4 personas)"></div>
     <div class="form-group"><label>Día y Hora:</label><input type="text" id="bookTime" placeholder="Ej. Sábado 14:30"></div>
-    <div class="form-group"><label>Notas para cocina:</label><input type="text" id="bookNotes" placeholder="Ej. Alergia severa a trazas"></div>
-    <button class="btn btn-green" style="width:100%; padding:12px;" onclick="sendBookingPreAlert()">📲 Enviar por WhatsApp al Restaurante</button>
+    <div class="form-group"><label>Notas:</label><input type="text" id="bookNotes" placeholder="Ej. Alergia severa a trazas"></div>
+    <button class="btn btn-green" style="width:100%; padding:12px;" onclick="sendBookingPreAlert()">📲 Enviar por WhatsApp</button>
   </div>
 </div>
 
-<!-- MODAL DEJAR RESEÑA -->
 <div class="modal" id="reviewModal">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <h2 style="margin:0; font-size:1rem;">✍️ Valorar Seguridad del Local</h2>
       <button class="btn btn-outline" onclick="closeModal('reviewModal')">✕</button>
     </div>
-    <div class="form-group"><label>Tu Nombre:</label><input type="text" id="revAuthor" placeholder="Ej. Carlos M."></div>
-    <div class="form-group">
-      <label>Puntuación de Seguridad:</label>
-      <select id="revStars">
-        <option value="5">⭐⭐⭐⭐⭐ (5/5) - Comí 100% seguro</option>
-        <option value="4">⭐⭐⭐⭐ (4/5) - Buena atención</option>
-        <option value="3">⭐⭐⭐ (3/5) - Correcto</option>
-        <option value="1">⭐ (1/5) - Desconocían las trazas</option>
-      </select>
-    </div>
-    <div class="form-group"><label>Alergias con las que comiste:</label><input type="text" id="revAllergens"></div>
-    <div class="form-group"><label>Tu experiencia:</label><textarea id="revComment" rows="3"></textarea></div>
-    <button class="btn btn-green" style="width:100%; padding:12px;" onclick="saveUserReview()">💬 Publicar Experiencia</button>
+    <div class="form-group"><label>Tu Nombre:</label><input type="text" id="revAuthor"></div>
+    <div class="form-group"><label>Puntuación:</label><select id="revStars"><option value="5">⭐⭐⭐⭐⭐ (5/5) - 100% Seguro</option><option value="4">⭐⭐⭐⭐ (4/5) - Buena atención</option><option value="3">⭐⭐⭐ (3/5) - Correcto</option><option value="1">⭐ (1/5) - Peligro de trazas</option></select></div>
+    <div class="form-group"><label>Alergias:</label><input type="text" id="revAllergens"></div>
+    <div class="form-group"><label>Experiencia:</label><textarea id="revComment" rows="3"></textarea></div>
+    <button class="btn btn-green" style="width:100%; padding:12px;" onclick="saveUserReview()">💬 Publicar</button>
   </div>
 </div>
 
-<!-- MODAL CÓDIGO BIDI -->
 <div class="modal" id="qrModal">
   <div class="modal-content" style="text-align:center;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <h2 style="margin:0; font-size:1rem;">📱 Código Bidi Oficial de Mesa</h2>
       <button class="btn btn-outline" onclick="closeModal('qrModal')">✕</button>
     </div>
-    <div style="background:#fff; padding:14px; border-radius:14px; display:inline-block; margin-bottom:10px;">
-      <img id="qrImageDisplay" src="" alt="QR" style="width:200px; height:200px;">
-    </div>
+    <div style="background:#fff; padding:14px; border-radius:14px; display:inline-block; margin-bottom:10px;"><img id="qrImageDisplay" src="" alt="QR" style="width:200px; height:200px;"></div>
     <input type="text" id="qrDirectLink" readonly style="width:100%; padding:8px; border-radius:8px; background:var(--bg); color:#fff; border:1px solid var(--border); margin-bottom:10px;">
     <button class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('qrDirectLink').value).then(()=>alert('✅ Enlace Bidi copiado'))">📋 Copiar Enlace Bidi</button>
   </div>
 </div>
 
+<div class="modal" id="legalModal" style="z-index:5000;">
+  <div class="modal-content" style="border:2px solid var(--amber);">
+    <h2 style="margin:0 0 8px; font-size:1.05rem; color:var(--amber);">⚖️ Aviso Sanitario y Legal (Reglamento UE 1169/2011)</h2>
+    <p style="font-size:0.78rem; color:#cbd5e1; line-height:1.45;">
+      1. <b>TusAlergias</b> es una herramienta informativa de apoyo. La responsabilidad sobre la exactitud de las recetas, el etiquetado de fabricantes y la prevención de contaminación cruzada en cocina recae exclusivamente en el establecimiento hostelero o fabricante.<br><br>
+      2. <b>Obligación del usuario:</b> Si padeces alergias o intolerancias severas, debes <b>confirmar siempre verbalmente tus alergias con el camarero o personal de sala</b> antes de consumir cualquier plato o producto.
+    </p>
+    <button class="btn btn-green" style="width:100%; padding:12px;" onclick="acceptLegalTerms()">✅ Entendido, acepto las condiciones de uso</button>
+  </div>
+</div>
 <script>
 const ALLERGENS = ["GLUTEN","CRUSTÁCEOS","HUEVO","PESCADO","CACAHUETES","SOJA","LÁCTEO","FRUTOS CON CÁSCARA","APIO","MOSTAZA","SÉSAMO","SULFITOS","ALTRAMUCES","MOLUSCOS"];
 const DIETS = [{id:"CRUDO_EMBARAZO",label:"🤰 Embarazada"},{id:"NO_VEGANO",label:"🌱 Vegano"},{id:"NO_VEGETARIANO",label:"🥚 Vegetariano"},{id:"CERDO",label:"🚫🐷 Sin Cerdo"},{id:"PICANTE",label:"🌶️ Sin Picante"}];
@@ -719,7 +632,7 @@ const SAMPLE_12_DISHES = [
   { id:4, cat:"ENTRANTES", name:"TARTAR DE ATÚN ROJO Y AGUACATE", traces:[], protocol:"Aliñar al natural con AOVE.", ings:[{n:"Atún y aguacate",a:["PESCADO"],tags:["CRUDO_EMBARAZO","NO_VEGANO","NO_VEGETARIANO"],sub:"atún, aguacate, lima",mod:false},{n:"Teriyaki",a:["GLUTEN","SOJA","SÉSAMO"],tags:[],sub:"soja, trigo",mod:true,note:"Aliñar solo con AOVE"}] },
   { id:5, cat:"ENTRANTES", name:"ALCACHOFAS CONFITADAS A LA PLANCHA", traces:[], protocol:"Plancha limpia.", ings:[{n:"Alcachofa",a:[],tags:[],sub:"alcachofa",mod:false},{n:"Jamón ibérico",a:[],tags:["CERDO","NO_VEGANO","NO_VEGETARIANO"],sub:"jamón",mod:true,note:"Sin jamón"},{n:"Piñones",a:["FRUTOS CON CÁSCARA"],tags:[],sub:"piñones",mod:true,note:"Sin piñones"}] },
   { id:6, cat:"ENTRANTES", name:"ENSALADA DE CABRA Y MANZANA", traces:["CACAHUETES"], protocol:"Bol limpio.", ings:[{n:"Brotes y manzana",a:[],tags:[],sub:"lechuga, manzana",mod:false},{n:"Queso cabra",a:["LÁCTEO"],tags:["NO_VEGANO"],sub:"leche",mod:true,note:"Sin queso"},{n:"Nueces",a:["FRUTOS CON CÁSCARA"],tags:[],sub:"nueces",mod:true,note:"Sin nueces"}] },
-  { id:7, cat:"ARROCES", name:"ARROZ DEL SEÑORET MEDITERRÁNEO", traces:[], protocol:"Caldo natural sin harinas.", ings:[{n:"Arroz, sepia y gamba roja",a:["CRUSTÁCEOS","MOLUSCOS","PESCADO"],tags:["NO_VEGANO","NO_VEGETARIANO"],sub:"arroz, gamba roja, sepia, ñora, ajo, tomate",mod:false},{n:"Alioli",a:["HUEVO"],tags:["NO_VEGANO"],sub:"ajo, huevo",mod:true,note:"Sin salsera de alioli"}] },
+  { id:7, cat:"ARROCES", name:"ARROZ DEL SEÑORET MEDITERRÁNEO", traces:[], protocol:"Caldo natural sin harinas.", ings:[{n:"Arroz, sepia y gamba roja",a:[CRUSTÁCEOS","MOLUSCOS","PESCADO"],tags:["NO_VEGANO","NO_VEGETARIANO"],sub:"arroz, gamba roja, sepia, ñora, ajo, tomate",mod:false},{n:"Alioli",a:["HUEVO"],tags:["NO_VEGANO"],sub:"ajo, huevo",mod:true,note:"Sin salsera de alioli"}] },
   { id:8, cat:"ARROCES", name:"RISOTTO DE BOLETUS Y TRUFA", traces:[], protocol:"Terminar con AOVE sin lácteos bajo petición.", ings:[{n:"Arroz y setas",a:["SULFITOS"],tags:[],sub:"arroz, boletus, vino, ajo, cebolla",mod:false},{n:"Mantequilla y parmesano",a:["LÁCTEO"],tags:["NO_VEGANO"],sub:"leche",mod:true,note:"Sin mantecar con lácteos"}] },
   { id:9, cat:"PRINCIPALES", name:"CORVINA SALVAJE A LA BRASA", traces:[], protocol:"Parrilla limpia.", ings:[{n:"Corvina y verduras",a:["PESCADO"],tags:["NO_VEGANO","NO_VEGETARIANO"],sub:"corvina, calabacín",mod:false},{n:"Refrito de ajo y guindilla",a:[],tags:["PICANTE"],sub:"ajo, guindilla",mod:true,note:"Sin refrito de ajo ni guindilla"}] },
   { id:10, cat:"PRINCIPALES", name:"PRESA IBÉRICA GLASEADA", traces:[], protocol:"Bien pasada para embarazadas.", ings:[{n:"Presa y patata",a:[],tags:["CERDO","NO_VEGANO","NO_VEGETARIANO"],sub:"cerdo, patata",mod:false},{n:"Glaseado Teriyaki",a:["GLUTEN","SOJA","SÉSAMO"],tags:[],sub:"soja, trigo",mod:true,note:"Asar solo con sal en escamas"}] },
@@ -735,21 +648,7 @@ const PILOT_REST = {
 };
 
 const SAMPLE_HOME_LISTS = [
-  {
-    id: "hl_default",
-    name: "🍲 Mis Platos en Casa",
-    dishes: [
-      {
-        id: 901,
-        name: "ARROZ CON TOMATE Y CEBOLLA (EJEMPLO)",
-        ings: [
-          { n: "📊 Paquete Arroz Redondo", sub: "arroz 100%", a: [], tags: [] },
-          { n: "📊 Brick Tomate Frito", sub: "tomate, aceite de girasol, azúcar, sal, almidón de maíz", a: [], tags: [] },
-          { n: "🧅 Cebolla fresca (Manual)", sub: "cebolla", a: [], tags: [] }
-        ]
-      }
-    ]
-  },
+  { id: "hl_default", name: "🍲 Mis Platos en Casa", dishes: [] },
   { id: "hl_tuppers", name: "🍱 Cenas y Tuppers", dishes: [] }
 ];
 
@@ -758,7 +657,7 @@ function normalizeStr(s) { return (s || "").toLowerCase().normalize("NFD").repla
 function closeModal(id) { document.getElementById(id).style.display = "none"; }
 
 let appState = null;
-try { appState = JSON.parse(localStorage.getItem("tusalergias_v14_pro")); } catch(e){}
+try { appState = JSON.parse(localStorage.getItem("tusalergias_v15_final")); } catch(e){}
 if (!appState || !Array.isArray(appState.restaurants) || !appState.restaurants.length) {
   appState = {
     restaurants: [PILOT_REST],
@@ -769,126 +668,47 @@ if (!appState || !Array.isArray(appState.restaurants) || !appState.restaurants.l
     ],
     activeFolderId: "f_fav",
     homeLists: SAMPLE_HOME_LISTS,
-    activeHomeListId: "hl_default"
+    activeHomeListId: "hl_default",
+    currentUser: null,
+    legalAccepted: false
   };
 }
-if (!appState.votedRequests) appState.votedRequests = [];
-if (!appState.homeLists || !appState.homeLists.length) {
-  appState.homeLists = SAMPLE_HOME_LISTS;
-  appState.activeHomeListId = "hl_default";
-}
+if (!appState.homeLists) appState.homeLists = SAMPLE_HOME_LISTS;
 
 let activeRestId = appState.restaurants[0].id;
 let isStaffUnlocked = false;
-let currentView = "landing", previousView = "landing", currentWaiterLang = "es";
+let currentView = "discover", previousView = "discover", currentWaiterLang = "es";
 let leafletMap = null, markersLayer = null, lastGeoPlaces = [], lastSupermarketProducts = [];
-let selectedAllergens = new Set(), selectedDiets = new Set(), customAvoidSet = new Set();
+let selectedAllergens = new Set(), selectedDiets = new Set(), customAvoidSet = new Set(), strictTracesEnabled = true;
 let currentTab = "aptos", currentHomeTab = "aptos";
 let tempHomeDishIngs = [];
 let pendingUnsafeProduct = null;
 let html5QrScanner = null;
+let scanTargetMode = "home";
 
-function saveAppState() { localStorage.setItem("tusalergias_v14_pro", JSON.stringify(appState)); }
+function saveAppState() { localStorage.setItem("tusalergias_v15_final", JSON.stringify(appState)); }
 function getActiveRest() { return appState.restaurants.find(r => r.id === activeRestId) || appState.restaurants[0]; }
 function getActiveHomeList() { return appState.homeLists.find(l => l.id === appState.activeHomeListId) || appState.homeLists[0]; }
 
-function toggleDrawer(open) {
-  if (open) updateDrawerMenu();
-  document.getElementById("mainDrawer").classList.toggle("open", open);
-  document.getElementById("drawerBackdrop").style.display = open ? "block" : "none";
-}
-
-function updateDrawerMenu() {
-  const c = document.getElementById("drawerNavContent");
-  if (currentView === "home") {
-    c.innerHTML = `
-      <span class="drawer-badge" style="background:rgba(245,158,11,0.2); color:var(--amber);">Sección Para Casa 🏠</span>
-      <div class="drawer-item" onclick="showView('home'); toggleDrawer(false);">🍲 Mis Listas de Platos en Casa</div>
-      <div class="drawer-item" onclick="openHomeDishModal(); toggleDrawer(false);">📊 Escanear Código Barras / Plato</div>
-      <div class="drawer-item" onclick="createNewHomeList(); toggleDrawer(false);">➕ Crear Nueva Lista Casera</div>
-      <div class="drawer-divider"></div>
-      <div class="drawer-item" style="color:var(--green); font-weight:800;" onclick="showView('diner'); toggleDrawer(false);">🔄 Ir a Para Comensales 🥗</div>
-      <div class="drawer-item" style="color:var(--accent); font-weight:800;" onclick="showView('owner'); toggleDrawer(false);">🔄 Ir a Para Restaurantes 👨‍🍳</div>
-      <div class="drawer-item" onclick="showView('landing'); toggleDrawer(false);">🏠 Volver a Portada</div>`;
-  } else if (currentView === "diner" || (currentView === "app" && !isStaffUnlocked) || currentView === "map") {
-    c.innerHTML = `
-      <span class="drawer-badge" style="background:rgba(16,185,129,0.2); color:var(--green);">Sección Comensales 🥗</span>
-      <div class="drawer-item" onclick="showView('diner'); toggleDrawer(false);">🎒 Mis Rutas y Favoritos</div>
-      <div class="drawer-item" onclick="showView('map'); toggleDrawer(false);">🗺️ Mapa de Zonas Seguras</div>
-      <div class="drawer-item" onclick="openScanModal(); toggleDrawer(false);">📷 Abrir / Pegar Código Bidi</div>
-      <div class="drawer-item" onclick="openSuggestRestModal(); toggleDrawer(false);">💡 Sugerir Local Seguro</div>
-      <div class="drawer-divider"></div>
-      <div class="drawer-item" style="color:var(--amber); font-weight:800;" onclick="showView('home'); toggleDrawer(false);">🔄 Ir a Para Casa (Escáner) 🏠</div>
-      <div class="drawer-item" style="color:var(--accent); font-weight:800;" onclick="showView('owner'); toggleDrawer(false);">🔄 Ir a Para Restaurantes 👨‍🍳</div>
-      <div class="drawer-item" onclick="showView('landing'); toggleDrawer(false);">🏠 Volver a Portada</div>`;
-  } else if (currentView === "owner" || (currentView === "app" && isStaffUnlocked)) {
-    c.innerHTML = `
-      <span class="drawer-badge" style="background:rgba(56,189,248,0.2); color:var(--accent);">Sección Restaurantes 👨‍🍳</span>
-      <div class="drawer-item" onclick="showView('owner'); toggleDrawer(false);">🏪 Mis Locales Oficiales</div>
-      <div class="drawer-item" onclick="openNewRestaurantModal(); toggleDrawer(false);">➕ Dar de Alta mi Restaurante</div>
-      <div class="drawer-item" onclick="showView('map'); toggleDrawer(false);">🗺️ Ver Mapa de la Red</div>
-      <div class="drawer-divider"></div>
-      <div class="drawer-item" style="color:var(--green); font-weight:800;" onclick="showView('diner'); toggleDrawer(false);">🔄 Ir a Para Comensales 🥗</div>
-      <div class="drawer-item" style="color:var(--amber); font-weight:800;" onclick="showView('home'); toggleDrawer(false);">🔄 Ir a Para Casa (Escáner) 🏠</div>
-      <div class="drawer-item" onclick="showView('landing'); toggleDrawer(false);">🏠 Volver a Portada</div>`;
-  } else {
-    c.innerHTML = `
-      <div class="drawer-item" onclick="showView('diner'); toggleDrawer(false);">🥗 Entrar a Para Comensales</div>
-      <div class="drawer-item" onclick="showView('home'); toggleDrawer(false);">🏠 Entrar a Para Casa (Escáner)</div>
-      <div class="drawer-item" onclick="showView('owner'); toggleDrawer(false);">👨‍🍳 Entrar a Para Restaurantes</div>
-      <div class="drawer-item" onclick="showView('map'); toggleDrawer(false);">🗺️ Explorar Mapa Mundial</div>`;
-  }
-}
-
-function goBackView() {
-  if (currentView === "app") showView(isStaffUnlocked ? "owner" : (previousView === "map" ? "map" : "diner"));
-  else if (currentView === "map") showView("diner");
-  else showView("landing");
-}
-
-function showView(v) {
-  if (currentView !== v) previousView = currentView;
-  currentView = v;
-  ["landingView","homeView","dinerView","ownerView","mapView","appView"].forEach(id => {
-    document.getElementById(id).style.display = (id === v + "View") ? "block" : "none";
-  });
-  document.getElementById("headerMainTitle").innerText = "TusAlergias";
-  document.getElementById("headerRightActions").innerHTML = v === "landing" ? "" : `<button class="btn btn-outline" onclick="goBackView()">← Volver</button>`;
-  if (v === "home") renderHomeView();
-  if (v === "diner") renderDinerView();
-  if (v === "owner") renderOwnerView();
-  if (v === "map") setTimeout(initOrRefreshMap, 100);
-  if (v === "app") renderRestaurantApp();
-}
-
-function syncStrictTraces(checked) {
-  document.getElementById("strictTraces").checked = checked;
-  document.getElementById("homeStrictTraces").checked = checked;
-  if (currentView === "app") renderDishes();
-  if (currentView === "home") renderHomeDishes();
-}
-
-// ==========================================================
-// MOTOR UNIFICADO DE ESCANEO DE CÓDIGO DE BARRAS (CASA Y RESTAURANTES)
-// ==========================================================
+// TRADUCTOR MULTILINGÜE DE ETIQUETAS (ESPAÑOL, INGLÉS, FRANCÉS, ALEMÁN, ITALIANO)
 function detectAllergensFromString(str) {
   const norm = normalizeStr(str);
   const found = [];
   const map = {
-    "GLUTEN": ["gluten", "wheat", "trigo", "cebada", "barley", "centeno", "rye", "avena", "oats", "espelta", "kamut", "harina", "pan", "galleta", "pasta"],
+    "GLUTEN": ["gluten", "wheat", "trigo", "cebada", "barley", "centeno", "rye", "avena", "oats", "espelta", "kamut", "farine", "harina", "pan", "galleta", "pasta", "malt", "malta", "orge"],
     "CRUSTÁCEOS": ["crustaceo", "crustaceans", "gamba", "gambon", "langostino", "cangrejo", "cigala", "camaron", "shrimp", "prawn"],
-    "HUEVO": ["huevo", "huevos", "egg", "eggs", "yema", "clara", "albumina", "lecitina de huevo", "mayonesa"],
-    "PESCADO": ["pescado", "fish", "salmon", "atun", "bonito", "anchoa", "bacalao", "merluza", "corvina"],
-    "CACAHUETES": ["cacahuete", "cacahuetes", "peanuts", "peanut", "mani"],
-    "SOJA": ["soja", "soybeans", "soy", "edamame", "tofu", "lecitina de soja", "miso"],
-    "LÁCTEO": ["lacteo", "lacteos", "milk", "leche", "lactosa", "queso", "nata", "mantequilla", "yogur", "suero", "caseina", "whey"],
-    "FRUTOS CON CÁSCARA": ["frutos de cascara", "frutos secos", "nuts", "tree-nuts", "almendra", "avellana", "nuez", "nueces", "pistacho", "anacardo", "pinones", "macadamia"],
-    "APIO": ["apio", "celery"],
-    "MOSTAZA": ["mostaza", "mustard"],
-    "SÉSAMO": ["sesamo", "sesame", "ajonjoli", "tahini"],
-    "SULFITOS": ["sulfitos", "sulfito", "sulphites", "sulphur-dioxide", "dioxido de azufre", "vino", "vinagre", "e220", "e221", "e222", "e223", "e224"],
-    "ALTRAMUCES": ["altramuz", "altramuces", "lupin"],
-    "MOLUSCOS": ["molusco", "moluscos", "molluscs", "pulpo", "calamar", "sepia", "mejillon", "almeja", "ostra"]
+    "HUEVO": ["huevo", "huevos", "egg", "eggs", "oeuf", "ei", "yema", "clara", "albumina", "lecitina de huevo", "mayonesa"],
+    "PESCADO": ["pescado", "fish", "poisson", "fisch", "salmon", "atun", "tuna", "bonito", "anchoa", "bacalao", "merluza", "corvina"],
+    "CACAHUETES": ["cacahuete", "cacahuetes", "peanuts", "peanut", "erdnuss", "mani"],
+    "SOJA": ["soja", "soybeans", "soy", "soya", "edamame", "tofu", "miso"],
+    "LÁCTEO": ["lacteo", "lacteos", "milk", "leche", "lait", "milch", "lactosa", "lactose", "queso", "cheese", "fromage", "käse", "nata", "cream", "mantequilla", "butter", "yogur", "suero", "caseina", "whey"],
+    "FRUTOS CON CÁSCARA": ["frutos de cascara", "frutos secos", "nuts", "tree-nuts", "schalenfrüchte", "almendra", "almond", "avellana", "hazelnut", "nuez", "walnut", "nueces", "pistacho", "pistachio", "anacardo", "cashew", "pinones", "macadamia"],
+    "APIO": ["apio", "celery", "sellerie"],
+    "MOSTAZA": ["mostaza", "mustard", "senf"],
+    "SÉSAMO": ["sesamo", "sesame", "sesam", "ajonjoli", "tahini"],
+    "SULFITOS": ["sulfitos", "sulfito", "sulphites", "sulphur", "dioxido", "vino", "wine", "vinagre", "vinegar", "e220", "e221", "e222", "e223", "e224"],
+    "ALTRAMUCES": ["altramuz", "altramuces", "lupin", "lupine"],
+    "MOLUSCOS": ["molusco", "moluscos", "molluscs", "pulpo", "calamar", "sepia", "mejillon", "mussell", "almeja", "ostra"]
   };
   Object.keys(map).forEach(alKey => {
     if (map[alKey].some(k => norm.includes(k))) found.push(alKey);
@@ -896,31 +716,126 @@ function detectAllergensFromString(str) {
   return found;
 }
 
-// 1. EXTRAER SOLO EL NÚMERO DE CÓDIGO DE BARRAS DE UNA FOTO (IGNORANDO EL TEXTO DEL ENVASE)
+function showView(v) {
+  if (currentView !== v) previousView = currentView;
+  currentView = v;
+  ["discoverView","homeView","ownerView","profileView","appView"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = (id === v + "View") ? "block" : "none";
+  });
+  document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
+  if (v === "discover") document.getElementById("nav-discover")?.classList.add("active");
+  if (v === "home") { document.getElementById("nav-home")?.classList.add("active"); renderHomeView(); }
+  if (v === "owner") { document.getElementById("nav-owner")?.classList.add("active"); renderOwnerSessionView(); }
+  if (v === "profile") document.getElementById("nav-profile")?.classList.add("active");
+  if (v === "discover") setTimeout(initOrRefreshMap, 100);
+  if (v === "app") renderRestaurantApp();
+  window.scrollTo(0, 0);
+}
+
+// PERFIL SUPERIOR DE ALÉRGENOS
+function updateProfileBarSummary() {
+  const als = Array.from(selectedAllergens);
+  const diets = Array.from(selectedDiets).map(d => DIETS.find(x => x.id === d)?.label || d);
+  const custom = Array.from(customAvoidSet);
+  const total = [...als, ...diets, ...custom];
+  const bar = document.getElementById("activeProfileSummary");
+  if (!total.length) {
+    bar.innerHTML = `🛡️ <b>Sin alergias marcadas</b> (Toca para configurar tu perfil)`;
+  } else {
+    bar.innerHTML = `🛡️ <b>Vigilando:</b> <span style="color:#f87171;">${total.join(", ")}</span>`;
+  }
+}
+
+function openAllergyProfileModal() {
+  initFilterButtons();
+  document.getElementById("allergyProfileModal").style.display = "block";
+}
+
+function toggleStrictTraces(checked) {
+  strictTracesEnabled = checked;
+  document.getElementById("strictTraces").checked = checked;
+  document.getElementById("homeStrictTraces").checked = checked;
+  if (currentView === "app") renderDishes();
+  if (currentView === "home") renderHomeDishes();
+}
+
+// INICIO DE SESIÓN PROFESIONAL HOSTELERÍA (GOOGLE / EMAIL)
+function loginWithGoogle() {
+  appState.currentUser = { name: "Propietario Google", email: "hostelero@gmail.com" };
+  saveAppState();
+  renderOwnerSessionView();
+  alert("✅ ¡Conectado con cuenta de Google con éxito!");
+}
+
+function loginWithEmail() {
+  const email = document.getElementById("authEmailInput").value.trim();
+  const pass = document.getElementById("authPassInput").value.trim();
+  if (!email || !pass) { alert("Introduce email y contraseña."); return; }
+  appState.currentUser = { name: email.split("@")[0], email };
+  saveAppState();
+  renderOwnerSessionView();
+  alert("✅ ¡Sesión iniciada correctamente!");
+}
+
+function logoutOwnerSession() {
+  appState.currentUser = null;
+  saveAppState();
+  renderOwnerSessionView();
+}
+
+function renderOwnerSessionView() {
+  const logged = appState.currentUser !== null;
+  document.getElementById("ownerAuthCard").style.display = logged ? "none" : "block";
+  document.getElementById("ownerLoggedPanel").style.display = logged ? "block" : "none";
+  if (logged) {
+    document.getElementById("ownerAccountBadge").innerText = `Conectado como: ${appState.currentUser.email}`;
+    renderOwnerView();
+  }
+}
+
+// ESCÁNER UNIVERSAL (BOTÓN CENTRAL)
+function openUniversalScanner() {
+  document.getElementById("universalManualInput").value = "";
+  document.getElementById("universalScanStatus").style.display = "none";
+  stopBarcodeScanner();
+  document.getElementById("universalScanModal").style.display = "block";
+}
+function closeUniversalScanner() {
+  stopBarcodeScanner();
+  closeModal("universalScanModal");
+}
+
+function handleUniversalManualInput() {
+  const val = document.getElementById("universalManualInput").value.trim();
+  if (!val) return;
+  if (val.includes("http") || val.includes("restId=") || val.includes("carta=")) {
+    closeUniversalScanner();
+    processIncomingUrl(val);
+  } else {
+    lookupBarcodeNumber(val, "universal");
+  }
+}
+
+// MOTOR UNIFICADO DE CÓDIGO DE BARRAS (CASA, RESTAURANTES Y UNIVERSAL)
 async function handleBarcodePhotoScan(event, mode = "home") {
   stopBarcodeScanner();
   const file = event.target.files[0];
   if (!file) return;
 
-  const statusBox = document.getElementById(mode === "home" ? "ocrStatusBox" : "restOcrStatusBox");
+  const statusBox = document.getElementById(mode === "home" ? "ocrStatusBox" : (mode === "rest" ? "restOcrStatusBox" : "universalScanStatus"));
   statusBox.style.display = "block";
-  statusBox.innerText = "📊 Extrayendo número del código de barras de la foto...";
+  statusBox.innerText = "📊 Leyendo código de barras de la foto...";
 
   let detectedCode = null;
-
-  // Motor 1: API Nativa de Hardware Android/Chrome (BarcodeDetector)
   if ("BarcodeDetector" in window) {
     try {
       const detector = new BarcodeDetector({ formats: ["ean_13", "ean_8", "upc_a", "upc_e", "code_128", "code_39"] });
       const bitmap = await createImageBitmap(file);
       const codes = await detector.detect(bitmap);
-      if (codes && codes.length > 0) {
-        detectedCode = codes[0].rawValue;
-      }
+      if (codes && codes.length > 0) detectedCode = codes[0].rawValue;
     } catch (e) {}
   }
-
-  // Motor 2 (Respaldo): Decodificador ZXing sobre el archivo de imagen
   if (!detectedCode) {
     try {
       const fileScanner = new Html5Qrcode("hiddenBarcodeFileReader");
@@ -928,72 +843,63 @@ async function handleBarcodePhotoScan(event, mode = "home") {
       fileScanner.clear();
     } catch (e) {}
   }
-
   event.target.value = "";
 
   if (!detectedCode) {
-    statusBox.innerText = "⚠️ No se detectó nítidamente el código de barras en la foto. Acércate un poco más a las barras, usa '📷 Escáner en Vivo' o escribe los números abajo.";
+    statusBox.innerText = "⚠️ No se detectó nítidamente el código de barras. Usa 'Cámara en Vivo' o escribe el número EAN.";
     return;
   }
-
   await lookupBarcodeNumber(detectedCode, mode);
 }
 
-// 2. ESCÁNER DE CÓDIGO DE BARRAS EN VIVO (CÁMARA DIRECTA)
 function startBarcodeScanner(mode = "home") {
   stopBarcodeScanner();
-  const containerId = mode === "home" ? "homeBarcodeScannerContainer" : "restBarcodeScannerContainer";
-  const readerId = mode === "home" ? "homeBarcodeReader" : "restBarcodeReader";
+  const containerId = mode === "home" ? "homeBarcodeScannerContainer" : (mode === "rest" ? "restBarcodeScannerContainer" : "universalBarcodeScannerContainer");
+  const readerId = mode === "home" ? "homeBarcodeReader" : (mode === "rest" ? "restBarcodeReader" : "universalBarcodeReader");
   document.getElementById(containerId).style.display = "block";
 
   try {
     html5QrScanner = new Html5Qrcode(readerId);
     html5QrScanner.start(
       { facingMode: "environment" },
-      { fps: 12, qrbox: { width: 250, height: 110 } },
+      { fps: 12, qrbox: { width: 240, height: 110 } },
       (decodedText) => {
         stopBarcodeScanner();
         lookupBarcodeNumber(decodedText, mode);
       },
       () => {}
-    ).catch(() => {
-      stopBarcodeScanner();
-      const statusBox = document.getElementById(mode === "home" ? "ocrStatusBox" : "restOcrStatusBox");
-      statusBox.style.display = "block";
-      statusBox.innerText = "ℹ️ Usa el botón '📊 Foto Código Barras' o escribe el número EAN directamente.";
-    });
+    ).catch(() => { stopBarcodeScanner(); });
   } catch (e) {}
 }
 
 function stopBarcodeScanner() {
-  ["homeBarcodeScannerContainer", "restBarcodeScannerContainer"].forEach(id => {
+  ["homeBarcodeScannerContainer", "restBarcodeScannerContainer", "universalBarcodeScannerContainer"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
   });
   if (html5QrScanner) {
-    html5QrScanner.stop().then(() => {
-      html5QrScanner.clear();
-      html5QrScanner = null;
-    }).catch(() => { html5QrScanner = null; });
+    html5QrScanner.stop().then(() => { html5QrScanner.clear(); html5QrScanner = null; }).catch(() => { html5QrScanner = null; });
   }
 }
 
-// 3. CONSULTAR EL CÓDIGO DE BARRAS EN OPENFOODFACTS Y EXTRAER SUS INGREDIENTES
 async function lookupBarcodeNumber(rawCode, mode = "home") {
   const code = String(rawCode || "").replace(/\D/g, "");
-  if (!code) { alert("Introduce o escanea un código de barras válido."); return; }
+  if (!code) { alert("Código de barras no válido."); return; }
   stopBarcodeScanner();
 
-  const statusBox = document.getElementById(mode === "home" ? "ocrStatusBox" : "restOcrStatusBox");
+  const statusBox = document.getElementById(mode === "home" ? "ocrStatusBox" : (mode === "rest" ? "restOcrStatusBox" : "universalScanStatus"));
   statusBox.style.display = "block";
-  statusBox.innerText = `📊 Código ${code} captado. Descargando ingredientes oficiales...`;
+  statusBox.className = "";
+  statusBox.style.background = "rgba(56,189,248,0.15)";
+  statusBox.style.color = "var(--accent)";
+  statusBox.innerText = `📊 Consultando código ${code} en Open Food Facts...`;
 
   try {
     const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${encodeURIComponent(code)}.json`);
     const data = await res.json();
 
     if (data.status !== 1 || !data.product) {
-      statusBox.innerText = `⚠️ El código ${code} no figura en la base de datos de supermercados. Usa el buscador por nombre o añade los ingredientes manualmente.`;
+      statusBox.innerText = `⚠️ El producto con código ${code} no tiene datos de ingredientes en la red. Añádelo manualmente.`;
       return;
     }
 
@@ -1001,1213 +907,57 @@ async function lookupBarcodeNumber(rawCode, mode = "home") {
     const prodName = p.product_name_es || p.product_name || ("Producto " + code);
     const brand = p.brands ? ` (${p.brands.split(",")[0].trim()})` : "";
     const ingText = (p.ingredients_text_es || p.ingredients_text || "").replace(/\s+/g, " ").trim();
-    const strictTraces = document.getElementById("homeStrictTraces").checked;
-    const alTags = (p.allergens_tags || []).join(" ") + " " + (p.allergens || "");
-    const trTags = strictTraces ? ((p.traces_tags || []).join(" ") + " " + (p.traces || "")) : "";
+    
+    if (!ingText) {
+      statusBox.innerText = `⚠️ "${prodName}" existe pero no tiene lista de ingredientes declarada. Debes verificarlo físicamente.`;
+      return;
+    }
 
+    const alTags = (p.allergens_tags || []).join(" ") + " " + (p.allergens || "");
+    const trTags = strictTracesEnabled ? ((p.traces_tags || []).join(" ") + " " + (p.traces || "")) : "";
     const detectedAls = detectAllergensFromString(`${prodName} ${ingText} ${alTags} ${trTags}`);
     const fullTitle = `📊 ${prodName}${brand}`;
 
     if (mode === "rest") {
-      // AÑADIR DIRECTAMENTE COMO COMPONENTE EN EL PLATO DEL RESTAURANTE
-      addIngRow({
-        n: fullTitle,
-        sub: ingText || "Verificado por código de barras (" + code + ")",
-        mod: true,
-        note: "Adaptable en cocina",
-        a: detectedAls,
-        tags: []
-      });
-      statusBox.innerText = `✅ "${prodName}" añadido al plato con sus ingredientes y alérgenos: ${detectedAls.length ? detectedAls.join(", ") : "Sin alérgenos oficiales"}.`;
+      addIngRow({ n: fullTitle, sub: ingText, mod: true, note: "Adaptable en cocina", a: detectedAls, tags: [] });
+      statusBox.innerText = `✅ "${prodName}" añadido al plato con sus alérgenos detectados.`;
+    } else if (mode === "universal") {
+      const newProd = { n: fullTitle, sub: ingText, a: detectedAls, tags: [] };
+      const conflicts = checkProductConflicts(newProd);
+      statusBox.style.display = "block";
+      if (conflicts.length > 0) {
+        statusBox.style.background = "rgba(239,68,68,0.2)";
+        statusBox.style.color = "#fca5a5";
+        statusBox.innerHTML = `⛔ <b>¡NO APTO PARA TI!</b> Contiene: <b>${conflicts.join(", ")}</b><br><span style="font-size:0.7rem; color:#cbd5e1;">${ingText}</span><br><br><button class="btn btn-amber" onclick="openHomeDishModal(); closeUniversalScanner();">🍲 Añadir a un Plato Casero</button>`;
+      } else {
+        statusBox.style.background = "rgba(16,185,129,0.2)";
+        statusBox.style.color = "#6ee7b7";
+        statusBox.innerHTML = `✅ <b>¡PRODUCTO 100% SEGURO PARA TI!</b><br><span style="font-size:0.7rem; color:#cbd5e1;">${ingText}</span><br><br><button class="btn btn-amber" onclick="openHomeDishModal(); closeUniversalScanner();">🍲 Añadir a un Plato Casero</button>`;
+      }
     } else {
-      // AÑADIR AL PLATO CASERO ("PARA CASA") VERIFICANDO CONFLICTOS
       document.getElementById("tempProdName").value = fullTitle;
-      document.getElementById("tempProdSub").value = ingText || "Verificado por código de barras (" + code + ")";
-      renderTempProdAllergenChips(detectedAls);
-      statusBox.innerText = `✅ "${prodName}" leído del código ${code}. Ingredientes extraídos correctamente.`;
+      document.getElementById("tempProdSub").value = ingText;
+      statusBox.innerText = `✅ "${prodName}" escaneado. Verificando contra tu perfil...`;
       verifyAndAddProductToHomeDish();
     }
   } catch (e) {
-    statusBox.innerText = "⚠️ Error de conexión al consultar la base de datos de códigos de barras.";
+    statusBox.innerText = "⚠️ Error de conexión con la base de datos de productos.";
   }
 }
 
-// 4. BUSCADOR DE PRODUCTOS POR NOMBRE (PARA CASA Y PARA RESTAURANTES)
-async function searchSupermarketProduct(mode = "home") {
-  const inputId = mode === "home" ? "supermarketSearchInput" : "restSupermarketSearchInput";
-  const boxId = mode === "home" ? "supermarketResults" : "restSupermarketResults";
-  const q = document.getElementById(inputId).value.trim();
-  const box = document.getElementById(boxId);
-  if (!q) return;
-  box.style.display = "block";
-  box.innerHTML = `<div class="geo-result-item">🛒 Buscando ingredientes oficiales del producto...</div>`;
-
-  try {
-    const url = `https://es.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=5`;
-    const res = await fetch(url);
-    const data = await res.json();
-    lastSupermarketProducts = (data.products || []).filter(p => p.product_name);
-
-    if (!lastSupermarketProducts.length) {
-      box.innerHTML = `<div class="geo-result-item">No encontrado. Haz foto al código de barras o escríbelo manualmente.</div>`;
-      return;
-    }
-
-    box.innerHTML = lastSupermarketProducts.map((p, i) => `
-      <div class="geo-result-item" onclick="selectSupermarketProduct(${i}, '${mode}')">
-        🛒 <b>${esc(p.product_name)}</b> ${p.brands ? '— <span style="color:var(--accent);">'+esc(p.brands)+'</span>' : ''}
-      </div>
-    `).join("");
-  } catch (e) {
-    box.innerHTML = `<div class="geo-result-item">Sin conexión con el catálogo.</div>`;
-  }
-}
-
-function selectSupermarketProduct(idx, mode = "home") {
-  const p = lastSupermarketProducts[idx];
-  if (!p) return;
-  document.getElementById(mode === "home" ? "supermarketResults" : "restSupermarketResults").style.display = "none";
-
-  const prodTitle = `🛒 ${p.product_name}${p.brands ? ' (' + p.brands.split(",")[0] + ')' : ''}`;
-  const ingText = (p.ingredients_text_es || p.ingredients_text || "").replace(/\s+/g, " ").trim();
-  const strictTraces = document.getElementById("homeStrictTraces").checked;
-  const alTags = (p.allergens_tags || []).join(" ") + " " + (strictTraces ? (p.traces_tags || []).join(" ") : "");
-  const detectedAls = detectAllergensFromString(prodTitle + " " + ingText + " " + alTags);
-
-  if (mode === "rest") {
-    addIngRow({
-      n: prodTitle,
-      sub: ingText || "Ingredientes de catálogo",
-      mod: true,
-      note: "Adaptable en cocina",
-      a: detectedAls,
-      tags: []
-    });
-    const statusBox = document.getElementById("restOcrStatusBox");
-    statusBox.style.display = "block";
-    statusBox.innerText = `✅ "${p.product_name}" añadido a la receta con sus ingredientes y alérgenos.`;
-  } else {
-    document.getElementById("tempProdName").value = prodTitle;
-    document.getElementById("tempProdSub").value = ingText;
-    renderTempProdAllergenChips(detectedAls);
-    verifyAndAddProductToHomeDish();
-  }
-}
-
-// ==========================================================
-// SECCIÓN "PARA CASA": GESTIÓN DE PLATOS Y ALERTAS
-// ==========================================================
-function renderHomeView() {
-  initFilterButtons();
-  const list = getActiveHomeList();
-  appState.activeHomeListId = list.id;
-
-  const isSecondary = list.id !== "hl_default";
-  document.getElementById("btnRenameHomeList").style.display = isSecondary ? "inline-flex" : "none";
-  document.getElementById("btnDeleteHomeList").style.display = isSecondary ? "inline-flex" : "none";
-
-  document.getElementById("homeListsBar").innerHTML = appState.homeLists.map(l =>
-    `<div class="folder-pill ${l.id === list.id ? 'active' : ''}" onclick="appState.activeHomeListId='${esc(l.id)}';saveAppState();renderHomeView();">${esc(l.name)} (${(l.dishes||[]).length})</div>`
-  ).join("");
-
-  renderHomeDishes();
-}
-
-function setHomeTab(t) {
-  currentHomeTab = t;
-  document.getElementById("home-tab-aptos").classList.toggle("active", t === "aptos");
-  document.getElementById("home-tab-proh").classList.toggle("active", t === "proh");
-  renderHomeDishes();
-}
-
-function createNewHomeList() {
-  const n = prompt("🍲 Nombre de tu nueva lista de platos en casa:");
-  if (!n || !n.trim()) return;
-  const newId = "hl_" + Date.now();
-  appState.homeLists.push({ id: newId, name: "🍲 " + n.trim(), dishes: [] });
-  appState.activeHomeListId = newId;
-  saveAppState(); renderHomeView();
-}
-
-function renameActiveHomeList() {
-  const l = getActiveHomeList();
-  if (!l || l.id === "hl_default") return;
-  const n = prompt("Nuevo nombre para la lista:", l.name.replace("🍲 ", ""));
-  if (n && n.trim()) { l.name = "🍲 " + n.trim(); saveAppState(); renderHomeView(); }
-}
-
-function deleteActiveHomeList() {
-  const l = getActiveHomeList();
-  if (!l || l.id === "hl_default") return;
-  if (!confirm(`¿Eliminar la lista "${l.name}" y sus platos?`)) return;
-  appState.homeLists = appState.homeLists.filter(x => x.id !== l.id);
-  appState.activeHomeListId = "hl_default";
-  saveAppState(); renderHomeView();
-}
-
-function openHomeDishModal(dishId = null) {
-  const list = getActiveHomeList();
-  tempHomeDishIngs = [];
-  document.getElementById("tempProdName").value = "";
-  document.getElementById("tempProdSub").value = "";
-  document.getElementById("homeManualBarcodeInput").value = "";
-  document.getElementById("supermarketSearchInput").value = "";
-  document.getElementById("supermarketResults").style.display = "none";
-  document.getElementById("ocrStatusBox").style.display = "none";
-  stopBarcodeScanner();
-  renderTempProdAllergenChips([]);
-
-  if (dishId) {
-    const d = (list.dishes || []).find(x => x.id === dishId);
-    if (!d) return;
-    document.getElementById("homeDishModalTitle").innerText = "✏️ Editar Plato Casero";
-    document.getElementById("editHomeDishId").value = d.id;
-    document.getElementById("homeDishNameInput").value = d.name;
-    tempHomeDishIngs = JSON.parse(JSON.stringify(d.ings || []));
-  } else {
-    document.getElementById("homeDishModalTitle").innerText = "🍲 Crear Nuevo Plato en Casa";
-    document.getElementById("editHomeDishId").value = "";
-    document.getElementById("homeDishNameInput").value = "";
-  }
-
-  renderTempHomeDishIngs();
-  document.getElementById("homeDishModal").style.display = "block";
-}
-
-function closeHomeDishModal() {
-  stopBarcodeScanner();
-  closeModal("homeDishModal");
-}
-
-function renderTempProdAllergenChips(selectedArray = []) {
-  const sel = new Set(selectedArray);
-  document.getElementById("tempProdAllergens").innerHTML = ALLERGENS.map(a =>
-    `<div class="mini-chip ${sel.has(a)?'selected':''}" data-al="${a}" onclick="this.classList.toggle('selected')">${a}</div>`
-  ).join("");
-}
-
-function autoMarkAllergensFromLabelText() {
-  const text = document.getElementById("tempProdName").value + " " + document.getElementById("tempProdSub").value;
-  const detected = detectAllergensFromString(text);
-  renderTempProdAllergenChips(detected);
-}
-
-function focusManualProductInput() {
-  stopBarcodeScanner();
-  const nameInput = document.getElementById("tempProdName");
-  nameInput.value = "";
-  document.getElementById("tempProdSub").value = "";
-  renderTempProdAllergenChips([]);
-  nameInput.placeholder = "Escribe el ingrediente sin etiqueta (ej. Cebolla fresca, Ajo...)";
-  nameInput.focus();
-}
-
-async function handleLabelPhotoScan(event) {
+async function handleLabelPhotoScan(event, mode = "home") {
   stopBarcodeScanner();
   const file = event.target.files[0];
   if (!file) return;
-  const statusBox = document.getElementById("ocrStatusBox");
+  const statusBox = document.getElementById(mode === "home" ? "ocrStatusBox" : "restOcrStatusBox");
   statusBox.style.display = "block";
-  statusBox.innerText = "📑 Leyendo texto impreso de la etiqueta...";
+  statusBox.innerText = "📑 Leyendo texto de la etiqueta...";
 
   try {
     const result = await Tesseract.recognize(file, "spa");
     const rawText = (result?.data?.text || "").replace(/\s+/g, " ").trim();
-    if (!rawText) {
-      statusBox.innerText = "⚠️ No se pudo leer texto claro. Usa '📊 1. Foto Código Barras' para extraer los ingredientes exactos.";
-      return;
-    }
-    if (!document.getElementById("tempProdName").value) {
-      document.getElementById("tempProdName").value = "📑 Etiqueta Fotografía";
-    }
+    if (!rawText) { statusBox.innerText = "⚠️ Texto no legible."; return; }
+    document.getElementById("tempProdName").value = "📑 Etiqueta Foto";
     document.getElementById("tempProdSub").value = rawText;
-    const detected = detectAllergensFromString(rawText);
-    renderTempProdAllergenChips(detected);
-    statusBox.innerText = `✅ Texto leído. Alérgenos detectados: ${detected.length ? detected.join(", ") : "Ninguno"}.`;
-    verifyAndAddProductToHomeDish();
-  } catch (err) {
-    statusBox.innerText = "⚠️ Error al leer el texto.";
-  }
-  event.target.value = "";
-}
-
-function checkProductConflicts(prod) {
-  const alHits = (prod.a || []).filter(a => selectedAllergens.has(a));
-  const norm = normalizeStr(prod.n + " " + (prod.sub || ""));
-  const customHits = Array.from(customAvoidSet)
-    .filter(c => norm.includes(normalizeStr(c)))
-    .map(c => c.toUpperCase());
-  return [...alHits, ...customHits];
-}
-
-function verifyAndAddProductToHomeDish() {
-  const name = document.getElementById("tempProdName").value.trim();
-  const sub = document.getElementById("tempProdSub").value.trim();
-  if (!name && !sub) {
-    alert("Haz foto al código de barras o escribe el ingrediente primero.");
-    return;
-  }
-
-  const finalName = name || ("🧅 " + sub.split(",")[0].trim());
-  const selectedAls = Array.from(document.querySelectorAll("#tempProdAllergens .mini-chip.selected")).map(el => el.getAttribute("data-al"));
-  const autoAls = detectAllergensFromString(finalName + " " + sub);
-  const combinedAls = Array.from(new Set([...selectedAls, ...autoAls]));
-
-  const newProd = { n: finalName, sub: sub || finalName, a: combinedAls, tags: [] };
-  const conflicts = checkProductConflicts(newProd);
-
-  if (conflicts.length > 0) {
-    pendingUnsafeProduct = newProd;
-    document.getElementById("allergenWarningText").innerHTML = `
-      El producto <b>"${esc(newProd.n)}"</b> contiene:<br>
-      <span style="display:inline-block; margin-top:6px; padding:5px 12px; border-radius:8px; background:var(--red); color:#fff; font-weight:900;">
-        ⛔ ${esc(conflicts.join(", "))}
-      </span><br><br>
-      <span style="font-size:0.76rem; color:#cbd5e1;">Ingredientes del envase: ${esc(newProd.sub)}</span>
-    `;
-    document.getElementById("allergenWarningModal").style.display = "block";
-    return;
-  }
-
-  commitAddProductToHomeDish(newProd);
-}
-
-function cancelAddUnsafeProduct() {
-  pendingUnsafeProduct = null;
-  document.getElementById("tempProdName").value = "";
-  document.getElementById("tempProdSub").value = "";
-  renderTempProdAllergenChips([]);
-  closeModal("allergenWarningModal");
-}
-
-function confirmAddUnsafeProductAnyway() {
-  if (pendingUnsafeProduct) {
-    commitAddProductToHomeDish(pendingUnsafeProduct);
-    pendingUnsafeProduct = null;
-  }
-  closeModal("allergenWarningModal");
-}
-
-function commitAddProductToHomeDish(prod) {
-  tempHomeDishIngs.push(prod);
-  document.getElementById("tempProdName").value = "";
-  document.getElementById("tempProdSub").value = "";
-  renderTempProdAllergenChips([]);
-  renderTempHomeDishIngs();
-}
-
-function removeTempHomeIng(idx) {
-  tempHomeDishIngs.splice(idx, 1);
-  renderTempHomeDishIngs();
-}
-
-function renderTempHomeDishIngs() {
-  document.getElementById("homeDishIngCount").innerText = tempHomeDishIngs.length;
-  const container = document.getElementById("homeDishCurrentIngsList");
-  if (!tempHomeDishIngs.length) {
-    container.innerHTML = `<div style="font-size:0.76rem; color:var(--muted); padding:10px; background:var(--bg); border-radius:8px; text-align:center;">Aún no has añadido productos a este plato. Haz foto al código de barras o añade un ingrediente arriba.</div>`;
-    return;
-  }
-  container.innerHTML = tempHomeDishIngs.map((ing, i) => {
-    const conflicts = checkProductConflicts(ing);
-    const warnBadge = conflicts.length ? `<span style="color:#f87171; font-weight:800;">[⚠️ Lleva ${esc(conflicts.join(", "))}]</span>` : `<span style="color:var(--green);">[✅ Seguro]</span>`;
-    return `
-      <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg); padding:8px 10px; border-radius:8px; margin-bottom:6px; border:1px solid ${conflicts.length ? 'var(--red)' : 'var(--border)'};">
-        <div style="font-size:0.78rem;">
-          <b>${esc(ing.n)}</b> ${warnBadge}<br>
-          <span style="font-size:0.7rem; color:var(--muted);">${esc(ing.sub || "")} ${ing.a?.length ? '· ['+esc(ing.a.join(", "))+']' : ''}</span>
-        </div>
-        <button type="button" class="btn btn-danger" style="padding:4px 8px;" onclick="removeTempHomeIng(${i})">🗑️</button>
-      </div>`;
-  }).join("");
-}
-
-function saveHomeDish() {
-  const list = getActiveHomeList();
-  const editId = document.getElementById("editHomeDishId").value;
-  const name = document.getElementById("homeDishNameInput").value.trim().toUpperCase();
-  if (!name) { alert("Escribe el nombre del plato casero (ej. Arroz con tomate y cebolla)."); return; }
-  if (!tempHomeDishIngs.length) { alert("Añade al menos un producto o ingrediente al plato antes de guardarlo."); return; }
-
-  if (editId) {
-    const idx = list.dishes.findIndex(d => d.id == editId);
-    if (idx > -1) list.dishes[idx] = { id: Number(editId), name, ings: tempHomeDishIngs };
-  } else {
-    list.dishes.unshift({ id: Date.now(), name, ings: tempHomeDishIngs });
-  }
-
-  saveAppState();
-  closeHomeDishModal();
-  renderHomeView();
-}
-
-function deleteHomeDish(dishId) {
-  const list = getActiveHomeList();
-  if (!confirm("¿Eliminar este plato casero de tu lista?")) return;
-  list.dishes = (list.dishes || []).filter(d => d.id !== dishId);
-  saveAppState();
-  renderHomeView();
-}
-
-function renderHomeDishes() {
-  const list = getActiveHomeList();
-  const dishes = list.dishes || [];
-  let safeCount = 0, unsafeCount = 0;
-  let html = "";
-
-  dishes.forEach(d => {
-    let dishConflicts = [];
-    (d.ings || []).forEach(ing => {
-      const c = checkProductConflicts(ing);
-      if (c.length) dishConflicts.push(`${ing.n} (${c.join(", ")})`);
-    });
-
-    const isSafe = dishConflicts.length === 0;
-    if (isSafe) safeCount++; else unsafeCount++;
-
-    if ((currentHomeTab === "aptos" && !isSafe) || (currentHomeTab === "proh" && isSafe)) return;
-
-    const statusBanner = isSafe
-      ? `<div class="mod-box" style="background:rgba(16,185,129,0.15); color:#6ee7b7;">✅ PLATO COMPATIBLE CON TU PERFIL DE ALERGIAS</div>`
-      : `<div class="mod-box danger">⛔ CONTIENE ALÉRGENOS A EVITAR:<br>• ${dishConflicts.map(x=>esc(x)).join("<br>• ")}</div>`;
-
-    const pills = (d.ings || []).map(i => {
-      const c = checkProductConflicts(i);
-      return `<span class="ing-pill" style="border-color:${c.length?'var(--red)':'var(--border)'};"><b>${esc(i.n)}</b> ${i.sub ? '<i style="color:var(--muted);">('+esc(i.sub)+')</i>' : ''} ${i.a?.length ? '<span style="color:var(--accent);">['+esc(i.a.join(", "))+']</span>' : ''}</span>`;
-    }).join("");
-
-    html += `
-      <div class="dish-card ${isSafe ? 'aptos' : 'proh'}">
-        <div class="dish-header">
-          <h3 class="dish-name">${esc(d.name)}</h3>
-          <div style="display:flex; gap:5px;">
-            <button class="btn btn-outline" style="padding:4px 8px; font-size:0.7rem;" onclick="openHomeDishModal(${d.id})">✏️ Editar</button>
-            <button class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="deleteHomeDish(${d.id})">🗑️</button>
-          </div>
-        </div>
-        ${statusBanner}
-        <div class="ing-pills">${pills}</div>
-      </div>`;
-  });
-
-  document.getElementById("home-tab-aptos").innerText = `✅ PLATOS SEGUROS (${safeCount})`;
-  document.getElementById("home-tab-proh").innerText = `⚠️ CON ALÉRGENOS A EVITAR (${unsafeCount})`;
-  document.getElementById("homeDishesContainer").innerHTML = html || `
-    <div style="text-align:center; padding:24px 14px; background:var(--card); border-radius:12px; color:var(--muted); font-size:0.82rem;">
-      No hay platos en este apartado.<br><br>
-      <button class="btn btn-amber" onclick="openHomeDishModal()">📊 + Crear Nuevo Plato / Escanear Código Barras</button>
-    </div>`;
-}
-
-// ==========================================================
-// SECCIÓN COMENSALES Y RESTAURANTES
-// ==========================================================
-function renderDinerView() {
-  const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId) || appState.routeFolders[0];
-  appState.activeFolderId = folder.id;
-
-  const isSecondary = folder.id !== "f_fav";
-  document.getElementById("btnRenameFolder").style.display = isSecondary ? "inline-flex" : "none";
-  document.getElementById("btnDeleteFolder").style.display = isSecondary ? "inline-flex" : "none";
-
-  document.getElementById("routeFoldersBar").innerHTML = appState.routeFolders.map(f =>
-    `<div class="folder-pill ${f.id === folder.id ? 'active' : ''}" onclick="appState.activeFolderId='${esc(f.id)}';saveAppState();renderDinerView();">${esc(f.name)} (${(f.restIds||[]).length})</div>`
-  ).join("");
-
-  const list = appState.restaurants.filter(r => (folder.restIds || []).includes(r.id));
-  if (!list.length) {
-    document.getElementById("myRestaurantsList").innerHTML = `<div style="text-align:center; padding:20px; color:var(--muted); font-size:0.8rem;">Esta carpeta está vacía. Sugiere un local o guárdalo desde el mapa.</div>`;
-    return;
-  }
-
-  document.getElementById("myRestaurantsList").innerHTML = list.map(r => `
-    <div class="rest-list-card">
-      <div class="rest-info" onclick="openRestaurantForDiner('${esc(r.id)}')">
-        <div>
-          <b>${esc(r.name)}</b> ${r.unclaimed ? '<span class="community-badge">💡 Sugerido (Sin carta oficial)</span>' : '<span class="verified-badge">🛡️ Verificado</span>'}<br>
-          <span style="font-size:0.74rem; color:var(--muted);">📍 ${esc(r.city || 'En el mapa')} · ${r.unclaimed ? '🔥 '+(r.stats?.requests||1)+' peticiones de carta' : (r.menu||[]).length+' platos'}</span>
-        </div>
-      </div>
-      <div style="display:flex; gap:5px;">
-        <button class="btn btn-green" onclick="openRestaurantForDiner('${esc(r.id)}')">🍽️ Abrir</button>
-        <button class="btn btn-outline" onclick="openSaveToRouteModal('${esc(r.id)}')">🎒</button>
-        ${r.unclaimed ? `<button class="btn btn-danger" onclick="deleteRestaurant('${esc(r.id)}', true)">🗑️</button>` : ''}
-      </div>
-    </div>
-  `).join("");
-}
-
-function createNewRouteFolder(fromModal = false) {
-  const n = prompt("✈️ Nombre de tu nueva carpeta o ruta de viaje:");
-  if (!n || !n.trim()) return;
-  const newId = "f_" + Date.now();
-  appState.routeFolders.push({ id: newId, name: "📍 " + n.trim(), restIds: fromModal ? [activeRestId] : [] });
-  appState.activeFolderId = newId;
-  saveAppState();
-  if (fromModal) openSaveToRouteModal(activeRestId);
-  else renderDinerView();
-}
-
-function renameActiveFolder() {
-  const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId);
-  if (!folder || folder.id === "f_fav") return;
-  const n = prompt("Nuevo nombre para la carpeta:", folder.name.replace("📍 ", ""));
-  if (n && n.trim()) { folder.name = "📍 " + n.trim(); saveAppState(); renderDinerView(); }
-}
-
-function deleteActiveFolder() {
-  const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId);
-  if (!folder || folder.id === "f_fav") return;
-  if (!confirm(`¿Eliminar la carpeta "${folder.name}"?`)) return;
-  appState.routeFolders = appState.routeFolders.filter(f => f.id !== folder.id);
-  appState.activeFolderId = "f_fav";
-  saveAppState(); renderDinerView();
-}
-
-function openSaveToRouteModal(restId) {
-  const targetId = restId || activeRestId;
-  document.getElementById("routeFolderSelectorList").innerHTML = appState.routeFolders.map(f => {
-    const has = (f.restIds || []).includes(targetId);
-    return `<button class="btn ${has ? 'btn-green' : 'btn-outline'}" style="width:100%; justify-content:space-between; padding:11px;" onclick="toggleRestInFolder('${esc(f.id)}','${esc(targetId)}')">
-      <span>${esc(f.name)}</span><span>${has ? '✅ Guardado (Quitar)' : '+ Añadir aquí'}</span>
-    </button>`;
-  }).join("");
-  document.getElementById("saveRouteModal").style.display = "block";
-}
-
-function toggleRestInFolder(folderId, restId) {
-  const f = appState.routeFolders.find(x => x.id === folderId);
-  const r = appState.restaurants.find(x => x.id === restId);
-  if (!f || !r) return;
-  const idx = f.restIds.indexOf(restId);
-  if (idx > -1) f.restIds.splice(idx, 1);
-  else { f.restIds.push(restId); if (r.stats) r.stats.saves = (r.stats.saves || 0) + 1; }
-  saveAppState();
-  openSaveToRouteModal(restId);
-  if (currentView === "app") renderRestaurantApp();
-  if (currentView === "diner") renderDinerView();
-}
-
-function renderOwnerView() {
-  const officialRests = appState.restaurants.filter(r => !r.unclaimed);
-  if (!officialRests.length) {
-    document.getElementById("ownerRestaurantsList").innerHTML = `<div style="text-align:center; padding:18px; color:var(--muted); font-size:0.8rem;">No tienes locales oficiales dados de alta.</div>`;
-    return;
-  }
-
-  document.getElementById("ownerRestaurantsList").innerHTML = officialRests.map(r => `
-    <div class="rest-list-card">
-      <div class="rest-info" onclick="promptOwnerPassword('${esc(r.id)}')">
-        <div>
-          <b>${esc(r.name)}</b> <span class="verified-badge">🛡️ Oficial</span><br>
-          <span style="font-size:0.74rem; color:var(--muted);">📍 ${esc(r.city||'')} · 👁️ ${r.stats?.views||0} visitas · 📅 ${r.stats?.bookings||0} reservas</span>
-        </div>
-      </div>
-      <div style="display:flex; gap:5px;">
-        <button class="btn btn-primary" onclick="promptOwnerPassword('${esc(r.id)}')">🔐 Gestionar</button>
-        <button class="btn btn-green" onclick="openQrModal('${esc(r.id)}')">📱 Bidi</button>
-        <button class="btn btn-danger" onclick="deleteRestaurant('${esc(r.id)}', false)">🗑️</button>
-      </div>
-    </div>
-  `).join("");
-}
-
-function deleteRestaurant(id, isSuggested) {
-  const r = appState.restaurants.find(x => x.id === id);
-  if (!r) return;
-  if (!isSuggested) {
-    const p = prompt(`🔐 Introduce la contraseña de propietario para eliminar "${r.name}":`);
-    if (p === null) return;
-    if (p !== (r.pass || "2026")) { alert("❌ Contraseña incorrecta."); return; }
-  } else {
-    if (!confirm(`¿Eliminar el restaurante sugerido "${r.name}"?`)) return;
-  }
-  appState.restaurants = appState.restaurants.filter(x => x.id !== id);
-  appState.routeFolders.forEach(f => { f.restIds = (f.restIds || []).filter(rid => rid !== id); });
-  if (!appState.restaurants.length) appState.restaurants.push(PILOT_REST);
-  activeRestId = appState.restaurants[0].id;
-  saveAppState();
-  showView(isSuggested ? "diner" : "owner");
-}
-
-function openRestaurantForDiner(id) {
-  activeRestId = id; isStaffUnlocked = false;
-  const r = getActiveRest();
-  if (r.stats) r.stats.views = (r.stats.views || 0) + 1;
-  saveAppState(); showView("app");
-}
-
-function promptOwnerPassword(id) {
-  const r = appState.restaurants.find(x => x.id === id) || getActiveRest();
-  const p = prompt(`🔐 Introduce la contraseña de propietario de "${r.name}" (Demo: 2026):`);
-  if (p === (r.pass || "2026")) { activeRestId = r.id; isStaffUnlocked = true; showView("app"); }
-  else if (p !== null) alert("❌ Contraseña incorrecta.");
-}
-
-function lockStaffMode() { isStaffUnlocked = false; showView("owner"); }
-
-function confirmMenuUpdatedToday() {
-  const r = getActiveRest();
-  r.lastVerified = new Date().toLocaleDateString("es-ES");
-  r.unclaimed = false;
-  saveAppState(); renderRestaurantApp();
-  alert("✅ Carta verificada con fecha de hoy.");
-}
-
-function loadSampleMenuIntoActive() {
-  const r = getActiveRest();
-  r.menu = JSON.parse(JSON.stringify(SAMPLE_12_DISHES));
-  r.unclaimed = false;
-  saveAppState(); renderRestaurantApp();
-  alert("✅ Se han cargado los 12 platos de muestra.");
-}
-
-function renderRestaurantApp() {
-  const r = getActiveRest();
-  document.getElementById("headerMainTitle").innerText = r.name;
-  document.getElementById("activeRestCity").innerText = r.city ? `📍 ${r.city}` : "";
-  document.getElementById("activeRestBadge").className = r.unclaimed ? "community-badge" : "verified-badge";
-  document.getElementById("activeRestBadge").innerText = r.unclaimed ? "💡 Sugerido por Viajeros" : "🛡️ Zona Segura Verificada";
-  document.getElementById("activeRestLastVerified").innerText = r.unclaimed ? "" : `✓ Revisado: ${r.lastVerified || 'Hoy'}`;
-
-  document.getElementById("dinerHeaderActions").style.display = isStaffUnlocked ? "none" : "flex";
-  document.getElementById("staffBar").classList.toggle("show", isStaffUnlocked);
-
-  const hasPhone = !r.unclaimed && r.phone && r.phone.trim() !== "";
-  document.getElementById("btnBookingAction").style.display = hasPhone ? "inline-flex" : "none";
-
-  const hasMenu = Array.isArray(r.menu) && r.menu.length > 0;
-  document.getElementById("btnReportDiscrepancy").style.display = (!r.unclaimed && hasMenu) ? "inline-flex" : "none";
-
-  document.getElementById("unclaimedBanner").style.display = (r.unclaimed && !isStaffUnlocked) ? "block" : "none";
-  document.getElementById("menuInteractiveZone").style.display = (r.unclaimed && !isStaffUnlocked && !hasMenu) ? "none" : "block";
-
-  if (r.unclaimed) {
-    const alreadyVoted = (appState.votedRequests || []).includes(r.id);
-    const reqBtn = document.getElementById("btnRequestMenu");
-    reqBtn.disabled = alreadyVoted;
-    reqBtn.innerText = alreadyVoted
-      ? `✅ Solicitud registrada (${r.stats?.requests || 1} peticiones)`
-      : `🔥 Solicitar que suba su carta (${r.stats?.requests || 1})`;
-  }
-
-  const inAnyFolder = appState.routeFolders.some(f => (f.restIds || []).includes(r.id));
-  const favBtn = document.getElementById("btnToggleFav");
-  favBtn.innerText = inAnyFolder ? "★ En mis rutas" : "⭐ Guardar en Ruta";
-  favBtn.className = inAnyFolder ? "btn btn-green" : "btn btn-outline";
-
-  if (isStaffUnlocked) {
-    document.getElementById("ownerRoiMetrics").innerHTML = `
-      <div class="roi-box"><span class="roi-num">${r.stats?.views||0}</span><span class="roi-label">Visitas</span></div>
-      <div class="roi-box"><span class="roi-num">${r.stats?.saves||0}</span><span class="roi-label">En Rutas</span></div>
-      <div class="roi-box"><span class="roi-num">${r.stats?.bookings||0}</span><span class="roi-label">Pre-avisos</span></div>
-      <div class="roi-box"><span class="roi-num" style="color:${(r.stats?.alerts||0)>0?'#f87171':'#10b981'};">${r.stats?.alerts||0}</span><span class="roi-label">Alertas</span></div>`;
-  }
-
-  const cats = Array.from(new Set((r.menu || []).map(d => d.cat)));
-  document.getElementById("catFilter").innerHTML = `<option value="ALL">Todas las categorías (${(r.menu||[]).length})</option>` + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
-  initFilterButtons(); renderDishes(); renderReviews();
-}
-
-function requestOfficialMenu() {
-  const r = getActiveRest();
-  if ((appState.votedRequests || []).includes(r.id)) return;
-  if (!r.stats) r.stats = { views:1, saves:1, bookings:0, alerts:0, requests:1 };
-  r.stats.requests = (r.stats.requests || 1) + 1;
-  appState.votedRequests.push(r.id);
-  saveAppState(); renderRestaurantApp();
-}
-
-function claimCommunityRestaurant() {
-  const r = getActiveRest();
-  const code = prompt(`🛡️ VERIFICACIÓN DE TITULARIDAD ("${r.name}")\n\nIntroduce el código de activación (Para probar escribe: ALTA2026):`);
-  if (!code) return;
-  if (code.trim().toUpperCase() !== "ALTA2026") { alert("❌ Código no válido."); return; }
-  const newPass = prompt("🔑 Elige tu contraseña privada de propietario:", "2026");
-  if (!newPass || !newPass.trim()) return;
-  const phone = prompt("📞 Teléfono WhatsApp para reservas (ej. 34600000000):", r.phone || "");
-  r.pass = newPass.trim();
-  if (phone !== null) r.phone = phone.trim();
-  r.unclaimed = false;
-  r.lastVerified = new Date().toLocaleDateString("es-ES");
-  isStaffUnlocked = true;
-  saveAppState(); renderRestaurantApp();
-}
-
-function initFilterButtons() {
-  const alHtml = ALLERGENS.map(a => `<div class="chip ${selectedAllergens.has(a)?'active':''}" onclick="toggleAl('${a}')">${a}</div>`).join("");
-  const dietHtml = DIETS.map(d => `<div class="chip diet ${selectedDiets.has(d.id)?'active':''}" onclick="toggleDiet('${d.id}')">${d.label}</div>`).join("");
-  const quickHtml = QUICK_CUSTOM_INGS.map(q => `<span class="quick-ing ${customAvoidSet.has(q.toLowerCase())?'active':''}" onclick="toggleCustom('${q.toLowerCase()}')">🚫 ${q}</span>`).join("");
-  const tagsHtml = Array.from(customAvoidSet).map(t => `<span class="custom-tag-Badge" onclick="toggleCustom('${esc(t)}')">Sin ${esc(t.toUpperCase())} ✕</span>`).join("");
-
-  ["allergenGrid", "homeAllergenGrid"].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = alHtml; });
-  ["dietGrid", "homeDietGrid"].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = dietHtml; });
-  ["quickIngBar", "homeQuickIngBar"].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = quickHtml; });
-  ["activeCustomTags", "homeActiveCustomTags"].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = tagsHtml; });
-}
-
-function toggleAl(a) {
-  selectedAllergens.has(a) ? selectedAllergens.delete(a) : selectedAllergens.add(a);
-  initFilterButtons();
-  if (currentView === "app") { renderDishes(); renderReviews(); }
-  if (currentView === "home") renderHomeDishes();
-}
-
-function toggleDiet(d) {
-  selectedDiets.has(d) ? selectedDiets.delete(d) : selectedDiets.add(d);
-  initFilterButtons();
-  if (currentView === "app") renderDishes();
-  if (currentView === "home") renderHomeDishes();
-}
-
-function toggleCustom(t) {
-  customAvoidSet.has(t) ? customAvoidSet.delete(t) : customAvoidSet.add(t);
-  initFilterButtons();
-  if (currentView === "app") { renderDishes(); renderReviews(); }
-  if (currentView === "home") renderHomeDishes();
-}
-
-function addCustomIngFromInput(inputId = "customIngInput") {
-  const el = document.getElementById(inputId);
-  if (el && el.value.trim()) {
-    customAvoidSet.add(el.value.trim().toLowerCase());
-    el.value = "";
-    initFilterButtons();
-    if (currentView === "app") { renderDishes(); renderReviews(); }
-    if (currentView === "home") renderHomeDishes();
-  }
-}
-
-function clearAllFilters() {
-  selectedAllergens.clear(); selectedDiets.clear(); customAvoidSet.clear();
-  initFilterButtons();
-  if (currentView === "app") { renderDishes(); renderReviews(); }
-  if (currentView === "home") renderHomeDishes();
-}
-
-function setTab(t) {
-  currentTab = t;
-  document.querySelectorAll("#appView .tab").forEach(x => x.classList.remove("active"));
-  document.getElementById("tab-"+t).classList.add("active");
-  renderDishes();
-}
-
-function evaluateDish(dish, strict) {
-  if (!selectedAllergens.size && !selectedDiets.size && !customAvoidSet.size) return { status:"aptos", rem:[], blk:[], tr:[] };
-  let rem = [], blk = [], tr = [];
-  (dish.ings || []).forEach(ing => {
-    const alHits = (ing.a || []).filter(a => selectedAllergens.has(a));
-    const dHits = (ing.tags || []).filter(t => selectedDiets.has(t)).map(t => DIETS.find(x => x.id === t)?.label || t);
-    const norm = normalizeStr(ing.n + " " + (ing.sub || ""));
-    const cHits = Array.from(customAvoidSet).filter(c => norm.includes(normalizeStr(c))).map(c => `lleva ${c.toUpperCase()}`);
-    const all = [...alHits, ...dHits, ...cHits];
-    if (all.length) {
-      if (ing.mod) rem.push(`${esc(ing.note || 'Omitir '+ing.n)} (${esc(all.join(', '))})`);
-      else blk.push(`${esc(ing.n)} (${esc(all.join(', '))})`);
-    }
-  });
-  const traceHits = (dish.traces || []).filter(t => selectedAllergens.has(t));
-  if (traceHits.length) {
-    if (strict) blk.push(`Contiene trazas (${esc(traceHits.join(", "))})`);
-    else tr = traceHits;
-  }
-  if (blk.length) return { status:"proh", rem, blk, tr };
-  if (rem.length) return { status:"mod", rem, blk, tr };
-  return { status:"aptos", rem, blk, tr };
-}
-
-function quickToggleMod(dishId, idx) {
-  const d = getActiveRest().menu.find(x => x.id === dishId);
-  if (d && d.ings[idx]) { d.ings[idx].mod = !d.ings[idx].mod; saveAppState(); renderDishes(); }
-}
-
-function deleteDishById(dishId) {
-  const r = getActiveRest();
-  if (!confirm("¿Eliminar este plato de la carta?")) return;
-  r.menu = (r.menu || []).filter(d => d.id !== dishId);
-  saveAppState(); renderRestaurantApp();
-}
-
-function renderDishes() {
-  const r = getActiveRest();
-  if (!r.menu || r.menu.length === 0) {
-    document.getElementById("tab-aptos").innerText = "COMPATIBLES (0)";
-    document.getElementById("tab-mod").innerText = "ADAPTABLES (0)";
-    document.getElementById("tab-proh").innerText = "NO APTOS (0)";
-    document.getElementById("dishList").innerHTML = `
-      <div style="text-align:center; padding:22px 14px; background:var(--card); border-radius:12px; color:var(--muted); font-size:0.82rem;">
-        📋 Este restaurante aún no tiene platos cargados.
-        ${isStaffUnlocked ? '<br><br><button class="btn btn-amber" onclick="openDishModal()">+ Añadir Primer Plato</button> <button class="btn btn-orange" onclick="loadSampleMenuIntoActive()">📥 Cargar 12 Platos Muestra</button>' : ''}
-      </div>`;
-    return;
-  }
-
-  const q = normalizeStr(document.getElementById("searchInput").value);
-  const cat = document.getElementById("catFilter").value || "ALL";
-  const strict = document.getElementById("strictTraces").checked;
-  const counts = { aptos:0, mod:0, proh:0 };
-  let html = "";
-
-  (r.menu || []).forEach(d => {
-    if (cat !== "ALL" && d.cat !== cat) return;
-    if (q && !normalizeStr(d.name + " " + JSON.stringify(d.ings)).includes(q)) return;
-    const res = evaluateDish(d, strict);
-    counts[res.status]++;
-    if (res.status !== currentTab) return;
-
-    let badge = "";
-    if (res.status === "mod") badge = `<div class="mod-box warn">🔄 ADAPTABLE EN COCINA: ${res.rem.join(" · ")}</div>`;
-    if (res.status === "proh") badge = `<div class="mod-box danger">⛔ NO APTO: ${res.blk.join(" · ")}</div>`;
-    if (res.tr.length && res.status !== "proh") badge += `<div class="mod-box trace">ℹ️ Posibles trazas: ${esc(res.tr.join(", "))}</div>`;
-    if (d.protocol) badge += `<div class="mod-box protocol">👩‍🍳 ${esc(d.protocol)}</div>`;
-
-    const pills = (d.ings || []).map((i, idx) => {
-      const subTxt = i.sub ? ` <i style="color:var(--muted);">(${esc(i.sub)})</i>` : "";
-      const btn = isStaffUnlocked ? ` <b style="cursor:pointer;color:${i.mod?'#fcd34d':'#94a3b8'};" onclick="quickToggleMod(${d.id},${idx})">[${i.mod?'🔄 Adaptable':'🔒 Fijo'}]</b>` : "";
-      return `<span class="ing-pill"><b>${esc(i.n)}</b>${subTxt} ${i.a?.length?'<span style="color:var(--accent);">['+esc(i.a.join(','))+']</span>':''}${btn}</span>`;
-    }).join("");
-
-    const staffBtns = isStaffUnlocked
-      ? `<button class="btn btn-outline" style="padding:3px 7px;font-size:0.68rem;" onclick="openDishModal(${d.id})">✏️</button>
-         <button class="btn btn-danger" style="padding:3px 7px;font-size:0.68rem;" onclick="deleteDishById(${d.id})">🗑️</button>`
-      : "";
-
-    html += `<div class="dish-card ${res.status}"><div class="dish-header"><h3 class="dish-name">${esc(d.name)}</h3><div style="display:flex;gap:5px;align-items:center;">${staffBtns}<span class="dish-cat">${esc(d.cat)}</span></div></div>${badge}<div class="ing-pills">${pills}</div></div>`;
-  });
-
-  document.getElementById("tab-aptos").innerText = `COMPATIBLES (${counts.aptos})`;
-  document.getElementById("tab-mod").innerText = `ADAPTABLES (${counts.mod})`;
-  document.getElementById("tab-proh").innerText = `NO APTOS (${counts.proh})`;
-  document.getElementById("dishList").innerHTML = html || `<p style="text-align:center;color:var(--muted);">No hay platos en este apartado.</p>`;
-}
-
-function openDishModal(dishId = null) {
-  const r = getActiveRest();
-  const box = document.getElementById("ingredientsEditor");
-  box.innerHTML = "";
-  document.getElementById("restManualBarcodeInput").value = "";
-  document.getElementById("restSupermarketSearchInput").value = "";
-  document.getElementById("restSupermarketResults").style.display = "none";
-  document.getElementById("restOcrStatusBox").style.display = "none";
-  stopBarcodeScanner();
-  let tracesSet = new Set();
-
-  if (dishId) {
-    const d = (r.menu || []).find(x => x.id === dishId);
-    if (!d) return;
-    document.getElementById("dishModalTitle").innerText = "✏️ Editar Plato";
-    document.getElementById("editDishId").value = d.id;
-    document.getElementById("editName").value = d.name;
-    document.getElementById("editCat").value = d.cat;
-    document.getElementById("editProtocol").value = d.protocol || "";
-    (d.traces || []).forEach(t => tracesSet.add(t));
-    (d.ings || []).forEach(ing => addIngRow(ing));
-  } else {
-    document.getElementById("dishModalTitle").innerText = "➕ Nuevo Plato";
-    document.getElementById("editDishId").value = "";
-    document.getElementById("editName").value = "";
-    document.getElementById("editCat").value = "ENTRANTES";
-    document.getElementById("editProtocol").value = "";
-    addIngRow();
-  }
-
-  document.getElementById("editDishTraces").innerHTML = ALLERGENS.map(a =>
-    `<div class="mini-chip ${tracesSet.has(a)?'trace-sel':''}" data-tr="${a}" onclick="this.classList.toggle('trace-sel')">${a}</div>`
-  ).join("");
-
-  document.getElementById("dishModal").style.display = "block";
-}
-
-function closeRestDishModal() {
-  stopBarcodeScanner();
-  closeModal("dishModal");
-}
-
-function addIngRow(ing = { n:"", sub:"", mod:true, note:"", a:[], tags:[] }) {
-  const div = document.createElement("div");
-  div.className = "ing-editor-card";
-  const aSet = new Set(ing.a || []);
-  const tSet = new Set(ing.tags || []);
-
-  const alChips = ALLERGENS.map(a => `<div class="mini-chip ${aSet.has(a)?'selected':''}" data-al="${a}" onclick="this.classList.toggle('selected')">${a}</div>`).join("");
-  const dietChips = DIETS.map(d => `<div class="mini-chip ${tSet.has(d.id)?'diet-sel':''}" data-diet="${d.id}" onclick="this.classList.toggle('diet-sel')">${d.label}</div>`).join("");
-
-  div.innerHTML = `
-    <div style="display:flex; gap:6px; margin-bottom:6px;">
-      <input type="text" class="ing-n" value="${esc(ing.n)}" placeholder="Componente (ej. Salsa Brava)" style="flex:1; padding:7px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-weight:700;">
-      <button type="button" class="btn btn-danger" onclick="this.parentElement.parentElement.remove()">✕</button>
-    </div>
-    <input type="text" class="ing-sub" value="${esc(ing.sub||'')}" placeholder="Sub-ingredientes (ej. ajo, cebolla, ñora...)" style="width:100%; padding:6px; margin-bottom:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#cbd5e1; font-size:0.75rem;">
-    <div style="display:flex; gap:8px; align-items:center; margin-bottom:6px;">
-      <label style="font-size:0.74rem; color:#fcd34d; font-weight:700;"><input type="checkbox" class="ing-mod" ${ing.mod ? 'checked' : ''}> 🔄 Adaptable</label>
-      <input type="text" class="ing-note" value="${esc(ing.note||'')}" placeholder="Cómo adaptar (ej. Servir sin salsa)" style="flex:1; padding:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff; font-size:0.75rem;">
-    </div>
-    <div class="mini-chips ing-al-box">${alChips}</div>
-    <div class="mini-chips ing-diet-box" style="margin-top:5px;">${dietChips}</div>`;
-  document.getElementById("ingredientsEditor").prepend(div);
-}
-
-function saveDishFromModal() {
-  const r = getActiveRest();
-  const editId = document.getElementById("editDishId").value;
-  const name = document.getElementById("editName").value.trim().toUpperCase();
-  const cat = document.getElementById("editCat").value.trim().toUpperCase() || "CARTA";
-  const protocol = document.getElementById("editProtocol").value.trim();
-  if (!name) { alert("Escribe el nombre del plato."); return; }
-
-  const traces = Array.from(document.querySelectorAll("#editDishTraces .mini-chip.trace-sel")).map(el => el.getAttribute("data-tr"));
-  const ings = [];
-  document.querySelectorAll("#ingredientsEditor .ing-editor-card").forEach(card => {
-    const n = card.querySelector(".ing-n").value.trim();
-    if (!n) return;
-    ings.push({
-      n,
-      sub: card.querySelector(".ing-sub").value.trim(),
-      mod: card.querySelector(".ing-mod").checked,
-      note: card.querySelector(".ing-note").value.trim(),
-      a: Array.from(card.querySelectorAll(".ing-al-box .mini-chip.selected")).map(el => el.getAttribute("data-al")),
-      tags: Array.from(card.querySelectorAll(".ing-diet-box .mini-chip.diet-sel")).map(el => el.getAttribute("data-diet"))
-    });
-  });
-
-  if (!ings.length) { alert("Añade al menos un componente."); return; }
-
-  if (editId) {
-    const idx = r.menu.findIndex(d => d.id == editId);
-    if (idx > -1) r.menu[idx] = { id: Number(editId), cat, name, protocol, traces, ings };
-  } else {
-    r.menu.unshift({ id: Date.now(), cat, name, protocol, traces, ings });
-  }
-  r.unclaimed = false;
-  r.lastVerified = new Date().toLocaleDateString("es-ES");
-  saveAppState(); closeRestDishModal(); renderRestaurantApp();
-}
-
-async function searchPlaceCoords() {
-  const q = document.getElementById("geoSearchInput").value.trim();
-  const box = document.getElementById("geoResults");
-  if (!q) return;
-  box.style.display = "block";
-  box.innerHTML = `<div class="geo-result-item">🔎 Buscando calle o localidad en España...</div>`;
-  try {
-    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&countrycodes=es&q=${encodeURIComponent(q)}&limit=4`, { headers:{"Accept-Language":"es"} });
-    lastGeoPlaces = await res.json();
-    if (!lastGeoPlaces.length) { box.innerHTML = `<div class="geo-result-item">No encontrado. Busca por calle + municipio.</div>`; return; }
-    selectGeoPlace(0, false);
-    box.innerHTML = lastGeoPlaces.map((p, i) => `<div class="geo-result-item" onclick="selectGeoPlace(${i}, true)">📍 <b>${esc(p.display_name.split(',')[0])}</b> — ${esc(p.display_name.split(',').slice(1,3).join(','))}</div>`).join("");
-  } catch(e) { box.innerHTML = `<div class="geo-result-item">Error de red.</div>`; }
-}
-
-function selectGeoPlace(idx, closeList) {
-  const p = lastGeoPlaces[idx];
-  if (!p) return;
-  document.getElementById("restLatInput").value = parseFloat(p.lat).toFixed(5);
-  document.getElementById("restLngInput").value = parseFloat(p.lon).toFixed(5);
-  document.getElementById("restCityInput").value = p.display_name.split(",").slice(0, 3).join(",").trim();
-  if (closeList) document.getElementById("geoResults").style.display = "none";
-}
-
-function fillGpsForModal() {
-  navigator.geolocation?.getCurrentPosition(p => {
-    document.getElementById("restLatInput").value = p.coords.latitude.toFixed(5);
-    document.getElementById("restLngInput").value = p.coords.longitude.toFixed(5);
-  });
-}
-
-function openNewRestaurantModal() {
-  document.getElementById("restModalTitle").innerText = "➕ Alta de Restaurante Oficial";
-  document.getElementById("restEditId").value = "";
-  document.getElementById("restIsSuggest").value = "";
-  document.getElementById("restNameInput").value = "";
-  document.getElementById("geoSearchInput").value = "";
-  document.getElementById("geoResults").style.display = "none";
-  document.getElementById("restCityInput").value = "";
-  document.getElementById("restPhoneInput").value = "";
-  document.getElementById("restPassInput").value = "";
-  document.getElementById("passGroup").style.display = "block";
-  document.getElementById("phoneGroup").style.display = "block";
-  document.getElementById("restModal").style.display = "block";
-}
-
-function openSuggestRestModal() {
-  openNewRestaurantModal();
-  document.getElementById("restModalTitle").innerText = "💡 Sugerir Local Seguro (Comunidad)";
-  document.getElementById("restIsSuggest").value = "1";
-  document.getElementById("passGroup").style.display = "none";
-  document.getElementById("phoneGroup").style.display = "none";
-}
-
-function openEditRestModal(id) {
-  const r = appState.restaurants.find(x => x.id === id) || getActiveRest();
-  openNewRestaurantModal();
-  document.getElementById("restModalTitle").innerText = "⚙️ Configurar Datos del Restaurante";
-  document.getElementById("restEditId").value = r.id;
-  document.getElementById("restNameInput").value = r.name;
-  document.getElementById("restCityInput").value = r.city || "";
-  document.getElementById("restPhoneInput").value = r.phone || "";
-  document.getElementById("restPassInput").value = r.pass || "2026";
-  document.getElementById("restLatInput").value = r.lat || 37.5630;
-  document.getElementById("restLngInput").value = r.lng || -1.3090;
-}
-
-function saveRestaurantMeta() {
-  const id = document.getElementById("restEditId").value;
-  const isSug = document.getElementById("restIsSuggest").value === "1";
-  const name = document.getElementById("restNameInput").value.trim();
-  const city = document.getElementById("restCityInput").value.trim();
-  const phone = document.getElementById("restPhoneInput").value.trim();
-  const pass = document.getElementById("restPassInput").value.trim() || "2026";
-  const lat = parseFloat(document.getElementById("restLatInput").value) || 37.5630;
-  const lng = parseFloat(document.getElementById("restLngInput").value) || -1.3090;
-  if (!name) { alert("Escribe el nombre comercial del restaurante."); return; }
-
-  if (id) {
-    const r = getActiveRest();
-    r.name = name; r.city = city; r.phone = phone; r.pass = pass; r.lat = lat; r.lng = lng;
-    saveAppState(); closeModal("restModal"); renderRestaurantApp();
-  } else {
-    const newId = "r_" + Date.now();
-    appState.restaurants.push({
-      id: newId, name, city, phone, pass, lat, lng,
-      unclaimed: isSug,
-      lastVerified: isSug ? "Pendiente" : new Date().toLocaleDateString("es-ES"),
-      stats: { views:1, saves:1, bookings:0, alerts:0, requests:1 },
-      reviews: [],
-      menu: []
-    });
-    const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId) || appState.routeFolders[0];
-    if (isSug && !folder.restIds.includes(newId)) folder.restIds.push(newId);
-    activeRestId = newId;
-    saveAppState(); closeModal("restModal");
-    if (isSug) showView("diner");
-    else { isStaffUnlocked = true; showView("app"); }
-  }
-}
-
-function initOrRefreshMap() {
-  if (!leafletMap) {
-    leafletMap = L.map("mapContainer").setView([37.5630, -1.3090], 12);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(leafletMap);
-    markersLayer = L.layerGroup().addTo(leafletMap);
-  } else { leafletMap.invalidateSize(); markersLayer.clearLayers(); }
-
-  document.getElementById("mapCardsList").innerHTML = appState.restaurants.map(r => {
-    L.marker([r.lat||37.563, r.lng||-1.309]).addTo(markersLayer)
-      .bindPopup(`<b>${esc(r.name)}</b><br><span style="font-size:0.72rem;">${r.unclaimed?'💡 Sugerido':'🛡️ Verificado'}</span><br><button class="btn btn-green" style="margin-top:5px;" onclick="openRestaurantForDiner('${esc(r.id)}')">Abrir Ficha</button>`);
-    return `
-      <div class="rest-list-card">
-        <div class="rest-info" onclick="openRestaurantForDiner('${esc(r.id)}')">
-          <div>
-            <b>${esc(r.name)}</b> ${r.unclaimed?'<span class="community-badge">💡 Sugerido</span>':'<span class="verified-badge">🛡️ Verificado</span>'}<br>
-            <span style="font-size:0.74rem;color:var(--muted);">📍 ${esc(r.city||'')} · ${r.unclaimed ? 'Sin carta oficial' : (r.menu||[]).length+' platos'}</span>
-          </div>
-        </div>
-        <button class="btn btn-primary" onclick="openRestaurantForDiner('${esc(r.id)}')">🍽️ Ver</button>
-      </div>`;
-  }).join("");
-}
-
-function locateUserOnMap() {
-  navigator.geolocation?.getCurrentPosition(p => leafletMap?.setView([p.coords.latitude, p.coords.longitude], 14));
-}
-
-function openWaiterCardModal() {
-  renderWaiterModalChips();
-  renderWaiterCardLang("es");
-  document.getElementById("waiterCardModal").style.display = "block";
-}
-
-function renderWaiterModalChips() {
-  document.getElementById("waiterModalChips").innerHTML = ALLERGENS.map(a =>
-    `<div class="mini-chip ${selectedAllergens.has(a)?'selected':''}" onclick="toggleWaiterAl('${a}')">${a}</div>`
-  ).join("");
-}
-
-function toggleWaiterAl(a) {
-  selectedAllergens.has(a) ? selectedAllergens.delete(a) : selectedAllergens.add(a);
-  renderWaiterModalChips();
-  initFilterButtons();
-  renderDishes();
-  renderWaiterCardLang(currentWaiterLang);
-}
-
-function renderWaiterCardLang(lang) {
-  currentWaiterLang = lang;
-  const r = getActiveRest();
-  const strict = document.getElementById("strictTraces").checked;
-  const als = [...Array.from(selectedAllergens), ...Array.from(customAvoidSet).map(x=>x.toUpperCase())].join(", ") || "Selecciona arriba tus alérgenos";
-  let aptos = [], mod = [];
-  (r.menu || []).forEach(d => {
-    const res = evaluateDish(d, strict);
-    if (res.status === "aptos") aptos.push(esc(d.name));
-    if (res.status === "mod") mod.push(`${esc(d.name)} (${res.rem.join(" + ")})`);
-  });
-
-  const dict = {
-    es: { h:"⚠️ ATENCIÓN COCINA Y SALA: ALERGIA SEVERA", a:"No puedo consumir:", p:"Por favor, eviten contaminación cruzada en plancha, freidora y utensilios.", ok:"✅ Platos compatibles:", m:"🔄 Platos adaptables:" },
-    en: { h:"⚠️ KITCHEN & WAITER ALERT: SEVERE ALLERGY", a:"I cannot eat:", p:"Please avoid any cross-contamination on grills, fryers, and utensils.", ok:"✅ Safe dishes:", m:"🔄 Adaptable dishes:" },
-    fr: { h:"⚠️ ALERTE CUISINE : ALLERGIE SÉVÈRE", a:"Je ne peux pas consommer :", p:"Merci d'éviter toute contamination croisée sur la plancha et la friteuse.", ok:"✅ Plats compatibles :", m:"🔄 Plats adaptables :" },
-    it: { h:"⚠️ AVVISO CUCINA: GRAVE ALLERGIA", a:"Non posso consumare:", p:"Si prega di evitare la contaminazione crociata su piastre e friggitrici.", ok:"✅ Piatti idonei:", m:"🔄 Piatti adattabili:" }
-  }[lang];
-
-  const menuSummaryHtml = (r.menu && r.menu.length > 0) ? `
-    <div style="font-size:0.78rem; color:#10b981; font-weight:800;">${dict.ok}</div>
-    <div style="font-size:0.75rem; color:#cbd5e1; margin-bottom:8px;">${aptos.slice(0,8).join(" · ") || "—"}</div>
-    <div style="font-size:0.78rem; color:#f59e0b; font-weight:800;">${dict.m}</div>
-    <div style="font-size:0.75rem; color:#cbd5e1;">${mod.slice(0,8).join("<br>• ") || "—"}</div>
-  ` : "";
-
-  document.getElementById("waiterCardBody").innerHTML = `
-    <div style="font-weight:900; color:#f87171; font-size:0.96rem; margin-bottom:6px;">${dict.h}</div>
-    <div style="font-size:0.88rem; margin-bottom:6px;">${dict.a} <b style="color:#fde047;">${esc(als)}</b></div>
-    <div style="font-size:0.78rem; color:#7dd3fc; margin-bottom:10px;">🛡️ ${dict.p}</div>
-    ${menuSummaryHtml}`;
-}
-
-function openBookingModal() { document.getElementById("bookingModal").style.display = "block"; }
-function sendBookingPreAlert() {
-  const r = getActiveRest();
-  if (r.stats) r.stats.bookings = (r.stats.bookings || 0) + 1;
-  saveAppState();
-  const als = [...Array.from(selectedAllergens), ...Array.from(customAvoidSet).map(x=>x.toUpperCase())].join(", ") || "Especificar al llegar";
-  const notes = document.getElementById("bookNotes").value.trim();
-  const txt = `📅 *PRE-AVISO DE RESERVA CON ALERGIAS (TusAlergias)*\n🏪 *Restaurante:* ${r.name}\n👤 *Cliente:* ${document.getElementById("bookName").value || 'Comensal'}\n🕒 *Fecha/Hora:* ${document.getElementById("bookTime").value || 'Hoy'}\n🛡️ *Alergias a prever en cocina:* ${als}${notes ? '\n📝 *Nota:* '+notes : ''}`;
-  closeModal("bookingModal");
-  const cleanPhone = (r.phone || "").replace(/\D/g, "");
-  window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(txt)}`, "_blank");
-}
-
-function openReviewModal() {
-  document.getElementById("revAllergens").value = [...Array.from(selectedAllergens), ...Array.from(customAvoidSet).map(x=>x.toUpperCase())].join(", ");
-  document.getElementById("revComment").value = "";
-  document.getElementById("reviewModal").style.display = "block";
-}
-
-function saveUserReview() {
-  const r = getActiveRest();
-  if (!r.reviews) r.reviews = [];
-  const comment = document.getElementById("revComment").value.trim();
-  if (!comment) { alert("Escribe tu experiencia."); return; }
-  r.reviews.unshift({
-    id: Date.now(),
-    author: document.getElementById("revAuthor").value.trim() || "Comensal Verificado",
-    stars: parseInt(document.getElementById("revStars").value) || 5,
-    allergens: (document.getElementById("revAllergens").value.trim() || "GENERAL").toUpperCase(),
-    comment,
-    date: new Date().toLocaleDateString("es-ES"),
-    isAlert: false
-  });
-  saveAppState(); closeModal("reviewModal"); renderReviews();
-}
-
-function reportMenuDiscrepancy() {
-  const r = getActiveRest();
-  const msg = prompt("⚠️ ¿Qué cambio de ingrediente o error has detectado en la carta de este restaurante?");
-  if (!msg || !msg.trim()) return;
-  if (!r.stats) r.stats = { views:1, saves:0, bookings:0, alerts:0 };
-  r.stats.alerts = (r.stats.alerts || 0) + 1;
-  if (!r.reviews) r.reviews = [];
-  r.reviews.unshift({ id:Date.now(), author:"⚠️ AVISO A COCINA", stars:3, allergens:"REVISIÓN CARTA", comment:msg.trim(), date:new Date().toLocaleDateString("es-ES"), isAlert:true });
-  saveAppState(); renderRestaurantApp();
-  alert("✅ Aviso publicado y enviado al panel del propietario.");
-}
-
-function deleteReviewById(revId) {
-  const r = getActiveRest();
-  const rev = (r.reviews || []).find(x => x.id === revId);
-  if (rev && rev.isAlert && r.stats && r.stats.alerts > 0) r.stats.alerts--;
-  r.reviews = (r.reviews || []).filter(x => x.id !== revId);
-  saveAppState(); renderRestaurantApp();
-}
-
-function renderReviews() {
-  const r = getActiveRest();
-  const terms = [...Array.from(selectedAllergens), ...Array.from(customAvoidSet)].map(x => normalizeStr(x));
-  const sorted = (r.reviews || []).map(rv => {
-    const isTwin = terms.length > 0 && terms.some(t => normalizeStr(rv.allergens + " " + rv.comment).includes(t));
-    return { ...rv, isTwin };
-  }).sort((a, b) => (b.isTwin ? 1 : 0) - (a.isTwin ? 1 : 0));
-
-  document.getElementById("reviewsListContainer").innerHTML = sorted.map(rv => `
-    <div class="review-card ${rv.isTwin ? 'twin-match' : ''}">
-      <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:4px; align-items:center;">
-        <div><b>${esc(rv.author)}</b> ${"⭐".repeat(rv.stars||5)} ${rv.isTwin ? '<span class="verified-badge">🎯 Tu misma alergia</span>' : ''}</div>
-        <div style="display:flex; gap:5px; align-items:center;">
-          <span class="verified-badge">🛡️ ${esc(rv.allergens)}</span>
-          ${isStaffUnlocked ? `<button class="btn btn-danger" style="padding:2px 6px;font-size:0.65rem;" onclick="deleteReviewById(${rv.id||0})">✕</button>` : ''}
-        </div>
-      </div>
-      <div style="font-size:0.8rem; margin-top:5px; color:#cbd5e1;">"${esc(rv.comment)}"</div>
-    </div>
-  `).join("") || `<div style="font-size:0.78rem; color:var(--muted);">Aún no hay opiniones en este local.</div>`;
-}
-
-function buildPortableBidiLink(r) {
-  const base = window.location.origin + window.location.pathname;
-  const payload = { id:r.id, n:r.name, c:r.city||"", p:r.phone||"", lat:r.lat||37.563, lng:r.lng||-1.309, m:(r.menu||[]).slice(0,25) };
-  const enc = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-  return `${base}?restId=${encodeURIComponent(r.id)}&carta=${encodeURIComponent(enc)}`;
-}
-
-function openQrModal(id) {
-  const r = appState.restaurants.find(x => x.id === id) || getActiveRest();
-  const fullLink = buildPortableBidiLink(r);
-  const qrUrl = fullLink.length > 1100 ? `${window.location.origin}${window.location.pathname}?restId=${encodeURIComponent(r.id)}` : fullLink;
-  document.getElementById("qrDirectLink").value = fullLink;
-  document.getElementById("qrImageDisplay").src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=${encodeURIComponent(qrUrl)}`;
-  document.getElementById("qrModal").style.display = "block";
-}
-
-function openScanModal() {
-  document.getElementById("pasteBidiInput").value = "";
-  document.getElementById("scanModal").style.display = "block";
-}
-
-function importFromBidiInput() {
-  const val = document.getElementById("pasteBidiInput").value.trim();
-  if (!val) return;
-  closeModal("scanModal");
-  processIncomingUrl(val);
-}
-
-function processIncomingUrl(rawUrl) {
-  try {
-    const u = rawUrl.startsWith("http") ? new URL(rawUrl) : new URL(window.location.origin + "/" + rawUrl);
-    const carta = u.searchParams.get("carta");
-    const rId = u.searchParams.get("restId");
-    if (carta) {
-      const d = JSON.parse(decodeURIComponent(escape(atob(carta))));
-      let existing = appState.restaurants.find(x => x.id === d.id);
-      if (!existing) {
-        existing = { id:d.id||("qr_"+Date.now()), name:d.n||"Restaurante Bidi", city:d.c||"", phone:d.p||"", pass:"2026", lat:d.lat||37.563, lng:d.lng||-1.309, unclaimed:false, lastVerified:"Verificado", stats:{views:1,saves:1,bookings:0,alerts:0}, reviews:[], menu:d.m||[] };
-        appState.restaurants.push(existing);
-      }
-      if (!appState.routeFolders[0].restIds.includes(existing.id)) appState.routeFolders[0].restIds.push(existing.id);
-      saveAppState(); openRestaurantForDiner(existing.id);
-      return;
-    }
-    if (rId && appState.restaurants.some(x => x.id === rId)) {
-      openRestaurantForDiner(rId);
-      return;
-    }
-    alert("Código o enlace Bidi no encontrado.");
-  } catch(e) { alert("Enlace Bidi no válido."); }
-}
-
-function shareWhatsApp() {
-  const r = getActiveRest();
-  window.open(`https://wa.me/?text=${encodeURIComponent("🛡️ Consulta la carta de alérgenos de " + r.name + " en TusAlergias: " + buildPortableBidiLink(r))}`, "_blank");
-}
-
-window.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search);
-  if (params.has("carta") || params.has("restId")) processIncomingUrl(window.location.href);
-  else showView("landing");
-});
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
-}
-</script>
-</body>
-</html>
+    statusBox.innerText = `✅ Texto leído correctamente.`;
+    if (mode === "home") verifyAndAddPro
