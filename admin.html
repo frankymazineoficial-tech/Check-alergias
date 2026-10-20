@@ -86,6 +86,9 @@
       <div class="row" style="justify-content:space-between;"><h2 style="margin:0;">Resumen</h2>
         <div class="row"><button class="btn btn-outline" id="btnRefresh">Actualizar</button><button class="btn btn-outline" data-logout>Salir</button></div></div>
       <div class="stats" id="stats" style="margin-top:12px;"></div>
+      <h2 style="margin:16px 0 8px; font-size:0.9rem;">Usuarios (contador anónimo)</h2>
+      <div class="stats" id="usersStats"></div>
+      <p class="muted" style="margin:8px 0 0;">Cuenta móviles, no personas con nombre: quien desactiva las estadísticas en Mi Perfil no aparece. Útil para patrocinadores e inversores: usuarios totales, activos al mes y cuántos repiten.</p>
       <p class="muted" id="statsNote" style="margin-bottom:0;"></p>
     </section>
 
@@ -230,6 +233,22 @@ if (!cfg || !okVal(cfg.apiKey) || !okVal(cfg.projectId) || !okVal(cfg.appId)) {
         F.getDoc(F.doc(db, "meta", "founders"))
       ]);
       const nFounders = founders.exists() ? Number(founders.data().count) || 0 : 0;
+      // Personas que usan la app (contador anónimo, una ficha por móvil)
+      const users = F.collection(db, "users");
+      const ago = d => F.Timestamp.fromMillis(Date.now() - d * DAY);
+      const opt = q => count(q).catch(() => null);
+      const [uTotal, u7, u30, uNew, uRepeat, uPlay] = await Promise.all([
+        opt(users),
+        opt(F.query(users, F.where("lastSeen", ">", ago(7)), F.orderBy("lastSeen"))),
+        opt(F.query(users, F.where("lastSeen", ">", ago(30)), F.orderBy("lastSeen"))),
+        opt(F.query(users, F.where("firstSeen", ">", ago(7)), F.orderBy("firstSeen"))),
+        opt(F.query(users, F.where("days", ">", 1), F.orderBy("days"))),
+        opt(F.query(users, F.where("mode", "==", "play")))
+      ]);
+      const ub = $("usersStats"); ub.textContent = "";
+      const dash = v => v == null ? "—" : v;
+      [[dash(uTotal), "personas han usado la app"], [dash(u7), "activas en los últimos 7 días"], [dash(u30), "activas en los últimos 30 días"], [dash(uNew), "nuevas esta semana"], [dash(uRepeat), "han vuelto otro día"], [dash(uPlay), "usan la app de Google Play"]]
+        .forEach(([n, label]) => { const d = document.createElement("div"); d.className = "stat"; const b = document.createElement("b"); b.textContent = n; const s = document.createElement("span"); s.textContent = label; d.append(b, s); ub.appendChild(d); });
       box.textContent = "";
       [[nOwners, "cuentas de restaurante"], [`${nFounders} / 30`, "Fundadores"], [nPublished, "locales con carta publicada"], [nRests, "locales creados"], [nSuggs, "sugerencias sin reclamar"], [nPaying == null ? "—" : nPaying, "cuentas con suscripción activa"]]
         .forEach(([n, label]) => { const d = document.createElement("div"); d.className = "stat"; const b = document.createElement("b"); b.textContent = n; const s = document.createElement("span"); s.textContent = label; d.append(b, s); box.appendChild(d); });
@@ -393,6 +412,7 @@ El equipo de TusAlergias`;
     try {
       const rv = await F.getDocs(F.collection(db, "restaurants", rid, "reviews"));
       for (let i = 0; i < rv.docs.length; i += 400) { const b = F.writeBatch(db); rv.docs.slice(i, i + 400).forEach(d => b.delete(d.ref)); await b.commit(); }
+      await F.deleteDoc(F.doc(db, "drafts", rid)).catch(() => {});
       const b = F.writeBatch(db);
       b.delete(F.doc(db, "menus", rid)); b.delete(F.doc(db, "stats", rid)); b.delete(F.doc(db, "restaurants", rid));
       await b.commit();

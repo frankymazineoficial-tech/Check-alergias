@@ -137,6 +137,30 @@
   .todo-note { background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.4); color:#fde68a; padding:8px 10px; border-radius:8px; font-size:0.74rem; }
   .info-box { font-size:0.76rem; line-height:1.45; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px; margin-bottom:12px; }
   .btn[disabled] { opacity:0.5; cursor:not-allowed; }
+  .mai-spin { width:46px; height:46px; margin:18px auto 12px; border:4px solid var(--border); border-top-color:var(--amber); border-radius:50%; animation:maiSpin 0.9s linear infinite; }
+  @keyframes maiSpin { to { transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .mai-spin { animation-duration:3s; } }
+  .help-group { font-size:0.72rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--accent); font-weight:800; margin:14px 0 8px; }
+  .help-sec { background:var(--bg); border:1px solid var(--border); border-radius:10px; margin-bottom:8px; }
+  .help-sec summary { cursor:pointer; padding:12px; font-weight:800; font-size:0.86rem; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .help-sec summary::-webkit-details-marker { display:none; }
+  .help-sec summary::after { content:"+"; color:var(--accent); font-size:1.1rem; font-weight:800; flex-shrink:0; }
+  .help-sec[open] summary::after { content:"−"; }
+  .help-sec[open] summary { border-bottom:1px solid var(--border); }
+  .help-body { padding:4px 12px 10px; font-size:0.8rem; line-height:1.5; color:#cbd5e1; }
+  .help-body p { margin:8px 0; }
+  .help-body ul, .help-body ol { padding-left:20px; margin:8px 0; }
+  .help-body li { margin-bottom:5px; }
+  .help-body b { color:#fff; }
+  .help-ok { color:var(--green); font-weight:800; }
+  .help-mod { color:var(--amber); font-weight:800; }
+  .help-no { color:var(--red); font-weight:800; }
+  .help-warn { background:rgba(245,158,11,0.12); border-left:3px solid var(--amber); padding:7px 9px; border-radius:6px; color:#fde68a; }
+  .dish-card.is-draft { border-style:dashed; border-width:1px 1px 1px 5px; border-color:#64748b; opacity:0.92; }
+  .draft-badge { display:inline-block; font-size:0.66rem; font-weight:800; color:#e2e8f0; background:#475569; padding:2px 7px; border-radius:6px; margin-bottom:6px; }
+  .drafts-bar { background:rgba(148,163,184,0.12); border:1px dashed #64748b; border-radius:10px; padding:9px 10px; margin-bottom:10px; font-size:0.78rem; }
+  .pub-switch { display:flex; align-items:center; gap:8px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px; margin-top:10px; font-size:0.8rem; font-weight:700; cursor:pointer; }
+  .pub-switch input { width:20px; height:20px; flex-shrink:0; }
 </style>
 </head>
 <body>
@@ -257,6 +281,7 @@
       </div>
     </div>
     <div id="ownerPlanBox" class="info-box"></div>
+    <button class="btn btn-outline" id="btnOwnerHelp" style="width:100%; margin-bottom:10px;" onclick="openHelpModal('alta')">📖 Cómo cargar y gestionar tu carta</button>
     <div id="ownerRestaurantsList"></div>
   </div>
 </div>
@@ -264,6 +289,10 @@
 <!-- PESTAÑA 4: MI PERFIL, BACKUP Y LEGAL -->
 <div id="profileView" class="container" style="display:none;">
   <h2 style="margin:0 0 12px; font-size:1.05rem;">👤 Mi Perfil y Herramientas</h2>
+  <div class="rest-list-card">
+    <div><b>📖 Instrucciones de uso</b><br><span style="font-size:0.74rem; color:var(--muted);">Cómo funciona cada parte de la app, paso a paso</span></div>
+    <button class="btn btn-primary" id="btnHelp" onclick="openHelpModal()">Ver</button>
+  </div>
   <div class="rest-list-card">
     <div><b>🛡️ Configurar Mis Alergias, Dietas y Trazas</b><br><span style="font-size:0.74rem; color:var(--muted);">Personaliza qué ingredientes vigila la app en restaurantes y en casa</span></div>
     <button class="btn btn-amber" onclick="openAllergyProfileModal()">⚙️ Editar Perfil</button>
@@ -280,11 +309,15 @@
     </div>
   </div>
   <div class="rest-list-card">
+    <div><b>📊 Estadísticas anónimas</b><br><span style="font-size:0.74rem; color:var(--muted);">Cuenta que este móvil usa la app (solo el día y el tipo de móvil, nunca tus alergias), para conseguir apoyos para TusAlergias</span></div>
+    <label style="display:flex; align-items:center; gap:6px; font-size:0.78rem; font-weight:700; cursor:pointer;"><input type="checkbox" id="usageToggle" checked onchange="toggleUsage(this.checked)"> Activadas</label>
+  </div>
+  <div class="rest-list-card">
     <div><b>⚖️ Normativa Sanitaria (Reglamento UE 1169/2011)</b><br><span style="font-size:0.74rem; color:var(--muted);">Condiciones legales de uso y exención de responsabilidad</span></div>
     <button class="btn btn-outline" onclick="openModal('legalModal')">Ver Aviso</button>
   </div>
   <div class="rest-list-card">
-    <div><b>🔒 Privacidad</b><br><span style="font-size:0.74rem; color:var(--muted);">Qué datos guarda la app y dónde: todo se queda en tu móvil</span></div>
+    <div><b>🔒 Privacidad</b><br><span style="font-size:0.74rem; color:var(--muted);">Qué datos guarda la app y dónde: tu perfil de alergias se queda en tu móvil</span></div>
     <button class="btn btn-outline" onclick="openPrivacyModal()">Ver política</button>
   </div>
   <div class="rest-list-card" style="border-color:rgba(239,68,68,0.5);">
@@ -315,6 +348,7 @@
     </div>
     <div style="display:flex; gap:6px; flex-wrap:wrap;">
       <button class="btn btn-amber" onclick="openDishModal()">+ Añadir Plato (Con Escáner)</button>
+      <button class="btn btn-purple" id="btnMenuAi" onclick="openMenuAiModal()">📸 Subir carta con foto</button>
       <button class="btn btn-orange" onclick="loadSampleMenuIntoActive()">📥 Cargar 12 Platos Muestra</button>
       <button class="btn btn-green" onclick="openQrModal(activeRestId)">📱 Código Bidi</button>
       <button class="btn btn-outline" onclick="openEditRestModal(activeRestId)">⚙️ Datos / WhatsApp</button>
@@ -558,6 +592,7 @@
       <div id="restOcrStatusBox" style="display:none; padding:7px; border-radius:8px; background:rgba(16,185,129,0.15); color:var(--green); font-size:0.73rem; margin-top:6px; font-weight:700;"></div>
     </div>
     <div id="ingredientsEditor"></div>
+    <label class="pub-switch"><input type="checkbox" id="editPublished" checked> <span>📢 Publicado: lo ven los clientes<br><span style="font-weight:400; font-size:0.72rem; color:var(--muted);">Desmárcalo para guardarlo como borrador: solo lo verás tú.</span></span></label>
     <button class="btn btn-green" style="width:100%; padding:12px; margin-top:8px;" onclick="saveDishFromModal()">💾 Guardar Plato en la Carta</button>
   </div>
 </div>
@@ -694,16 +729,18 @@
 <h3>Si usas la app como cliente</h3>
 <ul>
   <li><b>Tu perfil de alergias, dietas e ingredientes a evitar, tus platos caseros y tus rutas se guardan solo en tu móvil.</b> No los recibimos ni se envían a ningún servidor.</li>
+  <li><b>Estadísticas anónimas de uso:</b> al usar la app con conexión, guardamos un identificador técnico anónimo de tu móvil, el primer y el último día en que la usaste, cuántos días la has usado y si es Android, iPhone, la app de Google Play o la web. No incluye tu nombre, tu email, tu perfil de alergias, lo que miras ni tu ubicación. Sirve para saber cuántas personas usan TusAlergias y mostrar cifras globales a posibles patrocinadores e inversores. Puedes desactivarlo en Mi Perfil → «Estadísticas anónimas», y se borra lo apuntado de tu móvil.</li>
   <li>Si publicas una <b>opinión, un aviso de cambio en una carta o una sugerencia de local</b>, guardamos lo que escribes (el nombre que indiques, la puntuación, el texto y, si quieres, tus alergias) y un identificador anónimo técnico de tu dispositivo. <b>Las opiniones son públicas</b>: no incluyas datos que no quieras que otros vean.</li>
 </ul>
 
 <h3>Si usas la app como restaurante</h3>
 <ul>
   <li>Tu email y tu cuenta de acceso.</li>
-  <li>Los datos de tus locales (nombre, dirección, teléfono y ubicación) y sus cartas. <b>Son públicos</b>: cualquiera puede verlos en la app, en sus enlaces y en los códigos QR.</li>
+  <li>Los datos de tus locales (nombre, dirección, teléfono y ubicación) y sus cartas. <b>Son públicos</b>: cualquiera puede verlos en la app, en sus enlaces y en los códigos QR. Los platos que guardas como borrador no son públicos: solo los ves tú.</li>
   <li>Estadísticas de tu carta: visitas, guardados, pre-avisos y avisos.</li>
   <li>Tu aceptación de las condiciones y tu número de Fundador, si lo tienes.</li>
   <li>Cuando empiece el cobro, si te suscribes: el plan elegido, su estado y sus fechas. El pago lo gestionan Google Play o, con tarjeta en la web, Stripe: <b>nosotros nunca vemos los datos de tu tarjeta</b>.</li>
+  <li><b>«Subir carta con foto»:</b> si usas esta función, las fotos o el PDF de tu carta se envían a la inteligencia artificial de Google (Firebase AI Logic y Gemini en Google Cloud) para leer los platos. No guardamos esas imágenes: solo los platos que tú revisas y añades. Google actúa como encargado del tratamiento y, en este servicio de pago, no usa tus imágenes para entrenar sus modelos. No incluyas en las fotos datos personales que no sean necesarios.</li>
 </ul>
 
 <h3>Para qué y con qué base legal</h3>
@@ -711,6 +748,7 @@
   <li>Prestar el servicio a los restaurantes y gestionar su cuenta: ejecución de las condiciones aceptadas (art. 6.1.b del RGPD).</li>
   <li>Publicar las opiniones, avisos y sugerencias que envías: tu consentimiento (art. 6.1.a) y, si incluyes alergias, tu consentimiento explícito (art. 9.2.a). Puedes retirarlo borrándolas.</li>
   <li>Avisarte de cambios en el servicio y en su precio: ejecución de las condiciones aceptadas.</li>
+  <li>Las estadísticas anónimas de uso: nuestro interés legítimo en conocer el uso del servicio (art. 6.1.f). Solo mostramos cifras globales, nunca datos de una persona, y puedes oponerte desactivándolas.</li>
 </ul>
 <p>No vendemos ni cedemos tus datos, no usamos publicidad ni herramientas de analítica y no tomamos decisiones automatizadas sobre ti.</p>
 
@@ -772,7 +810,7 @@
 <p>Las primeras 30 cuentas de restaurante que se registren serán <b>Fundadoras</b>. Cuando empiece el cobro tendrán 12 meses más gratis y, después, un precio de <b>9,99 € al mes o 99,99 € al año (IVA incluido)</b> mientras mantengan la suscripción activa sin interrupción. La condición de Fundador pertenece a la cuenta y no se puede transferir.</p>
 
 <h3>5. Tu responsabilidad sobre la información</h3>
-<p>El restaurante es el único responsable de que la información de alérgenos, ingredientes, trazas y dietas que publica sea completa, correcta y esté al día, conforme al Reglamento (UE) 1169/2011 y al Real Decreto 126/2015. Las detecciones automáticas de la app son orientativas y debes revisarlas. TusAlergias es una herramienta de apoyo: no sustituye las obligaciones de información del establecimiento ni la confirmación verbal con el cliente.</p>
+<p>El restaurante es el único responsable de que la información de alérgenos, ingredientes, trazas y dietas que publica sea completa, correcta y esté al día, conforme al Reglamento (UE) 1169/2011 y al Real Decreto 126/2015. Las detecciones automáticas de la app son orientativas y debes revisarlas. Lo mismo ocurre con «Subir carta con foto»: la lectura la hace una inteligencia artificial que puede equivocarse, por eso la app te pide revisar y confirmar cada plato antes de publicarlo. TusAlergias es una herramienta de apoyo: no sustituye las obligaciones de información del establecimiento ni la confirmación verbal con el cliente.</p>
 
 <h3>6. Lo que publicas</h3>
 <p>Autorizas a mostrar públicamente el nombre, la dirección, el teléfono, la ubicación y la carta de tus locales en la app, en sus enlaces y en los códigos QR. Garantizas que tienes derecho a publicarlos.</p>
@@ -808,6 +846,296 @@
   </div>
 </div>
 
+<div class="modal" id="menuAiModal" style="z-index:3200;">
+  <div class="modal-content" style="border:2px solid var(--purple);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <h2 style="margin:0; font-size:1.02rem; color:#e9d5ff;">📸 Subir la carta con fotos</h2>
+      <button class="btn btn-outline" onclick="closeMenuAiModal()" aria-label="Cerrar">✕</button>
+    </div>
+
+    <div id="mai-pick">
+      <div class="info-box">Haz una foto a cada página de tu carta (o sube el PDF). La inteligencia artificial leerá los platos, sus ingredientes y los alérgenos que indica la carta.<br><b>Antes de publicar, revisas tú cada plato:</b> la IA puede equivocarse y la información de alérgenos es responsabilidad del restaurante.</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <label class="btn btn-amber" style="cursor:pointer; margin:0; padding:11px 4px; text-align:center;">📷 Hacer foto<input type="file" accept="image/*" capture="environment" style="display:none;" onchange="onMenuAiFiles(event)"></label>
+        <label class="btn btn-outline" style="cursor:pointer; margin:0; padding:11px 4px; text-align:center;">🖼️ Elegir fotos o PDF<input type="file" accept="image/*,application/pdf" multiple style="display:none;" onchange="onMenuAiFiles(event)"></label>
+      </div>
+      <div id="maiFileInfo" style="font-size:0.76rem; color:var(--green); font-weight:700; margin:10px 0 0; min-height:1em;"></div>
+      <ul style="font-size:0.74rem; color:var(--muted); margin:10px 0 12px; padding-left:18px; line-height:1.5;">
+        <li>Una foto por página, de frente y con buena luz.</li>
+        <li>Que se vea la leyenda de alérgenos (iconos o números) si la carta la tiene.</li>
+        <li>Si la carta no indica alérgenos, la IA los deduce de los ingredientes y te avisa para que lo compruebes.</li>
+      </ul>
+      <button class="btn btn-primary" id="maiReadBtn" style="width:100%; padding:12px;" disabled onclick="readMenuWithAi()">✨ Leer la carta</button>
+    </div>
+
+    <div id="mai-busy" style="display:none; text-align:center;">
+      <div class="mai-spin" role="status" aria-label="Leyendo"></div>
+      <p style="font-weight:800; margin:0 0 4px;">Leyendo tu carta…</p>
+      <p style="font-size:0.76rem; color:var(--muted); margin:0 0 14px;">Puede tardar hasta un minuto. No cierres la app.</p>
+      <button class="btn btn-outline" onclick="closeMenuAiModal(true)">Cancelar</button>
+    </div>
+
+    <div id="mai-review" style="display:none;">
+      <div id="maiSummary" class="info-box"></div>
+      <div style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+        <button class="btn btn-outline" style="font-size:0.72rem; padding:5px 9px;" onclick="maiReviewAll()">☑️ Marcar todos como revisados</button>
+      </div>
+      <div id="maiList"></div>
+      <div style="position:sticky; bottom:0; background:var(--card); padding:10px 0 4px;">
+        <button class="btn btn-green" id="maiAddBtn" style="width:100%; padding:12px;" disabled onclick="addReviewedAiDishes(false)">Marca «Revisado» para publicar</button>
+        <button class="btn btn-outline" id="maiDraftBtn" style="width:100%; padding:9px; margin-top:6px;" onclick="addReviewedAiDishes(true)">📝 Guardar como borrador</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="helpModal" style="z-index:3300;">
+  <div class="modal-content" style="border:2px solid var(--accent);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <h2 style="margin:0; font-size:1.04rem; color:var(--accent);">📖 Cómo se usa TusAlergias</h2>
+      <button class="btn btn-outline" onclick="closeModal('helpModal')" aria-label="Cerrar">✕</button>
+    </div>
+    <p style="font-size:0.78rem; color:var(--muted); margin:0 0 6px; line-height:1.45;">Toca un apartado para abrirlo. Lo que va entre «comillas» es el texto del botón que verás en la app.</p>
+
+    <div class="help-group">Para clientes</div>
+
+    <details class="help-sec" id="help-perfil">
+      <summary>🛡️ 1. Configura tu perfil (lo primero)</summary>
+      <div class="help-body">
+        <ol>
+          <li>Ve a «👤 Mi Perfil» → «⚙️ Editar Perfil». También puedes tocar «⚙️ Mis Alergias» en la pantalla de Restaurantes.</li>
+          <li>Toca los alérgenos que debes evitar. Son los 14 que la ley obliga a declarar en Europa.</li>
+          <li>Si sigues una dieta, márcala: embarazada, vegana, vegetariana, sin cerdo o sin picante.</li>
+          <li>¿Evitas algo más (ajo, kiwi…)? Escríbelo en «Otros ingredientes a vigilar» y pulsa «+ Vigilar».</li>
+          <li>Pulsa «✅ Listo».</li>
+        </ol>
+        <p><b>«Bloquear también trazas»</b>: activado, un plato con trazas de tu alérgeno sale como NO APTO. Desactivado, sale con un aviso de trazas. Déjalo activado si tu alergia es grave.</p>
+        <p>Tu perfil se guarda <b>solo en este móvil</b>. No se envía a ningún sitio.</p>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-carta">
+      <summary>🍽️ 2. Mira la carta de un restaurante</summary>
+      <div class="help-body">
+        <p><b>Para abrirla</b>, escanea el código QR de la mesa con «📷 ESCANEAR». También puedes ir a «🍽️ Restaurantes», tocar el local en el mapa y pulsar «Ver Carta». «📍 Mi GPS» centra el mapa donde estás.</p>
+        <p><b>Los platos se ordenan en tres pestañas</b> según tu perfil:</p>
+        <ul>
+          <li><span class="help-ok">COMPATIBLES</span>: no llevan nada de lo que evitas.</li>
+          <li><span class="help-mod">ADAPTABLES</span>: lo llevan, pero el restaurante lo puede quitar. El aviso naranja te dice qué pedir (por ejemplo, «Sin picatostes»).</li>
+          <li><span class="help-no">NO APTOS</span>: lo llevan y no se puede quitar. El aviso rojo te dice por qué.</li>
+        </ul>
+        <p>El aviso azul indica <b>trazas en cocina</b> (posible contaminación cruzada) y el morado, cómo lo prepara la cocina. Debajo de cada plato ves sus ingredientes y, entre corchetes, sus alérgenos. Para encontrar un plato, usa el buscador o el filtro de categorías.</p>
+        <p>«✓ Revisado» es el último día en que el restaurante confirmó su carta.</p>
+        <p class="help-warn">La carta la publica el restaurante. <b>Confirma siempre tus alergias con el camarero antes de pedir.</b></p>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-antes">
+      <summary>📅 3. Antes de ir: pre-aviso y rutas</summary>
+      <div class="help-body">
+        <ul>
+          <li><b>«📅 Pre-aviso Reserva»</b>: escribe tu nombre, cuántos sois, el día y la hora. Se abre WhatsApp con un mensaje al restaurante que incluye tus alergias y dietas, y tú decides si lo envías. Solo aparece si el local tiene WhatsApp.</li>
+          <li><b>«⭐ Guardar en Ruta»</b>: guarda el local en una carpeta, por ejemplo «Favoritos» o «Vacaciones». Tus carpetas están en «🍽️ Restaurantes», en «🎒 Mis Rutas». Con ✏️ cambias su nombre y con 🗑️ la borras.</li>
+          <li><b>«📲 Compartir»</b>: envía el enlace de la carta por WhatsApp.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-camarero">
+      <summary>🗣️ 4. En la mesa: tarjeta para el camarero</summary>
+      <div class="help-body">
+        <p>Pulsa «🗣️ Camarero» (arriba) o «👤 Mi Perfil» → «Abrir Tarjeta». La tarjeta explica tus alergias en español, inglés, francés o italiano: elige el idioma y enseña la pantalla.</p>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-opiniones">
+      <summary>💬 5. Opiniones y avisos de errores</summary>
+      <div class="help-body">
+        <ul>
+          <li><b>«✍️ Valorar»</b>: puntúa cómo te atendieron con tu alergia y cuenta tu experiencia. <b>Es pública</b>, así que no pongas nada que no quieras que se vea. Puedes borrar tus opiniones.</li>
+          <li><b>«⚠️ Aviso Carta»</b>: si ves un error en la carta (un plato ha cambiado, falta un alérgeno…), avisa. El restaurante lo verá.</li>
+          <li>Las opiniones de personas con tus mismas alergias salen primero.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-sugerir">
+      <summary>💡 6. Locales sin carta: sugerir y pedir</summary>
+      <div class="help-body">
+        <ul>
+          <li><b>«💡 Sugerir Local»</b> (en Restaurantes): añade un sitio que aún no está. Saldrá en el mapa como «sugerido por la comunidad», todavía sin carta.</li>
+          <li>En un local sugerido, <b>«🔥 Solicitar que suba su carta»</b> suma tu petición (una por persona). Así el restaurante ve que hay clientes interesados.</li>
+          <li>Si eres el dueño, <b>«🔑 Soy el propietario: Reclamar»</b> te lleva a crear tu cuenta de hostelería.</li>
+          <li>Una sugerencia solo la puede borrar quien la hizo.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-escaner">
+      <summary>📷 7. Escanea productos del súper</summary>
+      <div class="help-body">
+        <p>Pulsa «📷 ESCANEAR», el botón central de abajo, y elige una opción:</p>
+        <ul>
+          <li><b>«📷 Cámara en Vivo»</b>: apunta al código de barras.</li>
+          <li><b>«📊 Foto Cód. Barras»</b>: haz una foto al código.</li>
+          <li><b>«📑 Foto Etiqueta»</b>: haz una foto a la lista de ingredientes y la app la lee.</li>
+          <li>También puedes escribir el número del código de barras y pulsar «Analizar».</li>
+        </ul>
+        <p>Verás <span class="help-ok">✅ Apto</span> o <span class="help-no">⛔ No apto</span> según tu perfil, con el motivo. Si sale ⚠️, el producto no está en la base de datos o no tiene ingredientes: haz «📑 Foto Etiqueta».</p>
+        <p class="help-warn">Los datos vienen de Open Food Facts, una base de datos colaborativa que puede estar incompleta o desactualizada. <b>Lee siempre la etiqueta del envase.</b></p>
+        <p>El mismo escáner abre la carta de un restaurante si apuntas al QR de su mesa.</p>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-casa">
+      <summary>🏠 8. En casa: tus platos y recetas</summary>
+      <div class="help-body">
+        <ol>
+          <li>Ve a «🏠 En Casa» → «🍲 + Crear Plato Casero» y escribe el nombre.</li>
+          <li>Añade los productos que usas: escanea su código, haz una foto a la etiqueta, busca el producto del súper o escribe un ingrediente sin etiqueta (cebolla, ajo…).</li>
+          <li>Si un producto no es apto, la app te avisa y tú decides si lo añades.</li>
+          <li>Pulsa «💾 Guardar Plato en Casa».</li>
+        </ol>
+        <p>Tus platos se reparten en «✅ Platos seguros» y «⚠️ Con alérgenos a evitar», y se vuelven a revisar solos si cambias tu perfil. Con «+ Nueva Lista» los organizas (por ejemplo, «Cenas» o «Cumpleaños»).</p>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-datos">
+      <summary>💾 9. Tus datos, copias y privacidad</summary>
+      <div class="help-body">
+        <ul>
+          <li>Tu perfil, tus platos caseros y tus rutas se guardan <b>solo en este móvil</b>. Si cambias de móvil o borras la app, se pierden, salvo que hagas una copia.</li>
+          <li><b>«💾 Copia de Seguridad»</b>: «📤 Exportar» descarga un archivo con todo. En el móvil nuevo, pulsa «📥 Importar» y elige ese archivo. Ojo: sustituye lo que haya en ese móvil.</li>
+          <li><b>«📊 Estadísticas anónimas»</b>: cuenta que este móvil usa la app, sin tu nombre ni tus alergias. Si lo desactivas, se borra lo apuntado.</li>
+          <li><b>«🗑️ Borrar todos mis datos»</b>: elimina de este móvil todo lo tuyo. Lee el aviso antes de confirmar.</li>
+          <li><b>Botón «atrás» del móvil</b>: cierra la ventana abierta o vuelve a la pantalla anterior. En la pantalla de inicio, púlsalo dos veces para salir.</li>
+          <li><b>Sin internet</b>, la app se abre con lo último que guardó. Para buscar productos, ver el mapa o publicar cambios hace falta conexión.</li>
+        </ul>
+      </div>
+    </details>
+
+    <div class="help-group">Para restaurantes</div>
+
+    <details class="help-sec" id="help-alta">
+      <summary>👨‍🍳 10. Crea tu cuenta y da de alta el local</summary>
+      <div class="help-body">
+        <ol>
+          <li>Ve a «👨‍🍳 Hostelería» → «Crear cuenta». Entra con Google, o con tu email y una contraseña de 6 caracteres o más, y acepta las condiciones.</li>
+          <li>Pulsa «➕ Alta Restaurante» y escribe el nombre del local.</li>
+          <li>Busca la calle con «Buscar» y elige la dirección correcta. Si estás en el local, también puedes pulsar «📍 GPS».</li>
+          <li>Pon el WhatsApp de reservas con el 34 delante (ejemplo: 34600111222) y pulsa «💾 Guardar».</li>
+        </ol>
+        <p>Puedes tener <b>hasta 3 locales</b> por cuenta. Cada local aparece en el mapa de los clientes en cuanto tiene un plato <b>publicado</b>.</p>
+        <p>Para volver a tu carta: «👨‍🍳 Hostelería» → «Gestionar». ¿Has olvidado la contraseña? Pulsa «¿Has olvidado la contraseña?» y te llegará un email para cambiarla.</p>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-foto">
+      <summary>📸 11. Carga tu carta con una foto (lo más rápido)</summary>
+      <div class="help-body">
+        <ol>
+          <li>En tu carta, pulsa «📸 Subir carta con foto».</li>
+          <li>Haz una foto a cada página («📷 Hacer foto») o elige fotos o el PDF de la carta («🖼️ Elegir fotos o PDF»). Puedes subir hasta 8 archivos. Haz las fotos de frente, con buena luz, y que se lea la leyenda de alérgenos.</li>
+          <li>Pulsa «✨ Leer la carta» y espera (puede tardar hasta un minuto).</li>
+          <li>Con tu carta delante, revisa cada plato: corrige el nombre o la sección y mira los avisos naranjas. Cuando esté bien, marca <b>«Revisado»</b>. Con «🗑️ Descartar» quitas lo que no sea un plato.</li>
+          <li>Pulsa «📢 Publicar … platos revisados» y los clientes los verán. Los que no hayas revisado se quedan en la ventana.</li>
+          <li>¿Prefieres revisarlos con calma? Pulsa «📝 Guardar … como borrador». Todos pasan a tu carta como borradores, que solo ves tú (apartado 14).</li>
+          <li>Después, con ✏️ puedes retocar cualquier plato, por ejemplo para indicar qué ingredientes se pueden quitar.</li>
+        </ol>
+        <p class="help-warn">La lectura la hace una inteligencia artificial, que puede equivocarse. <b>Tú eres responsable de lo que publicas.</b> Se pueden hacer hasta 15 lecturas al día desde cada móvil.</p>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-plato">
+      <summary>✏️ 12. Añade o edita un plato a mano</summary>
+      <div class="help-body">
+        <ol>
+          <li>Pulsa «+ Añadir Plato (Con Escáner)» y escribe el nombre y la categoría (ENTRANTES, CARNES…).</li>
+          <li>Añade sus componentes: escanea el envase del producto que usas en cocina («📊 Foto Cód. Barras», «📷 Escáner Vivo» o «📑 Foto Etiqueta»), búscalo por nombre o marca, o pulsa «➕ Componente Manual».</li>
+          <li>En cada componente, marca sus alérgenos y si es fijo o adaptable (apartado 13). Si el texto menciona un alérgeno que no has marcado, la app te avisa.</li>
+          <li>En «⚠️ Trazas en cocina», marca los alérgenos que pueden llegar al plato por contaminación cruzada.</li>
+          <li>En «👩‍🍳 Protocolo en cocina», explica cómo lo preparáis para alérgicos (por ejemplo, «Freidora exclusiva sin gluten»).</li>
+          <li>Deja marcada «📢 Publicado» para que lo vean los clientes, o desmárcala para guardarlo como borrador.</li>
+          <li>Pulsa «💾 Guardar Plato en la Carta».</li>
+        </ol>
+        <p>En tu carta, ✏️ edita un plato y 🗑️ lo borra.</p>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-fijo">
+      <summary>🔒 13. Ingrediente fijo o adaptable</summary>
+      <div class="help-body">
+        <p>En tu carta, toca un ingrediente para cambiar entre:</p>
+        <ul>
+          <li><b>🔒 Fijo</b>: no se puede quitar. A un cliente alérgico a ese ingrediente, el plato le sale NO APTO.</li>
+          <li><b>🔄 Adaptable</b>: se puede quitar o cambiar. Escribe cómo (por ejemplo, «Sin picatostes»). El cliente lo verá y el plato le saldrá ADAPTABLE.</li>
+        </ul>
+        <p class="help-warn">Marca como adaptable <b>solo lo que de verdad podéis quitar sin riesgo</b> en cocina.</p>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-aldia">
+      <summary>✅ 14. Borradores y carta al día</summary>
+      <div class="help-body">
+        <p><b>Borradores</b>: son platos que solo ves tú. Sirven para preparar platos nuevos, la carta de temporada o los que todavía tienes que revisar. Los clientes solo ven los platos publicados.</p>
+        <ul>
+          <li>En tu carta, los borradores llevan la etiqueta «📝 BORRADOR · solo lo ves tú».</li>
+          <li><b>«📢 Publicar»</b> en un plato lo muestra a los clientes, y <b>«📝 A borrador»</b> lo vuelve a esconder sin borrarlo.</li>
+          <li>Arriba de la lista tienes «📢 Publicar todos los borradores» y «🗑️ Borrar borradores».</li>
+        </ul>
+        <p><b>Carta al día</b>:</p>
+        <ul>
+          <li>Los cambios se publican solos y el QR de las mesas no hay que volver a imprimirlo.</li>
+          <li><b>«✅ Verificar Carta Hoy»</b>: púlsalo cada vez que revises la carta, aunque no cambies nada. Los clientes ven la fecha de «Revisado».</li>
+          <li>Mira los <b>«⚠️ Aviso Carta»</b> que dejan los clientes en las opiniones y corrige lo que haga falta.</li>
+          <li><b>«📥 Cargar 12 Platos Muestra»</b> añade 12 platos de ejemplo como borradores, para ver cómo queda una carta. Tu carta no cambia y los clientes no los ven. Bórralos con «🗑️ Borrar borradores».</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-qr">
+      <summary>📱 15. Código QR para las mesas</summary>
+      <div class="help-body">
+        <p>Pulsa «📱 Código Bidi» → «🖨️ Cartel para la mesa» y se descarga un cartel listo para imprimir. También puedes «⬇️ Descargar QR», «📋 Copiar enlace» o enviarlo por «📲 WhatsApp».</p>
+        <p>El QR abre siempre tu carta actualizada.</p>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-comensal">
+      <summary>🧑‍🤝‍🧑 16. Atiende a un cliente en la mesa</summary>
+      <div class="help-body">
+        <p>En tu carta, en «Comprobar la carta para un comensal», toca las alergias y dietas del cliente. Si evita algo más, escríbelo y pulsa «+ Vigilar». Las pestañas te muestran al momento qué puede tomar.</p>
+        <p>No se guarda nada. Pulsa «🧹 Limpiar» antes del siguiente cliente.</p>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-local">
+      <summary>📊 17. Estadísticas y datos del local</summary>
+      <div class="help-body">
+        <ul>
+          <li>Arriba de tu carta ves cuántas visitas ha tenido, cuántas veces la han guardado, los pre-avisos de reserva y los avisos de errores.</li>
+          <li><b>«⚙️ Datos / WhatsApp»</b>: cambia el nombre, la dirección o el WhatsApp.</li>
+          <li><b>«🔒 Salir»</b>: vuelve a la vista de cliente.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="help-sec" id="help-plan">
+      <summary>💳 18. Plan, pagos y baja</summary>
+      <div class="help-body">
+        <ul>
+          <li>Durante el lanzamiento, la app es gratis. Los 30 primeros restaurantes son Fundadores y tienen ventajas (mira las condiciones).</li>
+          <li>Antes de empezar a cobrar te avisaremos con 30 días. Entonces podrás suscribirte desde el recuadro del plan en «👨‍🍳 Hostelería», con Google Play o con tarjeta.</li>
+          <li><b>«Cerrar Sesión»</b>: sales de tu cuenta en este móvil.</li>
+          <li><b>«🗑️ Eliminar cuenta»</b>: borra tu cuenta, tus locales, sus cartas, opiniones y estadísticas, y cancela la suscripción si la tienes. <b>No se puede deshacer.</b></li>
+        </ul>
+      </div>
+    </details>
+
+    <p style="font-size:0.7rem; color:var(--muted); text-align:center; margin:14px 0 0;">TusAlergias es una herramienta de ayuda y no sustituye el consejo de tu médico.</p>
+  </div>
+</div>
+
 <div class="modal" id="uiDialog" style="z-index:7000;" role="dialog" aria-modal="true" aria-labelledby="uiDialogMsg">
   <div class="modal-content" style="max-width:440px; margin-top:18vh;">
     <div id="uiDialogMsg" style="font-size:0.88rem; line-height:1.45; white-space:pre-line; margin-bottom:12px;"></div>
@@ -833,7 +1161,7 @@
 </div>
 
 <script>
-const APP_VERSION = "3.1";
+const APP_VERSION = "3.5";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
@@ -1010,12 +1338,17 @@ function sanitizeMenu(menu) {
     if (!Number.isFinite(id) || id <= 0 || used.has(id)) id = Date.now() + k;
     used.add(id);
     return {
-      id, cat: str(d.cat, 60) || "CARTA", name: str(d.name, 160) || "PLATO", protocol: str(d.protocol, 300),
+      id, cat: str(d.cat, 60) || "CARTA", name: str(d.name, 160) || "PLATO", protocol: str(d.protocol, 300), draft: !!d.draft,
       traces: (Array.isArray(d.traces) ? d.traces : []).filter(x => ALLERGENS.includes(x)),
       ings: (Array.isArray(d.ings) ? d.ings : []).slice(0, 40).map(sanitizeIng)
     };
   });
 }
+// Borradores: platos que el restaurante aún no publica. Solo los ve su dueño (modo propietario).
+function publicMenu(r) { return ((r && r.menu) || []).filter(d => !d.draft); }
+function draftMenu(r) { return ((r && r.menu) || []).filter(d => d.draft); }
+function viewMenu(r) { return isStaffUnlocked ? ((r && r.menu) || []) : publicMenu(r); }
+function withoutDraftFlag(menu) { return menu.map(({ draft, ...d }) => d); }
 function sanitizeRest(r) {
   r = r || {};
   const lat = Number(r.lat), lng = Number(r.lng);
@@ -1625,7 +1958,7 @@ async function pipeBytes(bytes, stream) {
 async function encodeMenuPayload(r) {
   const compact = {
     v: 2, i: r.id, n: r.name || "", c: r.city || "", p: r.phone || "", y: r.lat, x: r.lng, d: r.lastVerified || "",
-    m: (r.menu || []).map(d => [d.cat || "", d.name || "", d.protocol || "", bitMask(d.traces, ALLERGENS),
+    m: publicMenu(r).map(d => [d.cat || "", d.name || "", d.protocol || "", bitMask(d.traces, ALLERGENS),
       (d.ings || []).map(i => [i.n || "", i.sub || "", i.mod ? 1 : 0, i.note || "", bitMask(i.a, ALLERGENS), bitMask(i.tags, DIET_IDS)])])
   };
   const json = new TextEncoder().encode(JSON.stringify(compact));
@@ -1651,7 +1984,8 @@ async function decodeMenuPayload(s) {
 // ============================================================
 // NAVEGACIÓN, PERFIL PERSONAL, COMENSAL (MODO GESTIÓN) Y CUENTA DE HOSTELERÍA
 // ============================================================
-function showView(v) {
+function showView(v, fromBack) {
+  if (!fromBack) navRemember(v);           // para el botón «atrás» del móvil
   if (v !== "app" && isStaffUnlocked) { isStaffUnlocked = false; resetStaffGuest(); }   // salir de la carta cierra el modo propietario
   currentView = v;
   ["discoverView","homeView","ownerView","profileView","appView"].forEach(id => {
@@ -2258,6 +2592,7 @@ function openHomeDishModal(dishId = null, preset = null) {
   tempHomeDishIngs = dish ? JSON.parse(JSON.stringify(dish.ings || [])) : (preset ? [preset] : []);
   renderTempHomeDishIngs();
   openModal("homeDishModal");
+  rememberModalState("homeDishModal");
 }
 function closeHomeDishModal() { stopBarcodeScanner(); closeModal("homeDishModal"); }
 
@@ -2641,7 +2976,7 @@ function renderOwnerView() {
   $("ownerRestaurantsList").innerHTML = mine.map(r => `
     <div class="rest-list-card">
       <div class="rest-info" onclick="manageRestaurant('${r.id}')">
-        <div><b>${esc(r.name)}</b> ${r.demo ? '<span class="community-badge">🧪 Demo</span>' : (r.cloud ? ((r.menu || []).length ? '<span class="verified-badge">🌐 Publicado</span>' : '<span class="community-badge">✏️ Sin platos: no visible</span>') : '<span class="verified-badge">🛡️ Oficial</span>')}<br><span style="font-size:0.73rem; color:var(--muted);">📍 ${esc(r.city || "")}</span></div>
+        <div><b>${esc(r.name)}</b> ${r.demo ? '<span class="community-badge">🧪 Demo</span>' : (r.cloud ? (publicMenu(r).length ? '<span class="verified-badge">🌐 Publicado</span>' : (draftMenu(r).length ? '<span class="community-badge">📝 Solo borradores: no visible</span>' : '<span class="community-badge">✏️ Sin platos: no visible</span>')) + (publicMenu(r).length && draftMenu(r).length ? ` <span class="community-badge">📝 ${draftMenu(r).length} borrador${draftMenu(r).length === 1 ? "" : "es"}</span>` : "") : '<span class="verified-badge">🛡️ Oficial</span>')}<br><span style="font-size:0.73rem; color:var(--muted);">📍 ${esc(r.city || "")}</span></div>
       </div>
       <div style="display:flex; gap:5px;">
         <button class="btn btn-primary" onclick="manageRestaurant('${r.id}')">${r.cloud ? "✏️ Gestionar" : "🔐 Gestionar"}</button>
@@ -2680,12 +3015,59 @@ function confirmMenuUpdatedToday() {
 }
 async function loadSampleMenuIntoActive() {
   const r = getActiveRest();
-  if ((r.menu || []).length && !await uiConfirm(`Esto sustituye tu carta actual (${r.menu.length} platos) por los 12 platos de muestra.\n\n¿Continuar?`, { okText: "Sustituir", danger: true })) return;
-  r.menu = JSON.parse(JSON.stringify(SAMPLE_12_DISHES));
+  const room = 300 - (r.menu || []).length;
+  if (room < SAMPLE_12_DISHES.length) { uiAlert("No caben los 12 platos de muestra: la carta admite 300 como máximo."); return; }
+  if ((r.menu || []).length && !await uiConfirm("Se añadirán 12 platos de ejemplo como BORRADORES: los clientes no los verán y tu carta no cambia.\n\n¿Añadirlos?", { okText: "Añadir" })) return;
+  const base = Date.now();
+  const sample = JSON.parse(JSON.stringify(SAMPLE_12_DISHES)).map((d, i) => ({ ...d, id: base + i, draft: true }));
+  r.menu = sanitizeMenu((r.menu || []).concat(sample));
   r.unclaimed = false;
   saveAppState(); renderRestaurantApp();
-  toast("✅ 12 platos de muestra cargados.");
+  toast("📝 12 platos de muestra añadidos como borradores. Solo los ves tú.");
 }
+
+// ---------- Borradores: platos que solo ve el restaurante ----------
+function draftsBarHtml(r) {
+  const nPub = publicMenu(r).length, nDraft = draftMenu(r).length;
+  if (!nDraft) return "";
+  return `<div class="drafts-bar" id="draftsBar">
+    <div>📢 <b>${nPub}</b> publicado${nPub === 1 ? "" : "s"} · 📝 <b>${nDraft}</b> borrador${nDraft === 1 ? "" : "es"} <span style="color:var(--muted);">(solo los ves tú)</span></div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
+      <button class="btn btn-green" id="btnPublishAllDrafts" style="padding:5px 9px; font-size:0.72rem;" onclick="publishAllDrafts()">📢 Publicar todos los borradores</button>
+      <button class="btn btn-outline" id="btnDeleteAllDrafts" style="padding:5px 9px; font-size:0.72rem;" onclick="deleteAllDrafts()">🗑️ Borrar borradores</button>
+    </div>
+  </div>`;
+}
+function draftsSavedNote(r) { return r.cloud ? "" : " Recuerda generar de nuevo el código Bidi."; }
+function toggleDishDraft(dishId) {
+  const r = getActiveRest();
+  const d = (r.menu || []).find(x => x.id === dishId);
+  if (!d || !ownsOrStaff(r)) return;
+  d.draft = !d.draft;
+  if (!d.draft) r.lastVerified = today();
+  saveAppState(); renderRestaurantApp();
+  toast(d.draft ? `📝 «${d.name}» es ahora un borrador: los clientes ya no lo ven.` : `📢 «${d.name}» publicado: ya lo ven los clientes.${draftsSavedNote(r)}`);
+}
+async function publishAllDrafts() {
+  const r = getActiveRest();
+  const n = draftMenu(r).length;
+  if (!n || !ownsOrStaff(r)) return;
+  if (!await uiConfirm(`¿Publicar los ${n} borradores? Los clientes los verán en tu carta. Comprueba antes que sus alérgenos son correctos.`, { okText: "Publicar" })) return;
+  r.menu.forEach(d => { d.draft = false; });
+  r.lastVerified = today();
+  saveAppState(); renderRestaurantApp();
+  toast(`📢 ${n} ${n === 1 ? "plato publicado" : "platos publicados"}.${draftsSavedNote(r)}`);
+}
+async function deleteAllDrafts() {
+  const r = getActiveRest();
+  const n = draftMenu(r).length;
+  if (!n || !ownsOrStaff(r)) return;
+  if (!await uiConfirm(`¿Borrar los ${n} borradores? Los platos publicados no se tocan. No se puede deshacer.`, { okText: "Borrar", danger: true })) return;
+  r.menu = r.menu.filter(d => !d.draft);
+  saveAppState(); renderRestaurantApp();
+  toast(`🗑️ ${n} ${n === 1 ? "borrador borrado" : "borradores borrados"}.`);
+}
+function ownsOrStaff(r) { return !!(r && isStaffUnlocked && (ownsRestaurant(r) || !r.cloud)); }
 async function deleteRestaurant(id, isSuggested) {
   const r = appState.restaurants.find(x => x.id === id);
   if (!r) return;
@@ -2755,19 +3137,21 @@ function renderRestaurantApp() {
 
   $("dinerHeaderActions").style.display = isStaffUnlocked ? "none" : "flex";
   $("staffBar").classList.toggle("show", isStaffUnlocked);
+  updateMenuAiButton();
   $("topAllergenBar").style.display = isStaffUnlocked ? "none" : "flex";
   if (isStaffUnlocked) { renderRoiMetrics(r); renderStaffGuestPanel(); }
   $("syncStatus").style.display = (isStaffUnlocked && r.cloud) ? "inline" : "none";
   $("btnBookingAction").style.display = (!r.unclaimed && r.phone) ? "inline-flex" : "none";
-  $("btnReportDiscrepancy").style.display = (!r.unclaimed && (r.menu || []).length && !menuLockedForDiner(r)) ? "inline-flex" : "none";
+  $("btnReportDiscrepancy").style.display = (!r.unclaimed && publicMenu(r).length && !menuLockedForDiner(r)) ? "inline-flex" : "none";
   $("unclaimedBanner").style.display = (r.unclaimed && !isStaffUnlocked) ? "block" : "none";
   $("btnDeleteSuggestion").style.display = canDeleteSuggestion(r) ? "inline-flex" : "none";
   $("btnRequestMenu").innerText = `🔥 Solicitar que suba su carta (${(r.stats && r.stats.requests) || 0})`;
-  $("menuInteractiveZone").style.display = (r.unclaimed && !isStaffUnlocked && !(r.menu || []).length) ? "none" : "block";
+  $("menuInteractiveZone").style.display = (r.unclaimed && !isStaffUnlocked && !publicMenu(r).length) ? "none" : "block";
 
-  const cats = Array.from(new Set((r.menu || []).map(d => d.cat)));
+  const shownMenu = viewMenu(r);
+  const cats = Array.from(new Set(shownMenu.map(d => d.cat)));
   const prevCat = $("catFilter").value;
-  $("catFilter").innerHTML = `<option value="ALL">Todas (${(r.menu || []).length})</option>` + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+  $("catFilter").innerHTML = `<option value="ALL">Todas (${shownMenu.length})</option>` + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
   if (cats.includes(prevCat)) $("catFilter").value = prevCat;
   renderDishes(); renderReviews();
 }
@@ -2781,18 +3165,19 @@ function renderDishes() {
     $("dishList").innerHTML = menuLockedHtml();
     return;
   }
-  if (!r.menu || !r.menu.length) {
+  const menu = viewMenu(r);
+  if (!menu.length) {
     $("tab-aptos").innerText = "COMPATIBLES (0)";
     $("tab-mod").innerText = "ADAPTABLES (0)";
     $("tab-proh").innerText = "NO APTOS (0)";
-    $("dishList").innerHTML = `<div style="text-align:center; padding:20px; color:var(--muted); font-size:0.8rem;">${isStaffUnlocked ? "Tu carta está vacía. Pulsa «+ Añadir Plato» o carga los platos de muestra." : "Este local aún no tiene platos cargados."}</div>`;
+    $("dishList").innerHTML = `<div style="text-align:center; padding:20px; color:var(--muted); font-size:0.8rem;">${isStaffUnlocked ? "Tu carta está vacía. Pulsa «📸 Subir carta con foto» para cargarla de una vez, o añade los platos uno a uno." : "Este local aún no tiene platos cargados."}</div>`;
     return;
   }
   const q = normalizeStr($("searchInput").value);
   const cat = $("catFilter").value || "ALL";
   const counts = { aptos: 0, mod: 0, proh: 0 };
-  let html = "";
-  r.menu.forEach(d => {
+  let html = isStaffUnlocked ? draftsBarHtml(r) : "";
+  menu.forEach(d => {
     if (cat !== "ALL" && d.cat !== cat) return;
     if (q && !normalizeStr(d.name + " " + (d.ings || []).map(i => i.n + " " + i.sub).join(" ")).includes(q)) return;
     const res = evaluateDish(d, isStaffUnlocked ? true : strictTracesEnabled);
@@ -2809,14 +3194,15 @@ function renderDishes() {
         ? `<span class="ing-pill ing-toggle" onclick="toggleIngMod(${d.id}, ${k})" title="Tocar para cambiar entre Fijo y Adaptable">${i.mod ? "🔄" : "🔒"} <b>${esc(i.n)}</b>${al}</span>`
         : `<span class="ing-pill"><b>${esc(i.n)}</b>${al}</span>`;
     }).join("");
-    const staffBtns = isStaffUnlocked ? `<button class="btn btn-outline" style="padding:2px 6px;font-size:0.65rem;" onclick="openDishModal(${d.id})" aria-label="Editar plato">✏️</button><button class="btn btn-danger" style="padding:2px 6px;font-size:0.65rem;" onclick="deleteDishById(${d.id})" aria-label="Borrar plato">🗑️</button>` : "";
-    html += `<div class="dish-card ${res.status}"><div class="dish-header"><h3 class="dish-name">${esc(d.name)}</h3><div style="display:flex;gap:4px;align-items:center;">${staffBtns}<span class="dish-cat">${esc(d.cat)}</span></div></div>${badge}<div class="ing-pills">${pills}</div></div>`;
+    const staffBtns = isStaffUnlocked ? `<button class="btn ${d.draft ? "btn-green" : "btn-outline"} dish-pub-btn" style="padding:2px 6px;font-size:0.65rem;" onclick="toggleDishDraft(${d.id})">${d.draft ? "📢 Publicar" : "📝 A borrador"}</button><button class="btn btn-outline" style="padding:2px 6px;font-size:0.65rem;" onclick="openDishModal(${d.id})" aria-label="Editar plato">✏️</button><button class="btn btn-danger" style="padding:2px 6px;font-size:0.65rem;" onclick="deleteDishById(${d.id})" aria-label="Borrar plato">🗑️</button>` : "";
+    const draftBadge = d.draft ? `<div class="draft-badge">📝 BORRADOR · solo lo ves tú</div>` : "";
+    html += `<div class="dish-card ${res.status}${d.draft ? " is-draft" : ""}">${draftBadge}<div class="dish-header"><h3 class="dish-name">${esc(d.name)}</h3><div style="display:flex;gap:4px;align-items:center;">${staffBtns}<span class="dish-cat">${esc(d.cat)}</span></div></div>${badge}<div class="ing-pills">${pills}</div></div>`;
   });
   $("tab-aptos").innerText = `COMPATIBLES (${counts.aptos})`;
   $("tab-mod").innerText = `ADAPTABLES (${counts.mod})`;
   $("tab-proh").innerText = `NO APTOS (${counts.proh})`;
   const emptyMsg = { aptos: "Ningún plato es compatible tal cual. Mira la pestaña ADAPTABLES.", mod: "No hay platos que necesiten adaptación.", proh: "Ningún plato queda descartado." }[currentTab];
-  $("dishList").innerHTML = html || `<p style="text-align:center;color:var(--muted);font-size:0.8rem;">${emptyMsg}</p>`;
+  $("dishList").innerHTML = html + (counts[currentTab] ? "" : `<p style="text-align:center;color:var(--muted);font-size:0.8rem;">${emptyMsg}</p>`);
 }
 function setTab(t) {
   currentTab = t;
@@ -2881,9 +3267,11 @@ function openDishModal(dishId = null) {
   $("editName").value = d ? d.name : "";
   $("editCat").value = d ? d.cat : "ENTRANTES";
   $("editProtocol").value = d ? d.protocol || "" : "";
+  $("editPublished").checked = d ? !d.draft : true;
   if (d) [...(d.ings || [])].reverse().forEach(ing => addIngRow(ing, false));   // se insertan arriba: así se mantiene el orden
   else addIngRow(null, false);
   openModal("dishModal");
+  rememberModalState("dishModal");
 }
 function closeRestDishModal() { stopBarcodeScanner(); closeModal("dishModal"); }
 
@@ -2975,14 +3363,16 @@ async function saveDishFromModal() {
     if (!ok) return;
   }
   const traces = ALLERGENS.filter(a => editorTraces.has(a));
+  const draft = !$("editPublished").checked;
   if (editId) {
     const idx = r.menu.findIndex(d => String(d.id) === String(editId));
-    if (idx > -1) r.menu[idx] = { ...r.menu[idx], cat, name, protocol, traces, ings };
+    if (idx > -1) r.menu[idx] = { ...r.menu[idx], cat, name, protocol, traces, ings, draft };
   } else {
-    r.menu.unshift({ id: Date.now(), cat, name, protocol, traces, ings });
+    r.menu.unshift({ id: Date.now(), cat, name, protocol, traces, ings, draft });
   }
   saveAppState(); closeRestDishModal(); renderRestaurantApp();
-  toast(r.cloud ? "💾 Plato guardado. Tu carta online se actualiza sola." : "💾 Plato guardado. Recuerda generar de nuevo el código Bidi.");
+  toast(draft ? "📝 Guardado como borrador: solo lo ves tú. Publícalo cuando esté listo."
+    : (r.cloud ? "💾 Plato guardado y publicado. Tu carta online se actualiza sola." : "💾 Plato guardado. Recuerda generar de nuevo el código Bidi."));
 }
 
 // ============================================================
@@ -3031,12 +3421,12 @@ async function openQrModal(id) {
   if (r.cloud) {
     $("qrInfo").innerHTML = `📏 Imprímelo de al menos <b>${cm} cm</b> de lado, o descarga el cartel para la mesa.
       <div style="color:#6ee7b7; margin-top:6px;">✅ Este código siempre muestra tu carta actual: si cambias un plato no hace falta volver a imprimirlo.</div>
-      ${(r.menu || []).length ? "" : `<div style="color:#fcd34d; margin-top:6px;">⚠️ Tu carta aún no tiene platos: añade al menos uno para que se publique.</div>`}`;
+      ${publicMenu(r).length ? "" : `<div style="color:#fcd34d; margin-top:6px;">⚠️ Tu carta aún no tiene platos publicados: publica al menos uno para que aparezca.</div>`}`;
     return;
   }
   const dense = qr.version >= 25
     ? `<div style="color:#fcd34d; margin-top:6px;">⚠️ Carta grande: el código es muy denso. Imprímelo grande y nítido, o comparte el enlace por WhatsApp.</div>` : "";
-  $("qrInfo").innerHTML = `📏 Imprímelo de al menos <b>${cm} cm</b> de lado (${r.menu.length} platos, versión ${qr.version}).
+  $("qrInfo").innerHTML = `📏 Imprímelo de al menos <b>${cm} cm</b> de lado (${publicMenu(r).length} platos publicados, versión ${qr.version}).
     <div style="color:#fca5a5; margin-top:6px;">🔁 Este código lleva la carta dentro: si cambias un plato, genera e imprime uno nuevo.</div>${dense}`;
 }
 function downloadQrPng() {
@@ -3211,6 +3601,7 @@ let registeringOwner = false;  // evita abrir dos veces el registro
 let lastPublicPull = 0;
 let founderCount = null;       // plazas de Fundador ya ocupadas
 const pushedSnapshot = {};     // última versión subida de cada local (solo se suben cambios)
+const draftsInCloud = {};      // locales que tienen documento de borradores en la nube
 
 function cloudConfig() {
   const c = window.TUSALERGIAS_FIREBASE_CONFIG;
@@ -3293,7 +3684,7 @@ function restSummary(r) {
   return {
     ownerUid: r.ownerUid, name: str(r.name, 120), city: str(r.city, 200), phone: str(r.phone, 20),
     lat: Number(r.lat) || 0, lng: Number(r.lng) || 0, lastVerified: str(r.lastVerified, 40),
-    published: (r.menu || []).length > 0, dishCount: Math.min((r.menu || []).length, 300), updatedAt: cloud.F.serverTimestamp()
+    published: publicMenu(r).length > 0, dishCount: Math.min(publicMenu(r).length, 300), updatedAt: cloud.F.serverTimestamp()
   };
 }
 function restSnapshot(r) { return JSON.stringify([r.name, r.city, r.phone, r.lat, r.lng, r.lastVerified, r.menu]); }
@@ -3423,12 +3814,27 @@ async function cloudPullOwner() {
   for (const d of qs.docs) {
     const id = safeId(d.id);
     ids.add(id);
-    const [m, st] = await Promise.all([F.getDoc(F.doc(db, "menus", id)).catch(() => null), F.getDoc(F.doc(db, "stats", id)).catch(() => null)]);
-    const r = upsertCloudRest(id, d.data(), m && m.exists() ? (m.data().menu || []) : [], st && st.exists() ? st.data() : undefined);
+    const [m, st, dr] = await Promise.all([F.getDoc(F.doc(db, "menus", id)).catch(() => null), F.getDoc(F.doc(db, "stats", id)).catch(() => null),
+      F.getDoc(F.doc(db, "drafts", id)).catch(() => null)]);
+    draftsInCloud[id] = !!(dr && dr.exists());
+    const menu = mergeDrafts(m && m.exists() ? (m.data().menu || []) : [], dr && dr.exists() ? dr.data() : null);
+    const r = upsertCloudRest(id, d.data(), menu, st && st.exists() ? st.data() : undefined);
     pushedSnapshot[id] = restSnapshot(r);
   }
   removeLocalCloudRests(r => r.ownerUid === uidNow && !r.suggestion && !ids.has(r.id));
   ownerPulledOk = true;
+}
+
+// Une la carta publicada y los borradores (que solo descarga su dueño)
+function mergeDrafts(pub, drDoc) {
+  const out = (Array.isArray(pub) ? pub : []).map(d => ({ ...d, draft: false }));
+  const seen = new Set(out.map(d => String(d.id)));
+  const drafts = drDoc && Array.isArray(drDoc.menu) ? drDoc.menu : [];
+  drafts.forEach(d => { if (d && !seen.has(String(d.id))) { out.push({ ...d, draft: true }); seen.add(String(d.id)); } });
+  const order = drDoc && Array.isArray(drDoc.order) ? drDoc.order.map(String) : [];
+  if (!order.length) return out;
+  const pos = id => { const i = order.indexOf(String(id)); return i < 0 ? 1e6 : i; };
+  return out.map((d, k) => [d, k]).sort((x, y) => (pos(x[0].id) - pos(y[0].id)) || (x[1] - y[1])).map(x => x[0]);
 }
 
 // Al abrir un local: carta actual, reseñas y (si es tuyo) estadísticas
@@ -3487,13 +3893,25 @@ function pushOwnedChanges() {
     if (pushedSnapshot[r.id] === snap) return;
     pushedSnapshot[r.id] = snap;
     setSync("saving");
+    const all = sanitizeMenu(r.menu);
+    const pub = all.filter(d => !d.draft), drafts = all.filter(d => d.draft);
     const b = F.writeBatch(db);
     b.set(F.doc(db, "restaurants", r.id), restSummary(r), { merge: true });
-    b.set(F.doc(db, "menus", r.id), { menu: sanitizeMenu(r.menu), updatedAt: F.serverTimestamp() });
-    b.commit().then(() => setSync("ok")).catch(e => {
+    b.set(F.doc(db, "menus", r.id), { menu: withoutDraftFlag(pub), updatedAt: F.serverTimestamp() });
+    const main = b.commit();
+    // Borradores: documento privado aparte (si falla, lo publicado se guarda igual)
+    const needDrafts = drafts.length > 0 || draftsInCloud[r.id];
+    const side = needDrafts
+      ? F.setDoc(F.doc(db, "drafts", r.id), { menu: withoutDraftFlag(drafts), order: all.map(d => d.id), updatedAt: F.serverTimestamp() })
+          .then(() => { draftsInCloud[r.id] = true; })
+          .catch(e => { throw Object.assign(e || new Error("borradores"), { drafts: true }); })
+      : Promise.resolve();
+    Promise.all([main, side]).then(() => setSync("ok")).catch(e => {
       delete pushedSnapshot[r.id];
       setSync("error");
-      toast("⚠️ No se pudo guardar en la nube: " + cloudErr(e), "err");
+      toast(e && e.drafts && /permission/i.test(cloudErr(e))
+        ? "⚠️ Los borradores no se pudieron guardar en la nube: falta actualizar las reglas de Firestore. Lo publicado sí se ha guardado."
+        : "⚠️ No se pudo guardar en la nube: " + cloudErr(e), "err");
     });
   });
 }
@@ -3543,6 +3961,8 @@ async function cloudDeleteRestaurantDocs(id) {
     rv.docs.slice(i, i + 400).forEach(d => b.delete(d.ref));
     await b.commit();
   }
+  await F.deleteDoc(F.doc(db, "drafts", id)).catch(() => {});
+  delete draftsInCloud[id];
   const b = F.writeBatch(db);
   b.delete(F.doc(db, "menus", id));
   b.delete(F.doc(db, "stats", id));
@@ -4005,6 +4425,488 @@ function renderOwnerPlanBox() {
 }
 
 // ============================================================
+// BOTÓN «ATRÁS» DEL MÓVIL
+// La app es una sola página: sin esto, «atrás» la cierra. Se deja una entrada de guarda en
+// el historial y, cada vez que el usuario pulsa atrás, la app decide qué hacer:
+//   1) cerrar la ventana abierta (apagando la cámara si hace falta);
+//   2) volver a la pantalla anterior;
+//   3) en la pantalla de inicio, avisar «Pulsa atrás otra vez para salir».
+// ============================================================
+const navStack = [];
+let navReady = false, exitArmedAt = 0;
+const modalSnapshots = {};
+
+// showView() avisa aquí de cada cambio de pantalla hecho por el usuario
+function navRemember(v) {
+  if (!navReady || v === currentView) return;
+  navStack.push({ v: currentView, rest: activeRestId });
+  if (navStack.length > 30) navStack.shift();
+}
+
+// Contenido de un formulario, para saber si hay cambios sin guardar
+function formSnapshot(id) {
+  const el = $(id);
+  if (!el) return "";
+  const vals = [...el.querySelectorAll("input, textarea, select")].map(i => i.type === "checkbox" ? i.checked : i.value);
+  const chips = [...el.querySelectorAll(".selected, .diet-sel, .on")].length;
+  return JSON.stringify([vals, chips, el.querySelectorAll(".ing-editor-card, .home-ing-row").length]);
+}
+function rememberModalState(id) { setTimeout(() => { modalSnapshots[id] = formSnapshot(id); }, 60); }
+async function closeIfNoChanges(id, closer) {
+  if (modalSnapshots[id] !== undefined && modalSnapshots[id] !== formSnapshot(id)) {
+    const ok = await uiConfirm("Hay cambios sin guardar. ¿Salir sin guardar?", { okText: "Salir sin guardar", cancelText: "Seguir editando" });
+    if (!ok) return;
+  }
+  closer();
+}
+
+// Ventanas que necesitan algo más que ocultarse al cerrarlas
+const BACK_CLOSERS = {
+  uiDialog: () => closeUiDialog(false),
+  universalScanModal: () => closeUniversalScanner(),
+  dishModal: () => closeIfNoChanges("dishModal", closeRestDishModal),
+  homeDishModal: () => closeIfNoChanges("homeDishModal", closeHomeDishModal),
+  allergenWarningModal: () => cancelAddUnsafeProduct(),
+  registerModal: () => cancelRegistration(),
+  legalModal: () => {}            // la bienvenida no se puede saltar: hay que aceptarla
+};
+function topOpenModal() {
+  if ($("uiDialog") && $("uiDialog").style.display === "block") return "uiDialog";
+  const open = [...document.querySelectorAll(".modal")].filter(m => m.id !== "uiDialog" && m.style.display === "block");
+  return open.length ? open[open.length - 1].id : null;
+}
+
+function handleBack() {
+  const m = topOpenModal();
+  if (m) { (BACK_CLOSERS[m] || (() => closeModal(m)))(); return true; }
+  while (navStack.length) {
+    const prev = navStack.pop();
+    if (prev.v === currentView && prev.v !== "app") continue;
+    if (prev.v === "app") {
+      if (!getRest(prev.rest)) continue;
+      activeRestId = prev.rest;
+    }
+    showView(prev.v, true);
+    return true;
+  }
+  if (currentView !== "discover") { showView("discover", true); return true; }
+  return false;
+}
+
+function onBackPressed(e) {
+  if (!e.state || e.state.ta !== 0) return;          // solo nos interesa volver a la entrada de guarda
+  if (handleBack()) { exitArmedAt = 0; history.pushState({ ta: 1 }, ""); return; }
+  if (Date.now() - exitArmedAt < 2500) { history.back(); return; }   // segundo toque: salir
+  exitArmedAt = Date.now();
+  toast("Pulsa atrás otra vez para salir", "info");
+  history.pushState({ ta: 1 }, "");
+}
+
+function initBackButton() {
+  try {
+    history.replaceState({ ta: 0 }, "");
+    history.pushState({ ta: 1 }, "");
+    window.addEventListener("popstate", onBackPressed);
+    navReady = true;
+  } catch (e) { console.warn("atrás:", e); }
+}
+
+// ============================================================
+// CONTADOR ANÓNIMO DE USUARIOS (cifras para patrocinadores e inversores)
+// - Cada móvil tiene un identificador anónimo de Firebase, sin email ni datos personales.
+// - Una vez al día, como mucho, se apunta en users/{id}: primer día, último día, número de días
+//   de uso, si es la app de Google Play, la instalada o la web, y si es Android o iPhone.
+// - Nunca se guarda el perfil de alergias, ni qué cartas se miran, ni la ubicación.
+// - Se puede desactivar en Mi Perfil; entonces se borra lo apuntado de ese móvil.
+// ============================================================
+const USAGE_DAY_KEY = "tusalergias_uso_dia", USAGE_OFF_KEY = "tusalergias_uso_off";
+
+function usageEnabled() { try { return localStorage.getItem(USAGE_OFF_KEY) !== "1"; } catch (e) { return true; } }
+function usageMode() {
+  if (isPlayApp()) return "play";
+  try { if (matchMedia("(display-mode: standalone)").matches || navigator.standalone) return "pwa"; } catch (e) {}
+  return "web";
+}
+function usagePlatform() {
+  const ua = navigator.userAgent || "";
+  return /android/i.test(ua) ? "android" : (/iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && navigator.maxTouchPoints > 1)) ? "ios" : "otro";
+}
+function localDay() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+
+async function pingUsage() {
+  if (!isCloudMode() || !usageEnabled() || !appState.legalAccepted) return;
+  let last = null;
+  try { last = localStorage.getItem(USAGE_DAY_KEY); } catch (e) {}
+  const today = localDay();
+  if (last === today) return;
+  try {
+    if (!await initCloud()) return;
+    const u = await ensureCloudUser();
+    const { F, db } = cloud;
+    const ref = F.doc(db, "users", u.uid);
+    const info = { mode: usageMode(), platform: usagePlatform() };
+    try {
+      await F.updateDoc(ref, { lastSeen: F.serverTimestamp(), days: F.increment(1), ...info });
+    } catch (e) {
+      if (!/not-found/.test(e && e.code || "")) throw e;
+      await F.setDoc(ref, { firstSeen: F.serverTimestamp(), lastSeen: F.serverTimestamp(), days: 1, ...info });
+    }
+    try { localStorage.setItem(USAGE_DAY_KEY, today); } catch (e) {}
+  } catch (e) {
+    // Si ya se contó hace poco (las reglas lo impiden), se deja para otro día
+    if (/permission/.test(e && e.code || "")) { try { localStorage.setItem(USAGE_DAY_KEY, today); } catch (x) {} }
+    else console.warn("uso:", e);
+  }
+}
+async function cloudDeleteUsage() {
+  if (!cloud || !cloud.auth.currentUser) return;
+  try { await cloud.F.deleteDoc(cloud.F.doc(cloud.db, "users", cloud.auth.currentUser.uid)); } catch (e) {}
+}
+function renderUsageToggle() {
+  const el = $("usageToggle");
+  if (el) el.checked = usageEnabled();
+}
+async function toggleUsage(on) {
+  try { if (on) localStorage.removeItem(USAGE_OFF_KEY); else { localStorage.setItem(USAGE_OFF_KEY, "1"); localStorage.removeItem(USAGE_DAY_KEY); } } catch (e) {}
+  if (on) { toast("✅ Gracias: tu uso se contará de forma anónima."); pingUsage(); }
+  else { await cloudDeleteUsage(); toast("Hecho: ya no se cuenta tu uso y se ha borrado lo apuntado de este móvil.", "info"); }
+}
+
+// ============================================================
+// SUBIR LA CARTA CON UNA FOTO (inteligencia artificial)
+// - El restaurante hace fotos de su carta (o sube un PDF) y Gemini, a través de Firebase
+//   AI Logic, devuelve los platos con sus ingredientes, alérgenos y trazas.
+// - NUNCA se publica nada sin que el restaurante revise y confirme cada plato: la IA puede
+//   equivocarse y la responsabilidad legal de la información es del restaurante.
+// - El detector de alérgenos de la app repasa lo que lee la IA y avisa de contradicciones.
+// - Usa un SDK de Firebase más moderno solo para esta función, en una instancia aparte.
+// - Proveedor: Agent Platform de Google Cloud (antes Vertex AI), de pago por uso. Es el que
+//   permiten las condiciones de Google para apps con usuarios en la UE (la capa gratuita de la
+//   API de Gemini no se puede ofrecer a usuarios europeos) y no usa las cartas para entrenar.
+// ============================================================
+const MENU_AI = {
+  sdk: "12.17.0",
+  provider: () => window.TUSALERGIAS_AI_PROVIDER === "gemini" ? "gemini" : "agent",
+  model: () => (typeof window.TUSALERGIAS_AI_MODEL === "string" && window.TUSALERGIAS_AI_MODEL.trim()) || "gemini-3.8-flash",
+  fallbackModel: "gemini-3.5-flash",   // estable hasta, como pronto, mayo de 2027
+  maxFiles: 8,
+  maxPerDay: 15,                 // lecturas por móvil y día (cuida la cuota gratuita)
+  dayKey: "tusalergias_ia_dia"
+};
+let menuAiCtx = null, maiFiles = [], maiDishes = [], maiRun = 0;
+
+function appCheckKey() {
+  const k = window.TUSALERGIAS_APPCHECK_KEY;
+  return typeof k === "string" && k.trim() && !/PEGA|TU_/i.test(k) ? k.trim() : null;
+}
+async function getMenuAi() {
+  if (menuAiCtx) return menuAiCtx;
+  const cfg = cloudConfig();
+  if (!cfg) throw Object.assign(new Error("sin servidor"), { code: "sin-servidor" });
+  const base = `https://www.gstatic.com/firebasejs/${MENU_AI.sdk}/`;
+  const [appM, acM, aiM] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-app-check.js"), import(base + "firebase-ai.js")]);
+  const app = appM.initializeApp(cfg, "tusalergias-ia");
+  const key = appCheckKey();
+  if (key) acM.initializeAppCheck(app, { provider: new acM.ReCaptchaEnterpriseProvider(key), isTokenAutoRefreshEnabled: true });
+  const backend = MENU_AI.provider() === "gemini" ? new aiM.GoogleAIBackend() : new (aiM.AgentPlatformBackend || aiM.VertexAIBackend)("global");
+  const ai = aiM.getAI(app, { backend });
+  const S = aiM.Schema;
+  const alList = S.array({ items: S.enumString({ enum: ALLERGENS }) });
+  const schema = S.object({
+    properties: {
+      dishes: S.array({
+        items: S.object({
+          properties: {
+            category: S.string({ description: "Sección de la carta en mayúsculas, por ejemplo ENTRANTES" }),
+            name: S.string({ description: "Nombre del plato en mayúsculas, sin precio" }),
+            ingredients: S.array({
+              items: S.object({
+                properties: { name: S.string(), details: S.string(), allergens: alList },
+                optionalProperties: ["details"]
+              })
+            }),
+            allergens: alList,
+            traces: alList,
+            uncertain: S.boolean(),
+            note: S.string()
+          },
+          optionalProperties: ["note"]
+        })
+      })
+    }
+  });
+  const models = {};
+  const modelFor = name => models[name] || (models[name] = aiM.getGenerativeModel(ai, {
+    model: name,
+    generationConfig: { responseMimeType: "application/json", responseSchema: schema, temperature: 0.1 }
+  }));
+  menuAiCtx = { modelFor };
+  return menuAiCtx;
+}
+
+function menuAiPrompt() {
+  return `Eres un asistente que digitaliza cartas de restaurantes españoles para una app de alérgenos.
+Lee la carta de las imágenes o del PDF y devuelve TODOS los platos y bebidas que se pueden pedir.
+Para cada plato:
+- category: la sección de la carta tal como aparece, en mayúsculas (por ejemplo ENTRANTES, CARNES, POSTRES). Si no hay secciones, CARTA.
+- name: el nombre del plato en mayúsculas, sin precio.
+- ingredients: los ingredientes que menciona la carta, cada uno con los alérgenos que contiene (puedes deducirlos: la galleta lleva GLUTEN, la nata LÁCTEO, la mayonesa HUEVO). En details pon aclaraciones que aparezcan (por ejemplo «harina de trigo, leche»).
+- allergens: los alérgenos que la carta indica para el plato, con iconos, números o tabla. Usa la leyenda de la carta para interpretarlos.
+- traces: los alérgenos que la carta indica como «puede contener» o «trazas».
+- uncertain: true si algo no se lee bien, si la carta no indica alérgenos para ese plato o si dudas; explica el motivo en note, en español.
+Usa solo estos 14 alérgenos, escritos exactamente así: ${ALLERGENS.join(", ")}.
+No inventes ingredientes que la carta no mencione. No incluyas precios, horarios ni textos que no sean platos.`;
+}
+
+// ---------- Quién puede usarla ----------
+// Solo restaurantes con cuenta de Hostelería (email o Google), en un local suyo publicado en la nube.
+// Ni los clientes, ni el local de ejemplo, ni los locales del modo de prueba con contraseña.
+function menuAiAllowed(r) {
+  r = r || getActiveRest();
+  return !!(isCloudMode() && isStaffUnlocked && cloudOwner() && r && r.cloud && !r.suggestion && ownsRestaurant(r));
+}
+function updateMenuAiButton() {
+  const b = $("btnMenuAi");
+  if (b) b.style.display = menuAiAllowed() ? "" : "none";
+}
+
+// ---------- Ventana ----------
+function openMenuAiModal() {
+  if (!menuAiAllowed()) { uiAlert("📸 «Subir carta con foto» es solo para restaurantes con cuenta de Hostelería. Entra en la pestaña Hostelería con tu cuenta y gestiona tu local desde allí."); return; }
+  maiFiles = []; maiDishes = [];
+  $("maiFileInfo").textContent = "";
+  $("maiReadBtn").disabled = true;
+  maiStep("pick");
+  openModal("menuAiModal");
+}
+function maiStep(step) {
+  ["pick", "busy", "review"].forEach(s => { $("mai-" + s).style.display = s === step ? "block" : "none"; });
+}
+async function closeMenuAiModal(force) {
+  if (!force && maiDishes.some(d => !d.discarded)) {
+    const ok = await uiConfirm("Los platos leídos aún no se han añadido a tu carta. ¿Salir y descartarlos?", { okText: "Salir", cancelText: "Seguir revisando" });
+    if (!ok) return;
+  }
+  maiRun++;
+  maiDishes = []; maiFiles = [];
+  closeModal("menuAiModal");
+}
+function onMenuAiFiles(ev) {
+  const picked = [...(ev.target.files || [])];
+  ev.target.value = "";
+  const ok = picked.filter(f => /^image\//.test(f.type) || f.type === "application/pdf");
+  maiFiles = maiFiles.concat(ok).slice(0, MENU_AI.maxFiles);
+  const pdfs = maiFiles.filter(f => f.type === "application/pdf").length;
+  $("maiFileInfo").textContent = maiFiles.length
+    ? `✅ ${maiFiles.length} ${maiFiles.length === 1 ? "archivo" : "archivos"}${pdfs ? ` (${pdfs} PDF)` : ""} listo${maiFiles.length === 1 ? "" : "s"}. Puedes añadir más páginas (máx. ${MENU_AI.maxFiles}).`
+    : "";
+  $("maiReadBtn").disabled = !maiFiles.length;
+  if (picked.length !== ok.length) toast("Solo se admiten fotos o PDF.", "err");
+}
+
+// Las fotos se reducen en el móvil para que lleguen rápido (y gasten menos)
+function fileToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(",")[1]);
+    r.onerror = () => reject(r.error);
+    r.readAsDataURL(blob);
+  });
+}
+async function prepareMenuFile(f) {
+  if (f.type === "application/pdf") {
+    if (f.size > 10 * 1024 * 1024) throw Object.assign(new Error("El PDF pesa más de 10 MB. Prueba a hacer fotos de las páginas."), { code: "muy-grande" });
+    return { inlineData: { mimeType: "application/pdf", data: await fileToBase64(f) } };
+  }
+  const bmp = await createImageBitmap(f);
+  const scale = Math.min(1, 2048 / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas");
+  c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
+  c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+  const blob = await new Promise(res => c.toBlob(res, "image/jpeg", 0.85));
+  return { inlineData: { mimeType: "image/jpeg", data: await fileToBase64(blob) } };
+}
+
+function modelGone(e) { return /\b404\b|NOT_FOUND|is not found|not supported for generateContent/i.test(String((e && e.message) || e)); }
+function menuAiErrorText(e) {
+  const m = String((e && (e.code || "")) + " " + (e && e.message || ""));
+  if (/sin-servidor/.test(m)) return "La app no está conectada a su servidor.";
+  if (/muy-grande/.test(m)) return e.message;
+  if (/limite-dia/.test(m)) return e.message;
+  if (/app.?check|attestation|unauthenticated/i.test(m)) return "Falta activar la protección App Check para la IA (guía: «Carta con foto»).";
+  if (/billing|BILLING_DISABLED|prepay/i.test(m)) return "Falta activar el plan de pago por uso (Blaze) en Firebase para la IA (guía: «Carta con foto»).";
+  if (/not been used|disabled|api-not-enabled|PERMISSION_DENIED|403/i.test(m)) return "Falta activar Firebase AI Logic en la consola de Firebase (guía: «Carta con foto»).";
+  if (/\b429\b|quota|RESOURCE_EXHAUSTED|rate.?limit/i.test(m)) return "Ahora mismo hay demasiadas lecturas. Inténtalo dentro de unos minutos.";
+  if (modelGone(e)) return "El modelo de IA no está disponible. Revisa TUSALERGIAS_AI_MODEL en firebase-config.js.";
+  if (navigator.onLine === false || /failed to fetch|networkerror|network-request-failed|load failed/i.test(m)) return "Sin conexión a internet. Inténtalo de nuevo.";
+  if ((e && e.name === "SyntaxError") || /valid JSON|JSON\.parse/i.test(m)) return "No se pudo entender la respuesta. Prueba con una foto más nítida.";
+  return "No se pudo leer la carta: " + ((e && e.message) || e);
+}
+function aiDayCount(add) {
+  const today = localDay();
+  let d = { day: today, n: 0 };
+  try { const s = JSON.parse(localStorage.getItem(MENU_AI.dayKey) || "null"); if (s && s.day === today) d = s; } catch (e) {}
+  if (add) { d.n += add; try { localStorage.setItem(MENU_AI.dayKey, JSON.stringify(d)); } catch (e) {} }
+  return d.n;
+}
+
+async function readMenuWithAi() {
+  if (!maiFiles.length) return;
+  if (!menuAiAllowed()) { closeMenuAiModal(true); openMenuAiModal(); return; }
+  if (aiDayCount(0) >= MENU_AI.maxPerDay) { uiAlert(`Has hecho ${MENU_AI.maxPerDay} lecturas hoy desde este móvil. Mañana podrás seguir; mientras, puedes añadir platos a mano.`); return; }
+  const run = ++maiRun;
+  maiStep("busy");
+  try {
+    const { modelFor } = await getMenuAi();
+    const parts = [menuAiPrompt()];
+    for (const f of maiFiles) parts.push(await prepareMenuFile(f));
+    const size = parts.slice(1).reduce((t, x) => t + x.inlineData.data.length, 0);
+    if (size > 18 * 1024 * 1024) throw Object.assign(new Error("Los archivos pesan demasiado juntos. Léelos en dos veces."), { code: "muy-grande" });
+    if (run !== maiRun) return;
+    aiDayCount(1);
+    // Si Google retira el modelo elegido, se usa el de reserva sin que el restaurante note nada
+    let res = null, lastErr = null;
+    for (const name of [...new Set([MENU_AI.model(), MENU_AI.fallbackModel])]) {
+      try { res = await modelFor(name).generateContent(parts); break; }
+      catch (e) { lastErr = e; if (!modelGone(e)) throw e; console.warn("IA carta: modelo no disponible", name); }
+    }
+    if (!res) throw lastErr;
+    if (run !== maiRun) return;                 // se cerró la ventana mientras leía
+    const text = res && res.response && typeof res.response.text === "function" ? res.response.text() : "";
+    const json = JSON.parse(text);
+    maiDishes = aiToDishes(json);
+    if (!maiDishes.length) { maiStep("pick"); uiAlert("No hemos encontrado platos en estas fotos. Prueba con fotos más cercanas y con buena luz, una por página."); return; }
+    renderMenuAiReview();
+    maiStep("review");
+  } catch (e) {
+    if (run !== maiRun) return;
+    console.warn("IA carta:", e);
+    maiStep("pick");
+    uiAlert("⚠️ " + menuAiErrorText(e));
+  }
+}
+
+// ---------- De la respuesta de la IA a platos de la app ----------
+function normAllergen(x) {
+  const k = normText(String(x || "")).toUpperCase().trim();
+  return ALLERGENS.find(a => normText(a).toUpperCase() === k) || null;
+}
+function aiToDishes(json) {
+  const list = Array.isArray(json && json.dishes) ? json.dishes : [];
+  // Alérgenos válidos, sin repetir y en el orden oficial de la app
+  const uniq = arr => { const set = new Set((Array.isArray(arr) ? arr : []).map(normAllergen)); return ALLERGENS.filter(x => set.has(x)); };
+  return list.slice(0, 300).map((d, k) => {
+    const warnings = [], textTraces = new Set();
+    const ings = (Array.isArray(d.ingredients) ? d.ingredients : []).slice(0, 40).map(i => {
+      const n = str(String(i && i.name || "").trim(), 160);
+      const sub = str(String(i && i.details || "").trim(), 800);
+      const marked = uniq(i && i.allergens);
+      // Lo que el detector de la app encuentra en el texto y la IA no marcó se añade y se avisa
+      const det = detectAllergens(n + " . " + sub);
+      det.tr.forEach(t => textTraces.add(t));
+      const found = det.a.filter(a => !marked.includes(a));
+      if (found.length) warnings.push(`«${n}» menciona ${found.join(", ")}: lo hemos marcado, compruébalo.`);
+      const a = ALLERGENS.filter(x => marked.includes(x) || found.includes(x));
+      return { n, sub, mod: false, note: "", a, tags: detectDiets(n + " " + sub, a) };
+    }).filter(i => i.n);
+    const dishAl = uniq(d.allergens);
+    const covered = new Set(ings.flatMap(i => i.a));
+    const loose = dishAl.filter(a => !covered.has(a));
+    if (loose.length) {
+      ings.push({ n: ings.length ? "Alérgenos indicados en la carta" : "Ingredientes sin detallar", sub: "", mod: false, note: "", a: loose, tags: detectDiets("", loose) });
+      warnings.push(`La carta indica ${loose.join(", ")} sin decir en qué ingrediente.`);
+    }
+    if (!ings.length) ings.push({ n: "Ingredientes sin detallar", sub: "", mod: false, note: "", a: [], tags: [] });
+    const allAl = new Set(ings.flatMap(i => i.a));
+    if (!allAl.size) warnings.push("No se ha detectado ningún alérgeno. Comprueba que de verdad no tiene.");
+    if (d.uncertain) warnings.push("La IA tiene dudas" + (d.note ? `: ${str(d.note, 200)}` : "."));
+    return {
+      cat: (str(String(d.category || "").trim(), 60) || "CARTA").toUpperCase(),
+      name: (str(String(d.name || "").trim(), 160) || "PLATO").toUpperCase(),
+      protocol: "", traces: ALLERGENS.filter(x => uniq(d.traces).includes(x) || textTraces.has(x)), ings, warnings, reviewed: false, discarded: false
+    };
+  });
+}
+
+// ---------- Revisión ----------
+function renderMenuAiReview() {
+  const active = maiDishes.filter(d => !d.discarded);
+  const done = active.filter(d => d.reviewed).length;
+  $("maiSummary").innerHTML = `Hemos leído <b>${active.length} platos</b>. Revisa cada uno con la carta delante y marca «Revisado»: los revisados se pueden publicar ya. Los avisos en naranja son lo que más conviene mirar. Si prefieres revisarlos con calma, guárdalos como <b>borrador</b>: solo los verás tú hasta que los publiques.`;
+  $("maiList").innerHTML = maiDishes.map((d, k) => d.discarded ? "" : `
+    <div class="dish-card ${d.warnings.length ? "mod" : "aptos"}" style="margin-bottom:8px;">
+      <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+        <input type="text" value="${esc(d.name)}" aria-label="Nombre del plato" style="flex:2; min-width:140px; padding:6px; border-radius:6px; border:1px solid #475569; background:var(--bg); color:#fff; font-weight:800;" onchange="maiEdit(${k}, 'name', this.value)">
+        <input type="text" value="${esc(d.cat)}" aria-label="Sección" style="flex:1; min-width:90px; padding:6px; border-radius:6px; border:1px solid #475569; background:var(--bg); color:#fff; font-size:0.72rem;" onchange="maiEdit(${k}, 'cat', this.value)">
+      </div>
+      <div class="ing-pills" style="margin-top:6px;">${d.ings.map(i => `<span class="ing-pill"><b>${esc(i.n)}</b>${i.a.length ? ` <span style="color:var(--accent);">[${esc(i.a.join(", "))}]</span>` : ""}</span>`).join("")}</div>
+      ${d.traces.length ? `<div class="mod-box trace">ℹ️ Trazas: ${esc(d.traces.join(", "))}</div>` : ""}
+      ${d.warnings.map(w => `<div class="mod-box warn">⚠️ ${esc(w)}</div>`).join("")}
+      <div style="display:flex; gap:8px; align-items:center; margin-top:6px;">
+        <label style="display:flex; align-items:center; gap:6px; font-size:0.78rem; font-weight:800; cursor:pointer;"><input type="checkbox" ${d.reviewed ? "checked" : ""} onchange="maiReview(${k}, this.checked)"> Revisado</label>
+        <button class="btn btn-outline" style="margin-left:auto; padding:3px 8px; font-size:0.7rem;" onclick="maiDiscard(${k})">🗑️ Descartar</button>
+      </div>
+    </div>`).join("");
+  $("maiAddBtn").disabled = !done;
+  $("maiAddBtn").textContent = done ? `📢 Publicar ${done} ${done === 1 ? "plato revisado" : "platos revisados"}` : "Marca «Revisado» para publicar";
+  $("maiDraftBtn").textContent = `📝 Guardar ${active.length === 1 ? "el plato" : `los ${active.length}`} como borrador`;
+}
+function maiEdit(k, field, value) {
+  const d = maiDishes[k]; if (!d) return;
+  d[field] = (str(String(value || "").trim(), field === "cat" ? 60 : 160) || (field === "cat" ? "CARTA" : "PLATO")).toUpperCase();
+}
+function maiReview(k, on) { if (maiDishes[k]) { maiDishes[k].reviewed = !!on; renderMenuAiReview(); } }
+async function maiReviewAll() {
+  const ok = await uiConfirm("¿Has comprobado TODOS los platos con tu carta delante? Lo que publiques lo verán personas con alergias.", { okText: "Sí, los he revisado", cancelText: "Volver" });
+  if (!ok) return;
+  maiDishes.forEach(d => { if (!d.discarded) d.reviewed = true; });
+  renderMenuAiReview();
+}
+function maiDiscard(k) { if (maiDishes[k]) { maiDishes[k].discarded = true; renderMenuAiReview(); } }
+// Publicar los revisados, o guardar todo como borrador (solo lo ve el restaurante) para revisarlo después
+function addReviewedAiDishes(asDrafts) {
+  const r = getActiveRest();
+  if (!r || !ownsRestaurant(r)) return;
+  const chosen = maiDishes.filter(d => !d.discarded && (asDrafts || d.reviewed));
+  if (!chosen.length) return;
+  const room = 300 - (r.menu || []).length;
+  if (room <= 0) { uiAlert("Tu carta ya tiene 300 platos, que es el máximo."); return; }
+  const base = Date.now();
+  const add = chosen.slice(0, room).map((d, i) => ({ id: base + i, cat: d.cat, name: d.name, protocol: "", traces: d.traces, ings: d.ings, draft: !!asDrafts }));
+  r.menu = sanitizeMenu((r.menu || []).concat(add));
+  if (!asDrafts) r.lastVerified = today();
+  saveAppState();
+  const left = asDrafts ? 0 : maiDishes.filter(d => !d.discarded && !d.reviewed).length;
+  maiDishes = asDrafts ? [] : maiDishes.filter(d => !d.discarded && !d.reviewed);
+  if (left) renderMenuAiReview(); else closeMenuAiModal(true);
+  renderRestaurantApp();
+  const n = add.length;
+  toast(asDrafts
+    ? `📝 ${n} ${n === 1 ? "plato guardado" : "platos guardados"} como borrador. Solo los ves tú: revísalos y publícalos desde tu carta.`
+    : `📢 ${n} ${n === 1 ? "plato publicado" : "platos publicados"}${r.cloud ? ". Tu carta online se actualiza sola." : "."}${left ? ` Quedan ${left} por revisar.` : ""}`);
+  if (chosen.length > room) uiAlert(`Solo cabían ${room} platos: la carta admite 300 como máximo.`);
+}
+
+// «Atrás» del móvil: cerrar esta ventana avisa si hay platos sin añadir
+BACK_CLOSERS.menuAiModal = () => closeMenuAiModal(false);
+
+// ============================================================
+// INSTRUCCIONES DE USO (Mi Perfil → 📖 Instrucciones de uso)
+// openHelpModal() abre la ayuda con todo plegado; openHelpModal("foto") la abre por ese apartado.
+// ============================================================
+function openHelpModal(section) {
+  document.querySelectorAll("#helpModal details").forEach(d => { d.open = false; });
+  openModal("helpModal");
+  const target = section && $("help-" + section);
+  if (target) {
+    target.open = true;
+    setTimeout(() => { try { target.scrollIntoView({ block: "start", behavior: "smooth" }); } catch (e) { target.scrollIntoView(); } }, 60);
+  } else {
+    $("helpModal").scrollTop = 0;
+  }
+}
+
+// ============================================================
 // TARJETA DEL CAMARERO (4 IDIOMAS, CON ALÉRGENOS Y DIETAS TRADUCIDOS)
 // ============================================================
 const AL_I18N = {
@@ -4264,6 +5166,7 @@ function acceptLegalTerms() {
   appState.legalAccepted = true;
   saveAppState();
   closeModal("legalModal");
+  pingUsage();
 }
 function openPrivacyModal() {
   $("privacyLocalNote").style.display = isCloudMode() ? "none" : "block";
@@ -4280,12 +5183,13 @@ async function deleteAllMyData() {
   if (cloud) {
     try {
       await cloudDeleteMyReviews();
+      await cloudDeleteUsage();
       if (owner && !await cloudDeleteAccount()) return;
       try { await cloud.A.signOut(cloud.auth); } catch (e) {}
       try { await cloud.F.terminate(cloud.db); await cloud.F.clearIndexedDbPersistence(cloud.db); } catch (e) {}
     } catch (e) { uiAlert("⚠️ No se pudo borrar todo en la nube: " + authErrorText(e)); return; }
   }
-  try { localStorage.removeItem(STATE_KEY); localStorage.removeItem(PROFILE_KEY); } catch (e) {}
+  try { [STATE_KEY, PROFILE_KEY, USAGE_DAY_KEY, USAGE_OFF_KEY].forEach(k => localStorage.removeItem(k)); } catch (e) {}
   location.replace(location.pathname);
 }
 
@@ -4326,6 +5230,9 @@ window.addEventListener("DOMContentLoaded", async () => {
   const accion = new URLSearchParams(location.search).get("accion");
   if (accion === "escanear") setTimeout(openUniversalScanner, 300);
   else if (accion === "casa") showView("home");
+  initBackButton();
+  renderUsageToggle();
+  pingUsage();
 });
 
 if ("serviceWorker" in navigator) {

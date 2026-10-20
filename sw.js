@@ -3,7 +3,7 @@
 //   y, sin conexión, se abre la última guardada.
 // - Las librerías con versión fija se guardan para funcionar sin conexión.
 // - Los datos en vivo (cartas en la nube, productos, mapas, direcciones) nunca se sirven desde aquí.
-const CACHE = "tusalergias-v3.1.0";
+const CACHE = "tusalergias-v3.5.0";
 const SHELL = ["./", "./index.html", "./manifest.json", "./firebase-config.js", "./icon-192.png", "./icon-512.png", "./privacidad.html", "./condiciones.html"];
 
 self.addEventListener("install", event => {
@@ -22,7 +22,7 @@ self.addEventListener("activate", event => {
   );
 });
 
-const LIVE = /(^|\.)(firestore\.googleapis\.com|identitytoolkit\.googleapis\.com|securetoken\.googleapis\.com|firebaseinstallations\.googleapis\.com|openfoodfacts\.org|nominatim\.openstreetmap\.org|tile\.openstreetmap\.org|wa\.me|apis\.google\.com|firebaseapp\.com|web\.app|cloudfunctions\.net|run\.app|stripe\.com|play\.google\.com)$/;
+const LIVE = /(^|\.)(firestore\.googleapis\.com|identitytoolkit\.googleapis\.com|securetoken\.googleapis\.com|firebaseinstallations\.googleapis\.com|openfoodfacts\.org|nominatim\.openstreetmap\.org|tile\.openstreetmap\.org|wa\.me|apis\.google\.com|firebaseapp\.com|web\.app|cloudfunctions\.net|run\.app|stripe\.com|play\.google\.com|firebasevertexai\.googleapis\.com|firebaseappcheck\.googleapis\.com|google\.com|recaptcha\.net)$/;
 const LIBS = /(^|\.)(unpkg\.com|cdn\.jsdelivr\.net|www\.gstatic\.com)$/;
 
 function timeout(ms) { return new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)); }
