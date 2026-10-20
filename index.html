@@ -135,6 +135,13 @@
   details summary { cursor:pointer; color:var(--accent); }
   :focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
   .todo-note { background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.4); color:#fde68a; padding:8px 10px; border-radius:8px; font-size:0.74rem; }
+  .header-sub { font-size:0.72rem; }
+  .verified-badge, .community-badge { font-size:0.7rem; }
+  .roi-label { font-size:0.66rem; }
+  .dish-cat { font-size:0.7rem; }
+  .mini-chip, .mini-label { font-size:0.7rem; }
+  .ing-auto-hint { font-size:0.72rem; }
+  .stale-warn { color:var(--amber); font-weight:800; }
   .info-box { font-size:0.76rem; line-height:1.45; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px; margin-bottom:12px; }
   .btn[disabled] { opacity:0.5; cursor:not-allowed; }
   .mai-spin { width:46px; height:46px; margin:18px auto 12px; border:4px solid var(--border); border-top-color:var(--amber); border-radius:50%; animation:maiSpin 0.9s linear infinite; }
@@ -564,7 +571,7 @@
     </div>
     <input type="hidden" id="editDishId">
     <div style="display:grid; grid-template-columns:1fr 130px; gap:8px;">
-      <div class="form-group"><label>Nombre del Plato:</label><input type="text" id="editName" placeholder="Ej. ARROZ DEL SEÑORET"></div>
+      <div class="form-group"><label>Nombre del Plato:</label><input type="text" id="editName" placeholder="Ej. ARROZ DEL SEÑORET" oninput="updateNameHint()"><div id="editNameHint" class="ing-auto-hint" style="display:none;"></div></div>
       <div class="form-group"><label>Categoría:</label><input type="text" id="editCat" value="ENTRANTES"></div>
     </div>
     <div class="form-group"><label>👩‍🍳 Protocolo en cocina:</label><input type="text" id="editProtocol" placeholder="Ej. Sartén o freidora limpia exclusiva"></div>
@@ -722,15 +729,15 @@
     </div>
     <div class="privacy-text">
 <p id="privacyLocalNote" class="todo-note" style="display:none;">🧪 Esta copia de la app funciona sin servidor: ahora mismo ningún dato sale de tu móvil. El resto de esta política describe la versión con servidor.</p>
-<p><b>Última actualización:</b> 19 de octubre de 2026.</p>
+<p><b>Última actualización:</b> 20 de octubre de 2026.</p>
 <h3>Responsable</h3>
-<p><span class="todo">[NOMBRE Y APELLIDOS O EMPRESA]</span> · NIF: <span class="todo">[NIF]</span> · Domicilio: <span class="todo">[DOMICILIO]</span> · Contacto: <span class="todo">[EMAIL DE CONTACTO]</span></p>
+<p>Francisco José Ureña Castillo · Lorca (Murcia), España · Contacto: tusalergiasapp@gmail.com</p>
 
 <h3>Si usas la app como cliente</h3>
 <ul>
   <li><b>Tu perfil de alergias, dietas e ingredientes a evitar, tus platos caseros y tus rutas se guardan solo en tu móvil.</b> No los recibimos ni se envían a ningún servidor.</li>
   <li><b>Estadísticas anónimas de uso:</b> al usar la app con conexión, guardamos un identificador técnico anónimo de tu móvil, el primer y el último día en que la usaste, cuántos días la has usado y si es Android, iPhone, la app de Google Play o la web. No incluye tu nombre, tu email, tu perfil de alergias, lo que miras ni tu ubicación. Sirve para saber cuántas personas usan TusAlergias y mostrar cifras globales a posibles patrocinadores e inversores. Puedes desactivarlo en Mi Perfil → «Estadísticas anónimas», y se borra lo apuntado de tu móvil.</li>
-  <li>Si publicas una <b>opinión, un aviso de cambio en una carta o una sugerencia de local</b>, guardamos lo que escribes (el nombre que indiques, la puntuación, el texto y, si quieres, tus alergias) y un identificador anónimo técnico de tu dispositivo. <b>Las opiniones son públicas</b>: no incluyas datos que no quieras que otros vean.</li>
+  <li>Si publicas una <b>opinión, un aviso de cambio en una carta o una sugerencia de local</b>, guardamos lo que escribes (el nombre que indiques, la puntuación, el texto y, si quieres, tus alergias) y un identificador anónimo técnico de tu dispositivo. <b>Las opiniones son públicas</b>, también las alergias que escribas en ellas: no incluyas datos que no quieras que otros vean. Junto a cada opinión se guarda el resumen criptográfico de una llave que solo tiene tu móvil, para que puedas borrarla desde él.</li>
 </ul>
 
 <h3>Si usas la app como restaurante</h3>
@@ -740,7 +747,7 @@
   <li>Estadísticas de tu carta: visitas, guardados, pre-avisos y avisos.</li>
   <li>Tu aceptación de las condiciones y tu número de Fundador, si lo tienes.</li>
   <li>Cuando empiece el cobro, si te suscribes: el plan elegido, su estado y sus fechas. El pago lo gestionan Google Play o, con tarjeta en la web, Stripe: <b>nosotros nunca vemos los datos de tu tarjeta</b>.</li>
-  <li><b>«Subir carta con foto»:</b> si usas esta función, las fotos o el PDF de tu carta se envían a la inteligencia artificial de Google (Firebase AI Logic y Gemini en Google Cloud) para leer los platos. No guardamos esas imágenes: solo los platos que tú revisas y añades. Google actúa como encargado del tratamiento y, en este servicio de pago, no usa tus imágenes para entrenar sus modelos. No incluyas en las fotos datos personales que no sean necesarios.</li>
+  <li><b>«Subir carta con foto»:</b> si usas esta función, las fotos o el PDF de tu carta pasan por nuestro servidor (Google Cloud, en Bélgica) hasta la inteligencia artificial Gemini de Google Cloud, que lee los platos. No guardamos esas imágenes: solo los platos que tú revisas y añades, y cuántas lecturas hace cada cuenta al día (para el límite de uso). Google actúa como encargado del tratamiento y, en este servicio de pago, no usa tus imágenes para entrenar sus modelos; la lectura puede hacerse en servidores de Google fuera de la UE, con las garantías indicadas más abajo. No incluyas en las fotos datos personales que no sean necesarios.</li>
 </ul>
 
 <h3>Para qué y con qué base legal</h3>
@@ -770,13 +777,13 @@
 
 <h3 id="borrar-cuenta">Cómo borrar tu cuenta y tus datos</h3>
 <ul>
-  <li><b>Restaurantes:</b> en la app, pestaña Hostelería → «🗑️ Eliminar cuenta». Se borran al momento tu cuenta, tus locales, sus cartas, opiniones y estadísticas. Si tienes una suscripción, la cancelamos en ese momento para que no se te vuelva a cobrar. Si la contrataste con Google Play, también puedes cancelarla tú en Google Play → Pagos y suscripciones.</li>
-  <li><b>Clientes:</b> en la app, Mi Perfil → «Borrar todos mis datos». Se borran los datos de tu móvil y las opiniones que publicaste desde él.</li>
-  <li>Si no puedes entrar en la app, escribe a <span class="todo">[EMAIL DE CONTACTO]</span> desde el email de tu cuenta indicando que quieres borrarla. Lo haremos en un plazo máximo de 30 días.</li>
+  <li><b>Restaurantes:</b> en la app, pestaña Hostelería → «🗑️ Eliminar cuenta». Se borran al momento tu cuenta, tus locales, sus cartas, opiniones y estadísticas. Solo queda, si fuiste Fundador, una marca técnica sin datos personales que impide volver a ocupar otra plaza. Si tienes una suscripción, la cancelamos en ese momento para que no se te vuelva a cobrar. Si la contrataste con Google Play, también puedes cancelarla tú en Google Play → Pagos y suscripciones.</li>
+  <li><b>Clientes:</b> en la app, Mi Perfil → «Borrar todos mis datos». Se borran los datos de tu móvil y las opiniones que publicaste desde él. Si alguna no se puede borrar (por ejemplo, sin conexión), la app te lo dice; escríbenos indicando el restaurante y la fecha, y la borramos.</li>
+  <li>Si no puedes entrar en la app, escribe a tusalergiasapp@gmail.com desde el email de tu cuenta indicando que quieres borrarla. Lo haremos en un plazo máximo de 30 días.</li>
 </ul>
 
 <h3>Tus derechos</h3>
-<p>Puedes pedir acceso, rectificación, supresión, oposición, limitación y portabilidad de tus datos escribiendo a <span class="todo">[EMAIL DE CONTACTO]</span>. También puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).</p>
+<p>Puedes pedir acceso, rectificación, supresión, oposición, limitación y portabilidad de tus datos escribiendo a tusalergiasapp@gmail.com. También puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).</p>
 
 <h3>Menores</h3>
 <p>Las cuentas de restaurante son solo para mayores de edad. Los menores de 14 años no deben publicar opiniones sin permiso de sus padres o tutores.</p>
@@ -794,10 +801,10 @@
       <button class="btn btn-outline" onclick="closeModal('termsModal')">✕</button>
     </div>
     <div class="privacy-text">
-<p><b>Condiciones para restaurantes · Fase de lanzamiento.</b> Versión del 19 de octubre de 2026.</p>
+<p><b>Condiciones para restaurantes · Fase de lanzamiento.</b> Versión del 20 de octubre de 2026.</p>
 
 <h3>1. Qué es TusAlergias</h3>
-<p>TusAlergias permite a los restaurantes publicar sus cartas con la información de alérgenos y dietas, y a sus clientes filtrarlas según sus alergias. El titular del servicio es <span class="todo">[NOMBRE Y APELLIDOS O EMPRESA]</span>, con NIF <span class="todo">[NIF]</span> y domicilio en <span class="todo">[DOMICILIO]</span>. Contacto: <span class="todo">[EMAIL DE CONTACTO]</span>.</p>
+<p>TusAlergias permite a los restaurantes publicar sus cartas con la información de alérgenos y dietas, y a sus clientes filtrarlas según sus alergias. El titular del servicio es Francisco José Ureña Castillo, con domicilio en Lorca (Murcia), España. Contacto: tusalergiasapp@gmail.com.</p>
 
 <h3>2. Gratis durante el lanzamiento</h3>
 <p>Mientras dure la fase de lanzamiento, el servicio para restaurantes es gratuito. No pedimos tarjeta ni datos de pago. Cada cuenta puede gestionar hasta 3 locales.</p>
@@ -810,7 +817,7 @@
 <p>Las primeras 30 cuentas de restaurante que se registren serán <b>Fundadoras</b>. Cuando empiece el cobro tendrán 12 meses más gratis y, después, un precio de <b>9,99 € al mes o 99,99 € al año (IVA incluido)</b> mientras mantengan la suscripción activa sin interrupción. La condición de Fundador pertenece a la cuenta y no se puede transferir.</p>
 
 <h3>5. Tu responsabilidad sobre la información</h3>
-<p>El restaurante es el único responsable de que la información de alérgenos, ingredientes, trazas y dietas que publica sea completa, correcta y esté al día, conforme al Reglamento (UE) 1169/2011 y al Real Decreto 126/2015. Las detecciones automáticas de la app son orientativas y debes revisarlas. Lo mismo ocurre con «Subir carta con foto»: la lectura la hace una inteligencia artificial que puede equivocarse, por eso la app te pide revisar y confirmar cada plato antes de publicarlo. TusAlergias es una herramienta de apoyo: no sustituye las obligaciones de información del establecimiento ni la confirmación verbal con el cliente.</p>
+<p>El restaurante es el único responsable de que la información de alérgenos, ingredientes, trazas y dietas que publica sea completa, correcta y esté al día, conforme al Reglamento (UE) 1169/2011 y al Real Decreto 126/2015. Las detecciones automáticas de la app son orientativas y debes revisarlas. Para proteger a los clientes, la app puede mostrarles avisos según el nombre y el texto de cada plato (por ejemplo, «Según su nombre: LÁCTEO» o «No detalla sus ingredientes: pregunta al camarero»), aunque no los hayas marcado; para evitarlos, detalla bien los ingredientes y sus alérgenos. Lo mismo ocurre con «Subir carta con foto»: la lectura la hace una inteligencia artificial que puede equivocarse, por eso la app te pide revisar y confirmar cada plato antes de publicarlo. TusAlergias es una herramienta de apoyo: no sustituye las obligaciones de información del establecimiento ni la confirmación verbal con el cliente.</p>
 
 <h3>6. Lo que publicas</h3>
 <p>Autorizas a mostrar públicamente el nombre, la dirección, el teléfono, la ubicación y la carta de tus locales en la app, en sus enlaces y en los códigos QR. Garantizas que tienes derecho a publicarlos.</p>
@@ -871,7 +878,7 @@
     <div id="mai-busy" style="display:none; text-align:center;">
       <div class="mai-spin" role="status" aria-label="Leyendo"></div>
       <p style="font-weight:800; margin:0 0 4px;">Leyendo tu carta…</p>
-      <p style="font-size:0.76rem; color:var(--muted); margin:0 0 14px;">Puede tardar hasta un minuto. No cierres la app.</p>
+      <p style="font-size:0.76rem; color:var(--muted); margin:0 0 14px;">Suele tardar uno o dos minutos. No cierres la app.</p>
       <button class="btn btn-outline" onclick="closeMenuAiModal(true)">Cancelar</button>
     </div>
 
@@ -922,10 +929,11 @@
         <ul>
           <li><span class="help-ok">COMPATIBLES</span>: no llevan nada de lo que evitas.</li>
           <li><span class="help-mod">ADAPTABLES</span>: lo llevan, pero el restaurante lo puede quitar. El aviso naranja te dice qué pedir (por ejemplo, «Sin picatostes»).</li>
-          <li><span class="help-no">NO APTOS</span>: lo llevan y no se puede quitar. El aviso rojo te dice por qué.</li>
+          <li><span class="help-no">NO APTOS</span>: lo llevan y no se puede quitar, o no se puede saber si lo llevan. El aviso rojo te dice por qué.</li>
         </ul>
+        <p>La app también mira <b>el nombre del plato</b> y lo que dice cada ingrediente. Si el nombre indica algo que el restaurante no ha marcado (por ejemplo, «Tarta de queso» sin lácteo, o «Gambas al ajillo» si evitas el ajo), verás <b>«Según su nombre: …»</b>. Si un plato <b>no detalla sus ingredientes</b>, no sale como compatible: pregunta al camarero.</p>
         <p>El aviso azul indica <b>trazas en cocina</b> (posible contaminación cruzada) y el morado, cómo lo prepara la cocina. Debajo de cada plato ves sus ingredientes y, entre corchetes, sus alérgenos. Para encontrar un plato, usa el buscador o el filtro de categorías.</p>
-        <p>«✓ Revisado» es el último día en que el restaurante confirmó su carta.</p>
+        <p>«Revisada por el local» es el último día en que el restaurante confirmó su carta. Al abrirla, la app comprueba si hay cambios: «✓ Carta al día» es que la que ves es la última. Si no hay conexión verás <b>«⚠️ Sin conexión: estás viendo la copia guardada…»</b>, con su fecha: puede haber cambios, así que confírmalo todo con el camarero.</p>
         <p class="help-warn">La carta la publica el restaurante. <b>Confirma siempre tus alergias con el camarero antes de pedir.</b></p>
       </div>
     </details>
@@ -952,7 +960,7 @@
       <summary>💬 5. Opiniones y avisos de errores</summary>
       <div class="help-body">
         <ul>
-          <li><b>«✍️ Valorar»</b>: puntúa cómo te atendieron con tu alergia y cuenta tu experiencia. <b>Es pública</b>, así que no pongas nada que no quieras que se vea. Puedes borrar tus opiniones.</li>
+          <li><b>«✍️ Valorar»</b>: puntúa cómo te atendieron con tu alergia y cuenta tu experiencia. <b>Es pública</b>, igual que las alergias que escribas en ella, así que no pongas nada que no quieras que se vea. Puedes borrar tus opiniones desde el móvil con el que las publicaste (🗑️).</li>
           <li><b>«⚠️ Aviso Carta»</b>: si ves un error en la carta (un plato ha cambiado, falta un alérgeno…), avisa. El restaurante lo verá.</li>
           <li>Las opiniones de personas con tus mismas alergias salen primero.</li>
         </ul>
@@ -1036,13 +1044,13 @@
         <ol>
           <li>En tu carta, pulsa «📸 Subir carta con foto».</li>
           <li>Haz una foto a cada página («📷 Hacer foto») o elige fotos o el PDF de la carta («🖼️ Elegir fotos o PDF»). Puedes subir hasta 8 archivos. Haz las fotos de frente, con buena luz, y que se lea la leyenda de alérgenos.</li>
-          <li>Pulsa «✨ Leer la carta» y espera (puede tardar hasta un minuto).</li>
+          <li>Pulsa «✨ Leer la carta» y espera (suele tardar uno o dos minutos).</li>
           <li>Con tu carta delante, revisa cada plato: corrige el nombre o la sección y mira los avisos naranjas. Cuando esté bien, marca <b>«Revisado»</b>. Con «🗑️ Descartar» quitas lo que no sea un plato.</li>
           <li>Pulsa «📢 Publicar … platos revisados» y los clientes los verán. Los que no hayas revisado se quedan en la ventana.</li>
           <li>¿Prefieres revisarlos con calma? Pulsa «📝 Guardar … como borrador». Todos pasan a tu carta como borradores, que solo ves tú (apartado 14).</li>
           <li>Después, con ✏️ puedes retocar cualquier plato, por ejemplo para indicar qué ingredientes se pueden quitar.</li>
         </ol>
-        <p class="help-warn">La lectura la hace una inteligencia artificial, que puede equivocarse. <b>Tú eres responsable de lo que publicas.</b> Se pueden hacer hasta 15 lecturas al día desde cada móvil.</p>
+        <p class="help-warn">La lectura la hace una inteligencia artificial, que puede equivocarse. <b>Tú eres responsable de lo que publicas.</b> Cada cuenta puede hacer hasta 15 lecturas al día. La app también lee el nombre de cada plato: si indica algo (por ejemplo, «Carpaccio» = crudo), lo añade como «Según el nombre del plato» para que lo compruebes. Si la carta no detalla los ingredientes, añádelos al editar el plato: si no, los clientes con dietas verán «pregunta al camarero».</p>
       </div>
     </details>
 
@@ -1052,7 +1060,7 @@
         <ol>
           <li>Pulsa «+ Añadir Plato (Con Escáner)» y escribe el nombre y la categoría (ENTRANTES, CARNES…).</li>
           <li>Añade sus componentes: escanea el envase del producto que usas en cocina («📊 Foto Cód. Barras», «📷 Escáner Vivo» o «📑 Foto Etiqueta»), búscalo por nombre o marca, o pulsa «➕ Componente Manual».</li>
-          <li>En cada componente, marca sus alérgenos y si es fijo o adaptable (apartado 13). Si el texto menciona un alérgeno que no has marcado, la app te avisa.</li>
+          <li>En cada componente, marca sus alérgenos y si es fijo o adaptable (apartado 13). Si el texto menciona un alérgeno que no has marcado, la app te avisa. Si el <b>nombre del plato</b> indica algo que ningún componente explica (por ejemplo, «Tarta de queso» sin lácteo), verás un aviso debajo del nombre: márcalo en su componente o cambia el nombre.</li>
           <li>En «⚠️ Trazas en cocina», marca los alérgenos que pueden llegar al plato por contaminación cruzada.</li>
           <li>En «👩‍🍳 Protocolo en cocina», explica cómo lo preparáis para alérgicos (por ejemplo, «Freidora exclusiva sin gluten»).</li>
           <li>Deja marcada «📢 Publicado» para que lo vean los clientes, o desmárcala para guardarlo como borrador.</li>
@@ -1161,7 +1169,7 @@
 </div>
 
 <script>
-const APP_VERSION = "3.5.1";
+const APP_VERSION = "3.6.1";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
@@ -1169,7 +1177,7 @@ const PLAN = {
   founderMax: 30, founderFreeMonths: 12, maxRestaurants: 3, noticeDays: 30,
   founderFreeDays: 365,      // los 12 meses gratis de los Fundadores, contados desde el inicio del cobro
   graceDays: 7,              // días de margen tras el inicio del cobro (o tras el año gratis) antes de ocultar la carta
-  termsVersion: "2026-10-19"
+  termsVersion: "2026-10-20"
 };
 const DAY_MS = 86400000;
 const ALLERGENS = ["GLUTEN","CRUSTÁCEOS","HUEVO","PESCADO","CACAHUETES","SOJA","LÁCTEO","FRUTOS CON CÁSCARA","APIO","MOSTAZA","SÉSAMO","SULFITOS","ALTRAMUCES","MOLUSCOS"];
@@ -1360,6 +1368,8 @@ function sanitizeRest(r) {
     lastVerified: str(r.lastVerified, 40),
     cloud: !!r.cloud, ownerUid: r.ownerUid ? safeId(r.ownerUid, "u_") : null, suggestion: !!r.suggestion, founder: !!r.founder,
     paidUntil: Math.max(0, Number(r.paidUntil) || 0),
+    syncedAt: Math.max(0, Number(r.syncedAt) || 0),                       // última vez que se comprobó en la nube
+    ver: typeof r.ver === "string" ? r.ver.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40) : "",   // versión de la carta en la nube
     sid: r.sid ? safeId(r.sid, "s_") : null, createdBy: r.createdBy ? safeId(r.createdBy, "u_") : null,
     stats: { views: +st.views || 0, saves: +st.saves || 0, bookings: +st.bookings || 0, alerts: +st.alerts || 0, requests: +st.requests || 0 },
     reviews: (Array.isArray(r.reviews) ? r.reviews : []).slice(0, 300).map(rv => ({
@@ -1408,7 +1418,7 @@ function normalizeState(s) {
   return {
     restaurants, routeFolders, homeLists,
     votedRequests: (Array.isArray(s.votedRequests) ? s.votedRequests : []).map(x => safeId(x)),
-    myReviews: (Array.isArray(s.myReviews) ? s.myReviews : []).map(x => str(x, 140)).filter(x => /^[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+$/.test(x)).slice(-500),
+    myReviews: (Array.isArray(s.myReviews) ? s.myReviews : []).map(x => str(x, 200)).filter(x => /^[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+(?:\|[A-Za-z0-9_-]{32,100})?$/.test(x)).slice(-500),
     activeFolderId: routeFolders.some(f => f.id === s.activeFolderId) ? s.activeFolderId : "f_fav",
     activeHomeListId: homeLists.some(l => l.id === s.activeHomeListId) ? s.activeHomeListId : "hl_default",
     currentUser: cu, legalAccepted: !!s.legalAccepted,
@@ -1483,8 +1493,12 @@ function kwSource(list) {
   return list.map(k => {
     if (/^re:/.test(k)) return k.slice(3);
     const prefix = k.endsWith("*");                       // "weizen*" -> weizenmehl, weizenstarke...
-    const body = rxEscape(normText(prefix ? k.slice(0, -1) : k)).replace(/\s+/g, "\\s+");
-    return prefix ? body + "[a-z]*" : body;
+    const clean = normText(prefix ? k.slice(0, -1) : k);
+    let body = rxEscape(clean).replace(/\s+/g, "\\s+");
+    if (prefix) return body + "[a-z]*";
+    // Plural en -z → -ces: codorniz → codornices, perdiz → perdices, nuez → nueces
+    if (/[a-z]z$/.test(clean)) body = body.slice(0, -1) + "(?:z|ces)";
+    return body;
   }).join("|");
 }
 // Palabra completa, admite plural en -s / -es
@@ -1499,49 +1513,88 @@ const TRACE_MARK_RE = /(?:pueden? contener|podria contener|trazas|elaborad[oa] e
 const AL_RULES = {
   "GLUTEN": {
     strong: ["gluten","glutine","trigo","wheat","ble","weizen*","frumento","cebada","barley","orge","gersten*","gerste","orzo","centeno","rye","seigle","roggen*","segale","avena","oat","avoine","hafer*","espelta","spelt","epeautre","dinkel*","farro","kamut","triticale","malta","malt","seitan","cuscus","couscous","cous cous","bulgur"],
-    weak: ["harina","flour","farine","mehl","farina","pan","bread","pain","pane","galleta","biscuit","cookie","cracker","pasta","fideo","fideua","noodle","rebozado","rebozada","empanado","empanada","empanadilla","pan rallado","breadcrumb","bechamel","besamel","picatoste","crouton","croqueta","bizcocho","semola","hojaldre","magdalena","croissant","cruasan","gofre","waffle","pizza","churro","polvoron","rosquilla","donut","bunuelo","crepe","crep","salmorejo","migas","torrija","tempura","lasana","lasagna","canelon","canelones","ravioli","espagueti","spaghetti","macarron","macarrones","tallarin","tallarines","noqui","gnocchi","romesco","salsa de soja","soy sauce","teriyaki","cerveza","beer","biere","bier","birra"],
+    weak: ["harina","flour","farine","mehl","farina","pan","bread","pain","pane","galleta","biscuit","cookie","cracker","pasta","fideo","fideua","noodle","rebozado","rebozada","empanado","empanada","empanadilla","pan rallado","breadcrumb","bechamel","besamel","picatoste","crouton","croqueta","bizcocho","semola","hojaldre","magdalena","croissant","cruasan","gofre","waffle","pizza","churro","polvoron","rosquilla","donut","bunuelo","crepe","crep","salmorejo","migas","torrija","tempura","lasana","lasagna","canelon","canelones","ravioli","espagueti","spaghetti","macarron","macarrones","tallarin","tallarines","noqui","gnocchi","romesco","salsa de soja","soy sauce","teriyaki","cerveza","beer","biere","bier","birra",
+           // Panes, masas y pastas que no llevan la palabra «pan» o «harina»
+           "panko","bao","gyoza","dumpling","wonton","wan tun","udon","ramen","yakisoba","soba","brioche","focaccia","ciabatta","chapata","baguette","picos","regana","colines","grissini","rosquilleta","biscote",
+           "fettuccine","tagliatelle","penne","rigatoni","fusilli","tortellini","linguine","pappardelle","bocadillo","bocata","montadito","sandwich","tosta","mollete","panecillo","bollo","bolleria","ensaimada","sobao","roscon","berlina",
+           "brownie","muffin","cupcake","crumble","profiterol","eclair","lionesa","vol au vent","volovan","quiche","samosa","rollito de primavera","rollitos de primavera","spring roll","tortita","pancake","pita","wrap","burrito",
+           "katsu","tonkatsu","milanesa","a la romana","enharinado","enharinada","cachopo","san jacobo","flamenquin","pestino","porra","gazpacho","ajoblanco","sopa de ajo","sopas de ajo","hoisin","ponzu",
+           "albondiga","coulant","gofio","paparajote","pastel de carne","pastel de cierva","marinera","marinero","ensalada cesar","salsa cesar"],
     free: /(^|[^a-z0-9])(?:sin gluten|libre de gluten|exento de gluten|gluten[\s-]free|sans gluten|senza glutine|glutenfrei|apto para celiacos|apto celiacos)(?=[^a-z0-9]|$)/,
     excl: ["re:harina\\s+de\\s+(?:arroz|maiz|garbanzos?|almendras?|cocos?|soja|patatas?|yuca|tapioca|quinoa|teff|castanas?|guisantes?|lentejas?|mandioca|trigo\\s+sarraceno|alforfon|sorgo|mijo|habas?|altramuz|algarroba|platano|lino|chia|amaranto|cacahuetes?)",
            "re:trigo\\s+sarraceno", "buckwheat", "sarrasin", "re:grano\\s+saraceno",
            "re:(?:fideos?|noodles?|pasta|pan|tortitas?|tortillas?|crackers?|galletas?|semola)\\s+de\\s+(?:arroz|maiz|garbanzos?|lentejas?|quinoa|trigo\\s+sarraceno)",
            "re:rice\\s+(?:flour|noodles?|paper)", "re:(?:farine|pain)\\s+de\\s+(?:riz|mais)", "re:semola\\s+de\\s+maiz",
            "re:pasta\\s+de\\s+(?:tomates?|curry|miso|sesamo|cacahuetes?|almendras?|avellanas?|aceitunas?|pimientos?|ajo|anchoas?|wasabi|tamarindo|jengibre|chile|guindilla|dientes|soja|judias?|frutos\\s+secos|cacao|azucar|membrillo|dulce)",
-           "re:(?:tomato|curry)\\s+paste"]
+           "re:(?:tomato|curry)\\s+paste",
+           "re:picos\\s+de\\s+europa", "re:wraps?\\s+de\\s+(?:lechuga|col|arroz)", "re:gazpachos?\\s+sin\\s+pan", "re:pan\\s+de\\s+oro",
+           "re:(?:soba|ramen|udon)\\s+(?:de\\s+arroz|sin\\s+gluten)", "re:(?:a\\s+la|salsa)\\s+marinera"]
   },
-  "CRUSTÁCEOS": { strong: ["crustaceo","crustacean","crustace","krebstiere","crostaceo","crostacei","gamba","gambon","langostino","langosta","bogavante","cangrejo","centolla","buey de mar","necora","cigala","camaron","quisquilla","carabinero","percebe","shrimp","prawn","crab","lobster","krill","crevette","homard","langoustine","scampi"] },
+  "CRUSTÁCEOS": {
+    strong: ["crustaceo","crustacean","crustace","krebstiere","crostaceo","crostacei","gamba","gambon","gambita","langostino","langosta","bogavante","cangrejo","centolla","centollo","buey de mar","necora","cigala","cigalita","camaron","quisquilla","carabinero","percebe","shrimp","prawn","crab","lobster","krill","crevette","homard","langoustine","scampi",
+             "txangurro","changurro","galera","santiaguino","cigarra de mar","bisque","salsa americana",
+             // «Marisco» puede ser crustáceo o molusco: se avisa de los dos
+             "marisco","mariscos","mariscada","seafood","fruits de mer","frutti di mare"],
+    excl: ["re:bisques?\\s+de\\s+(?:tomates?|calabazas?|setas|champinones|verduras?|pimientos?|zanahorias?)"]
+  },
   "HUEVO": {
     strong: ["huevo","egg","oeuf","eier","uovo","uova","yema","clara de huevo","albumina","ovoalbumina","ovoproducto","lisozima","lysozyme","e1105","huevina"],
-    weak: ["mayonesa","mayonnaise","merengue","meringue","alioli","tortilla"],
+    // Preparaciones que por receta llevan huevo
+    weak: ["mayonesa","mayonnaise","merengue","meringue","alioli","tortilla","flan","natillas","crema pastelera","crema catalana","tiramisu","carbonara","ensaladilla","a la romana","torrija","quiche","profiterol","eclair","lionesa","crepe","crep","gofre","waffle","tortita","pancake","bizcocho","magdalena","brioche","mousse","milanesa","cachopo","san jacobo","flamenquin","croqueta","bunuelo","revuelto","zarangollo","paparajote","merengada","tocino de cielo","tocinillo de cielo","salsa rosa","salsa golf","albondiga","coulant","pastel de carne","pastel de cierva","marinera","marinero","ensalada murciana","ensalada cesar","salsa cesar"],
     free: /(^|[^a-z0-9])(?:sin huevos?|libre de huevos?|egg[\s-]free|sans oeufs?|senza uova|ohne eier?)(?=[^a-z0-9]|$)/,
-    excl: ["re:(?:mayonesas?|mayonnaise|alioli)\\s+(?:vegana|vegetal)", "re:tortillas?\\s+(?:de\\s+)?(?:maiz|trigo|harina|mexicanas?|wraps?|fajitas?)"]
+    excl: ["re:(?:mayonesas?|mayonnaise|alioli)\\s+(?:vegana|vegetal)", "re:tortillas?\\s+(?:de\\s+)?(?:maiz|trigo|harina|mexicanas?|wraps?|fajitas?)", "re:revueltos?\\s+(?:vegan[oa]s?|de\\s+tofu)", "re:(?:a\\s+la|salsa)\\s+marinera"]
   },
-  "PESCADO": { strong: ["pescado","fish","poisson","fisch*","pesce","salmon","atun","tuna","bonito","anchoa","anchovy","boqueron","bacalao","merluza","pescadilla","corvina","sardina","caballa","jurel","lubina","rodaballo","trucha","lenguado","rape","mero","cazon","emperador","pez espada","pez","peces","panga","tilapia","abadejo","eglefino","arenque","palometa","salmonete","besugo","sargo","mojama","surimi","huevas","caviar","worcestershire","perrins","garum","dashi","katsuobushi","nuoc mam"] },
-  "CACAHUETES": { strong: ["cacahuete","cacahuate","mani","peanut","arachide","arachidi","arachis","erdnuss*","groundnut"] },
-  "SOJA": { strong: ["soja","soya","soy","soybean","soia","edamame","tofu","tempeh","miso","tamari","natto","shoyu"] },
+  "PESCADO": {
+    strong: ["pescado","fish","poisson","fisch*","pesce","salmon","atun","tuna","bonito","anchoa","anchovy","boqueron","boqueroncito","bacalao","merluza","pescadilla","corvina","sardina","sardinilla","caballa","jurel","lubina","rodaballo","trucha","lenguado","rape","mero","cazon","emperador","pez espada","pez","peces","panga","tilapia","abadejo","eglefino","arenque","palometa","salmonete","besugo","sargo","mojama","surimi","huevas","caviar","worcestershire","perrins","garum","dashi","katsuobushi","nuoc mam",
+             "dorada","gallo","raya","cabracho","rascacio","melva","anguila","angula","gulas","congrio","bacaladilla","urta","pargo","denton","gallineta","ventresca","kokotxa","cococha","chanquete","tintorera","caella","marrajo","pintarroja","tiburon","esturion",
+             "breca","chicharro","cherne","cherna","mujol","skrei","pijota","acedia","brotola","lenguadina","japuta","botarga","fumet","sashimi","pescaito","pescadito","nam pla","tonnato",
+             "arroz a banda","arroz caldero","caldero del mar menor","caldero murciano","marinera","marinero","ensalada murciana"],
+    weak: ["fideua","pad thai","ensalada cesar","salsa cesar"],
+    excl: ["re:pico\\s+de\\s+gallo", "re:(?:a\\s+la|salsa)\\s+marinera", "re:fideuas?\\s+(?:de\\s+(?:verduras?|pollo|carne|setas)|vegetal|vegana)", "re:gallos?\\s+(?:de\\s+corral|campero|capon|de\\s+pelea)", "re:caldo\\s+de\\s+gallo",
+           // «dorada» como adjetivo (cebolla dorada, patatas doradas…) no es el pescado
+           "re:(?:cebollas?|cebolletas?|chalotas?|patatas?|papas|piel|pieles|costras?|cortezas?|masas?|harinas?|mantequillas?|pechugas?|alitas?|croquetas?|empanadas?|empanadillas?|tostadas?|rebanadas?|almendras?|avellanas?|setas?|berenjenas?|calabazas?|manzanas?|peras?|pinas?|uvas?|pasas|laminas?|lascas?|capas?|salsas?|virutas?|migas?|tiras?|rodajas?|cortinas?|carnes?|panceta|cebollita|cebollitas)\\s+doradas?"]
+  },
+  "CACAHUETES": { strong: ["cacahuete","cacahuate","mani","peanut","arachide","arachidi","arachis","erdnuss*","groundnut"], weak: ["pad thai","satay","sate"] },
+  "SOJA": { strong: ["soja","soya","soy","soybean","soia","edamame","tofu","tempeh","miso","tamari","natto","shoyu","hoisin","ponzu","teriyaki","heura","yuba","okara","kikkoman"] },
   "LÁCTEO": {
-    strong: ["lacteo","leche","milk","lait","milch*","latte","lactosa","lactose","lattosio","laktose","lactoserum","suero","whey","caseina","caseinato","casein","caseinate","queso","cheese","fromage","kase","formaggio","nata","cream","creme fraiche","mantequilla","butter","beurre","ghee","yogur","yogurt","yoghurt","yaourt","joghurt","kefir","requeson","mozzarella","parmesano","parmigiano","parmesan","burrata","ricotta","mascarpone","cuajada","lactoalbumina","lactoglobulina"],
-    weak: ["bechamel","besamel","flan","natillas","crema catalana","helado","pesto"],
+    strong: ["lacteo","leche","milk","lait","milch*","latte","lactosa","lactose","lattosio","laktose","lactoserum","suero","whey","caseina","caseinato","casein","caseinate","queso","quesito","cheese","fromage","kase","formaggio","nata","cream","creme fraiche","mantequilla","butter","beurre","ghee","yogur","yogurt","yoghurt","yaourt","joghurt","kefir","requeson","mozzarella","parmesano","parmigiano","parmesan","burrata","ricotta","mascarpone","cuajada","lactoalbumina","lactoglobulina",
+             // Quesos que suelen escribirse sin la palabra «queso»
+             "cheddar","brie","camembert","gouda","edam","gorgonzola","roquefort","provolone","feta","stracciatella","scamorza","emmental","gruyere","halloumi","pecorino","grana padano","taleggio","fontina","manchego","idiazabal","cabrales","tetilla","roncal","torta del casar","payoyo","majorero","rulo de cabra","philadelphia","labneh","labne","skyr","paneer","cottage","raclette",
+             "chantilly","capuchino","cappuccino","cafe bombon","cafe asiatico","cafe cortado","crema de orujo","crema de whisky","baileys","leche merengada"],
+    weak: ["bechamel","besamel","flan","natillas","crema catalana","helado","pesto","ganache","croqueta","lasana","lasagna","canelon","canelones","gratinado","gratinada","gratinados","gratinadas","au gratin","gratin","fondue","tiramisu","panna cotta","pannacotta","profiterol","carbonara","quiche","crema pastelera","batido","mousse","cachopo","san jacobo","brioche","croissant","cruasan","coulant","risotto","paparajote","ensalada cesar","salsa cesar"],
     free: /(^|[^a-z0-9])(?:sin leche|sin lacteos?|libre de lacteos?|libre de leche|dairy[\s-]free|milk[\s-]free|sans lait|senza latte|ohne milch|sin proteinas? de leche)(?=[^a-z0-9]|$)/,
     excl: ["re:leche\\s+de\\s+(?:coco|almendras?|avena|soja|arroz|avellanas?|anacardos?|tigre|chufa|canamo|quinoa|espelta|guisantes?|nuez|nueces)",
            "re:leches?\\s+vegetal(?:es)?", "re:(?:coconut|almond|oat|soy|soya|rice|cashew|hazelnut|pea)\\s+milk",
            "re:lait\\s+de\\s+(?:coco|amandes?|soja|riz|avoine)", "re:latte\\s+di\\s+(?:cocco|mandorla|soia|riso|avena)",
            "re:mantequilla\\s+de\\s+(?:cacahuetes?|mani|almendras?|anacardos?|cacao|karite)", "re:(?:peanut|cocoa|nut|almond|shea|cashew)\\s+butter",
-           "re:beurre\\s+de\\s+(?:cacahuetes?|cacao|karite)", "re:burro\\s+di\\s+cacao", "re:cream\\s+of\\s+tartar", "re:nata\\s+de\\s+coco"]
+           "re:beurre\\s+de\\s+(?:cacahuetes?|cacao|karite)", "re:burro\\s+di\\s+cacao", "re:cream\\s+of\\s+tartar", "re:nata\\s+de\\s+coco",
+           // Alternativas vegetales que se llaman como el lácteo
+           "re:(?:quesos?|natas?|mantequillas?|yogur(?:es|t)?|leches?|helados?)\\s+(?:vegan[oa]s?|vegetal(?:es)?)",
+           "re:(?:quesos?|yogur(?:es|t)?|natas?)\\s+de\\s+(?:soja|avena|almendras?|anacardos?|arroz|coco)",
+           // «manchego» como adjetivo (de La Mancha), no el queso
+           "re:(?:pisto|asadillo|tiznao|morteruelo|atascaburras|cordero|cocido|ajo|ajoarriero|gazpacho|caldero|caldo|potaje|guiso|migas|duelos\\s+y\\s+quebrantos)\\s+manchegos?", "re:a\\s+la\\s+manchega"]
   },
   "FRUTOS CON CÁSCARA": {
-    strong: ["frutos de cascara","fruto de cascara","frutos secos","fruto seco","nut","tree nuts","noix","fruits a coque","frutta a guscio","schalenfruchte","almendra","almond","amande","mandorla","mandorle","mandel*","avellana","hazelnut","noisette","nocciola","nocciole","haselnuss*","nuez","nueces","walnut","noce","noci","walnuss*","pecana","pacana","pecan","anacardo","cashew","cajou","anacardi","pistacho","pistachio","pistache","pistacchio","pistacchi","macadamia","nuez de brasil","castana de brasil","castana de para","brazil nut","praline","gianduja","gianduia","turron","mazapan","marzipan","nougat","pinon","pinones","pine nut"],
-    weak: ["romesco","pesto"],
+    strong: ["frutos de cascara","fruto de cascara","frutos secos","fruto seco","nut","tree nuts","noix","fruits a coque","frutta a guscio","schalenfruchte","almendra","almond","amande","mandorla","mandorle","mandel*","avellana","hazelnut","noisette","nocciola","nocciole","haselnuss*","nuez","nueces","walnut","noce","noci","walnuss*","pecana","pacana","pecan","anacardo","cashew","cajou","anacardi","pistacho","pistachio","pistache","pistacchio","pistacchi","macadamia","nuez de brasil","castana de brasil","castana de para","brazil nut","praline","gianduja","gianduia","turron","mazapan","marzipan","nougat","pinon","pinones","pine nut",
+             "marcona","frangipane","macaron","baklava","dukkah","nocilla","nutella","crocanti","carquinyoli","carquinoli","panellet","tarta de santiago","ajoblanco"],
+    weak: ["romesco","pesto","amaretto","amaretti","garrapinada","polvoron","alfajor"],
     excl: ["re:nuez\\s+moscada", "nutmeg", "re:noix\\s+de\\s+(?:coco|muscade)", "re:noce\\s+(?:moscata|di\\s+cocco)", "re:nuez\\s+de\\s+coco"]
   },
   "APIO": { strong: ["apio","celery","celeri","celeriac","sedano","apionabo","sellerie*"] },
   "MOSTAZA": { strong: ["mostaza","mustard","moutarde","senf*","senape","dijon"] },
-  "SÉSAMO": { strong: ["sesamo","sesame","sesam*","ajonjoli","tahini","tahina","tahin","gomasio","hummus","halva"] },
+  "SÉSAMO": { strong: ["sesamo","sesame","sesam*","ajonjoli","tahini","tahina","tahin","gomasio","hummus","halva","furikake","dukkah","re:za.?atar"] },
   "SULFITOS": {
-    strong: ["sulfito","sulfite","sulphite","solfito","solfiti","sulfit","dioxido de azufre","anhidrido sulfuroso","sulphur dioxide","sulfur dioxide","anhydride sulfureux","anidride solforosa","schwefeldioxid","metabisulfito","bisulfito","metabisulfite","bisulfite","vino","wine","vin","vinagre","vinagreta","vinegar","vinaigre","vinaigrette","aceto","sidra","cava","champan","vermut"],
+    strong: ["sulfito","sulfite","sulphite","solfito","solfiti","sulfit","dioxido de azufre","anhidrido sulfuroso","sulphur dioxide","sulfur dioxide","anhydride sulfureux","anidride solforosa","schwefeldioxid","metabisulfito","bisulfito","metabisulfite","bisulfite","vino","wine","vin","vinagre","vinagreta","vinegar","vinaigre","vinaigrette","aceto","sidra","cava","champan","vermut",
+             "jerez","pedro ximenez","oporto","marsala","sangria","tinto de verano","kalimotxo","calimocho","rebujito"],
     extra: /(^|[^a-z0-9])e[\s-]?22[0-8](?=[^0-9]|$)/
   },
   "ALTRAMUCES": { strong: ["altramuz","altramuces","lupin","lupine","lupino","lupini","lupinen"] },
-  "MOLUSCOS": { strong: ["molusco","mollusc","mollusk","mollusque","mollusco","molluschi","weichtiere","pulpo","octopus","poulpe","polpo","calamar","squid","calmar","calamaro","sepia","seiche","chipiron","puntillita","mejillon","mussel","moule","cozza","cozze","almeja","clam","palourde","vongole","ostra","oyster","huitre","ostrica","vieira","scallop","saint jacques","berberecho","cockle","navaja","caracol","snail","escargot","bigaro","lapa","zamburina","pota","abulon","oreja de mar"] }
+  "MOLUSCOS": {
+    strong: ["molusco","mollusc","mollusk","mollusque","mollusco","molluschi","weichtiere","pulpo","pulpito","octopus","poulpe","polpo","calamar","calamarcito","squid","calmar","calamaro","sepia","seiche","chipiron","puntillita","puntilla","mejillon","mussel","moule","cozza","cozze","almeja","almejita","clam","palourde","vongole","ostra","ostion","oyster","huitre","ostrica","vieira","scallop","saint jacques","berberecho","cockle","navaja","navajita","caracol","snail","escargot","bigaro","lapa","zamburina","pota","abulon","oreja de mar",
+             "choco","jibia","raba","arroz negro","chopito","coquina","tellerina","tallarina","tellina","volandeira","canailla","canadilla","busano","chirla","longueiron","muergo","escupina","sepionet","concha fina",
+             "marisco","mariscos","mariscada","seafood","fruits de mer","frutti di mare"],
+    excl: ["re:choco\\s+(?:blanco|negro|crunch|chips?|cookies?|bombon)"]
+  }
 };
 Object.values(AL_RULES).forEach(r => {
   r.strongRe = kwTest(r.strong);
@@ -1592,14 +1645,19 @@ function splitTraces(t) {
 }
 
 // Devuelve { a: alérgenos presentes, tr: alérgenos solo como trazas }
-function detectAllergens(raw) {
+// ctx (opcional): más texto del mismo plato que solo sirve para entender negaciones.
+// Así «PAN CON TOMATE» con el componente «Pan sin gluten» no se marca como GLUTEN.
+function detectAllergens(raw, ctx) {
   const full = " " + normText(raw) + " ";
-  const { main, trace } = splitTraces(stripNegations(full));
-  const neg = negatedWords(full);
+  const ctxFull = ctx ? " " + normText(ctx) + " " : "";
+  const base = splitTraces(stripNegations(full));
+  const neg = negatedWords(full + ctxFull);
   const a = [], tr = [];
   ALLERGENS.forEach(al => {
     const r = AL_RULES[al];
-    const freeOf = (r.free && r.free.test(full)) || (FREE_WORDS[al] || []).some(w => neg.has(w));
+    const freeOf = (r.free && (r.free.test(full) || (!!ctxFull && r.free.test(ctxFull)))) || (FREE_WORDS[al] || []).some(w => neg.has(w));
+    // Las excepciones se quitan antes y después de las negaciones («gazpacho sin pan» no es gluten)
+    const parts = r.exclRe ? splitTraces(stripNegations(full.replace(r.exclRe, "$1 "))) : base;
     const hit = txt => {
       const x = r.exclRe ? txt.replace(r.exclRe, "$1 ") : txt;
       if (r.strongRe.test(x)) return true;
@@ -1607,8 +1665,8 @@ function detectAllergens(raw) {
       if (r.weakRe && !freeOf && r.weakRe.test(x)) return true;
       return false;
     };
-    if (hit(main)) a.push(al);
-    else if (hit(trace)) tr.push(al);
+    if (hit(parts.main)) a.push(al);
+    else if (hit(parts.trace)) tr.push(al);
   });
   return { a, tr };
 }
@@ -1619,14 +1677,26 @@ function detectAllergensFromString(str) { return detectAllergens(str).a; }
 const DIET_TAG_LABELS = { CRUDO_EMBARAZO:"🤰 No apto embarazo", NO_VEGANO:"🌱 No vegano", NO_VEGETARIANO:"🥚 No vegetariano", CERDO:"🐷 Lleva cerdo", PICANTE:"🌶️ Picante" };
 const DIET_RULES = {
   CERDO: {
-    kw: ["cerdo","porcino","porcina","pork","porc","schwein","schweinefleisch","maiale","suino","jamon","bacon","beicon","panceta","pancetta","tocino","torrezno","chorizo","chistorra","salchichon","fuet","sobrasada","morcilla","butifarra","longaniza","salchicha","frankfurt","mortadela","mortadella","salami","pepperoni","prosciutto","guanciale","lacon","cochinillo","manteca de cerdo","manteca iberica","lard","saindoux","strutto","iberico","iberica","gelatina","gelatine","gelatin","e441"],
-    excl: ["re:jamon\\s+(?:de\\s+)?(?:pavo|pollo)", "re:(?:salchichas?|fiambres?|chorizos?|hamburguesas?|bacon|beicon)\\s+(?:de\\s+)?(?:pollo|pavo|ternera|vacuno|vegetal(?:es)?|veganos?|veganas?|veggie|tofu|soja)",
-           "re:gelatinas?\\s+(?:vegetal(?:es)?|de\\s+pescado|bovina|de\\s+vacuno|de\\s+ternera|halal|kosher)", "re:(?:bovine|fish|vegetable)\\s+gelatine?", "re:queso\\s+iberico"]
+    kw: ["cerdo","porcino","porcina","pork","porc","schwein","schweinefleisch","maiale","suino","jamon","bacon","beicon","panceta","pancetta","tocino","torrezno","chorizo","chistorra","salchichon","fuet","sobrasada","morcilla","butifarra","longaniza","salchicha","frankfurt","mortadela","mortadella","salami","pepperoni","prosciutto","guanciale","lacon","cochinillo","manteca de cerdo","manteca iberica","lard","saindoux","strutto","iberico","iberica","gelatina","gelatine","gelatin","e441",
+         // Cortes, platos y productos que son cerdo aunque no lo digan
+         "lomo","costilla","codillo","manitas","oreja","morro","papada","carrillada","carrillera","jabali","cochinita","carnitas","porchetta","speck","coppa","lardo","lardon","chicharron","pringa","fabada","callos","olla podrida","pote asturiano","pote gallego",
+         "cocido madrileno","cocido montanes","cocido lebaniego","cocido maragato","cocido gallego","cocido andaluz","carbonara","tonkatsu","tonkotsu","char siu","cachopo","san jacobo","flamenquin","embutido","mantecado","polvoron","manteca colora","manteca colorada","morcon","pulled pork","michirones","chato murciano","pastel de carne"],
+    excl: ["re:jamon\\s+(?:de\\s+)?(?:pavo|pollo)", "re:(?:salchichas?|fiambres?|chorizos?|hamburguesas?|bacon|beicon|embutidos?)\\s+(?:de\\s+)?(?:pollo|pavo|ternera|vacuno|vegetal(?:es)?|veganos?|veganas?|veggie|tofu|soja)",
+           "re:gelatinas?\\s+(?:vegetal(?:es)?|de\\s+pescado|bovina|de\\s+vacuno|de\\s+ternera|halal|kosher)", "re:(?:bovine|fish|vegetable)\\s+gelatine?", "re:queso\\s+iberico",
+           // Mismo corte, otro animal
+           "re:lomos?\\s+(?:alto|bajo)", "re:(?:lomos?|costillas?|carrilladas?|carrilleras?|morros?|manitas|orejas?)\\s+(?:alt[oa]s?\\s+|baj[oa]s?\\s+)?de\\s+(?:ternera|vaca|buey|vacuno|novillo|toro|cordero|lechazo|cabrito|ciervo|venado|corzo|caballo|potro|atun|bonito|bacalao|salmon|merluza|rape|corvina|lubina|dorada|pez\\s+espada|emperador|pescado|pollo|pavo|conejo|mar)",
+           "re:chicharrones?\\s+de\\s+(?:pollo|pescado|calamar)", "re:callos\\s+de\\s+bacalao", "re:tocino\\s+de\\s+cielo", "re:carbonaras?\\s+(?:vegana|vegetariana|de\\s+setas|de\\s+calabacin)"]
   },
   NO_VEGETARIANO: {
-    kw: ["carne","meat","viande","fleisch","carni","pollo","chicken","poulet","pavo","turkey","dinde","ternera","vacuno","buey","beef","boeuf","manzo","cordero","lamb","agneau","lamm","agnello","cabrito","conejo","rabbit","lapin","pato","duck","canard","oca","ganso","goose","codorniz","perdiz","faisan","ciervo","venado","jabali","caballo","caldo de ave","fondo de ave","ave","extracto de carne","foie","higado","callos","chicharron","hamburguesa","albondiga","embutido","fiambre","gelatina","gelatine","gelatin","cuajo animal","e441"],
-    excl: ["re:(?:hamburguesas?|albondigas?|salchichas?|carnes?|nuggets?|chorizos?)\\s+(?:vegetal(?:es)?|veganos?|veganas?|veggie|de\\s+soja|de\\s+seitan|de\\s+tofu|de\\s+heura)",
-           "re:carne\\s+de\\s+(?:membrillo|soja)", "re:gelatinas?\\s+vegetal(?:es)?"]
+    kw: ["carne","meat","viande","fleisch","carni","pollo","chicken","poulet","pavo","turkey","dinde","ternera","vacuno","buey","beef","boeuf","manzo","cordero","lamb","agneau","lamm","agnello","cabrito","conejo","rabbit","lapin","pato","duck","canard","oca","ganso","goose","codorniz","perdiz","faisan","ciervo","venado","jabali","caballo","caldo de ave","fondo de ave","ave","extracto de carne","foie","higado","callos","chicharron","hamburguesa","albondiga","embutido","fiambre","gelatina","gelatine","gelatin","cuajo animal","e441",
+         // Cortes, piezas y platos de carne que no llevan la palabra «carne»
+         "solomillo","entrecot","chuleton","chuleta","bistec","filete","lomo","costilla","carrillada","carrillera","rabo","codillo","manitas","oreja","morro","pechuga","muslo","contramuslo","alitas","nuggets","kebab","shawarma","gyros","doner","burger","hot dog","perrito caliente",
+         "vaca","novillo","lechazo","chivo","choto","corzo","gamo","liebre","pichon","torcaz","avestruz","magret","gallina","capon","picanton","pularda","cecina","rinon","molleja","sesos","criadillas","zarajo","gallinejas","entresijos","morteruelo",
+         "pate","demi glace","demiglace","consome","puchero","fabada","olla podrida","pote asturiano","pote gallego","cocido madrileno","cocido montanes","cocido lebaniego","cocido maragato","cocido gallego","cocido andaluz","bolonesa","bolognese","ragu","pringa","picanha","escalope","vitello","paella valenciana","michirones","pastel de carne","pastel de cierva","erizo de mar","erizos de mar","huevas de erizo"],
+    excl: ["re:(?:hamburguesas?|albondigas?|salchichas?|carnes?|nuggets?|chorizos?|filetes?|escalopes?|burgers?|bolonesas?|bolognese|pates?|kebabs?)\\s+(?:vegetal(?:es)?|veganos?|veganas?|veggie|vegetarian[oa]s?|de\\s+(?:soja|seitan|tofu|heura|lentejas?|garbanzos?|quinoa|verduras?|setas|champinones|alubias|judias|remolacha|boniato|calabaza|espinacas|berenjenas?|aceitunas?|olivas?|pimientos?|tomates?|alcachofas?))",
+           "re:(?:veggie|vegan[oa]?|vegetal(?:es)?|vegetarian[oa]s?)\\s+(?:burgers?|hamburguesas?|nuggets?)",
+           "re:carne\\s+de\\s+(?:membrillo|soja)", "re:gelatinas?\\s+vegetal(?:es)?",
+           "re:(?:leches?|quesos?|natas?|mantequillas?|yogur(?:es|t)?)\\s+de\\s+vaca"]
   },
   NO_VEGANO: {
     kw: ["miel","honey","miele","honig","jalea real","propoleo","propolis","cera de abeja","beeswax","carmin","cochinilla","e120","goma laca","shellac","e904","e901","lanolina","lanolin","cuajo","rennet","e542"],
@@ -1634,11 +1704,17 @@ const DIET_RULES = {
   },
   CRUDO_EMBARAZO: {
     rawRe: /(?:sin\s+pasteurizar|no\s+pasteurizad[oa]s?|leche\s+cruda|lait\s+cru|latte\s+crudo|unpasteuri[sz]ed|raw\s+milk|huevos?\s+crudos?)/,
-    kw: ["crudo","cruda","raw","ahumado","ahumada","smoked","fume","affumicato","tartar","tartare","carpaccio","tataki","sushi","sashimi","ceviche","cebiche","poke","foie gras","foie","jamon serrano","jamon iberico","jamon curado","jamon crudo","embutido","chorizo","salchichon","fuet","sobrasada","lomo embuchado","cecina","salami","prosciutto","mojama","pez espada","emperador","atun rojo","tiburon","cazon","marrajo","mielga","pintarroja","tintorera","lucio","mayonesa casera","poco hecha","poco hecho"],
-    excl: ["re:(?:pimenton|paprika|sal|aceite|azucar|aroma|ajo|te)(?:\\s+[a-z]+){0,3}\\s+ahumad[oa]s?", "re:raw\\s+(?:cane\\s+)?sugar", "re:smoked\\s+(?:paprika|salt)", "re:aceite[a-z\\s]{0,40}en\\s+crudo", "re:(?:cacao|azucar)\\s+crud[oa]s?", "re:aroma\\s+de\\s+humo"]
+    kw: ["crudo","cruda","raw","ahumado","ahumada","smoked","fume","affumicato","tartar","tartare","carpaccio","tataki","sushi","sashimi","ceviche","cebiche","poke","foie gras","foie","jamon serrano","jamon iberico","jamon curado","jamon crudo","embutido","chorizo","salchichon","fuet","sobrasada","lomo embuchado","cecina","salami","prosciutto","mojama","pez espada","emperador","atun rojo","tiburon","cazon","marrajo","mielga","pintarroja","tintorera","lucio","mayonesa casera","poco hecha","poco hecho",
+         "nigiri","gravlax","caviar","huevas","marinado","marinada","boquerones en vinagre","boqueron en vinagre","anchoas en vinagre","ostra","ostras","huevo poche","huevos poche","huevo mollet","huevo a baja temperatura","tiramisu","pate","morcon","erizo de mar","erizos de mar","huevas de erizo"],
+    excl: ["re:(?:pimenton|paprika|sal|aceite|azucar|aroma|ajo|te)(?:\\s+[a-z]+){0,3}\\s+ahumad[oa]s?", "re:raw\\s+(?:cane\\s+)?sugar", "re:smoked\\s+(?:paprika|salt)", "re:aceite[a-z\\s]{0,40}en\\s+crudo", "re:(?:cacao|azucar)\\s+crud[oa]s?", "re:aroma\\s+de\\s+humo",
+           "re:(?:pollo|pollos|carnes?|cerdo|ternera|cordero|costillas?|alitas?|pechugas?|muslos?|contramuslos?|verduras?|tofu|setas|champinones|tempeh|seitan|pinchos?|brochetas?)\\s+marinad[oa]s?",
+           "re:ostras?\\s+(?:a\\s+la\\s+brasa|gratinadas?|fritas?|al\\s+horno|a\\s+la\\s+plancha|al\\s+vapor|cocinadas?|en\\s+tempura|rebozadas?)",
+           "re:pates?\\s+de\\s+(?:aceitunas?|olivas?|setas|champinones|berenjenas?|pimientos?|tomates?|verduras?|garbanzos?|alcachofas?)",
+           // Carpaccio de fruta o verdura: crudo, pero sin riesgo para el embarazo
+           "re:carpaccios?\\s+de\\s+(?:pina|frutas?|melon|sandia|mango|pera|manzana|fresas?|kiwi|naranja|remolacha|calabacin|tomates?|setas|champinones|boletus|alcachofas?|pepino|verduras?)"]
   },
   PICANTE: {
-    kw: ["picante","guindilla","cayena","chile","chili","chilli","jalapeno","habanero","chipotle","tabasco","sriracha","wasabi","harissa","piri piri","peri peri","gochujang","sambal","peperoncino","piment","spicy","hot sauce","scharf","rocoto","aji","brava","kimchi","nduja","arrabbiata","diavola"],
+    kw: ["picante","guindilla","cayena","chile","chili","chilli","jalapeno","habanero","chipotle","tabasco","sriracha","wasabi","harissa","piri piri","peri peri","gochujang","sambal","peperoncino","piment","spicy","hot sauce","scharf","rocoto","aji","brava","kimchi","nduja","arrabbiata","diavola","mojo picon","diabla","vindaloo","pimientos de padron","pimiento de padron","pil pil","pilpil"],
     excl: ["re:(?:origen|producto|hecho|elaborado|fabricado|cosecha|vino)\\s*:?\\s*(?:de\\s+|en\\s+)?chile", "re:piment\\s+doux", "re:aji\\s+dulce"]
   }
 };
@@ -1671,18 +1747,45 @@ function detectDiets(raw, allergens) {
 }
 
 // Ingredientes personalizados del usuario ("ajo" no salta con "bajo" ni "ajonjolí")
+// Sinónimos y preparaciones de los ingredientes que más se evitan: quien evita el ajo
+// también debe enterarse de «gambas al ajillo», «alioli» o «ajoblanco».
+const CUSTOM_SYNONYMS = {
+  ajo: ["ajo","ajillo","ajete","alioli","allioli","aioli","all i oli","ali oli","ajoblanco","ajo blanco","ajada","ajoarriero","pil pil","pilpil","mojo","chimichurri","gremolata","pesto","tzatziki","romesco","salsa verde","garlic","ail","aglio","knoblauch"],
+  cebolla: ["cebolla","cebolleta","cebollita","chalota","chalote","escalonia","escalona","encebollado","encebollada","sofrito","pisto","onion","shallot","oignon","echalote","cipolla","scalogno","zwiebel"],
+  manzana: ["manzana","sidra","compota de manzana","tatin","strudel","calvados","apple","cider","pomme","mela","apfel"],
+  maiz: ["maiz","palomitas","polenta","maicena","mazorca","choclo","elote","nachos","totopos","arepa","maize","corn","mais"],
+  aguacate: ["aguacate","guacamole","palta","avocado","avocat"],
+  tomate: ["tomate","tomatito","tomatina","ketchup","catsup","salmorejo","gazpacho","tumaca","tumaka","pisto","sofrito","bolonesa","bolognese","marinara","arrabbiata","pomodoro","concasse","tomato","tomaten"],
+  cilantro: ["cilantro","coriandro","culantro","coriander","coriandre","coriandolo","koriander"],
+  jengibre: ["jengibre","gari","ginger","gingembre","zenzero","ingwer"],
+  limon: ["limon","limonada","limoncello","lemon","citron","limone","zitrone"],
+  nora: ["nora","romesco"],
+  setas: ["seta","champinon","hongo","boletus","rebozuelo","niscalo","senderuela","trompeta de la muerte","girgola","pleurotus","shiitake","portobello","enoki","shimeji","morilla","colmenilla","mushroom","funghi","pilze"]
+};
+function customTerms(term) {
+  const k = normText(term).trim().replace(/\s+/g, " ");
+  if (!k) return [];
+  // «ajos», «cebollas», «tomates» → también en singular
+  const forms = new Set([k]);
+  if (/ces$/.test(k) && k.length > 4) forms.add(k.slice(0, -3) + "z");          // nueces → nuez
+  else if (/[^aeiou]es$/.test(k) && k.length > 4) forms.add(k.slice(0, -2));  // champiñones → champiñón
+  if (/s$/.test(k) && k.length > 3) forms.add(k.slice(0, -1));                // ajos → ajo, setas → seta
+  const out = new Set(forms);
+  forms.forEach(f => (CUSTOM_SYNONYMS[f] || []).forEach(x => out.add(x)));
+  return [...out];
+}
 const customReCache = {};
 function customHit(text, term) {
   const k = normText(term).trim();
   if (!k) return false;
-  if (!customReCache[k]) customReCache[k] = kwTest([k]);
-  return customReCache[k].test(stripNegations(" " + normText(text) + " "));
+  if (!customReCache[k]) { const list = customTerms(k); customReCache[k] = list.length ? kwTest(list) : null; }
+  return !!customReCache[k] && customReCache[k].test(stripNegations(" " + normText(text) + " "));
 }
 
 // Perfil completo de un producto de casa (alérgenos, trazas y dietas)
 function productProfile(prod) {
   const text = `${prod.n || ""} . ${prod.sub || ""}`;
-  const det = detectAllergens(text);
+  const det = detectAllergens(text, prod.ctx);
   const a = new Set([...(prod.offA || []), ...det.a]);
   if (!prod.v2) (prod.a || []).forEach(x => a.add(x));       // productos guardados con versiones anteriores
   const tr = new Set([...(prod.tr || []), ...det.tr].filter(x => !a.has(x)));
@@ -1710,26 +1813,81 @@ function productTraceInfo(prod) {
 // Dietas de un ingrediente de restaurante: las marcadas por el local + las deducidas de sus alérgenos
 function ingDiets(ing) { return inferDietsFromAllergens(ing.a || [], new Set(ing.tags || [])); }
 
-// Evalúa un plato de restaurante con el perfil activo (el tuyo, o el del comensal en modo gestión)
+// Componentes que pone la app cuando la carta no detalla los ingredientes (lectura con IA)
+const ING_UNKNOWN = "Ingredientes sin detallar";
+const ING_LOOSE = "Alérgenos indicados en la carta";
+const ING_NAME = "Según el nombre del plato";
+const PLACEHOLDER_INGS = new Set([ING_UNKNOWN, ING_LOOSE, ING_NAME].map(x => normText(x)));
+function isPlaceholderIng(ing) { return PLACEHOLDER_INGS.has(normText(ing && ing.n).trim()); }
+const DIET_ASK = { CRUDO_EMBARAZO: "embarazo", NO_VEGANO: "dieta vegana", NO_VEGETARIANO: "dieta vegetariana", CERDO: "sin cerdo", PICANTE: "sin picante" };
+
+// El detector es costoso: cada texto se analiza una sola vez
+const detMemo = new Map();
+function memoDetect(kind, txt, extra) {
+  const key = kind + "\u0001" + txt + "\u0001" + (extra || "");
+  let v = detMemo.get(key);
+  if (v === undefined) {
+    v = kind === "a" ? detectAllergens(txt, extra) : detectDiets(txt, extra ? extra.split(",") : []);
+    if (detMemo.size > 6000) detMemo.clear();
+    detMemo.set(key, v);
+  }
+  return v;
+}
+
+// Evalúa un plato de restaurante con el perfil activo (el tuyo, o el del comensal en modo gestión).
+// Cuenta lo que marca el restaurante, lo que menciona el texto de cada componente y lo que dice el
+// NOMBRE del plato. Un plato sin ingredientes detallados nunca sale «compatible» si no se puede saber.
 function evaluateDish(dish, strict) {
   const S = activeSets();
   if (!S.al.size && !S.di.size && !S.cu.size) return { status:"aptos", rem:[], blk:[], tr:[] };
   const rem = [], blk = [];
-  let tr = [];
-  (dish.ings || []).forEach(ing => {
-    const alHits = (ing.a || []).filter(a => S.al.has(a));
-    const dHits = Array.from(ingDiets(ing)).filter(t => S.di.has(t)).map(t => DIET_TAG_LABELS[t] || t);
+  const covered = new Set();                     // "A:GLUTEN", "D:CERDO", "C:ajo": ya explicado por un componente
+  const ings = Array.isArray(dish.ings) ? dish.ings : [];
+  const traces = new Set((dish.traces || []).filter(t => S.al.has(t)));
+  ings.forEach(ing => {
     const txt = `${ing.n || ""} . ${ing.sub || ""}`;
-    const cHits = Array.from(S.cu).filter(c => customHit(txt, c)).map(c => `lleva ${c.toUpperCase()}`);
-    const all = [...alHits, ...dHits, ...cHits];
-    if (!all.length) return;
-    if (ing.mod) rem.push(`${esc(ing.note || ("Sin " + ing.n))} (${esc(all.join(", "))})`);
-    else blk.push(`${esc(ing.n)} (${esc(all.join(", "))})`);
+    const det = memoDetect("a", txt);
+    const declared = new Set(ing.a || []);
+    const allA = ALLERGENS.filter(x => declared.has(x) || det.a.includes(x));
+    const diets = new Set([...ingDiets(ing), ...memoDetect("d", txt, allA.join(","))]);
+    const labels = [];
+    allA.forEach(x => { if (S.al.has(x)) { covered.add("A:" + x); labels.push(declared.has(x) ? x : `${x} (según la descripción)`); } });
+    diets.forEach(t => { if (S.di.has(t)) { covered.add("D:" + t); labels.push(DIET_TAG_LABELS[t] || t); } });
+    S.cu.forEach(c => { if (customHit(txt, c)) { covered.add("C:" + c); labels.push(`lleva ${c.toUpperCase()}`); } });
+    det.tr.forEach(t => { if (S.al.has(t) && !allA.includes(t)) traces.add(t); });
+    if (!labels.length) return;
+    if (ing.mod) rem.push(`${esc(ing.note || ("Sin " + ing.n))} (${esc(labels.join(", "))})`);
+    else blk.push(`${esc(ing.n)} (${esc(labels.join(", "))})`);
   });
-  const traceHits = (dish.traces || []).filter(t => S.al.has(t));
-  if (traceHits.length) {
-    if (strict) blk.push(`Trazas en cocina (${esc(traceHits.join(", "))})`);
-    else tr = traceHits;
+  // Lo que dice el nombre y no explica ningún componente («TARTA DE QUESO» sin el lácteo marcado)
+  const named = new Set();
+  const name = String(dish.name || "").trim();
+  if (name) {
+    // La sección y los componentes sirven de contexto («SIN GLUTEN», «Pan sin gluten»)
+    const ctx = [dish.cat || "", ...ings.map(i => `${i.n || ""} . ${i.sub || ""}`)].join(" . ");
+    const nd = memoDetect("a", name, ctx);
+    const nDiets = memoDetect("d", name, nd.a.join(","));
+    const hits = [];
+    nd.a.forEach(x => { if (S.al.has(x) && !covered.has("A:" + x)) { hits.push(x); named.add("A:" + x); } });
+    nDiets.forEach(t => { if (S.di.has(t) && !covered.has("D:" + t)) { hits.push(DIET_TAG_LABELS[t] || t); named.add("D:" + t); } });
+    S.cu.forEach(c => { if (!covered.has("C:" + c) && customHit(name, c)) { hits.push(`lleva ${c.toUpperCase()}`); named.add("C:" + c); } });
+    nd.tr.forEach(t => { if (S.al.has(t) && !covered.has("A:" + t)) traces.add(t); });
+    if (hits.length) blk.push(`Según su nombre: ${esc(hits.join(", "))}. Confírmalo con el camarero`);
+  }
+  // Sin ingredientes detallados no se puede saber si encaja con tu dieta o lo que evitas
+  if (!ings.some(i => !isPlaceholderIng(i))) {
+    const allergenInfo = ings.some(i => (i.a || []).length) || (dish.traces || []).length > 0;
+    const unknown = [];
+    if (S.al.size && !allergenInfo) unknown.push("alérgenos");
+    S.di.forEach(t => { if (!covered.has("D:" + t) && !named.has("D:" + t)) unknown.push(DIET_ASK[t] || t); });
+    S.cu.forEach(c => { if (!covered.has("C:" + c) && !named.has("C:" + c)) unknown.push("sin " + c); });
+    if (unknown.length) blk.push(`No detalla sus ingredientes: pregunta al camarero (${esc(unknown.join(", "))})`);
+  }
+  let tr = [];
+  const trHits = ALLERGENS.filter(x => traces.has(x));
+  if (trHits.length) {
+    if (strict) blk.push(`Trazas en cocina (${esc(trHits.join(", "))})`);
+    else tr = trHits;
   }
   if (blk.length) return { status:"proh", rem, blk, tr };
   if (rem.length) return { status:"mod", rem, blk, tr };
@@ -2005,6 +2163,18 @@ function showView(v, fromBack) {
   if (v === "owner") renderOwnerSessionView();
   if (v === "app") renderRestaurantApp();
   window.scrollTo(0, 0);
+  syncAddressBar();
+}
+// Mientras ves la carta de un local de la nube, la dirección lleva ?r=<local>: si el navegador
+// recarga la página (o la compartes), vuelve a abrirse esa carta y no el mapa.
+let addressSyncReady = false;
+function syncAddressBar() {
+  if (!addressSyncReady) return;
+  try {
+    const r = currentView === "app" ? getActiveRest() : null;
+    const want = r && r.cloud && !r.suggestion && !isStaffUnlocked ? location.pathname + "?r=" + encodeURIComponent(r.id) : location.pathname;
+    if (location.pathname + location.search + location.hash !== want) history.replaceState(history.state, "", want);
+  } catch (e) {}
 }
 
 // ---------- Perfil personal ----------
@@ -2664,11 +2834,16 @@ function renderHomeDishes() {
   const list = getActiveHomeList();
   let safe = 0, unsafe = 0, html = "";
   (list.dishes || []).forEach(d => {
-    const conflicts = [];
+    const conflicts = [], seen = new Set();
     (d.ings || []).forEach(ing => {
       const c = checkProductConflicts(ing);
+      c.forEach(x => seen.add(x));
       if (c.length) conflicts.push(`${ing.n} (${c.join(", ")})`);
     });
+    // Lo que indica el nombre del plato y no explica ningún producto
+    const ctx = (d.ings || []).map(i => `${i.n || ""} . ${i.sub || ""}`).join(" . ");
+    const byName = checkProductConflicts({ n: d.name || "", sub: "", v2: true, ctx }).filter(x => !seen.has(x) && !/^Trazas de /.test(x));
+    if (byName.length) conflicts.push(`Según su nombre: ${byName.join(", ")}`);
     const isSafe = conflicts.length === 0;
     if (isSafe) safe++; else unsafe++;
     if ((currentHomeTab === "aptos" && !isSafe) || (currentHomeTab === "proh" && isSafe)) return;
@@ -3111,12 +3286,28 @@ function openRestaurantForDiner(id) {
   const r = getActiveRest();
   if (r.cloud) cloudInc(id, "views");
   else if (!ownsRestaurant(r)) r.stats.views = (r.stats.views || 0) + 1;
+  // ¿Es la carta de ahora? Mientras se comprueba, y si no se puede, el cliente lo ve claro
+  if (r.cloud && !r.suggestion) restFresh[id] = navigator.onLine === false ? "stale" : "checking";
   saveAppState(); showView("app");
-  if (r.cloud) cloudPullRestaurant(id).then(res => {
+  if (r.cloud) (async () => { if (!cloud && isCloudMode()) await initCloud(); return cloudPullRestaurant(id); })().then(res => {
+    if (!r.suggestion) restFresh[id] = res === true ? "fresh" : "stale";
     if (activeRestId !== id) return;
     if (res === "gone") { toast("Este local ya no está disponible.", "info"); showView("discover"); }
-    else if (res === true && currentView === "app") renderRestaurantApp();
+    else if (currentView === "app") renderRestaurantApp();
   });
+}
+// Texto bajo el nombre del local: cuándo la revisó el restaurante y si la que ves es la última
+function freshnessHtml(r) {
+  if (r.unclaimed) return "";
+  const rev = `Revisada por el local: ${esc(r.lastVerified || "sin fecha")}`;
+  if (isStaffUnlocked || !r.cloud || r.suggestion) {
+    return r.imported ? `✓ ${rev} · 📱 Copia recibida por código: si el local cambia la carta, pide el código nuevo.` : `✓ ${rev}`;
+  }
+  const st = restFresh[r.id];
+  if (st === "fresh") return `✓ Carta al día (comprobada ahora) · ${rev}`;
+  if (st === "checking") return `⏳ Comprobando si hay cambios en la carta… · ${rev}`;
+  const when = r.syncedAt ? new Date(r.syncedAt).toLocaleString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
+  return `<span class="stale-warn">⚠️ Sin conexión: estás viendo la copia guardada${when ? " el " + esc(when) : ""}. Puede haber cambios: confírmalo con el camarero.</span> · ${rev}`;
 }
 
 // ---------- Vista de la carta ----------
@@ -3133,7 +3324,7 @@ function renderRestaurantApp() {
   $("activeRestCity").innerText = r.city ? `📍 ${r.city}` : "";
   $("activeRestBadge").className = r.unclaimed ? "community-badge" : "verified-badge";
   $("activeRestBadge").innerText = r.demo ? "🧪 Carta de ejemplo (no es un restaurante real)" : (r.unclaimed ? "💡 Sugerido por la comunidad" : (r.imported ? "📱 Carta recibida por Bidi" : (r.cloud ? "🛡️ Carta publicada por el restaurante" : "🛡️ Zona Segura Verificada"))) + (r.founder ? " · 🏅 Fundador" : "");
-  $("activeRestLastVerified").innerText = r.unclaimed ? "" : `✓ Revisado: ${r.lastVerified || "sin fecha"}`;
+  $("activeRestLastVerified").innerHTML = freshnessHtml(r);
 
   $("dinerHeaderActions").style.display = isStaffUnlocked ? "none" : "flex";
   $("staffBar").classList.toggle("show", isStaffUnlocked);
@@ -3270,6 +3461,7 @@ function openDishModal(dishId = null) {
   $("editPublished").checked = d ? !d.draft : true;
   if (d) [...(d.ings || [])].reverse().forEach(ing => addIngRow(ing, false));   // se insertan arriba: así se mantiene el orden
   else addIngRow(null, false);
+  updateNameHint();
   openModal("dishModal");
   rememberModalState("dishModal");
 }
@@ -3302,9 +3494,9 @@ function addIngRow(ing = null, autoDetect = true) {
     </div>
     <input type="text" class="ing-note" placeholder="Cómo se adapta, lo verá el cliente (ej. Servir sin salsa)" maxlength="200" style="width:100%; padding:5px; margin-top:6px; border-radius:6px; border:1px solid var(--amber); background:#1c2541; color:#fde68a; font-size:0.72rem;">
     <div class="mini-label">Alérgenos de este componente:</div>
-    <div class="mini-chips ing-al-box">${ALLERGENS.map(a => `<div class="mini-chip" data-al="${esc(a)}" onclick="this.classList.toggle('selected')">${esc(a)}</div>`).join("")}</div>
+    <div class="mini-chips ing-al-box">${ALLERGENS.map(a => `<div class="mini-chip" data-al="${esc(a)}" onclick="this.classList.toggle('selected'); updateNameHint()">${esc(a)}</div>`).join("")}</div>
     <div class="mini-label">Dietas:</div>
-    <div class="mini-chips ing-diet-box">${DIET_IDS.map(d => `<div class="mini-chip" data-diet="${d}" onclick="this.classList.toggle('diet-sel')">${DIET_TAG_LABELS[d]}</div>`).join("")}</div>
+    <div class="mini-chips ing-diet-box">${DIET_IDS.map(d => `<div class="mini-chip" data-diet="${d}" onclick="this.classList.toggle('diet-sel'); updateNameHint()">${DIET_TAG_LABELS[d]}</div>`).join("")}</div>
     <div class="ing-auto-hint" style="display:none;"></div>`;
   card.querySelector(".ing-n").value = base.n;
   card.querySelector(".ing-sub").value = base.sub;
@@ -3312,8 +3504,14 @@ function addIngRow(ing = null, autoDetect = true) {
   card.querySelectorAll(".ing-al-box .mini-chip").forEach(el => { if (base.a.includes(el.dataset.al)) el.classList.add("selected"); });
   card.querySelectorAll(".ing-diet-box .mini-chip").forEach(el => { if (base.tags.includes(el.dataset.diet)) el.classList.add("diet-sel"); });
   setRowMod(card, base.mod);
-  card.querySelector(".ing-n").addEventListener("change", () => autoTickRow(card));
-  card.querySelector(".ing-sub").addEventListener("change", () => autoTickRow(card));
+  // Se marca mientras se escribe (no al salir del campo): si el aviso apareciera al tocar
+  // «Guardar», el botón se movería y el toque caería fuera
+  let tickTimer = null;
+  const tickSoon = () => { clearTimeout(tickTimer); tickTimer = setTimeout(() => autoTickRow(card), 350); };
+  ["input", "change"].forEach(ev => {
+    card.querySelector(".ing-n").addEventListener(ev, ev === "input" ? tickSoon : () => { clearTimeout(tickTimer); autoTickRow(card); });
+    card.querySelector(".ing-sub").addEventListener(ev, ev === "input" ? tickSoon : () => { clearTimeout(tickTimer); autoTickRow(card); });
+  });
   $("ingredientsEditor").prepend(card);
   if (autoDetect) autoTickRow(card);
   return card;
@@ -3335,6 +3533,26 @@ function autoTickRow(card) {
   addEditorTraces(det.tr);
   const hint = card.querySelector(".ing-auto-hint");
   if (added.length) { hint.style.display = "block"; hint.textContent = "🔍 Marcado automáticamente según el texto: " + added.join(", ") + ". Revísalo."; }
+  updateNameHint();
+}
+
+// Lo que el NOMBRE del plato indica y ningún componente explica: los clientes lo verán como aviso
+function editorComponents() {
+  return [...document.querySelectorAll("#ingredientsEditor .ing-editor-card")].map(card => ({
+    n: card.querySelector(".ing-n").value.trim(), sub: card.querySelector(".ing-sub").value.trim(),
+    a: [...card.querySelectorAll(".ing-al-box .mini-chip.selected")].map(el => el.dataset.al),
+    tags: [...card.querySelectorAll(".ing-diet-box .mini-chip.diet-sel")].map(el => el.dataset.diet)
+  })).filter(i => i.n);
+}
+function updateNameHint() {
+  const el = $("editNameHint");
+  if (!el) return;
+  const name = $("editName").value.trim().toUpperCase();
+  const info = name ? nameComponent(name, editorComponents(), true, $("editCat").value) : { ing: null };
+  if (!info.ing) { el.style.display = "none"; el.textContent = ""; return; }
+  const tags = info.ing.tags.filter(t => !(t === "NO_VEGANO" && info.ing.tags.includes("NO_VEGETARIANO")));
+  el.style.display = "block";
+  el.textContent = `🔍 Por el nombre del plato, la app avisará a los clientes de: ${[...info.ing.a, ...tags.map(t => DIET_TAG_LABELS[t] || t)].join(", ")}. Si el plato lo lleva, márcalo en su componente; si no, cambia el nombre.`;
 }
 
 async function saveDishFromModal() {
@@ -3358,6 +3576,10 @@ async function saveDishFromModal() {
     ings.push({ n, sub, mod, note, a, tags });
   });
   if (!ings.length) { toast("Añade al menos un componente con nombre.", "err"); return; }
+  // Si ya hay ingredientes de verdad, el aviso «Ingredientes sin detallar» de la lectura con IA sobra
+  if (ings.some(i => !isPlaceholderIng(i))) for (let k = ings.length - 1; k >= 0; k--) {
+    if (normText(ings[k].n).trim() === normText(ING_UNKNOWN) && !ings[k].a.length && !ings[k].tags.length) ings.splice(k, 1);
+  }
   if (warnings.length) {
     const ok = await uiConfirm("⚠️ El texto de estos componentes menciona alérgenos que no están marcados:\n\n" + warnings.join("\n") + "\n\n¿Guardar igualmente?", { okText: "Guardar igual", cancelText: "Revisar" });
     if (!ok) return;
@@ -3602,6 +3824,7 @@ let lastPublicPull = 0;
 let founderCount = null;       // plazas de Fundador ya ocupadas
 const pushedSnapshot = {};     // última versión subida de cada local (solo se suben cambios)
 const draftsInCloud = {};      // locales que tienen documento de borradores en la nube
+const restFresh = {};          // ¿la carta que ve el cliente es la última? "checking" | "fresh" | "stale"
 
 function cloudConfig() {
   const c = window.TUSALERGIAS_FIREBASE_CONFIG;
@@ -3816,9 +4039,17 @@ async function cloudPullOwner() {
     ids.add(id);
     const [m, st, dr] = await Promise.all([F.getDoc(F.doc(db, "menus", id)).catch(() => null), F.getDoc(F.doc(db, "stats", id)).catch(() => null),
       F.getDoc(F.doc(db, "drafts", id)).catch(() => null)]);
+    const local = getRest(id);
+    // Si en este móvil hay cambios aún sin subir, no se pisan (se subirán y el servidor dirá si chocan).
+    // Si la carta no se pudo leer, tampoco: no se vacía la copia del móvil por un fallo de red.
+    if (local && (!m || (pushedSnapshot[id] !== undefined && pushedSnapshot[id] !== restSnapshot(local)))) {
+      upsertCloudRest(id, { ...d.data(), name: local.name, city: local.city, phone: local.phone, lat: local.lat, lng: local.lng, lastVerified: local.lastVerified }, undefined, st && st.exists() ? st.data() : undefined);
+      continue;
+    }
     draftsInCloud[id] = !!(dr && dr.exists());
     const menu = mergeDrafts(m && m.exists() ? (m.data().menu || []) : [], dr && dr.exists() ? dr.data() : null);
     const r = upsertCloudRest(id, d.data(), menu, st && st.exists() ? st.data() : undefined);
+    r.ver = m && m.exists() ? String(m.data().ver || "") : "";
     pushedSnapshot[id] = restSnapshot(r);
   }
   removeLocalCloudRests(r => r.ownerUid === uidNow && !r.suggestion && !ids.has(r.id));
@@ -3837,7 +4068,10 @@ function mergeDrafts(pub, drDoc) {
   return out.map((d, k) => [d, k]).sort((x, y) => (pos(x[0].id) - pos(y[0].id)) || (x[1] - y[1])).map(x => x[0]);
 }
 
-// Al abrir un local: carta actual, reseñas y (si es tuyo) estadísticas
+// Al abrir un local: carta actual, reseñas y (si es tuyo) estadísticas.
+// Devuelve true si llegó del servidor, "cached" si Firebase solo tenía su copia (sin conexión),
+// false si falló y "gone" si el local ya no existe.
+const fromCacheSnap = x => !!(x && x.metadata && x.metadata.fromCache);
 async function cloudPullRestaurant(id) {
   if (!cloud) return false;
   const r = getRest(id);
@@ -3848,29 +4082,95 @@ async function cloudPullRestaurant(id) {
       const s = await F.getDoc(F.doc(db, "suggestions", r.sid));
       if (!s.exists() || s.data().claimed) { removeLocalCloudRests(x => x.id === id); saveAppState(); return "gone"; }
       upsertCloudSuggestion(r.sid, s.data()); saveAppState();
-      return true;
+      return fromCacheSnap(s) ? "cached" : true;
     }
     const mine = ownsRestaurant(r);
     let denied = false;
-    const [s, m, rv, st] = await Promise.all([
+    const [s, m, rv, st, dr] = await Promise.all([
       F.getDoc(F.doc(db, "restaurants", id)),
       // Con el cobro activo, el servidor no entrega la carta de un local sin suscripción
-      mine ? Promise.resolve(null) : F.getDoc(F.doc(db, "menus", id)).catch(e => { if (e && /permission/.test(e.code || "")) { denied = true; return null; } throw e; }),
+      F.getDoc(F.doc(db, "menus", id)).catch(e => { if (e && /permission/.test(e.code || "")) { denied = true; return null; } throw e; }),
       F.getDocs(F.query(F.collection(db, "restaurants", id, "reviews"), F.orderBy("createdAt", "desc"), F.limit(30))),
-      mine ? F.getDoc(F.doc(db, "stats", id)).catch(() => null) : Promise.resolve(null)
+      mine ? F.getDoc(F.doc(db, "stats", id)).catch(() => null) : Promise.resolve(null),
+      mine ? F.getDoc(F.doc(db, "drafts", id)).catch(() => null) : Promise.resolve(null)
     ]);
     if (!s.exists()) { removeLocalCloudRests(x => x.id === id); saveAppState(); return "gone"; }
-    // Si es tuyo, tu copia del móvil manda (puede tener cambios aún sin subir)
-    upsertCloudRest(id, mine ? { ...s.data(), name: r.name, city: r.city, phone: r.phone, lat: r.lat, lng: r.lng, lastVerified: r.lastVerified } : s.data(),
-      m && m.exists() ? (m.data().menu || []) : undefined, st && st.exists() ? st.data() : undefined);
+    const cached = fromCacheSnap(s) || fromCacheSnap(m) || fromCacheSnap(rv);
+    const stats = st && st.exists() ? st.data() : undefined;
+    if (mine) {
+      // Tu copia del móvil manda si tiene cambios sin subir. Si no, y la nube tiene otra versión
+      // (la cambiaste desde otro dispositivo), se carga la de la nube.
+      const pending = pushedSnapshot[id] === undefined || pushedSnapshot[id] !== restSnapshot(r);
+      const cloudVer = m && m.exists() ? String(m.data().ver || "") : "";
+      if (!pending && !cached && m && m.exists() && cloudVer !== (r.ver || "")) {
+        draftsInCloud[id] = !!(dr && dr.exists());
+        const rr = upsertCloudRest(id, s.data(), mergeDrafts(m.data().menu || [], dr && dr.exists() ? dr.data() : null), stats);
+        rr.ver = cloudVer;
+        pushedSnapshot[id] = restSnapshot(rr);
+        toast("🔄 Tu carta se ha actualizado con los cambios hechos desde otro dispositivo.", "info");
+      } else {
+        upsertCloudRest(id, { ...s.data(), name: r.name, city: r.city, phone: r.phone, lat: r.lat, lng: r.lng, lastVerified: r.lastVerified }, undefined, stats);
+      }
+    } else {
+      upsertCloudRest(id, s.data(), m && m.exists() ? (m.data().menu || []) : undefined);
+    }
     const rr = getRest(id);
     rr.reviews = rv.docs.map(reviewFromDoc);
     rr.menuDenied = denied;
     if (denied) rr.menu = [];
+    if (!cached) rr.syncedAt = Date.now();
     saveAppState();
-    return true;
+    return cached ? "cached" : true;
   } catch (e) { console.warn("pullRestaurant:", e); return false; }
 }
+
+// Vuelve a cargar de la nube un local tuyo (tras un choque con otro dispositivo)
+async function reloadOwnedFromCloud(rid) {
+  const { F, db } = cloud;
+  const [s, m, dr] = await Promise.all([
+    F.getDocFromServer(F.doc(db, "restaurants", rid)),
+    F.getDocFromServer(F.doc(db, "menus", rid)),
+    F.getDocFromServer(F.doc(db, "drafts", rid)).catch(() => null)
+  ]);
+  if (!s.exists()) { removeLocalCloudRests(x => x.id === rid); saveAppState(); return; }
+  draftsInCloud[rid] = !!(dr && dr.exists());
+  const r = upsertCloudRest(rid, s.data(), mergeDrafts(m.exists() ? (m.data().menu || []) : [], dr && dr.exists() ? dr.data() : null));
+  r.ver = m.exists() ? String(m.data().ver || "") : "";
+  r.syncedAt = Date.now();
+  pushedSnapshot[rid] = restSnapshot(r);
+  saveAppState();
+}
+// Al volver a la app tras un rato: tus locales (si no tienes cambios sin subir) y la carta que estás mirando
+async function refreshAfterResume() {
+  if (!cloud) return;
+  if (cloudOwner()) {
+    for (const r of appState.restaurants.filter(x => x.cloud && !x.suggestion && x.ownerUid === cloudUser.uid)) {
+      if (pushedSnapshot[r.id] === undefined || pushedSnapshot[r.id] !== restSnapshot(r)) continue;
+      try {
+        const m = await cloud.F.getDoc(cloud.F.doc(cloud.db, "menus", r.id));
+        if (!fromCacheSnap(m) && m.exists() && String(m.data().ver || "") !== (r.ver || "")) {
+          await reloadOwnedFromCloud(r.id);
+          toast("🔄 Tu carta se ha actualizado con los cambios hechos desde otro dispositivo.", "info");
+          if (currentView === "app" && activeRestId === r.id) renderRestaurantApp();
+        }
+      } catch (e) { console.warn("refresco:", e); }
+    }
+  }
+  const cur = getActiveRest();
+  if (currentView === "app" && !isStaffUnlocked && cur && cur.cloud && !cur.suggestion) {
+    restFresh[cur.id] = "checking"; renderRestaurantApp();
+    const res = await cloudPullRestaurant(cur.id);
+    restFresh[cur.id] = res === true ? "fresh" : "stale";
+    if (currentView === "app" && activeRestId === cur.id) renderRestaurantApp();
+  }
+}
+let hiddenSince = 0;
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") { hiddenSince = Date.now(); return; }
+  const away = hiddenSince ? Date.now() - hiddenSince : 0;
+  hiddenSince = 0;
+  if (away >= 60000) refreshAfterResume();
+});
 
 // ---------- Escritura de tus locales ----------
 let pushTimer = null;
@@ -3885,35 +4185,62 @@ function setSync(state) {
   el.textContent = state === "saving" ? (navigator.onLine === false ? "📴 Sin conexión: se subirá al volver" : "⏳ Guardando en la nube…")
     : state === "ok" ? "☁️ Guardado en la nube" : state === "error" ? "⚠️ No se pudo guardar en la nube" : "";
 }
+// Cada subida lleva una versión nueva y la versión sobre la que se hizo (base). Las reglas solo la
+// aceptan si la base es la versión que hay en la nube: un móvil con la carta vieja no puede pisar
+// lo que se cambió desde otro dispositivo.
+function newVer() {
+  try { const a = new Uint8Array(10); crypto.getRandomValues(a); return Array.from(a, b => (b % 36).toString(36)).join("") + Date.now().toString(36); }
+  catch (e) { return Math.random().toString(36).slice(2, 12) + Date.now().toString(36); }
+}
+const resolvingConflict = {};
 function pushOwnedChanges() {
   if (!cloudOwner()) return;
   const { F, db } = cloud;
   appState.restaurants.filter(r => r.cloud && !r.suggestion && r.ownerUid === cloudUser.uid).forEach(r => {
+    if (resolvingConflict[r.id]) return;
     const snap = restSnapshot(r);
     if (pushedSnapshot[r.id] === snap) return;
     pushedSnapshot[r.id] = snap;
     setSync("saving");
     const all = sanitizeMenu(r.menu);
     const pub = all.filter(d => !d.draft), drafts = all.filter(d => d.draft);
+    const base = r.ver || "", ver = newVer();
+    r.ver = ver;
+    try { localStorage.setItem(STATE_KEY, JSON.stringify(appState)); } catch (e) {}
     const b = F.writeBatch(db);
     b.set(F.doc(db, "restaurants", r.id), restSummary(r), { merge: true });
-    b.set(F.doc(db, "menus", r.id), { menu: withoutDraftFlag(pub), updatedAt: F.serverTimestamp() });
-    const main = b.commit();
-    // Borradores: documento privado aparte (si falla, lo publicado se guarda igual)
-    const needDrafts = drafts.length > 0 || draftsInCloud[r.id];
-    const side = needDrafts
-      ? F.setDoc(F.doc(db, "drafts", r.id), { menu: withoutDraftFlag(drafts), order: all.map(d => d.id), updatedAt: F.serverTimestamp() })
-          .then(() => { draftsInCloud[r.id] = true; })
-          .catch(e => { throw Object.assign(e || new Error("borradores"), { drafts: true }); })
-      : Promise.resolve();
-    Promise.all([main, side]).then(() => setSync("ok")).catch(e => {
-      delete pushedSnapshot[r.id];
-      setSync("error");
-      toast(e && e.drafts && /permission/i.test(cloudErr(e))
-        ? "⚠️ Los borradores no se pudieron guardar en la nube: falta actualizar las reglas de Firestore. Lo publicado sí se ha guardado."
-        : "⚠️ No se pudo guardar en la nube: " + cloudErr(e), "err");
-    });
+    b.set(F.doc(db, "menus", r.id), { menu: withoutDraftFlag(pub), updatedAt: F.serverTimestamp(), ver, base });
+    // Borradores: documento privado aparte, en la misma operación (todo o nada)
+    const withDrafts = drafts.length > 0 || draftsInCloud[r.id];
+    if (withDrafts) b.set(F.doc(db, "drafts", r.id), { menu: withoutDraftFlag(drafts), order: all.map(d => d.id), updatedAt: F.serverTimestamp() });
+    b.commit().then(() => { if (withDrafts) draftsInCloud[r.id] = true; setSync("ok"); }).catch(e => onPushError(r.id, base, ver, e));
   });
+}
+async function onPushError(rid, base, ver, e) {
+  delete pushedSnapshot[rid];
+  const r = getRest(rid);
+  const undo = () => { if (r && r.ver === ver) { r.ver = base; try { localStorage.setItem(STATE_KEY, JSON.stringify(appState)); } catch (x) {} } };
+  if (!/permission/i.test(cloudErr(e))) { undo(); setSync("error"); toast("⚠️ No se pudo guardar en la nube: " + cloudErr(e), "err"); return; }
+  // ¿Lo rechazó el servidor porque otro dispositivo cambió la carta? Se mira la versión que hay allí
+  let cloudVer = null;
+  try { const m = await cloud.F.getDocFromServer(cloud.F.doc(cloud.db, "menus", rid)); cloudVer = m.exists() ? String(m.data().ver || "") : ""; } catch (x) {}
+  if (cloudVer !== null && r && cloudVer === r.ver) { setSync("ok"); return; }        // ya está resuelto
+  if (cloudVer !== null && cloudVer !== base && cloudVer !== ver) {
+    if (resolvingConflict[rid]) return;
+    resolvingConflict[rid] = true;
+    try { await reloadOwnedFromCloud(rid); } catch (x) { console.warn("recarga:", x); }
+    finally { delete resolvingConflict[rid]; }
+    setSync("ok");
+    if (currentView === "app" && activeRestId === rid) renderRestaurantApp();
+    else if (currentView === "owner") renderOwnerSessionView();
+    uiAlert("🔄 Tu carta se había cambiado desde otro dispositivo. Hemos cargado la versión más reciente para no borrar esos cambios.\n\nTu último cambio no se ha guardado: vuelve a hacerlo.");
+    return;
+  }
+  undo();
+  setSync("error");
+  toast(cloudVer === base
+    ? "⚠️ No se pudo guardar en la nube: faltan las reglas nuevas de Firestore (versión 3.6.1). Tus cambios siguen en este móvil."
+    : "⚠️ No se pudo guardar en la nube: " + cloudErr(e), "err");
 }
 
 function freeSlotsFor(uidNow) {
@@ -3928,14 +4255,14 @@ async function cloudCreateRestaurant(data) {
   if (!ownerPulledOk) { try { await cloudPullOwner(); } catch (e) { uiAlert("Necesitas conexión a internet para dar de alta un restaurante."); return null; } }
   const { F, db } = cloud;
   for (const rid of freeSlotsFor(cloudUser.uid)) {
-    const r = sanitizeRest({ ...data, id: rid, cloud: true, ownerUid: cloudUser.uid, menu: [], reviews: [], lastVerified: today() });
+    const r = sanitizeRest({ ...data, id: rid, cloud: true, ownerUid: cloudUser.uid, menu: [], reviews: [], lastVerified: today(), ver: newVer() });
     try {
       await F.runTransaction(db, async tx => {
         const ref = F.doc(db, "restaurants", rid);
         const ex = await tx.get(ref);
         if (ex.exists()) throw Object.assign(new Error("ocupado"), { code: "slot-taken" });
         tx.set(ref, { ...restSummary(r), createdAt: F.serverTimestamp(), founder: !!(ownerProfile.founderNumber > 0), fromSuggestion: data.fromSuggestion || "" });
-        tx.set(F.doc(db, "menus", rid), { menu: [], updatedAt: F.serverTimestamp() });
+        tx.set(F.doc(db, "menus", rid), { menu: [], updatedAt: F.serverTimestamp(), ver: r.ver, base: "" });
         if (data.fromSuggestion) tx.update(F.doc(db, "suggestions", data.fromSuggestion), { claimed: true, claimedBy: cloudUser.uid, claimedRid: rid });
       });
       r.founder = ownerProfile.founderNumber > 0;
@@ -3946,7 +4273,8 @@ async function cloudCreateRestaurant(data) {
       return r;
     } catch (e) {
       if (e && e.code === "slot-taken") { await cloudPullOwner().catch(() => {}); continue; }
-      uiAlert("⚠️ No se pudo crear el restaurante: " + cloudErr(e) + (navigator.onLine === false ? "\n\nNecesitas conexión a internet." : ""));
+      uiAlert("⚠️ No se pudo crear el restaurante: " + cloudErr(e) + (navigator.onLine === false ? "\n\nNecesitas conexión a internet." : "")
+        + (/permission/.test(cloudErr(e)) ? "\n\nSi acabas de actualizar la app, publica las reglas nuevas de Firestore (versión 3.6.1)." : ""));
       return null;
     }
   }
@@ -3985,17 +4313,61 @@ async function ensureCloudUser() {
   const cred = await cloud.A.signInAnonymously(cloud.auth);
   return cred.user;
 }
+// Cada opinión lleva el resumen (SHA-256) de una llave secreta que solo guarda este móvil.
+// Con ella se puede borrar aunque después entres o salgas de una cuenta (cambia tu usuario).
+function randomKey() {
+  const a = new Uint8Array(32); crypto.getRandomValues(a);
+  return btoa(String.fromCharCode(...a)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+// En hexadecimal (64 caracteres, minúsculas): así no depende de variantes de base64 en las reglas
+async function sha256hex(text) {
+  const h = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)));
+  return Array.from(h, b => b.toString(16).padStart(2, "0")).join("");
+}
+function myReviewKey(id, revId) {
+  const p = id + "/" + revId + "|";
+  const hit = appState.myReviews.find(x => x.startsWith(p));
+  return hit ? hit.slice(p.length) : "";
+}
 async function cloudAddReview(id, rv) {
   const u = await ensureCloudUser();
   const { F, db } = cloud;
   const ref = F.doc(F.collection(db, "restaurants", id, "reviews"));
-  appState.myReviews.push(id + "/" + ref.id);
-  const done = F.setDoc(ref, { author: rv.author, stars: rv.stars, allergens: rv.allergens, comment: rv.comment, isAlert: !!rv.isAlert, authorUid: u.uid, createdAt: F.serverTimestamp() });
+  let key = "", delHash = null;
+  try { key = randomKey(); delHash = await sha256hex(key); } catch (e) { key = ""; delHash = null; }
+  appState.myReviews.push(id + "/" + ref.id + (key ? "|" + key : ""));
+  const data = { author: rv.author, stars: rv.stars, allergens: rv.allergens, comment: rv.comment, isAlert: !!rv.isAlert, authorUid: u.uid, createdAt: F.serverTimestamp() };
+  if (delHash) data.delHash = delHash;
+  // Con las reglas antiguas (sin llave) se publica igual, sin llave
+  const done = F.setDoc(ref, data).catch(e => {
+    if (!delHash || !/permission/.test(e && e.code || "")) throw e;
+    delete data.delHash;
+    appState.myReviews = appState.myReviews.map(p => p === id + "/" + ref.id + "|" + key ? id + "/" + ref.id : p);
+    return F.setDoc(ref, data);
+  });
   return { id: ref.id, uid: u.uid, done };
 }
+// Borra una opinión tuya: con tu usuario si es el mismo, o con la llave guardada en este móvil.
+// Devuelve true si ya no existe.
 async function cloudDeleteReview(id, revId) {
-  await cloud.F.deleteDoc(cloud.F.doc(cloud.db, "restaurants", id, "reviews", revId));
-  appState.myReviews = appState.myReviews.filter(p => p !== id + "/" + revId);
+  const { F, db } = cloud;
+  const ref = F.doc(db, "restaurants", id, "reviews", revId);
+  const key = myReviewKey(id, revId);
+  const forget = () => { appState.myReviews = appState.myReviews.filter(p => p !== id + "/" + revId && !p.startsWith(id + "/" + revId + "|")); };
+  const me = cloud.auth.currentUser;
+  let s = null;
+  try { s = await F.getDoc(ref); } catch (e) { /* sin permiso de lectura no ocurre: las opiniones son públicas */ }
+  if (s && !s.exists()) { forget(); return true; }
+  const author = s && s.exists() ? s.data().authorUid : null;
+  if (me && author && author === me.uid) await F.deleteDoc(ref);
+  else if (key) {
+    const b = F.writeBatch(db);
+    b.set(F.doc(db, "reviewDeletes", revId), { rid: id, key, at: F.serverTimestamp() });
+    b.delete(ref);
+    await b.commit();
+  } else await F.deleteDoc(ref);          // dueño del local o administración
+  forget();
+  return true;
 }
 async function cloudSuggest(d) {
   const u = await ensureCloudUser();
@@ -4055,14 +4427,17 @@ async function cloudGoogle() {
 async function cloudCreateOwnerProfile() {
   const { F, db } = cloud;
   const me = cloudUser;
+  const fRef = F.doc(db, "meta", "founders"), oRef = F.doc(db, "owners", me.uid), mRef = F.doc(db, "founderMarks", me.uid);
+  // Una cuenta que ya tuvo plaza de Fundador no puede volver a pedir otra (con reglas antiguas no hay marca)
+  let marked = false, marksOn = true;
+  try { marked = (await F.getDoc(mRef)).exists(); } catch (e) { marksOn = !/permission/.test(e && e.code || ""); }
   await F.runTransaction(db, async tx => {
-    const fRef = F.doc(db, "meta", "founders"), oRef = F.doc(db, "owners", me.uid);
     const f = await tx.get(fRef);
     const o = await tx.get(oRef);
     if (o.exists()) return;
     const count = f.exists() ? (Number(f.data().count) || 0) : 0;
-    const founderNumber = count < PLAN.founderMax ? count + 1 : 0;
-    if (founderNumber) tx.set(fRef, { count: founderNumber });
+    const founderNumber = !marked && count < PLAN.founderMax ? count + 1 : 0;
+    if (founderNumber) { tx.set(fRef, { count: founderNumber }); if (marksOn) tx.set(mRef, { n: founderNumber }); }
     tx.set(oRef, { email: me.email || "", plan: "lanzamiento", founderNumber, termsVersion: PLAN.termsVersion, termsAcceptedAt: F.serverTimestamp(), createdAt: F.serverTimestamp() });
   });
   const s = await F.getDoc(F.doc(db, "owners", me.uid));
@@ -4104,14 +4479,19 @@ async function cloudDeleteAccount() {
   ownerProfile = null;
   return true;
 }
-// Borra desde este móvil las reseñas que escribiste (para "Borrar todos mis datos")
+// Borra desde este móvil las opiniones que escribiste (para "Borrar todos mis datos").
+// Devuelve cuántas no se pudieron borrar (sin conexión, o publicadas antes de la llave con otro usuario).
 async function cloudDeleteMyReviews() {
-  if (!cloud || !appState.myReviews.length) return;
+  if (!cloud || !appState.myReviews.length) return 0;
+  let failed = 0;
   for (const p of appState.myReviews.slice()) {
-    const [rid, revId] = p.split("/");
-    try { await cloud.F.deleteDoc(cloud.F.doc(cloud.db, "restaurants", rid, "reviews", revId)); } catch (e) {}
+    const [path] = p.split("|");
+    const [rid, revId] = path.split("/");
+    // Sin conexión, el borrado se quedaría esperando: a los 15 s se cuenta como no borrada
+    try { await Promise.race([cloudDeleteReview(rid, revId), new Promise((_, no) => setTimeout(() => no(new Error("sin respuesta")), 15000))]); }
+    catch (e) { failed++; console.warn("borrar opinión:", e); }
   }
-  appState.myReviews = [];
+  return failed;
 }
 
 // ============================================================
@@ -4194,13 +4574,14 @@ async function refreshOwnerProfile() {
 }
 
 // Llamadas a las Cloud Functions (se cargan solo cuando hacen falta)
-async function callFn(name, data) {
+async function callFn(name, data, opts) {
+  if (!cloud && isCloudMode()) await initCloud();
   if (!cloud) throw Object.assign(new Error("Sin conexión con el servidor"), { code: "sin-nube" });
   if (!cloud.Fn) {
     const M = await import(`https://www.gstatic.com/firebasejs/${FB_VERSION}/firebase-functions.js`);
     cloud.Fn = { M, f: M.getFunctions(cloud.app, BILLING.region) };
   }
-  return cloud.Fn.M.httpsCallable(cloud.Fn.f, name)(data || {});
+  return cloud.Fn.M.httpsCallable(cloud.Fn.f, name, opts)(data || {});
 }
 function fnErrorText(e) {
   const c = String(e && e.code || "");
@@ -4579,89 +4960,25 @@ async function toggleUsage(on) {
 
 // ============================================================
 // SUBIR LA CARTA CON UNA FOTO (inteligencia artificial)
-// - El restaurante hace fotos de su carta (o sube un PDF) y Gemini, a través de Firebase
-//   AI Logic, devuelve los platos con sus ingredientes, alérgenos y trazas.
+// - El restaurante hace fotos de su carta (o sube un PDF) y el servidor de TusAlergias se las
+//   pasa a Gemini (Vertex AI de Google Cloud), que devuelve los platos con sus ingredientes,
+//   alérgenos y trazas. La función del servidor es «leerCartaIA» (servidor/ia).
+// - El servidor comprueba que es una cuenta de restaurante y aplica los límites diarios: desde
+//   el móvil no se puede llamar a la IA directamente ni saltarse el límite.
 // - NUNCA se publica nada sin que el restaurante revise y confirme cada plato: la IA puede
 //   equivocarse y la responsabilidad legal de la información es del restaurante.
-// - El detector de alérgenos de la app repasa lo que lee la IA y avisa de contradicciones.
-// - Usa un SDK de Firebase más moderno solo para esta función, en una instancia aparte.
-// - Proveedor: Agent Platform de Google Cloud (antes Vertex AI), de pago por uso. Es el que
-//   permiten las condiciones de Google para apps con usuarios en la UE (la capa gratuita de la
-//   API de Gemini no se puede ofrecer a usuarios europeos) y no usa las cartas para entrenar.
+// - El detector de alérgenos de la app repasa lo que lee la IA (también el NOMBRE del plato)
+//   y avisa de contradicciones.
 // ============================================================
 const MENU_AI = {
-  sdk: "12.17.0",
-  provider: () => window.TUSALERGIAS_AI_PROVIDER === "gemini" ? "gemini" : "agent",
-  model: () => (typeof window.TUSALERGIAS_AI_MODEL === "string" && window.TUSALERGIAS_AI_MODEL.trim()) || "gemini-3.8-flash",
-  fallbackModel: "gemini-3.5-flash",   // estable hasta, como pronto, mayo de 2027
+  fn: "leerCartaIA",
   maxFiles: 8,
-  maxPerDay: 15,                 // lecturas por móvil y día (cuida la cuota gratuita)
-  dayKey: "tusalergias_ia_dia"
+  maxPdfBytes: 6 * 1024 * 1024,     // un PDF más grande: mejor fotos de las páginas
+  maxTotalB64: 9 * 1024 * 1024,     // lo que admite el servidor en una lectura
+  imageSide: 1600,                  // las fotos se reducen en el móvil: llegan antes y gastan menos
+  timeoutMs: 300000
 };
-let menuAiCtx = null, maiFiles = [], maiDishes = [], maiRun = 0;
-
-function appCheckKey() {
-  const k = window.TUSALERGIAS_APPCHECK_KEY;
-  return typeof k === "string" && k.trim() && !/PEGA|TU_/i.test(k) ? k.trim() : null;
-}
-async function getMenuAi() {
-  if (menuAiCtx) return menuAiCtx;
-  const cfg = cloudConfig();
-  if (!cfg) throw Object.assign(new Error("sin servidor"), { code: "sin-servidor" });
-  const base = `https://www.gstatic.com/firebasejs/${MENU_AI.sdk}/`;
-  const [appM, acM, aiM] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-app-check.js"), import(base + "firebase-ai.js")]);
-  const app = appM.initializeApp(cfg, "tusalergias-ia");
-  const key = appCheckKey();
-  if (key) acM.initializeAppCheck(app, { provider: new acM.ReCaptchaEnterpriseProvider(key), isTokenAutoRefreshEnabled: true });
-  const backend = MENU_AI.provider() === "gemini" ? new aiM.GoogleAIBackend() : new (aiM.AgentPlatformBackend || aiM.VertexAIBackend)("global");
-  const ai = aiM.getAI(app, { backend });
-  const S = aiM.Schema;
-  const alList = S.array({ items: S.enumString({ enum: ALLERGENS }) });
-  const schema = S.object({
-    properties: {
-      dishes: S.array({
-        items: S.object({
-          properties: {
-            category: S.string({ description: "Sección de la carta en mayúsculas, por ejemplo ENTRANTES" }),
-            name: S.string({ description: "Nombre del plato en mayúsculas, sin precio" }),
-            ingredients: S.array({
-              items: S.object({
-                properties: { name: S.string(), details: S.string(), allergens: alList },
-                optionalProperties: ["details"]
-              })
-            }),
-            allergens: alList,
-            traces: alList,
-            uncertain: S.boolean(),
-            note: S.string()
-          },
-          optionalProperties: ["note"]
-        })
-      })
-    }
-  });
-  const models = {};
-  const modelFor = name => models[name] || (models[name] = aiM.getGenerativeModel(ai, {
-    model: name,
-    generationConfig: { responseMimeType: "application/json", responseSchema: schema, temperature: 0.1 }
-  }));
-  menuAiCtx = { modelFor };
-  return menuAiCtx;
-}
-
-function menuAiPrompt() {
-  return `Eres un asistente que digitaliza cartas de restaurantes españoles para una app de alérgenos.
-Lee la carta de las imágenes o del PDF y devuelve TODOS los platos y bebidas que se pueden pedir.
-Para cada plato:
-- category: la sección de la carta tal como aparece, en mayúsculas (por ejemplo ENTRANTES, CARNES, POSTRES). Si no hay secciones, CARTA.
-- name: el nombre del plato en mayúsculas, sin precio.
-- ingredients: los ingredientes que menciona la carta, cada uno con los alérgenos que contiene (puedes deducirlos: la galleta lleva GLUTEN, la nata LÁCTEO, la mayonesa HUEVO). En details pon aclaraciones que aparezcan (por ejemplo «harina de trigo, leche»).
-- allergens: los alérgenos que la carta indica para el plato, con iconos, números o tabla. Usa la leyenda de la carta para interpretarlos.
-- traces: los alérgenos que la carta indica como «puede contener» o «trazas».
-- uncertain: true si algo no se lee bien, si la carta no indica alérgenos para ese plato o si dudas; explica el motivo en note, en español.
-Usa solo estos 14 alérgenos, escritos exactamente así: ${ALLERGENS.join(", ")}.
-No inventes ingredientes que la carta no mencione. No incluyas precios, horarios ni textos que no sean platos.`;
-}
+let maiFiles = [], maiDishes = [], maiRun = 0;
 
 // ---------- Quién puede usarla ----------
 // Solo restaurantes con cuenta de Hostelería (email o Google), en un local suyo publicado en la nube.
@@ -4713,76 +5030,56 @@ function onMenuAiFiles(ev) {
 function fileToBase64(blob) {
   return new Promise((resolve, reject) => {
     const r = new FileReader();
-    r.onload = () => resolve(String(r.result).split(",")[1]);
+    r.onload = () => resolve(String(r.result).split(",")[1] || "");
     r.onerror = () => reject(r.error);
     r.readAsDataURL(blob);
   });
 }
 async function prepareMenuFile(f) {
   if (f.type === "application/pdf") {
-    if (f.size > 10 * 1024 * 1024) throw Object.assign(new Error("El PDF pesa más de 10 MB. Prueba a hacer fotos de las páginas."), { code: "muy-grande" });
-    return { inlineData: { mimeType: "application/pdf", data: await fileToBase64(f) } };
+    if (f.size > MENU_AI.maxPdfBytes) throw Object.assign(new Error("El PDF pesa más de 6 MB. Haz fotos de las páginas o divídelo."), { code: "muy-grande" });
+    return { mimeType: "application/pdf", data: await fileToBase64(f) };
   }
   const bmp = await createImageBitmap(f);
-  const scale = Math.min(1, 2048 / Math.max(bmp.width, bmp.height));
+  const scale = Math.min(1, MENU_AI.imageSide / Math.max(bmp.width, bmp.height));
   const c = document.createElement("canvas");
   c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
   c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
-  const blob = await new Promise(res => c.toBlob(res, "image/jpeg", 0.85));
-  return { inlineData: { mimeType: "image/jpeg", data: await fileToBase64(blob) } };
+  const blob = await new Promise(res => c.toBlob(res, "image/jpeg", 0.8));
+  return { mimeType: "image/jpeg", data: await fileToBase64(blob) };
 }
 
-function modelGone(e) { return /\b404\b|NOT_FOUND|is not found|not supported for generateContent/i.test(String((e && e.message) || e)); }
 function menuAiErrorText(e) {
-  const m = String((e && (e.code || "")) + " " + (e && e.message || ""));
-  if (/sin-servidor/.test(m)) return "La app no está conectada a su servidor.";
-  if (/muy-grande/.test(m)) return e.message;
-  if (/limite-dia/.test(m)) return e.message;
-  if (/app.?check|attestation|unauthenticated/i.test(m)) return "Falta activar la protección App Check para la IA (guía: «Carta con foto»).";
-  if (/billing|BILLING_DISABLED|prepay/i.test(m)) return "Falta activar el plan de pago por uso (Blaze) en Firebase para la IA (guía: «Carta con foto»).";
-  if (/not been used|disabled|api-not-enabled|PERMISSION_DENIED|403/i.test(m)) return "Falta activar Firebase AI Logic en la consola de Firebase (guía: «Carta con foto»).";
-  if (/\b429\b|quota|RESOURCE_EXHAUSTED|rate.?limit/i.test(m)) return "Ahora mismo hay demasiadas lecturas. Inténtalo dentro de unos minutos.";
-  if (modelGone(e)) return "El modelo de IA no está disponible. Revisa TUSALERGIAS_AI_MODEL en firebase-config.js.";
-  if (navigator.onLine === false || /failed to fetch|networkerror|network-request-failed|load failed/i.test(m)) return "Sin conexión a internet. Inténtalo de nuevo.";
-  if ((e && e.name === "SyntaxError") || /valid JSON|JSON\.parse/i.test(m)) return "No se pudo entender la respuesta. Prueba con una foto más nítida.";
-  return "No se pudo leer la carta: " + ((e && e.message) || e);
-}
-function aiDayCount(add) {
-  const today = localDay();
-  let d = { day: today, n: 0 };
-  try { const s = JSON.parse(localStorage.getItem(MENU_AI.dayKey) || "null"); if (s && s.day === today) d = s; } catch (e) {}
-  if (add) { d.n += add; try { localStorage.setItem(MENU_AI.dayKey, JSON.stringify(d)); } catch (e) {} }
-  return d.n;
+  const c = String(e && e.code || ""), m = String(e && e.message || "");
+  if (/muy-grande/.test(c)) return m;
+  if (/sin-nube/.test(c)) return "La app no está conectada a su servidor.";
+  if (/not-found|unimplemented/.test(c)) return "La lectura con IA aún no está activada en el servidor de TusAlergias (guía: «Carta con foto»).";
+  if (/resource-exhausted|invalid-argument|failed-precondition|permission-denied|data-loss/.test(c) && m) return m;
+  if (/unauthenticated/.test(c)) return "Entra en Hostelería con tu cuenta de restaurante.";
+  if (/deadline-exceeded/.test(c)) return "La lectura ha tardado demasiado. Prueba con menos páginas a la vez.";
+  if (navigator.onLine === false || /unavailable|network/.test(c) || /failed to fetch|networkerror|load failed/i.test(m)) return m && /unavailable/.test(c) ? m : "Sin conexión a internet. Inténtalo de nuevo.";
+  return "No se pudo leer la carta: " + (m || c || e);
 }
 
 async function readMenuWithAi() {
   if (!maiFiles.length) return;
   if (!menuAiAllowed()) { closeMenuAiModal(true); openMenuAiModal(); return; }
-  if (aiDayCount(0) >= MENU_AI.maxPerDay) { uiAlert(`Has hecho ${MENU_AI.maxPerDay} lecturas hoy desde este móvil. Mañana podrás seguir; mientras, puedes añadir platos a mano.`); return; }
   const run = ++maiRun;
   maiStep("busy");
   try {
-    const { modelFor } = await getMenuAi();
-    const parts = [menuAiPrompt()];
-    for (const f of maiFiles) parts.push(await prepareMenuFile(f));
-    const size = parts.slice(1).reduce((t, x) => t + x.inlineData.data.length, 0);
-    if (size > 18 * 1024 * 1024) throw Object.assign(new Error("Los archivos pesan demasiado juntos. Léelos en dos veces."), { code: "muy-grande" });
+    const files = [];
+    for (const f of maiFiles) files.push(await prepareMenuFile(f));
+    const size = files.reduce((t, x) => t + x.data.length, 0);
+    if (size > MENU_AI.maxTotalB64) throw Object.assign(new Error("Los archivos pesan demasiado juntos. Léelos en dos veces."), { code: "muy-grande" });
     if (run !== maiRun) return;
-    aiDayCount(1);
-    // Si Google retira el modelo elegido, se usa el de reserva sin que el restaurante note nada
-    let res = null, lastErr = null;
-    for (const name of [...new Set([MENU_AI.model(), MENU_AI.fallbackModel])]) {
-      try { res = await modelFor(name).generateContent(parts); break; }
-      catch (e) { lastErr = e; if (!modelGone(e)) throw e; console.warn("IA carta: modelo no disponible", name); }
-    }
-    if (!res) throw lastErr;
+    const res = await callFn(MENU_AI.fn, { files }, { timeout: MENU_AI.timeoutMs });
     if (run !== maiRun) return;                 // se cerró la ventana mientras leía
-    const text = res && res.response && typeof res.response.text === "function" ? res.response.text() : "";
-    const json = JSON.parse(text);
-    maiDishes = aiToDishes(json);
+    const out = res && res.data || {};
+    maiDishes = aiToDishes(out);
     if (!maiDishes.length) { maiStep("pick"); uiAlert("No hemos encontrado platos en estas fotos. Prueba con fotos más cercanas y con buena luz, una por página."); return; }
     renderMenuAiReview();
     maiStep("review");
+    if (typeof out.quedan === "number") toast(`📸 Carta leída. Te quedan ${Math.max(0, out.quedan)} ${out.quedan === 1 ? "lectura" : "lecturas"} hoy.`, "info");
   } catch (e) {
     if (run !== maiRun) return;
     console.warn("IA carta:", e);
@@ -4796,11 +5093,30 @@ function normAllergen(x) {
   const k = normText(String(x || "")).toUpperCase().trim();
   return ALLERGENS.find(a => normText(a).toUpperCase() === k) || null;
 }
+// Componente «Según el nombre del plato» con lo que el nombre indica y ningún ingrediente explica
+const NAME_WARNING = "El nombre del plato indica ";
+function nameComponent(name, ings, keepNameIng, cat) {
+  const others = keepNameIng ? ings : ings.filter(i => normText(i.n).trim() !== normText(ING_NAME));
+  const ctx = [cat || "", ...others.map(i => i.n + " . " + i.sub)].join(" . ");
+  const nd = detectAllergens(name, ctx);
+  const covered = new Set(others.flatMap(i => [...(i.a || []), ...detectAllergens(i.n + " . " + i.sub).a]));
+  const nameAl = nd.a.filter(a => !covered.has(a));
+  const tagsHave = new Set(others.flatMap(i => [...ingDiets(i), ...detectDiets(i.n + " . " + i.sub, i.a || [])]));
+  const nameTags = detectDiets(name, nd.a).filter(t => !tagsHave.has(t));
+  if (!nameAl.length && !nameTags.length) return { ing: null, warning: "", traces: nd.tr };
+  return {
+    ing: { n: ING_NAME, sub: name, mod: false, note: "", a: nameAl, tags: nameTags },
+    warning: NAME_WARNING + [...nameAl, ...nameTags.map(t => DIET_TAG_LABELS[t] || t)].join(", ") + ": lo hemos añadido, compruébalo.",
+    traces: nd.tr
+  };
+}
 function aiToDishes(json) {
   const list = Array.isArray(json && json.dishes) ? json.dishes : [];
   // Alérgenos válidos, sin repetir y en el orden oficial de la app
   const uniq = arr => { const set = new Set((Array.isArray(arr) ? arr : []).map(normAllergen)); return ALLERGENS.filter(x => set.has(x)); };
-  return list.slice(0, 300).map((d, k) => {
+  return list.slice(0, 300).map(d => {
+    d = d || {};
+    const name = (str(String(d.name || "").trim(), 160) || "PLATO").toUpperCase();
     const warnings = [], textTraces = new Set();
     const ings = (Array.isArray(d.ingredients) ? d.ingredients : []).slice(0, 40).map(i => {
       const n = str(String(i && i.name || "").trim(), 160);
@@ -4812,23 +5128,31 @@ function aiToDishes(json) {
       const found = det.a.filter(a => !marked.includes(a));
       if (found.length) warnings.push(`«${n}» menciona ${found.join(", ")}: lo hemos marcado, compruébalo.`);
       const a = ALLERGENS.filter(x => marked.includes(x) || found.includes(x));
-      return { n, sub, mod: false, note: "", a, tags: detectDiets(n + " " + sub, a) };
+      return { n, sub, mod: false, note: "", a, tags: detectDiets(n + " . " + sub, a) };
     }).filter(i => i.n);
-    const dishAl = uniq(d.allergens);
+    const realCount = ings.length;
+    // Alérgenos que la carta indica para el plato (iconos o tabla) y no están en ningún ingrediente
     const covered = new Set(ings.flatMap(i => i.a));
-    const loose = dishAl.filter(a => !covered.has(a));
+    const loose = uniq(d.allergens).filter(a => !covered.has(a));
     if (loose.length) {
-      ings.push({ n: ings.length ? "Alérgenos indicados en la carta" : "Ingredientes sin detallar", sub: "", mod: false, note: "", a: loose, tags: detectDiets("", loose) });
+      ings.push({ n: ING_LOOSE, sub: "", mod: false, note: "", a: loose, tags: detectDiets("", loose) });
       warnings.push(`La carta indica ${loose.join(", ")} sin decir en qué ingrediente.`);
+      loose.forEach(a => covered.add(a));
     }
-    if (!ings.length) ings.push({ n: "Ingredientes sin detallar", sub: "", mod: false, note: "", a: [], tags: [] });
+    // Lo que dice el NOMBRE del plato y no explica ningún ingrediente («CARPACCIO DE BUEY»)
+    const nameInfo = nameComponent(name, ings, false, d.category);
+    nameInfo.traces.forEach(t => textTraces.add(t));
+    if (nameInfo.ing) { ings.push(nameInfo.ing); warnings.push(nameInfo.warning); }
+    if (!realCount) {
+      ings.unshift({ n: ING_UNKNOWN, sub: "", mod: false, note: "", a: [], tags: [] });
+      warnings.push("La carta no detalla los ingredientes: añádelos al editar el plato. Mientras, los clientes con dietas o ingredientes que evitar verán «pregunta al camarero».");
+    }
     const allAl = new Set(ings.flatMap(i => i.a));
     if (!allAl.size) warnings.push("No se ha detectado ningún alérgeno. Comprueba que de verdad no tiene.");
     if (d.uncertain) warnings.push("La IA tiene dudas" + (d.note ? `: ${str(d.note, 200)}` : "."));
     return {
       cat: (str(String(d.category || "").trim(), 60) || "CARTA").toUpperCase(),
-      name: (str(String(d.name || "").trim(), 160) || "PLATO").toUpperCase(),
-      protocol: "", traces: ALLERGENS.filter(x => uniq(d.traces).includes(x) || textTraces.has(x)), ings, warnings, reviewed: false, discarded: false
+      name, protocol: "", traces: ALLERGENS.filter(x => uniq(d.traces).includes(x) || textTraces.has(x)), ings, warnings, reviewed: false, discarded: false
     };
   });
 }
@@ -4859,6 +5183,13 @@ function renderMenuAiReview() {
 function maiEdit(k, field, value) {
   const d = maiDishes[k]; if (!d) return;
   d[field] = (str(String(value || "").trim(), field === "cat" ? 60 : 160) || (field === "cat" ? "CARTA" : "PLATO")).toUpperCase();
+  if (field !== "name") return;
+  // Con otro nombre, lo que «dice el nombre» se vuelve a calcular
+  d.ings = d.ings.filter(i => normText(i.n).trim() !== normText(ING_NAME));
+  d.warnings = d.warnings.filter(w => !w.startsWith(NAME_WARNING));
+  const info = nameComponent(d.name, d.ings, false, d.cat);
+  if (info.ing) { d.ings.push(info.ing); d.warnings.push(info.warning); }
+  renderMenuAiReview();
 }
 function maiReview(k, on) { if (maiDishes[k]) { maiDishes[k].reviewed = !!on; renderMenuAiReview(); } }
 async function maiReviewAll() {
@@ -5051,7 +5382,9 @@ async function reportMenuDiscrepancy() {
 }
 function canDeleteReview(r, rv) {
   if (isStaffUnlocked) return true;
-  return !!(r.cloud && cloud && cloudUser && rv.authorUid && rv.authorUid === cloudUser.uid);
+  if (!r.cloud) return false;
+  // Tuya: la publicaste con este usuario o este móvil guarda su llave de borrado
+  return !!((cloud && cloudUser && rv.authorUid && rv.authorUid === cloudUser.uid) || (cloud && myReviewKey(r.id, rv.id)));
 }
 async function deleteReviewById(id) {
   const r = getActiveRest();
@@ -5179,15 +5512,22 @@ function openPrivacyModal() {
 }
 function openTermsModal() { openModal("termsModal"); }
 async function deleteAllMyData() {
+  if (isCloudMode() && !cloud) await initCloud();      // así se sabe bien si hay cuenta de hostelería
   const owner = cloudOwner();
   const msg = "Se borrarán de este móvil tu perfil de alergias, tus platos caseros, rutas, reseñas y restaurantes." +
     (cloud ? " También se borrarán de la nube las opiniones que publicaste desde este móvil." : "") +
     (owner ? `\n\nTambién se eliminará tu cuenta de hostelería (${cloudUser.email}) con sus locales, cartas y estadísticas.` : "") +
     "\n\nNo se puede deshacer. Si quieres conservarlos, exporta antes una copia de seguridad.";
   if (!await uiConfirm(msg, { okText: "Borrar todo", danger: true })) return;
+  if (isCloudMode() && navigator.onLine === false && (appState.myReviews.length || owner)) {
+    const wait = await uiConfirm("📴 No hay conexión: lo que publicaste no se puede borrar de la nube ahora.\n\n¿Lo dejamos para cuando tengas conexión?", { okText: "Sí, esperar", cancelText: "Seguir igualmente" });
+    if (wait) return;
+  }
   if (cloud) {
+    try { if (cloud.auth.authStateReady) await cloud.auth.authStateReady(); } catch (e) {}
     try {
-      await cloudDeleteMyReviews();
+      const failed = await cloudDeleteMyReviews();
+      if (failed && !await uiConfirm(`⚠️ No se han podido borrar ${failed} ${failed === 1 ? "opinión tuya" : "opiniones tuyas"} de la nube (¿sin conexión?).\n\nSi continúas, se borra todo lo demás y para borrarlas tendrás que escribirnos a tusalergiasapp@gmail.com indicando el restaurante y la fecha. ¿Continuar?`, { okText: "Continuar", cancelText: "Volver", danger: true })) return;
       await cloudDeleteUsage();
       if (owner && !await cloudDeleteAccount()) return;
       try { await cloud.A.signOut(cloud.auth); } catch (e) {}
@@ -5236,6 +5576,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   if (accion === "escanear") setTimeout(openUniversalScanner, 300);
   else if (accion === "casa") showView("home");
   initBackButton();
+  addressSyncReady = true;
+  syncAddressBar();
   renderUsageToggle();
   pingUsage();
 });

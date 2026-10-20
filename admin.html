@@ -224,13 +224,14 @@ if (!cfg || !okVal(cfg.apiKey) || !okVal(cfg.projectId) || !okVal(cfg.appId)) {
     const count = async q => (await F.getCountFromServer(q)).data().count;
     try {
       const now = F.Timestamp.fromMillis(Date.now());
-      const [nOwners, nRests, nPublished, nSuggs, nPaying, founders] = await Promise.all([
+      const [nOwners, nRests, nPublished, nSuggs, nPaying, founders, aiTot] = await Promise.all([
         count(F.collection(db, "owners")),
         count(F.collection(db, "restaurants")),
         count(F.query(F.collection(db, "restaurants"), F.where("published", "==", true))),
         count(F.query(F.collection(db, "suggestions"), F.where("claimed", "==", false))),
         count(F.query(F.collection(db, "owners"), F.where("paidUntil", ">", now), F.orderBy("paidUntil"))).catch(() => null),
-        F.getDoc(F.doc(db, "meta", "founders"))
+        F.getDoc(F.doc(db, "meta", "founders")),
+        F.getDoc(F.doc(db, "aiUsage", "_total")).catch(() => null)
       ]);
       const nFounders = founders.exists() ? Number(founders.data().count) || 0 : 0;
       // Personas que usan la app (contador anónimo, una ficha por móvil)
@@ -250,14 +251,18 @@ if (!cfg || !okVal(cfg.apiKey) || !okVal(cfg.projectId) || !okVal(cfg.appId)) {
       [[dash(uTotal), "personas han usado la app"], [dash(u7), "activas en los últimos 7 días"], [dash(u30), "activas en los últimos 30 días"], [dash(uNew), "nuevas esta semana"], [dash(uRepeat), "han vuelto otro día"], [dash(uPlay), "usan la app de Google Play"]]
         .forEach(([n, label]) => { const d = document.createElement("div"); d.className = "stat"; const b = document.createElement("b"); b.textContent = n; const s = document.createElement("span"); s.textContent = label; d.append(b, s); ub.appendChild(d); });
       box.textContent = "";
-      [[nOwners, "cuentas de restaurante"], [`${nFounders} / 30`, "Fundadores"], [nPublished, "locales con carta publicada"], [nRests, "locales creados"], [nSuggs, "sugerencias sin reclamar"], [nPaying == null ? "—" : nPaying, "cuentas con suscripción activa"]]
+      // Lecturas de cartas con IA hoy (las cuenta el servidor, por día de Madrid)
+      const madrid = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+      const aiToday = aiTot && aiTot.exists() && aiTot.data().day === madrid ? Number(aiTot.data().n) || 0 : 0;
+      [[nOwners, "cuentas de restaurante"], [`${nFounders} / 30`, "Fundadores"], [nPublished, "locales con carta publicada"], [nRests, "locales creados"], [nSuggs, "sugerencias sin reclamar"], [nPaying == null ? "—" : nPaying, "cuentas con suscripción activa"], [aiToday, "lecturas de cartas con IA hoy"]]
         .forEach(([n, label]) => { const d = document.createElement("div"); d.className = "stat"; const b = document.createElement("b"); b.textContent = n; const s = document.createElement("span"); s.textContent = label; d.append(b, s); box.appendChild(d); });
       $("statsNote").textContent = `Actualizado: ${new Date().toLocaleString("es-ES")}. Una idea para decidir cuándo cobrar: que haya al menos 50 locales con carta publicada y que los clientes las abran cada semana (mira «Uso de las cartas»).`;
     } catch (e) { box.textContent = errText(e); }
   }
 
   // ---------- Inicio del cobro ----------
-  function minDateStr() { const d = new Date(Date.now() + 31 * DAY); return d.toISOString().slice(0, 10); }
+  // Fecha mínima: hoy + 32 días en hora local (así siempre hay 30 días completos, también con cambio de hora)
+  function minDateStr() { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + 32); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
   async function loadPlan() {
     $("planDate").min = minDateStr();
     try {
