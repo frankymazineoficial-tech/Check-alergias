@@ -684,7 +684,9 @@ El equipo de TusAlergias`;
     const b1 = F.writeBatch(db);
     b1.set(F.doc(db, "restaurants", newRid), { ownerUid: c.uid, name: x.name, city: x.city || "", phone: x.phone || "", lat: x.lat, lng: x.lng, lastVerified: x.lastVerified || "",
       published: !!x.published, dishCount: Number(x.dishCount) || 0, updatedAt: now, createdAt: x.createdAt || F.Timestamp.now(),
-      founder: (Number(os.data().founderNumber) || 0) > 0, fromSuggestion: x.fromSuggestion || "", verified: true, verifiedAt: now, instance: newId() });
+      founder: (Number(os.data().founderNumber) || 0) > 0, fromSuggestion: x.fromSuggestion || "", verified: true, verifiedAt: now, instance: newId(),
+      // 3.9.2: la fecha de pago de la cuenta que lo recibe (si no, con el cobro activo la carta quedaría oculta)
+      ...(os.data().paidUntil ? { paidUntil: os.data().paidUntil } : {}) });
     const eqOld = ms.exists() && Array.isArray(ms.data().equip) ? ms.data().equip.slice(0, 12) : [];
     b1.set(F.doc(db, "menus", newRid), { menu: ms.exists() ? (ms.data().menu || []) : [], updatedAt: now, ver: newId(), base: "", ...(eqOld.length ? { equip: eqOld } : {}) });
     if (ss && ss.exists()) { const st = ss.data(); b1.set(F.doc(db, "stats", newRid), { views: Number(st.views) || 0, saves: Number(st.saves) || 0, bookings: Number(st.bookings) || 0, alerts: Number(st.alerts) || 0 }); }
