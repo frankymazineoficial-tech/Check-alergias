@@ -1,0 +1,15 @@
+Librerías de terceros que usa TusAlergias, servidas desde este mismo sitio, junto a index.html
+(así ningún servidor externo recibe la dirección IP de quien usa la app al cargarlas).
+
+- Leaflet 1.9.4 (mapa) · BSD 2-Clause · © 2010-2023 Volodymyr Agafonkin, © 2010-2011 CloudMade · https://leafletjs.com
+  Archivos: leaflet.js, leaflet.css, marker-icon.png, marker-icon-2x.png, marker-shadow.png, layers.png, layers-2x.png
+- html5-qrcode 2.3.8 (escáner de códigos) · Apache License 2.0 · https://github.com/mebjas/html5-qrcode
+  Archivo: html5-qrcode.min.js
+- tesseract.js 5.1.1 (lector de etiquetas) · Apache License 2.0 · https://github.com/naptha/tesseract.js
+  Archivos: tesseract.min.js, tesseract-worker.min.js (incluye idb-keyval 6.2.1, Apache 2.0, y zlib.js 0.3.1, MIT)
+- tesseract.js-core 5.1.1 · Apache License 2.0 · https://github.com/naptha/tesseract.js-core
+  Archivos: tesseract-core-simd-lstm.wasm.js, tesseract-core-lstm.wasm.js
+- Datos de idioma español de Tesseract (4.0.0_best_int) · Apache License 2.0 · https://github.com/naptha/tessdata
+  Archivo: spa.traineddata.gz
+
+Texto de la licencia Apache 2.0: https://www.apache.org/licenses/LICENSE-2.0

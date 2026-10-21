@@ -40,6 +40,10 @@
   .msg.ok { color:#6ee7b7; } .msg.err { color:#fca5a5; }
   .pill { display:inline-block; padding:2px 8px; border-radius:20px; font-size:0.72rem; font-weight:700; background:rgba(56,189,248,0.15); color:var(--accent); }
   [hidden] { display:none !important; }
+  .item { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px; margin-top:10px; font-size:0.82rem; line-height:1.45; }
+  .item .q { color:#cbd5e1; font-style:italic; margin:6px 0; white-space:pre-wrap; word-break:break-word; }
+  .item .who, td .who { color:var(--muted); font-size:0.76rem; margin-top:3px; white-space:pre-wrap; word-break:break-word; }
+  .item .who b { color:var(--text); }
 </style>
 <script src="firebase-config.js"></script>
 </head>
@@ -112,14 +116,54 @@
     <section class="card">
       <h2>Cuentas de restaurante y aviso por email</h2>
       <p class="muted">Las condiciones prometen avisar por email con 30 días de antelación. Copia los emails en el campo <b>CCO</b> (copia oculta) de tu correo, nunca en «Para».</p>
+      <p class="muted">«Retirar plaza» quita la plaza de Fundador a una cuenta falsa o abusiva: la plaza queda libre para otra y esa cuenta no podrá recuperarla.</p>
       <div class="row"><button class="btn btn-primary" id="btnOwners">Cargar cuentas</button>
         <button class="btn btn-outline" id="btnCopyEmails" disabled>Copiar emails</button>
         <button class="btn btn-outline" id="btnCsv" disabled>Descargar CSV</button></div>
       <div class="msg" id="ownersMsg"></div>
-      <div class="scroll"><table id="ownersTable" hidden><thead><tr><th>Email</th><th>Fundador</th><th>Alta</th><th>Suscripción</th></tr></thead><tbody></tbody></table></div>
+      <div class="scroll"><table id="ownersTable" hidden><thead><tr><th>Email</th><th>Fundador</th><th>Alta</th><th>Suscripción</th><th></th></tr></thead><tbody></tbody></table></div>
       <label for="mailText">Texto del email de aviso</label>
       <textarea id="mailText" readonly style="min-height:220px;"></textarea>
       <div class="row" style="margin-top:8px;"><button class="btn btn-outline" id="btnCopyMail">Copiar texto del email</button></div>
+    </section>
+
+    <section class="card">
+      <h2>Denuncias de opiniones</h2>
+      <p class="muted">Las opiniones solo las borran su autor y la administración. Cuando un restaurante (o un cliente) denuncia una, decides tú: <b>retirarla</b> si incumple las normas (es falsa, ofensiva, tiene datos personales o publicidad), <b>quitar solo la respuesta del local</b> si lo que incumple es la respuesta, o <b>mantenerla</b>. Mientras decides, sigue visible. No retires una opinión solo porque sea negativa.</p>
+      <button class="btn btn-primary" id="btnReports">Cargar denuncias pendientes</button>
+      <div class="msg" id="reportsMsg"></div>
+      <div id="reportsList"></div>
+    </section>
+
+    <section class="card">
+      <h2>Reclamaciones de locales</h2>
+      <p class="muted">Alguien dice que un local ya registrado por otra cuenta es suyo. Antes de aprobar, <b>llama al teléfono del local que aparece en Google Maps</b> (no solo al que te dan) y pregunta por esa persona; si quieres, escribe también a la cuenta actual. Al aprobar, el local pasa a su cuenta con su carta, opiniones y estadísticas, queda verificado y sus QR impresos siguen funcionando.</p>
+      <button class="btn btn-primary" id="btnClaims">Cargar reclamaciones pendientes</button>
+      <div class="msg" id="claimsMsg"></div>
+      <div id="claimsList"></div>
+    </section>
+
+    <section class="card">
+      <h2>Verificación de locales</h2>
+      <p class="muted">Verifica un local cuando hayas comprobado con el propio local (por su teléfono público, por ejemplo el de Google Maps) que la cuenta que lo gestiona es suya. Los verificados llevan «✓ Verificado» y salen primero. Si su dueño cambia el nombre o la localidad, pierden la verificación. La verificación no comprueba la carta: de sus alérgenos responde el restaurante.</p>
+      <button class="btn btn-primary" id="btnUnverified">Cargar locales sin verificar</button>
+      <div class="msg" id="unverifiedMsg"></div>
+      <div class="scroll"><table id="unverifiedTable" hidden><thead><tr><th>Local</th><th>Teléfono</th><th>Cuenta</th><th></th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <section class="card">
+      <h2>Locales borrados por sus dueños</h2>
+      <p class="muted">Al borrar un local se borran también sus opiniones. Este registro (sin datos de clientes) te deja ver si alguien borra un local para volver a crearlo sin sus opiniones malas: las condiciones lo prohíben y puedes retirar el local nuevo. Borra los registros de más de 12 meses.</p>
+      <button class="btn btn-primary" id="btnDeleted">Cargar registro</button>
+      <div class="msg" id="deletedMsg"></div>
+      <div class="scroll"><table id="deletedTable" hidden><thead><tr><th>Local</th><th>Opiniones</th><th>Borrado</th><th>Cuenta</th><th></th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <section class="card">
+      <h2>Limpieza de datos antiguos</h2>
+      <p class="muted">La política de privacidad promete guardar como máximo 12 meses las denuncias y reclamaciones ya resueltas y el registro de locales borrados. Pulsa este botón de vez en cuando (por ejemplo, una vez al mes).</p>
+      <button class="btn btn-outline" id="btnCleanup">Borrar lo resuelto hace más de 12 meses</button>
+      <div class="msg" id="cleanupMsg"></div>
     </section>
 
     <section class="card">
@@ -224,16 +268,20 @@ if (!cfg || !okVal(cfg.apiKey) || !okVal(cfg.projectId) || !okVal(cfg.appId)) {
     const count = async q => (await F.getCountFromServer(q)).data().count;
     try {
       const now = F.Timestamp.fromMillis(Date.now());
-      const [nOwners, nRests, nPublished, nSuggs, nPaying, founders, aiTot] = await Promise.all([
+      const [nOwners, nRests, nPublished, nSuggs, nPaying, founders, aiTot, nReports, nClaims, nVerified] = await Promise.all([
         count(F.collection(db, "owners")),
         count(F.collection(db, "restaurants")),
         count(F.query(F.collection(db, "restaurants"), F.where("published", "==", true))),
         count(F.query(F.collection(db, "suggestions"), F.where("claimed", "==", false))),
         count(F.query(F.collection(db, "owners"), F.where("paidUntil", ">", now), F.orderBy("paidUntil"))).catch(() => null),
         F.getDoc(F.doc(db, "meta", "founders")),
-        F.getDoc(F.doc(db, "aiUsage", "_total")).catch(() => null)
+        F.getDoc(F.doc(db, "aiUsage", "_total")).catch(() => null),
+        count(F.query(F.collection(db, "reports"), F.where("status", "==", "pendiente"))).catch(() => null),
+        count(F.query(F.collection(db, "claims"), F.where("status", "==", "pendiente"))).catch(() => null),
+        count(F.query(F.collection(db, "restaurants"), F.where("verified", "==", true))).catch(() => null)
       ]);
-      const nFounders = founders.exists() ? Number(founders.data().count) || 0 : 0;
+      // Plazas ocupadas: números de Fundador dados menos los retirados
+      const nFounders = founders.exists() ? Math.max(0, (Number(founders.data().count) || 0) - (Number(founders.data().revoked) || 0)) : 0;
       // Personas que usan la app (contador anónimo, una ficha por móvil)
       const users = F.collection(db, "users");
       const ago = d => F.Timestamp.fromMillis(Date.now() - d * DAY);
@@ -254,7 +302,7 @@ if (!cfg || !okVal(cfg.apiKey) || !okVal(cfg.projectId) || !okVal(cfg.appId)) {
       // Lecturas de cartas con IA hoy (las cuenta el servidor, por día de Madrid)
       const madrid = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
       const aiToday = aiTot && aiTot.exists() && aiTot.data().day === madrid ? Number(aiTot.data().n) || 0 : 0;
-      [[nOwners, "cuentas de restaurante"], [`${nFounders} / 30`, "Fundadores"], [nPublished, "locales con carta publicada"], [nRests, "locales creados"], [nSuggs, "sugerencias sin reclamar"], [nPaying == null ? "—" : nPaying, "cuentas con suscripción activa"], [aiToday, "lecturas de cartas con IA hoy"]]
+      [[nOwners, "cuentas de restaurante"], [`${nFounders} / 30`, "Fundadores"], [nPublished, "locales con carta publicada"], [nRests, "locales creados"], [nSuggs, "sugerencias sin reclamar"], [nPaying == null ? "—" : nPaying, "cuentas con suscripción activa"], [aiToday, "lecturas de cartas con IA hoy"], [nReports == null ? "—" : nReports, "denuncias de opiniones pendientes"], [nClaims == null ? "—" : nClaims, "reclamaciones de locales pendientes"], [nVerified == null ? "—" : nVerified, "locales verificados"]]
         .forEach(([n, label]) => { const d = document.createElement("div"); d.className = "stat"; const b = document.createElement("b"); b.textContent = n; const s = document.createElement("span"); s.textContent = label; d.append(b, s); box.appendChild(d); });
       $("statsNote").textContent = `Actualizado: ${new Date().toLocaleString("es-ES")}. Una idea para decidir cuándo cobrar: que haya al menos 50 locales con carta publicada y que los clientes las abran cada semana (mira «Uso de las cartas»).`;
     } catch (e) { box.textContent = errText(e); }
@@ -348,6 +396,8 @@ El equipo de TusAlergias`;
         cell(tr, tsMs(o.createdAt) ? new Date(tsMs(o.createdAt)).toLocaleDateString("es-ES") : "");
         const paid = tsMs(o.paidUntil);
         cell(tr, paid > Date.now() ? `Activa hasta ${new Date(paid).toLocaleDateString("es-ES")} (${o.sub && o.sub.channel === "play" ? "Google Play" : "tarjeta"})` : (paid ? "Caducada" : "—"));
+        const act = cell(tr, tsMs(o.founderRevokedAt) ? "plaza retirada" : "");
+        if (o.founderNumber > 0) button(act, "Retirar plaza", "btn-danger", () => revokeFounder(o, tr));
         tb.appendChild(tr);
       });
       show("ownersTable", owners.length > 0);
@@ -380,14 +430,15 @@ El equipo de TusAlergias`;
     msg("modMsg", "Cargando…");
     try {
       const qs = await F.getDocs(F.query(F.collection(db, "restaurants"), F.where("published", "==", true), F.limit(500)));
-      const tb = modTable(["Local", "Localidad", "Platos", ""]);
+      const tb = modTable(["Local", "Localidad", "Platos", "Verificado", ""]);
       qs.docs.forEach(d => {
         const r = d.data(), tr = document.createElement("tr");
         cell(tr, r.name); cell(tr, r.city); cell(tr, r.dishCount);
+        verifyCell(cell(tr, ""), d.ref, r);
         const td = cell(tr, "");
         button(td, "Opiniones", "btn-outline", () => loadReviews(d.id, r.name));
         td.append(" ");
-        button(td, "Retirar local", "btn-danger", () => removeRestaurant(d.id, r.name, tr));
+        button(td, "Retirar local", "btn-danger", () => removeRestaurant(d.id, r.name, tr, r.ownerUid));
         tb.appendChild(tr);
       });
       msg("modMsg", `${qs.docs.length} locales publicados.`, "ok");
@@ -412,8 +463,11 @@ El equipo de TusAlergias`;
       });
     } catch (e) { const tr = document.createElement("tr"); cell(tr, errText(e)); tb.appendChild(tr); }
   }
-  async function removeRestaurant(rid, name, tr) {
+  async function removeRestaurant(rid, name, tr, ownerUid) {
     if (!confirm(`¿Retirar «${name}»? Se borran su carta, sus opiniones y sus estadísticas, y sus QR dejarán de funcionar. No se puede deshacer.`)) return;
+    const why = askReason("Retirar el local", "El local es falso, no lo gestiona quien lo dio de alta o su contenido incumple las condiciones.");
+    if (why === null) return;
+    const to = await emailOf(ownerUid);
     try {
       const rv = await F.getDocs(F.collection(db, "restaurants", rid, "reviews"));
       for (let i = 0; i < rv.docs.length; i += 400) { const b = F.writeBatch(db); rv.docs.slice(i, i + 400).forEach(d => b.delete(d.ref)); await b.commit(); }
@@ -422,6 +476,7 @@ El equipo de TusAlergias`;
       b.delete(F.doc(db, "menus", rid)); b.delete(F.doc(db, "stats", rid)); b.delete(F.doc(db, "restaurants", rid));
       await b.commit();
       tr.remove(); msg("modMsg", `✅ «${name}» retirado.`, "ok");
+      mailLink($("modMsg"), to, `TusAlergias: hemos retirado «${name}»`, reasonLines(name, "retirar el local de TusAlergias, con su carta, sus opiniones y sus estadísticas. Sus códigos QR han dejado de funcionar.", why, "el punto C9 (Retirada de contenido)"));
     } catch (e) { msg("modMsg", errText(e), "err"); }
   }
   $("btnSuggs").onclick = async () => {
@@ -441,6 +496,319 @@ El equipo de TusAlergias`;
       msg("modMsg", `${qs.docs.length} sugerencias sin reclamar.`, "ok");
     } catch (e) { msg("modMsg", errText(e), "err"); }
   };
+
+  // ---------- Utilidades de las listas ----------
+  const el = (tag, text, cls) => { const e = document.createElement(tag); if (text != null) e.textContent = String(text); if (cls) e.className = cls; return e; };
+  const fdate = v => tsMs(v) ? new Date(tsMs(v)).toLocaleDateString("es-ES") : "";
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  const REASONS = { falsa: "No es real (falsa, no es cliente o es de la competencia)", ofensiva: "Insultos, amenazas u ofensas", datos: "Datos personales de alguien", spam: "Publicidad o spam", otro: "Otro motivo" };
+  const emailCache = {};
+  async function emailOf(uid) {
+    if (!uid) return "";
+    if (emailCache[uid] !== undefined) return emailCache[uid];
+    try { const s = await F.getDoc(F.doc(db, "owners", uid)); emailCache[uid] = s.exists() ? (s.data().email || "") : "(cuenta borrada)"; }
+    catch (e) { emailCache[uid] = ""; }
+    return emailCache[uid];
+  }
+  function newId() { const a = new Uint8Array(10); crypto.getRandomValues(a); return Array.from(a, b => (b % 36).toString(36)).join("") + Date.now().toString(36); }
+
+  // ---------- Email con los motivos ----------
+  // Cuando se retira o limita algo de un restaurante (su local, su respuesta, su verificación o su plaza de
+  // Fundador), la ley de servicios digitales (Reglamento UE 2022/2065, art. 17) obliga a explicarle por qué
+  // si tenemos su email. El panel prepara el email: tú lo envías desde tu correo (mejor tusalergiasapp@gmail.com).
+  const termsUrl = () => new URL("condiciones.html", location.href).href;
+  function askReason(what, def) {
+    const r = prompt(`Motivo (se incluirá en el email al restaurante):\n${what}`, def || "");
+    if (r === null || r === undefined) return null;
+    return String(r).trim() || def || "";
+  }
+  function reasonLines(name, done, reason, clause) {
+    return ["Hola:", "", name ? `Te escribimos desde TusAlergias sobre tu local «${name}».` : "Te escribimos desde TusAlergias sobre tu cuenta de restaurante.", "",
+      "Qué hemos hecho: " + done, "Motivo: " + reason,
+      `En qué nos basamos: ${clause} de las condiciones de uso (${termsUrl()}).`,
+      "La decisión la ha tomado una persona del equipo de TusAlergias, sin medios automatizados.", "",
+      "Si no estás de acuerdo, responde a este email explicando por qué y lo revisaremos. También puedes acudir a los tribunales.", "",
+      "TusAlergias · tusalergiasapp@gmail.com"];
+  }
+  function mailLink(parent, to, subject, lines, label) {
+    if (!to || /cuenta borrada/.test(to)) { parent.appendChild(el("div", "⚠️ No consta el email de esa cuenta: si puedes, avísale por otra vía.", "msg")); return null; }
+    const a = document.createElement("a");
+    a.className = "btn btn-green"; a.style.cssText = "display:inline-block; margin-top:8px; text-decoration:none;";
+    a.href = "mailto:" + encodeURIComponent(to) + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(lines.join("\n"));
+    a.textContent = (label || "📧 Enviar email con los motivos") + " a " + to;
+    parent.appendChild(a);
+    return a;
+  }
+
+  // ---------- Denuncias de opiniones ----------
+  $("btnReports").onclick = async () => {
+    msg("reportsMsg", "Cargando…");
+    const box = $("reportsList"); box.textContent = "";
+    try {
+      const qs = await F.getDocs(F.query(F.collection(db, "reports"), F.where("status", "==", "pendiente")));
+      const groups = new Map();
+      qs.docs.map(d => ({ ref: d.ref, ...d.data() })).sort((a, b) => tsMs(a.createdAt) - tsMs(b.createdAt)).forEach(x => {
+        const k = x.rid + "/" + x.revId;
+        if (!groups.has(k)) groups.set(k, []);
+        groups.get(k).push(x);
+      });
+      for (const reps of groups.values()) box.appendChild(await reportCard(reps));
+      msg("reportsMsg", groups.size ? plural(groups.size, "opinión denunciada.", "opiniones denunciadas.") : "No hay denuncias pendientes.", "ok");
+    } catch (e) { msg("reportsMsg", errText(e), "err"); }
+  };
+  async function reportCard(reps) {
+    const { rid, revId } = reps[0];
+    const revRef = F.doc(db, "restaurants", rid, "reviews", revId);
+    const [rs, rv] = await Promise.all([F.getDoc(F.doc(db, "restaurants", rid)).catch(() => null), F.getDoc(revRef).catch(() => null)]);
+    const card = el("div", null, "item");
+    card.appendChild(el("b", rs && rs.exists() ? `${rs.data().name} (${rs.data().city || "sin localidad"})` : "(local borrado)"));
+    const v = rv && rv.exists() ? rv.data() : null;
+    if (v) {
+      card.appendChild(el("div", `${v.isAlert ? "⚠️ Aviso de carta" : (v.author || "Anónimo") + " · " + "★".repeat(Math.max(1, Math.min(5, v.stars || 1)))} · ${fdate(v.createdAt)}`, "who"));
+      card.appendChild(el("div", "«" + (v.comment || "") + "»", "q"));
+      if (v.reply) card.appendChild(el("div", "Respuesta del local: «" + v.reply + "»", "q"));
+    } else card.appendChild(el("div", "Esta opinión ya no existe (la borró su autor o se borró el local).", "who"));
+    reps.forEach(x => {
+      const d = el("div", null, "who");
+      d.appendChild(el("b", (x.byOwner ? "🏪 Denuncia del dueño del local" : "👤 Denuncia de un cliente") + " · " + (REASONS[x.reason] || x.reason) + " · " + fdate(x.createdAt)));
+      if (x.text) d.appendChild(el("div", x.text));
+      card.appendChild(d);
+    });
+    const row = el("div", null, "row"); row.style.marginTop = "8px";
+    const done = async (change, status, okText, after) => {
+      try {
+        const b = F.writeBatch(db);
+        change(b);
+        reps.forEach(x => b.update(x.ref, { status, resolvedAt: F.serverTimestamp() }));
+        await b.commit();
+        card.replaceChildren(el("div", okText, "msg ok"));
+        if (after) await after();
+      } catch (e) { alert(errText(e)); }
+    };
+    if (v) {
+      button(row, "Retirar opinión", "btn-danger", () => { if (confirm("¿Retirar esta opinión? Se borra para todos y no se puede deshacer.")) done(b => b.delete(revRef), "retirada", "✅ Opinión retirada."); });
+      if (v.reply) button(row, "Quitar solo la respuesta del local", "btn-outline", () => {
+        if (!confirm("¿Quitar la respuesta del local? La opinión se mantiene.")) return;
+        const why = askReason("Quitar la respuesta del local", "Tu respuesta incumplía las normas de TusAlergias (era ofensiva o incluía datos personales).");
+        if (why === null) return;
+        const local = rs && rs.exists() ? rs.data() : null;
+        done(b => b.update(revRef, { reply: F.deleteField(), replyAt: F.deleteField() }), "respuesta-retirada", "✅ Respuesta del local quitada.", async () => {
+          if (local) mailLink(card, await emailOf(local.ownerUid), "TusAlergias: hemos retirado tu respuesta a una opinión",
+            reasonLines(local.name, `retirar tu respuesta pública a una opinión («${String(v.reply).slice(0, 120)}»). La opinión sigue publicada.`, why, "el punto C7 (Opiniones de clientes)"));
+        });
+      });
+      button(row, "Mantener (descartar la denuncia)", "btn-outline", () => done(() => {}, "descartada", "✅ Denuncia descartada: la opinión se mantiene."));
+    } else button(row, "Cerrar denuncia", "btn-outline", () => done(() => {}, "descartada", "✅ Denuncia cerrada."));
+    card.appendChild(row);
+    return card;
+  }
+
+  // ---------- Reclamaciones de locales ----------
+  $("btnClaims").onclick = async () => {
+    msg("claimsMsg", "Cargando…");
+    const box = $("claimsList"); box.textContent = "";
+    try {
+      const qs = await F.getDocs(F.query(F.collection(db, "claims"), F.where("status", "==", "pendiente")));
+      const list = qs.docs.map(d => ({ id: d.id, ref: d.ref, ...d.data() })).sort((a, b) => tsMs(a.createdAt) - tsMs(b.createdAt));
+      for (const c of list) box.appendChild(await claimCard(c));
+      msg("claimsMsg", list.length ? plural(list.length, "reclamación pendiente.", "reclamaciones pendientes.") : "No hay reclamaciones pendientes.", "ok");
+    } catch (e) { msg("claimsMsg", errText(e), "err"); }
+  };
+  async function claimCard(c) {
+    const rs = await F.getDoc(F.doc(db, "restaurants", c.rid)).catch(() => null);
+    const r = rs && rs.exists() ? rs.data() : null;
+    const card = el("div", null, "item");
+    card.appendChild(el("b", r ? `${r.name} (${r.city || "sin localidad"})` : "(el local ya no existe)"));
+    if (r) {
+      card.appendChild(el("div", `Teléfono que puso la cuenta actual: ${r.phone || "—"} · Alta: ${fdate(r.createdAt)} · ${r.verified ? "✓ Verificado" : "Sin verificar"}`, "who"));
+      card.appendChild(el("div", "Cuenta actual: " + (await emailOf(r.ownerUid)), "who"));
+    }
+    const who = el("div", null, "who");
+    who.appendChild(el("b", `Reclama: ${c.name} (${c.role})`));
+    who.appendChild(el("div", `Email: ${c.email} · Teléfono: ${c.phone}`));
+    who.appendChild(el("div", `Su cuenta en la app: ${await emailOf(c.uid)} · ${fdate(c.createdAt)}`));
+    card.appendChild(who);
+    if (c.message) card.appendChild(el("div", "«" + c.message + "»", "q"));
+    card.appendChild(el("div", "Antes de aprobar: 1) llama al teléfono público del local (búscalo en Google Maps, no uses el de la reclamación) y 2) pide por email un documento que acredite su relación con el local (cabecera de una factura del local, licencia de apertura…) o que te escriba desde el email del propio local. Cuando decidas, borra ese documento de tu correo.", "who"));
+    const ask = el("div"); card.appendChild(ask);
+    mailLink(ask, c.email, `TusAlergias: tu reclamación de «${r ? r.name : "un local"}»`, ["Hola:", "",
+      `Hemos recibido tu reclamación del local «${r ? r.name : ""}» en TusAlergias.`, "",
+      "Para comprobar que lo gestionas, responde a este email adjuntando un documento que acredite tu relación con el local (por ejemplo, la cabecera de una factura a nombre del local o su licencia de apertura) o escríbenos desde el email del propio local.",
+      "Solo lo usaremos para resolver la reclamación y lo borraremos después.", "", "TusAlergias · tusalergiasapp@gmail.com"], "📧 Pedir el documento");
+    const row = el("div", null, "row"); row.style.marginTop = "8px";
+    if (r) button(row, "Aprobar y traspasar el local", "btn-green", async () => {
+      const oldEmail = await emailOf(r.ownerUid);
+      if (!confirm(`¿Traspasar «${r.name}» a la cuenta ${await emailOf(c.uid)}?\n\nLa cuenta actual (${oldEmail}) dejará de gestionarlo. Hazlo solo si lo has comprobado llamando al local y con un documento.`)) return;
+      const why = askReason("Traspasar el local a quien lo reclama", "Hemos comprobado con el propio local que lo gestiona otra persona, que nos lo ha reclamado.");
+      if (why === null) return;
+      try {
+        await transferLocal(c);
+        card.replaceChildren(el("div", "✅ Local traspasado y verificado. Sus QR impresos siguen funcionando.", "msg ok"));
+        mailLink(card, oldEmail, `TusAlergias: «${r.name}» ha pasado a otra cuenta`, reasonLines(r.name, "traspasar el local, con su carta, opiniones y estadísticas, a la cuenta de quien lo ha reclamado. Tu cuenta ya no lo gestiona.", why, "el punto C8 (Verificación y reclamación de locales)"), "📧 Avisar con los motivos a la cuenta anterior");
+        card.appendChild(el("div"));
+        mailLink(card, c.email, `TusAlergias: reclamación aprobada`, ["Hola:", "", `Hemos aprobado tu reclamación: «${r.name}» ya está en tu cuenta de TusAlergias, verificado. Lo verás en la pestaña Hostelería.`, "", "TusAlergias · tusalergiasapp@gmail.com"], "📧 Avisar a quien reclama");
+      }
+      catch (e) { alert(e && e.message && !e.code ? e.message : errText(e)); }
+    });
+    button(row, "Rechazar", "btn-outline", async () => {
+      if (!confirm("¿Rechazar esta reclamación? El local sigue en la cuenta actual.")) return;
+      const why = askReason("Rechazar la reclamación", "No hemos podido comprobar con el local que lo gestionas.");
+      if (why === null) return;
+      try {
+        await F.updateDoc(c.ref, { status: "rechazada", resolvedAt: F.serverTimestamp() });
+        card.replaceChildren(el("div", "Reclamación rechazada.", "msg"));
+        mailLink(card, c.email, "TusAlergias: tu reclamación", ["Hola:", "", `Hemos revisado tu reclamación del local «${r ? r.name : ""}» y no la hemos aprobado.`, "Motivo: " + why, "", "Si crees que es un error, responde a este email con la información que lo acredite y lo revisaremos.", "", "TusAlergias · tusalergiasapp@gmail.com"], "📧 Avisar a quien reclama");
+      }
+      catch (e) { alert(errText(e)); }
+    });
+    card.appendChild(row);
+    return card;
+  }
+  // Traspaso: el local (con su carta, opiniones y estadísticas) pasa a la cuenta que lo reclama, verificado.
+  // La dirección antigua queda redirigida para que los QR impresos sigan llevando a la carta.
+  async function transferLocal(c) {
+    const rid = c.rid;
+    const [rs, ms, ss, rvs, os] = await Promise.all([
+      F.getDoc(F.doc(db, "restaurants", rid)), F.getDoc(F.doc(db, "menus", rid)), F.getDoc(F.doc(db, "stats", rid)).catch(() => null),
+      F.getDocs(F.collection(db, "restaurants", rid, "reviews")), F.getDoc(F.doc(db, "owners", c.uid))]);
+    if (!rs.exists()) throw new Error("El local ya no existe.");
+    if (!os.exists()) throw new Error("La cuenta que reclama aún no ha completado su registro en la app: pídele que entre en Hostelería y lo complete.");
+    let newRid = null;
+    for (let i = 1; i <= 3 && !newRid; i++) {
+      const id = `${c.uid}_${i}`;
+      const [a, red] = await Promise.all([F.getDoc(F.doc(db, "restaurants", id)), F.getDoc(F.doc(db, "redirects", id))]);
+      if (!a.exists() && !red.exists()) newRid = id;
+    }
+    if (!newRid) throw new Error("La cuenta que reclama ya tiene 3 locales: tiene que borrar uno antes.");
+    const x = rs.data(), now = F.serverTimestamp();
+    const b1 = F.writeBatch(db);
+    b1.set(F.doc(db, "restaurants", newRid), { ownerUid: c.uid, name: x.name, city: x.city || "", phone: x.phone || "", lat: x.lat, lng: x.lng, lastVerified: x.lastVerified || "",
+      published: !!x.published, dishCount: Number(x.dishCount) || 0, updatedAt: now, createdAt: x.createdAt || F.Timestamp.now(),
+      founder: (Number(os.data().founderNumber) || 0) > 0, fromSuggestion: x.fromSuggestion || "", verified: true, verifiedAt: now, instance: newId() });
+    b1.set(F.doc(db, "menus", newRid), { menu: ms.exists() ? (ms.data().menu || []) : [], updatedAt: now, ver: newId(), base: "" });
+    if (ss && ss.exists()) { const st = ss.data(); b1.set(F.doc(db, "stats", newRid), { views: Number(st.views) || 0, saves: Number(st.saves) || 0, bookings: Number(st.bookings) || 0, alerts: Number(st.alerts) || 0 }); }
+    await b1.commit();
+    for (let i = 0; i < rvs.docs.length; i += 400) { const b = F.writeBatch(db); rvs.docs.slice(i, i + 400).forEach(d => b.set(F.doc(db, "restaurants", newRid, "reviews", d.id), d.data())); await b.commit(); }
+    for (let i = 0; i < rvs.docs.length; i += 400) { const b = F.writeBatch(db); rvs.docs.slice(i, i + 400).forEach(d => b.delete(d.ref)); await b.commit(); }
+    const b3 = F.writeBatch(db);
+    b3.delete(F.doc(db, "drafts", rid)); b3.delete(F.doc(db, "menus", rid)); b3.delete(F.doc(db, "stats", rid)); b3.delete(F.doc(db, "restaurants", rid));
+    b3.set(F.doc(db, "redirects", rid), { to: newRid, at: now });
+    b3.update(c.ref, { status: "aprobada", resolvedAt: now, newRid });
+    await b3.commit();
+    return newRid;
+  }
+
+  // ---------- Verificación de locales ----------
+  function verifyCell(td, ref, r) {
+    const paint = on => {
+      td.textContent = on ? "✓ Sí " : "No ";
+      button(td, on ? "Quitar" : "Verificar", "btn-outline", async () => {
+        if (!confirm(on ? `¿Quitar la verificación de «${r.name}»?` : `¿Has comprobado con el local que «${r.name}» lo gestiona esta cuenta?`)) return;
+        let why = "";
+        if (on) { why = askReason("Quitar la verificación del local", "No hemos podido confirmar con el local que lo gestiona esta cuenta."); if (why === null) return; }
+        try {
+          await F.updateDoc(ref, on ? { verified: false, verifiedAt: F.deleteField() } : { verified: true, verifiedAt: F.serverTimestamp() }); paint(!on);
+          if (on) mailLink(td, await emailOf(r.ownerUid), `TusAlergias: «${r.name}» ya no aparece como verificado`, reasonLines(r.name, "quitar la etiqueta «✓ Local verificado» (el local sigue publicado).", why, "el punto C8 (Verificación y reclamación de locales)"));
+        }
+        catch (e) { alert(errText(e)); }
+      });
+    };
+    paint(r.verified === true);
+  }
+  $("btnUnverified").onclick = async () => {
+    msg("unverifiedMsg", "Cargando…");
+    try {
+      const [qs, dl] = await Promise.all([
+        F.getDocs(F.query(F.collection(db, "restaurants"), F.where("published", "==", true), F.limit(500))),
+        F.getDocs(F.query(F.collection(db, "deletedLocals"), F.orderBy("at", "desc"), F.limit(300))).catch(() => ({ docs: [] }))]);
+      // Locales borrados antes por la misma cuenta, o con el mismo nombre por cualquier cuenta
+      const norm = t => String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+      const deleted = dl.docs.map(d => d.data());
+      const list = qs.docs.filter(d => d.data().verified !== true);
+      const tb = $("unverifiedTable").querySelector("tbody"); tb.textContent = "";
+      for (const d of list) {
+        const r = d.data(), tr = document.createElement("tr");
+        const c1 = cell(tr, `${r.name} (${r.city || "sin localidad"}) · alta ${fdate(r.createdAt)}`);
+        deleted.filter(p => p.ownerUid === r.ownerUid || (norm(p.name) && norm(p.name) === norm(r.name))).forEach(p =>
+          c1.appendChild(el("div", `⚠️ ${p.ownerUid === r.ownerUid ? "Esta cuenta" : "Otra cuenta"} borró «${p.name}» (${plural(Number(p.reviews) || 0, "opinión", "opiniones")}) el ${fdate(p.at)}`, "who")));
+        cell(tr, r.phone || "—");
+        cell(tr, await emailOf(r.ownerUid));
+        button(cell(tr, ""), "Verificar", "btn-green", async () => {
+          if (!confirm(`¿Has comprobado con el local que «${r.name}» lo gestiona esta cuenta?`)) return;
+          try { await F.updateDoc(d.ref, { verified: true, verifiedAt: F.serverTimestamp() }); tr.remove(); } catch (e) { alert(errText(e)); }
+        });
+        tb.appendChild(tr);
+      }
+      show("unverifiedTable", list.length > 0);
+      msg("unverifiedMsg", list.length ? plural(list.length, "local publicado sin verificar.", "locales publicados sin verificar.") : "Todos los locales publicados están verificados.", "ok");
+    } catch (e) { msg("unverifiedMsg", errText(e), "err"); }
+  };
+
+  // ---------- Locales borrados por sus dueños ----------
+  $("btnDeleted").onclick = async () => {
+    msg("deletedMsg", "Cargando…");
+    try {
+      const qs = await F.getDocs(F.query(F.collection(db, "deletedLocals"), F.orderBy("at", "desc"), F.limit(200)));
+      const tb = $("deletedTable").querySelector("tbody"); tb.textContent = "";
+      for (const d of qs.docs) {
+        const x = d.data(), tr = document.createElement("tr");
+        const old = Date.now() - tsMs(x.at) > 365 * DAY;
+        cell(tr, `${x.name} (${x.city || ""})`); cell(tr, Number(x.reviews) || 0); cell(tr, fdate(x.at) + (old ? " · más de 12 meses" : "")); cell(tr, await emailOf(x.ownerUid));
+        button(cell(tr, ""), "Borrar registro", old ? "btn-danger" : "btn-outline", async () => {
+          if (!confirm("¿Borrar este registro?")) return;
+          try { await F.deleteDoc(d.ref); tr.remove(); } catch (e) { alert(errText(e)); }
+        });
+        tb.appendChild(tr);
+      }
+      show("deletedTable", qs.docs.length > 0);
+      msg("deletedMsg", qs.docs.length ? plural(qs.docs.length, "registro.", "registros.") : "Ningún dueño ha borrado locales.", "ok");
+    } catch (e) { msg("deletedMsg", errText(e), "err"); }
+  };
+
+  // ---------- Limpieza: lo resuelto hace más de 12 meses ----------
+  $("btnCleanup").onclick = async () => {
+    if (!confirm("¿Borrar las denuncias y reclamaciones resueltas hace más de 12 meses y los registros de locales borrados de más de 12 meses?")) return;
+    msg("cleanupMsg", "Borrando…");
+    try {
+      const limit = Date.now() - 365 * DAY, refs = [];
+      const old = v => tsMs(v) > 0 && tsMs(v) < limit;
+      for (const [col, states] of [["reports", ["retirada", "respuesta-retirada", "descartada"]], ["claims", ["aprobada", "rechazada"]]]) {
+        for (const st of states) {
+          const qs = await F.getDocs(F.query(F.collection(db, col), F.where("status", "==", st)));
+          qs.docs.forEach(d => { if (old(d.data().resolvedAt)) refs.push(d.ref); });
+        }
+      }
+      (await F.getDocs(F.collection(db, "deletedLocals"))).docs.forEach(d => { if (old(d.data().at)) refs.push(d.ref); });
+      for (let i = 0; i < refs.length; i += 400) { const b = F.writeBatch(db); refs.slice(i, i + 400).forEach(r => b.delete(r)); await b.commit(); }
+      msg("cleanupMsg", refs.length ? `✅ ${plural(refs.length, "registro antiguo borrado.", "registros antiguos borrados.")}` : "No había nada de más de 12 meses.", "ok");
+    } catch (e) { msg("cleanupMsg", errText(e), "err"); }
+  };
+
+  // ---------- Retirar una plaza de Fundador ----------
+  async function revokeFounder(o, tr) {
+    if (!confirm(`¿Retirar la plaza de Fundador nº ${o.founderNumber} a ${o.email}?\n\nPerderá las ventajas de Fundador, la plaza quedará libre para otra cuenta y esta cuenta no podrá volver a conseguirla. Hazlo solo si es una cuenta falsa o abusiva.`)) return;
+    const why = askReason("Retirar la plaza de Fundador", "La cuenta es falsa o está duplicada, o no hemos podido confirmar que gestione un local real.");
+    if (why === null) return;
+    try {
+      const f = await F.getDoc(F.doc(db, "meta", "founders"));
+      const d = f.exists() ? f.data() : {};
+      const count = Number(d.count) || 0, revoked = Number(d.revoked) || 0;
+      const b = F.writeBatch(db);
+      b.update(F.doc(db, "owners", o.uid), { founderNumber: 0, founderRevokedAt: F.serverTimestamp() });
+      b.set(F.doc(db, "meta", "founders"), { count, revoked: Math.min(count, revoked + 1) });
+      for (let i = 1; i <= 3; i++) {
+        const s = await F.getDoc(F.doc(db, "restaurants", `${o.uid}_${i}`));
+        if (s.exists() && s.data().founder) b.update(s.ref, { founder: false });
+      }
+      await b.commit();
+      o.founderNumber = 0;
+      tr.children[1].textContent = "— (retirada)";
+      tr.lastChild.textContent = "plaza retirada";
+      msg("ownersMsg", "✅ Plaza retirada. Ha quedado libre para otra cuenta.", "ok");
+      mailLink($("ownersMsg"), o.email, "TusAlergias: hemos retirado tu plaza de Fundador", reasonLines(null, "retirar la condición de Restaurante Fundador de tu cuenta (tus locales siguen publicados).", why, "el punto C4 (Restaurantes Fundadores)"));
+      loadSummary();
+    } catch (e) { msg("ownersMsg", errText(e), "err"); }
+  }
 
   // ---------- Uso ----------
   $("btnUsage").onclick = async () => {
