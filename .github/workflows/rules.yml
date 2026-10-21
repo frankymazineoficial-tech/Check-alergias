@@ -1,0 +1,30 @@
+name: Pruebas de reglas de Firebase
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'firestore.rules'
+      - 'rules.test.js'
+      - '.github/workflows/rules.yml'
+
+jobs:
+  reglas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Instalar herramientas
+        run: |
+          npm init -y
+          npm install firebase-tools@13.35.1 @firebase/rules-unit-testing@3.0.4 firebase@10.12.2
+          echo '{"firestore":{"rules":"firestore.rules"}}' > firebase.json
+      - name: Ejecutar pruebas con el emulador oficial
+        run: npx firebase emulators:exec --only firestore --project demo-tusalergias "node rules.test.js"
