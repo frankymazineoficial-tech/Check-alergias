@@ -4,7 +4,7 @@
 // - Las librerías del propio sitio (mapa, escáner, lector de etiquetas) y el programa de Firebase
 //   tienen versión fija: se guardan la primera vez que se usan y después se sirven desde el móvil.
 // - Los datos en vivo (cartas en la nube, productos, mapas, direcciones) nunca se sirven desde aquí.
-const CACHE = "tusalergias-v3.7";
+const CACHE = "tusalergias-v3.9";
 const SHELL = ["./", "./index.html", "./manifest.json", "./firebase-config.js", "./icon-192.png", "./icon-512.png", "./privacidad.html", "./condiciones.html"];
 
 self.addEventListener("install", event => {

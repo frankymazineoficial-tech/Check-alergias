@@ -183,7 +183,28 @@
   .mod-box.equip { background:rgba(249,115,22,0.14); color:#fdba74; }
   .mini-chip.equip-sel { background:var(--amber); color:#000; border-color:var(--amber); }
   .equip-card { background:var(--bg); border:1px solid var(--border); border-left:4px solid var(--amber); border-radius:10px; padding:10px; margin-bottom:10px; }
-  .equip-card .eq-used { font-size:0.68rem; color:var(--muted); margin-top:6px; }
+  .equip-card .eq-total { font-size:0.72rem; color:#fdba74; margin-top:8px; line-height:1.4; }
+  .equip-card .eq-none { font-size:0.72rem; color:var(--muted); }
+  .eq-linked-list summary { cursor:pointer; font-size:0.74rem; font-weight:700; color:#fde68a; }
+  .eq-link-item { display:flex; justify-content:space-between; align-items:center; gap:6px; font-size:0.72rem; padding:4px 0; border-bottom:1px solid var(--border); }
+  .ep-dish { background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:8px 10px; margin-bottom:8px; content-visibility:auto; contain-intrinsic-size:auto 90px; }
+  .ep-dish-head, .ep-ing { display:flex; gap:8px; align-items:flex-start; cursor:pointer; font-size:0.78rem; }
+  .ep-ing { margin:6px 0 0 22px; color:#cbd5e1; }
+  .ep-dish input, .ep-ing input { width:18px; height:18px; flex-shrink:0; margin-top:1px; }
+  .ep-ing small { color:var(--muted); }
+  .ep-ing small.ep-other { color:var(--amber); display:block; }
+  .ep-ap { display:flex; gap:6px; align-items:center; margin:4px 0 0 48px; font-size:0.72rem; color:#fde68a; cursor:pointer; }
+  .ep-ap input { width:16px; height:16px; }
+  .ing-eq-line { font-size:0.7rem; color:#fdba74; background:rgba(249,115,22,0.1); border-radius:6px; padding:6px 8px; margin-top:6px; line-height:1.4; }
+  .ing-eq-ap { display:flex; gap:6px; align-items:center; margin-top:5px; color:#fde68a; font-weight:700; cursor:pointer; }
+  .ing-eq-ap input { width:17px; height:17px; flex-shrink:0; }
+  .staff-tools-toggle { width:100%; text-align:left; background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.45); color:#fde68a; border-radius:10px; padding:11px 12px; font-weight:800; font-size:0.82rem; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .staff-tools-toggle.open { background:rgba(245,158,11,0.22); }
+  .staff-tools-toggle .stt-state { font-size:0.72rem; white-space:nowrap; }
+  .staff-forgot { font-size:0.7rem; color:var(--muted); text-align:right; }
+  #staffToolsBody { display:flex; flex-direction:column; gap:10px; }
+  #staffToolsBody > * { margin-bottom:10px; }
+  .waiter-pick-btn { width:100%; padding:12px; font-size:0.9rem; }
   .aptos-note { font-size:0.72rem; line-height:1.4; color:#bbf7d0; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.35); border-radius:8px; padding:7px 9px; margin-bottom:8px; }
 </style>
 </head>
@@ -209,7 +230,7 @@
     <div><h1 id="headerMainTitle">TusAlergias</h1><span class="header-sub" id="headerSubTitle">Cartas según tus alergias</span></div>
   </div>
   <div style="display:flex; gap:6px;">
-    <button class="btn btn-purple" onclick="openWaiterCardModal()">🗣️ Camarero</button>
+    <button class="btn btn-purple" id="btnWaiterCard" onclick="openWaiterCardModal()">🗣️ Camarero</button>
     <div id="headerRightActions"></div>
   </div>
 </header>
@@ -292,6 +313,12 @@
   </div>
 
   <!-- PANEL DE LOCALES UNA VEZ INICIADA SESIÓN -->
+  <div id="waiterPickCard" class="rest-list-card" style="display:none; flex-direction:column; align-items:stretch; gap:8px;">
+    <div><b>🧑‍🍳 Vista del camarero</b><br><span style="font-size:0.74rem; color:var(--muted);">Elige el local para ver su carta con el panel de alergias de la mesa.</span></div>
+    <div id="waiterPickList" style="display:flex; flex-direction:column; gap:6px;"></div>
+    <button class="btn btn-outline" onclick="unlockOwnerPanel()">🔒 Gestión y cuenta (PIN)</button>
+    <a href="#" class="staff-forgot" onclick="event.preventDefault(); forgotPin()">¿Has olvidado el PIN?</a>
+  </div>
   <div id="ownerLoggedPanel" style="display:none;">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
       <div>
@@ -354,12 +381,26 @@
 <!-- VISTA INTERNA: CARTA DEL RESTAURANTE -->
 <div id="appView" style="display:none;">
   <div class="staff-bar" id="staffBar">
+    <button type="button" class="staff-tools-toggle" id="staffToolsToggle" onclick="toggleStaffTools()"></button>
+    <a href="#" id="staffForgotPin" class="staff-forgot" style="display:none;" onclick="event.preventDefault(); forgotPin()">¿Has olvidado el PIN?</a>
+    <div id="staffToolsBody" style="display:none;">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
       <span style="font-size:0.74rem; font-weight:800; color:#fde047;">🔓 MODO PROPIETARIO — Toca un ingrediente para alternar entre Fijo (🔒) y Adaptable (🔄)</span>
       <span id="syncStatus" style="display:none; font-size:0.72rem; color:var(--accent); font-weight:700;"></span>
       <button class="btn btn-green" onclick="confirmMenuUpdatedToday()">✅ Verificar Carta Hoy</button>
     </div>
     <div class="roi-metrics" id="ownerRoiMetrics"></div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+      <button class="btn btn-amber" onclick="openDishModal()">+ Añadir Plato (Con Escáner)</button>
+      <button class="btn btn-purple" id="btnMenuAi" onclick="openMenuAiModal()">📸 Subir carta con foto</button>
+      <button class="btn btn-outline" id="btnEquip" onclick="openEquipModal()">🍟 Freidoras y planchas</button>
+      <button class="btn btn-orange" onclick="loadSampleMenuIntoActive()">📥 Cargar 12 Platos Muestra</button>
+      <button class="btn btn-green" onclick="openQrModal(activeRestId)">📱 Código Bidi</button>
+      <button class="btn btn-outline" onclick="openEditRestModal(activeRestId)">⚙️ Datos / WhatsApp</button>
+      <button class="btn btn-outline" onclick="changePin()">🔑 Cambiar PIN</button>
+      <button class="btn btn-primary" style="margin-left:auto;" onclick="lockStaffMode()">🏠 Mis restaurantes</button>
+    </div>
+    </div>
     <div style="background:rgba(0,0,0,0.3); border:1px solid var(--accent); border-radius:10px; padding:10px;">
       <div style="font-size:0.76rem; font-weight:800; color:var(--accent); margin-bottom:6px;">🧑‍🤝‍🧑 Comprobar la carta para un comensal (toca sus alergias; no se guarda):</div>
       <div class="allergen-grid" id="staffAllergenGrid"></div>
@@ -369,21 +410,13 @@
         <button class="btn btn-orange" onclick="addStaffCustom()">+ Vigilar</button>
         <button class="btn btn-outline" onclick="clearStaffGuest()">🧹 Limpiar</button>
       </div>
+      <button class="btn btn-green" id="btnSendKitchen" style="width:100%; margin-top:8px; padding:11px;" onclick="sendToKitchen()">📲 Enviar a cocina (compatibles, adaptables y no aptos)</button>
       <div id="staffCustomTags" style="margin-top:6px;"></div>
-    </div>
-    <div style="display:flex; gap:6px; flex-wrap:wrap;">
-      <button class="btn btn-amber" onclick="openDishModal()">+ Añadir Plato (Con Escáner)</button>
-      <button class="btn btn-purple" id="btnMenuAi" onclick="openMenuAiModal()">📸 Subir carta con foto</button>
-      <button class="btn btn-outline" id="btnEquip" onclick="openEquipModal()">🍟 Freidoras y planchas</button>
-      <button class="btn btn-orange" onclick="loadSampleMenuIntoActive()">📥 Cargar 12 Platos Muestra</button>
-      <button class="btn btn-green" onclick="openQrModal(activeRestId)">📱 Código Bidi</button>
-      <button class="btn btn-outline" onclick="openEditRestModal(activeRestId)">⚙️ Datos / WhatsApp</button>
-      <button class="btn btn-primary" style="margin-left:auto;" onclick="lockStaffMode()">🔒 Salir</button>
     </div>
   </div>
 
   <div class="container">
-    <div style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:12px;">
+    <div id="restInfoCard" style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:12px;">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
         <div>
           <span id="activeRestBadge" class="verified-badge"></span>
@@ -411,9 +444,9 @@
       <div class="controls-bar">
         <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar plato o ingrediente..." oninput="renderDishes()">
         <select id="catFilter" class="cat-filter" onchange="renderDishes()"></select>
-        <button class="btn btn-green" onclick="shareWhatsApp()">📲 Compartir</button>
+        <button class="btn btn-green" id="btnShareMenu" onclick="shareWhatsApp()">📲 Compartir</button>
       </div>
-      <div class="legal-banner">
+      <div class="legal-banner" id="menuLegalBanner">
         ⚠️ <b>Seguridad Alimentaria:</b> Filtro orientativo según los datos del local y <b>solo según lo que has añadido a tu perfil</b>. <b>Confirma siempre tus alergias con el camarero</b> antes de pedir.
       </div>
       <div class="tabs">
@@ -424,6 +457,7 @@
       <div id="dishList"></div>
     </div>
 
+    <div id="reviewsSection">
     <hr style="border-color:var(--border); margin:20px 0 12px;">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
       <div>
@@ -437,6 +471,7 @@
       </div>
     </div>
     <div id="reviewsListContainer"></div>
+    </div>
     <div id="claimLocalBox" style="display:none; text-align:center; margin-top:14px;"><a href="#" id="claimLocalLink" onclick="openClaimModal(); return false;" style="font-size:0.74rem; color:var(--muted);">🔑 ¿Es tu local? Reclámalo</a></div>
   </div>
 </div>
@@ -599,7 +634,7 @@
     </div>
     <div class="form-group"><label>👩‍🍳 Protocolo en cocina:</label><input type="text" id="editProtocol" placeholder="Ej. Sartén o freidora limpia exclusiva"></div>
     <div class="form-group"><label>⚠️ Trazas en cocina (puede haber contaminación cruzada de):</label><div class="mini-chips" id="editDishTraces"></div></div>
-    <div class="form-group"><label>🍟 Dónde se cocina (freidora o plancha compartida):</label><div class="mini-chips" id="editDishEquip"></div><div id="editDishEquipHint" class="ing-auto-hint" style="display:none; white-space:pre-line;"></div></div>
+    <div class="form-group" id="editDishEquipGroup"><label>🍟 Freidoras y planchas:</label><div id="editDishEquipInfo" style="font-size:0.72rem; color:var(--muted);"></div></div>
     <div class="ing-editor-card" style="border-color:var(--accent);">
       <div style="font-size:0.76rem; font-weight:800; color:var(--accent); margin-bottom:6px;">📊 Escanear Materia Prima en Cocina o Añadir Componente:</div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px;">
@@ -862,7 +897,7 @@
 <p><b>C3. Precio cuando termine el lanzamiento.</b> Al terminar la fase de lanzamiento, el servicio pasará a costar <b>19,99 € al mes o 199,99 € al año (IVA incluido)</b> por cuenta, con hasta 3 locales. Te avisaremos en la app y por email con al menos <b>30 días de antelación</b>.</p>
 <p>Podrás pagar con Google Play desde la app de Android o con tarjeta desde la web. <b>Nunca se te cobrará nada sin que te suscribas de forma expresa.</b> La suscripción se renueva sola cada mes o cada año, según elijas, y puedes cancelarla cuando quieras; seguirá activa hasta el final del periodo pagado. Si no lo haces, tus cartas dejarán de mostrarse al público 7 días después del inicio del cobro (o del final de tu año gratis de Fundador), pero podrás seguir entrando en tu cuenta para suscribirte más adelante o eliminarla.</p>
 <p><b>C4. Restaurantes Fundadores.</b> Las primeras 30 cuentas de restaurante que se registren <b>con el email verificado</b> serán <b>Fundadoras</b> (si te registras con tu email, la plaza se asigna cuando pulsas el enlace de verificación, si aún quedan). Cuando empiece el cobro tendrán 12 meses más gratis y, después, un precio de <b>9,99 € al mes o 99,99 € al año (IVA incluido)</b> mientras mantengan la suscripción activa sin interrupción. La condición de Fundador pertenece a la cuenta y no se puede transferir. Podemos retirarla a cuentas falsas, duplicadas o que incumplan estas condiciones; esa plaza queda libre para otra cuenta.</p>
-<p><b>C5. Tu responsabilidad sobre la información.</b> El restaurante es el único responsable de que la información de alérgenos, ingredientes, trazas y dietas que publica sea completa, correcta y esté al día, conforme al Reglamento (UE) 1169/2011 y al Real Decreto 126/2015. Las detecciones automáticas de la app son orientativas y debes revisarlas. Para proteger a los clientes, la app puede mostrarles avisos según el nombre y el texto de cada plato (por ejemplo, «Según su nombre: LÁCTEO» o «No detalla sus ingredientes: pregunta al camarero»), aunque no los hayas marcado; para evitarlos, detalla bien los ingredientes y sus alérgenos. Lo mismo ocurre con «Subir carta con foto»: la lectura la hace una inteligencia artificial que puede equivocarse, por eso la app te pide revisar y confirmar cada plato antes de publicarlo. TusAlergias es una herramienta de apoyo: no sustituye las obligaciones de información del establecimiento ni la confirmación verbal con el cliente. <b>Debes desglosar todos los ingredientes de cada plato</b>, también las salsas, fondos, rebozados, aceites, especias y aderezos. Si usas «🍟 Freidoras y planchas», debes indicar lo que se cocina en cada freidora o plancha y en cuál se prepara cada plato, y mantenerlo al día: la app lo usa para avisar a los clientes del contacto con sus alérgenos. Los componentes que no digan qué llevan se mostrarán a los clientes con avisos como «pregunta al camarero» y la responsabilidad de que la información sea completa y correcta es tuya.</p>
+<p><b>C5. Tu responsabilidad sobre la información.</b> El restaurante es el único responsable de que la información de alérgenos, ingredientes, trazas y dietas que publica sea completa, correcta y esté al día, conforme al Reglamento (UE) 1169/2011 y al Real Decreto 126/2015. Las detecciones automáticas de la app son orientativas y debes revisarlas. Para proteger a los clientes, la app puede mostrarles avisos según el nombre y el texto de cada plato (por ejemplo, «Según su nombre: LÁCTEO» o «No detalla sus ingredientes: pregunta al camarero»), aunque no los hayas marcado; para evitarlos, detalla bien los ingredientes y sus alérgenos. Lo mismo ocurre con «Subir carta con foto»: la lectura la hace una inteligencia artificial que puede equivocarse, por eso la app te pide revisar y confirmar cada plato antes de publicarlo. TusAlergias es una herramienta de apoyo: no sustituye las obligaciones de información del establecimiento ni la confirmación verbal con el cliente. <b>Debes desglosar todos los ingredientes de cada plato</b>, también las salsas, fondos, rebozados, aceites, especias y aderezos. Si usas «🍟 Freidoras y planchas», debes indicar qué ingredientes de tu carta se cocinan en cada freidora o plancha y añadir lo que se cocine en ellas y no esté en la carta, y mantenerlo al día. Lo que llega a un ingrediente desde su freidora o plancha cuenta como alérgeno de ese ingrediente. Solo debes marcar que un ingrediente «se puede cocinar aparte» (cazo con aceite limpio o sartén limpia) si de verdad lo preparáis así cuando un cliente lo pide. Los componentes que no digan qué llevan se mostrarán a los clientes con avisos como «pregunta al camarero» y la responsabilidad de que la información sea completa y correcta es tuya.</p>
 <p><b>C6. Lo que publicas.</b> Autorizas a mostrar públicamente el nombre, la dirección, el teléfono, la ubicación y la carta de tus locales en la app, en sus enlaces y en los códigos QR. Nos concedes, de forma gratuita y no exclusiva, permiso para reproducir el nombre comercial, el logotipo y las imágenes de tus locales con ese fin y para mencionar que tu local está en TusAlergias cuando demos a conocer la app, mientras tu local esté dado de alta. Garantizas que el local es tuyo o que estás autorizado para gestionarlo, y que tienes derecho a publicar esa información.</p>
 <p><b>C7. Opiniones de clientes.</b> Los clientes pueden publicar opiniones y avisos de errores en la carta de tus locales (una opinión y un aviso por persona y local). TusAlergias no comprueba que sus autores hayan consumido en el local: solo aplica un control técnico para limitar a una opinión por persona y local, además de la revisión manual de las que se denuncian. <b>No puedes borrarlos ni valorar tus propios locales.</b> Puedes responder públicamente a cada opinión, marcar un aviso como corregido cuando hayas arreglado la carta y denunciar las opiniones o avisos que creas que incumplen las normas (falsos, ofensivos, con datos personales o con publicidad), explicando tus motivos. La administración de TusAlergias decide si los retira; no retira una opinión solo por ser negativa. También puede retirar las respuestas de los locales que sean ofensivas o incluyan datos personales.</p>
 <p><b>C8. Verificación y reclamación de locales.</b> TusAlergias puede comprobar que una cuenta gestiona de verdad un local (por ejemplo, llamando a su teléfono público) y mostrarlo como <b>«✓ Verificado»</b>. La verificación se refiere a quién gestiona el local, no a la carta: de la información de alérgenos responde siempre el restaurante. Si cambias el nombre o la localidad de un local verificado, pierde la verificación hasta que se compruebe de nuevo.</p>
@@ -1082,6 +1117,21 @@
       </div>
     </details>
 
+    <details class="help-sec" id="help-pin">
+      <summary>🔑 Vista del camarero y PIN de gestión</summary>
+      <div class="help-body">
+        <p>Al abrir tu carta, el móvil muestra la <b>vista del camarero</b>: solo el panel de alergias de la mesa, la carta y «📲 Enviar a cocina». Sin botones de editar ni estadísticas, para no distraer.</p>
+        <p>Todo lo demás (añadir y editar platos, subir la carta con foto, freidoras, estadísticas, código Bidi, datos del local, opiniones y tu cuenta) está arriba, en <b>«⚙️ Gestión del restaurante»</b>, y se abre con un <b>PIN</b>:</p>
+        <ol>
+          <li>La primera vez que lo pulsas, crea un PIN de 4 a 8 cifras. Se guarda solo en ese móvil: si usas otro, crea otro PIN allí.</li>
+          <li>Dáselo solo a quien gestiona la carta.</li>
+          <li>Las herramientas se cierran al pulsar «▲ Cerrar y bloquear», al salir de Hostelería o tras un minuto con la app en segundo plano.</li>
+        </ol>
+        <p>Con el PIN puesto, la pestaña «👨‍🍳 Hostelería» abre directamente la vista del camarero (si tienes varios locales, primero eliges el local). «Mis restaurantes», la suscripción y tu cuenta se abren con «🔒 Gestión y cuenta (PIN)».</p>
+        <p class="help-warn">¿Has olvidado el PIN? Pulsa «¿Has olvidado el PIN?»: se cierra la sesión y, al volver a entrar con el email y la contraseña de la cuenta (o con Google), el PIN de ese móvil se borra y puedes crear otro.</p>
+      </div>
+    </details>
+
     <details class="help-sec" id="help-foto">
       <summary>📸 11. Carga tu carta con una foto (lo más rápido)</summary>
       <div class="help-body">
@@ -1105,18 +1155,23 @@
         <ol>
           <li>En la barra de tu restaurante, pulsa «🍟 Freidoras y planchas».</li>
           <li>Añade cada freidora y cada plancha, con un nombre que tu equipo reconozca («Freidora 2 · solo sin gluten»).</li>
-          <li>Escribe <b>todo lo que se cocina en ella</b> (croquetas, calamares, pimientos…). La app marca sola los alérgenos que detecta: revísalos.</li>
+          <li>Pulsa «➕ Elegir de mi carta» y marca los ingredientes de tus platos que se cocinan en ella (por ejemplo, las patatas del entrecot). Si todo el plato se cocina ahí, marca el plato.</li>
+          <li>Si se cocina algo que no está en tu carta, escríbelo en «Otros» y marca sus alérgenos.</li>
           <li>Pulsa «💾 Guardar freidoras y planchas».</li>
-          <li>Al editar cada plato, en «🍟 Dónde se cocina», elige su freidora o plancha.</li>
         </ol>
+        <p>También puedes indicarlo al editar un plato: cada componente tiene «🍟 Dónde se cocina este componente».</p>
+        <p>Lo que pasa por cada freidora o plancha <b>se calcula de tu carta publicada</b>: si cambias un plato, se actualiza solo. Los platos en borrador no cuentan hasta que los publicas.</p>
+        <p><b>Lo que le llega a un ingrediente desde su freidora o plancha cuenta como alérgeno suyo.</b> Por ejemplo, unas patatas fritas en el aceite de las croquetas llevan GLUTEN, HUEVO y LÁCTEO. Lo verás junto al ingrediente.</p>
+        <p>Si ese ingrediente se puede cocinar aparte, márcalo como <b>«🔄 Adaptable: se puede freír aparte (cazo con aceite limpio)»</b> o <b>«se puede hacer aparte (sartén limpia)»</b>. Lo tienes en «Elegir de mi carta», debajo de cada ingrediente marcado, y al editar el plato, en cada componente.</p>
         <p>Qué ve cada cliente según sus alergias:</p>
         <ul>
-          <li><span class="help-no">NO APTO</span> si se fríe en un aceite con algo que evita y no hay otra freidora libre de ello.</li>
-          <li><span class="help-mod">ADAPTABLE</span> si tienes otra freidora libre de lo que evita: verá «Pedir que lo hagan en la Freidora 2».</li>
-          <li><span class="help-mod">ADAPTABLE</span> si es una plancha: verá «Pedir plancha limpia o sartén aparte».</li>
+          <li><span class="help-mod">ADAPTABLE</span> si tienes otra freidora o plancha libre de lo que evita: verá «Patatas: pedir que lo hagan en la Freidora 2».</li>
+          <li><span class="help-mod">ADAPTABLE</span> si marcaste que se puede cocinar aparte: verá «Patatas: pedir que lo frían aparte, en un cazo con aceite limpio».</li>
+          <li><span class="help-mod">ADAPTABLE</span> si el ingrediente se puede quitar: verá, por ejemplo, «Sin patatas».</li>
+          <li><span class="help-no">NO APTO</span> en cualquier otro caso.</li>
         </ul>
         <p>Cuenta aunque el cliente acepte trazas, porque el aceite y la plancha están en contacto directo con el alimento.</p>
-        <p class="help-warn">Si cambias lo que fríes en una freidora, cámbialo aquí: se actualizan todos sus platos a la vez. Mantenerlo al día es responsabilidad del restaurante.</p>
+        <p class="help-warn">Si empiezas a freír algo nuevo en una freidora, márcalo en «Elegir de mi carta» (o en «Otros» si no está en la carta). Marca como «se puede cocinar aparte» solo lo que de verdad hagáis aparte cuando lo pide un cliente. Mantenerlo al día es responsabilidad del restaurante.</p>
       </div>
     </details>
 
@@ -1128,7 +1183,7 @@
           <li>Añade sus componentes: escanea el envase del producto que usas en cocina («📊 Foto Cód. Barras», «📷 Escáner Vivo» o «📑 Foto Etiqueta»), búscalo por nombre o marca, o pulsa «➕ Componente Manual».</li>
           <li>En cada componente, marca sus alérgenos y si es fijo o adaptable (apartado 13). Si el texto menciona un alérgeno que no has marcado, la app te avisa. Si el <b>nombre del plato</b> indica algo que ningún componente explica (por ejemplo, «Tarta de queso» sin lácteo), verás un aviso debajo del nombre: márcalo en su componente o cambia el nombre.</li>
           <li>En «⚠️ Trazas en cocina», marca los alérgenos que pueden llegar al plato por contaminación cruzada.</li>
-          <li>En «🍟 Dónde se cocina», elige la freidora o plancha en la que se hace el plato (apartado «Freidoras y planchas»).</li>
+          <li>En cada componente, en «🍟 Dónde se cocina este componente», elige su freidora o plancha (apartado «Freidoras y planchas»).</li>
           <li>En «👩‍🍳 Protocolo en cocina», explica cómo lo preparáis para alérgicos (por ejemplo, «Se sirve en plato aparte»).</li>
           <li>Deja marcada «📢 Publicado» para que lo vean los clientes, o desmárcala para guardarlo como borrador.</li>
           <li>Pulsa «💾 Guardar Plato en la Carta».</li>
@@ -1181,6 +1236,7 @@
       <summary>🧑‍🤝‍🧑 16. Atiende a un cliente en la mesa</summary>
       <div class="help-body">
         <p>En tu carta, en «Comprobar la carta para un comensal», toca las alergias y dietas del cliente. Si evita algo más, escríbelo y pulsa «+ Vigilar». Las pestañas te muestran al momento qué puede tomar.</p>
+        <p>Pulsa <b>«📲 Enviar a cocina»</b>, escribe la mesa si quieres y elige el chat de cocina en WhatsApp. El mensaje lleva las alergias de la mesa y los platos compatibles, los adaptables (con qué hay que adaptar) y los no aptos (con el motivo).</p>
         <p>No se guarda nada. Pulsa «🧹 Limpiar» antes del siguiente cliente.</p>
       </div>
     </details>
@@ -1189,9 +1245,9 @@
       <summary>📊 17. Estadísticas y datos del local</summary>
       <div class="help-body">
         <ul>
-          <li>Arriba de tu carta ves cuántas visitas ha tenido, cuántas veces la han guardado, los pre-avisos de reserva y los avisos de errores.</li>
+          <li>En «⚙️ Gestión del restaurante» (con el PIN) ves cuántas visitas ha tenido tu carta, cuántas veces la han guardado, los pre-avisos de reserva y los avisos de errores.</li>
           <li><b>«⚙️ Datos / WhatsApp»</b>: cambia el nombre, la dirección o el WhatsApp.</li>
-          <li><b>«🔒 Salir»</b>: vuelve a la vista de cliente.</li>
+          <li><b>«🏠 Mis restaurantes»</b>: vuelve a la lista de tus locales y a tu cuenta.</li>
         </ul>
       </div>
     </details>
@@ -1211,7 +1267,7 @@
     <details class="help-sec" id="help-opiniones-local">
       <summary>💬 19. Opiniones de tu local, verificación y reclamaciones</summary>
       <div class="help-body">
-        <p>Las opiniones son de los clientes: <b>no puedes borrarlas ni valorar tu propio local</b>. Así los clientes pueden fiarse de ellas. Lo que sí puedes hacer, desde «Gestionar»:</p>
+        <p>Las opiniones son de los clientes: <b>no puedes borrarlas ni valorar tu propio local</b>. Así los clientes pueden fiarse de ellas. Lo que sí puedes hacer, desde «⚙️ Gestión del restaurante» (con el PIN):</p>
         <ul>
           <li><b>«💬 Responder»</b>: tu respuesta sale debajo de la opinión, a la vista de todos. Responde con educación y sin datos personales. Puedes cambiarla o quitarla.</li>
           <li><b>«✅ Marcar como corregido»</b> en un «⚠️ Aviso Carta»: cuando hayas arreglado la carta. El aviso sigue visible con la etiqueta «Corregido por el local».</li>
@@ -1292,9 +1348,9 @@
   <div class="modal-content" style="border:2px solid var(--amber);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
       <h2 style="margin:0; font-size:1.02rem; color:#fde68a;">🍟 Freidoras y planchas</h2>
-      <button class="btn btn-outline" onclick="closeEquipModal()" aria-label="Cerrar">✕</button>
+      <button class="btn btn-outline" onclick="closeIfNoChanges('equipModal', closeEquipModal)" aria-label="Cerrar">✕</button>
     </div>
-    <div class="info-box">Da de alta cada freidora y plancha y escribe <b>todo lo que se cocina en ella</b>. Después, al editar cada plato, elige dónde se hace.<br><br>Lo que se fríe en el mismo aceite o se hace en la misma plancha llega al plato: la app lo tiene en cuenta con las alergias de cada cliente. Si tienes otra freidora libre de su alergia, se lo propone («pide que lo frían en la Freidora 2»).<br><br><b>Mantenlo al día:</b> si cambias lo que fríes en una freidora, cámbialo aquí y se actualizan todos sus platos. Esta información es responsabilidad del restaurante.</div>
+    <div class="info-box">Da de alta cada freidora y plancha. Después pulsa <b>«➕ Elegir de mi carta»</b> y marca los ingredientes de tus platos que se cocinan en ella. También puedes indicarlo al editar cada plato, en cada componente.<br><br>Lo que se fríe en el mismo aceite o se hace en la misma plancha pasa a los demás alimentos: la app lo tiene en cuenta con las alergias de cada cliente. Si tienes otra freidora libre de su alergia, se lo propone («pide que lo hagan en la Freidora 2»).<br><br>Lo que se cocina en cada equipo <b>se calcula de tu carta</b>: si cambias un plato, se actualiza solo. Añade a mano solo lo que no está en la carta. Esta información es responsabilidad del restaurante.</div>
     <div id="equipEmpty" style="font-size:0.78rem; color:var(--muted); text-align:center; padding:8px 0 12px;">Aún no hay ninguna. Añade la primera:</div>
     <div id="equipList"></div>
     <div id="equipAddBtns" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:10px 0;">
@@ -1302,6 +1358,20 @@
       <button class="btn btn-outline" onclick="addEquipRow('plancha')">+ 🍳 Añadir plancha</button>
     </div>
     <button class="btn btn-green" style="width:100%; padding:12px;" onclick="saveEquipFromModal()">💾 Guardar freidoras y planchas</button>
+  </div>
+</div>
+
+<div class="modal" id="equipPickModal" style="z-index:3400;">
+  <div class="modal-content" style="border:2px solid var(--purple);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px;">
+      <h2 style="margin:0; font-size:1rem; color:#e9d5ff;">Elegir de mi carta · <span id="epTitle"></span></h2>
+      <button class="btn btn-outline" onclick="closeEquipPick()" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="info-box" id="epInfo"></div>
+    <input type="text" id="epSearch" placeholder="🔍 Buscar plato o ingrediente..." oninput="renderEquipPick()" style="width:100%; padding:8px; border-radius:8px; border:1px solid #475569; background:var(--bg); color:#fff; margin-bottom:10px;">
+    <div id="epList"></div>
+    <button class="btn btn-green" style="width:100%; padding:12px; margin-top:10px;" onclick="closeEquipPick()">✔ Listo</button>
+    <div style="font-size:0.7rem; color:var(--muted); text-align:center; margin-top:6px;">Después pulsa «💾 Guardar freidoras y planchas».</div>
   </div>
 </div>
 <div class="modal" id="uiDialog" style="z-index:7000;" role="dialog" aria-modal="true" aria-labelledby="uiDialogMsg">
@@ -1332,7 +1402,7 @@
 </div>
 
 <script>
-const APP_VERSION = "3.7";
+const APP_VERSION = "3.9";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
@@ -1392,7 +1462,7 @@ function today() { return new Date().toLocaleDateString("es-ES"); }
 
 // ---------- Diálogos propios (Chrome puede bloquear alert/prompt y quedan feos en la app) ----------
 let uiDialogResolve = null, uiDialogIsPrompt = false;
-function openUiDialog({ msg, input = null, okText = "Aceptar", cancelText = "Cancelar", danger = false, showCancel = true, placeholder = "", inputType = "text" }) {
+function openUiDialog({ msg, input = null, okText = "Aceptar", cancelText = "Cancelar", danger = false, showCancel = true, placeholder = "", inputType = "text", inputMode = "" }) {
   return new Promise(resolve => {
     if (uiDialogResolve) uiDialogResolve(uiDialogIsPrompt ? null : false);
     uiDialogResolve = resolve; uiDialogIsPrompt = input !== null;
@@ -1400,6 +1470,8 @@ function openUiDialog({ msg, input = null, okText = "Aceptar", cancelText = "Can
     const inp = $("uiDialogInput");
     inp.style.display = uiDialogIsPrompt ? "block" : "none";
     inp.type = inputType;
+    inp.inputMode = inputMode;
+    inp.autocomplete = inputType === "password" ? "off" : "";
     inp.value = uiDialogIsPrompt ? input : "";
     inp.placeholder = placeholder;
     $("uiDialogCancel").style.display = showCancel ? "inline-flex" : "none";
@@ -1501,27 +1573,38 @@ const STATE_KEY = "tusalergias_v15_final", PROFILE_KEY = "tusalergias_profile_v1
 
 function sanitizeIng(i) {
   i = i || {};
-  return {
+  const out = {
     n: str(i.n, 160), sub: str(i.sub, 800), mod: !!i.mod, note: str(i.note, 200),
     a: (Array.isArray(i.a) ? i.a : []).filter(x => ALLERGENS.includes(x)),
     tags: (Array.isArray(i.tags) ? i.tags : []).filter(x => DIET_IDS.includes(x))
   };
+  const eq = sanitizeEqIds(i.eq);
+  if (eq.length) {
+    out.eq = eq;                              // freidoras o planchas donde se cocina este componente
+    const ap = sanitizeEqIds(i.ap).filter(id => eq.includes(id));
+    if (ap.length) out.ap = ap;               // en cuáles se puede cocinar aparte (cazo o sartén limpios)
+  }
+  return out;
 }
-// ---------- Freidoras y planchas compartidas (3.7) ----------
-// El local da de alta cada equipo y lo que se cocina en él. Cada plato guarda una copia de los
-// equipos donde se hace (así la carta que recibe el cliente se evalúa sin más datos).
-// a: alérgenos que marca el local; f: lo que se cocina en él (se lee para detectar más alérgenos
-// y lo que cada cliente evita aunque no sea de los 14, p. ej. pimiento).
+// ---------- Freidoras y planchas compartidas (3.8) ----------
+// El local da de alta cada equipo. Cada COMPONENTE de un plato dice en qué equipo se cocina
+// (ing.eq: ids). Lo que se cocina en un equipo se calcula de la carta publicada (y se mantiene al
+// día solo); a y f son lo que el local añade a mano porque no está en la carta (otros alérgenos y
+// otros alimentos; f se lee para detectar alérgenos y lo que cada cliente evita, p. ej. pimiento).
 const EQUIP_KINDS = {
-  freidora: { icon: "🍟", label: "Freidora", shared: "aceite compartido" },
-  plancha:  { icon: "🍳", label: "Plancha", shared: "plancha compartida" }
+  freidora: { icon: "🍟", label: "Freidora", shared: "aceite compartido", apart: "pedir que lo frían aparte, en un cazo con aceite limpio", apartShort: "se puede freír aparte en un cazo con aceite limpio" },
+  plancha:  { icon: "🍳", label: "Plancha", shared: "plancha compartida", apart: "pedir que lo hagan aparte, en una sartén limpia", apartShort: "se puede hacer aparte en una sartén limpia" }
 };
-const MAX_EQUIP = 12, MAX_DISH_EQ = 3;
+const MAX_EQUIP = 12, MAX_ING_EQ = 3;
+function cleanEqId(x) { return String(x == null ? "" : x).replace(/[^A-Za-z0-9_-]/g, "").slice(0, 24); }
+function sanitizeEqIds(list) {
+  return [...new Set((Array.isArray(list) ? list : []).map(cleanEqId).filter(Boolean))].slice(0, MAX_ING_EQ);
+}
 function sanitizeEquipItem(e) {
   e = e || {};
   const k = Object.prototype.hasOwnProperty.call(EQUIP_KINDS, e.k) ? e.k : "freidora";
   return {
-    i: String(e.i || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 24) || uid("e"), k,
+    i: cleanEqId(e.i) || uid("e"), k,
     n: str(e.n, 40) || EQUIP_KINDS[k].label,
     a: ALLERGENS.filter(x => (Array.isArray(e.a) ? e.a : []).includes(x)),
     f: str(e.f, 300)
@@ -1538,18 +1621,21 @@ function sanitizeMenu(menu) {
     let id = Math.floor(Number(d.id));
     if (!Number.isFinite(id) || id <= 0 || used.has(id)) id = Date.now() + k;
     used.add(id);
+    const ings = (Array.isArray(d.ings) ? d.ings : []).slice(0, 40).map(sanitizeIng);
+    // 3.7 guardaba la freidora en el plato entero: pasa a todos sus componentes
+    const old = sanitizeEqIds(Array.isArray(d.eq) ? d.eq.map(e => e && typeof e === "object" ? e.i : e) : []);
+    if (old.length) ings.forEach(i => { if (!i.eq) i.eq = old.slice(); });
     return {
       id, cat: str(d.cat, 60) || "CARTA", name: str(d.name, 160) || "PLATO", protocol: str(d.protocol, 300), draft: !!d.draft,
       traces: (Array.isArray(d.traces) ? d.traces : []).filter(x => ALLERGENS.includes(x)),
-      ings: (Array.isArray(d.ings) ? d.ings : []).slice(0, 40).map(sanitizeIng),
-      ...(Array.isArray(d.eq) && d.eq.length ? { eq: sanitizeEquip(d.eq, MAX_DISH_EQ) } : {})
+      ings
     };
   });
 }
 // Borradores: platos que el restaurante aún no publica. Solo los ve su dueño (modo propietario).
 function publicMenu(r) { return ((r && r.menu) || []).filter(d => !d.draft); }
 function draftMenu(r) { return ((r && r.menu) || []).filter(d => d.draft); }
-function viewMenu(r) { return isStaffUnlocked ? ((r && r.menu) || []) : publicMenu(r); }
+function viewMenu(r) { return isStaffUnlocked && pinOpen ? ((r && r.menu) || []) : publicMenu(r); }     // el camarero ve la carta publicada
 function withoutDraftFlag(menu) { return menu.map(({ draft, ...d }) => d); }
 function sanitizeRest(r) {
   r = r || {};
@@ -1638,6 +1724,7 @@ try { appState = normalizeState(JSON.parse(localStorage.getItem(STATE_KEY))); } 
 
 let activeRestId = appState.restaurants[0].id;
 let isStaffUnlocked = false;
+let pinOpen = false;          // hostelería: herramientas abiertas con el PIN (si no, vista del camarero)
 let currentView = "discover", currentWaiterLang = "es";
 let leafletMap = null, markersLayer = null, userMarker = null, lastGeoPlaces = [], lastSupermarketProducts = [];
 let selectedAllergens = new Set(), selectedDiets = new Set(), customAvoidSet = new Set(), strictTracesEnabled = true;
@@ -2023,8 +2110,8 @@ function memoDetect(kind, txt, extra) {
 // Evalúa un plato de restaurante con el perfil activo (el tuyo, o el del comensal en modo gestión).
 // Cuenta lo que marca el restaurante, lo que menciona el texto de cada componente y lo que dice el
 // NOMBRE del plato. Un plato sin ingredientes detallados nunca sale «compatible» si no se puede saber.
-// equipList: freidoras y planchas del local (para proponer otra libre de lo que evitas).
-function evaluateDish(dish, strict, equipList) {
+// eqx: freidoras y planchas del local con lo que se cocina en cada una (buildEquipIndex).
+function evaluateDish(dish, strict, eqx) {
   const S = activeSets();
   if (!S.al.size && !S.di.size && !S.cu.size) return { status:"aptos", rem:[], blk:[], tr:[] };
   const rem = [], blk = [];
@@ -2042,6 +2129,7 @@ function evaluateDish(dish, strict, equipList) {
     diets.forEach(t => { if (S.di.has(t)) { covered.add("D:" + t); labels.push(DIET_TAG_LABELS[t] || t); } });
     S.cu.forEach(c => { const ci = customHitInfo(txt, c); if (ci) { covered.add("C:" + c); labels.push(customWhy(ci, c)); } });
     det.tr.forEach(t => { if (S.al.has(t) && !allA.includes(t)) traces.add(t); });
+    if (eqx && ing.eq && ing.eq.length) equipEval(ing, allA, txt, S, eqx, rem, blk);
     if (!labels.length) {
       // Un componente que no dice qué lleva no permite saber si encaja con lo que evitas: se pregunta
       if ((S.cu.size || S.di.size) && ingGaps(ing)) {
@@ -2069,20 +2157,6 @@ function evaluateDish(dish, strict, equipList) {
     nd.tr.forEach(t => { if (S.al.has(t) && !covered.has("A:" + t)) traces.add(t); });
     if (hits.length) blk.push(`Según su nombre: ${esc(hits.join(", "))}. Confírmalo con el camarero`);
   }
-  // Freidoras y planchas compartidas: lo que se cocina en el mismo aceite o superficie llega al
-  // plato por contacto directo. No es una traza: cuenta aunque el cliente permita trazas.
-  // Freidora: el aceite no se cambia al momento; si hay otra freidora libre de lo que evitas, se
-  // puede pedir (ADAPTABLE); si no, NO APTO. Plancha: se puede limpiar o usar sartén aparte (ADAPTABLE).
-  (Array.isArray(dish.eq) ? dish.eq : []).forEach(e => {
-    const hits = equipHits(e, S);
-    if (!hits.length) return;
-    const K = EQUIP_KINDS[e.k] || EQUIP_KINDS.freidora;
-    const why = `${K.shared} con ${hits.join(", ")}`;
-    const alt = equipAlternative(e, equipList, S);
-    if (alt) rem.push(`Pedir que lo hagan en ${K.icon} ${esc(alt.n)} (${esc(e.n)}: ${esc(why)})`);
-    else if (e.k === "plancha") rem.push(`Pedir plancha limpia o sartén aparte (${esc(e.n)}: ${esc(why)})`);
-    else blk.push(`${K.icon} ${esc(e.n)}: ${esc(why)}`);
-  });
   // Sin ingredientes detallados no se puede saber si encaja con tu dieta o lo que evitas
   if (!ings.some(i => !isPlaceholderIng(i))) {
     const allergenInfo = ings.some(i => (i.a || []).length) || (dish.traces || []).length > 0;
@@ -2103,33 +2177,140 @@ function evaluateDish(dish, strict, equipList) {
   return { status:"aptos", rem, blk, tr };
 }
 
-// ---------- Freidoras y planchas: qué de lo que evitas se cocina en un equipo ----------
-function equipAllergens(e) {
-  const det = memoDetect("a", String(e && e.f || ""));
-  return ALLERGENS.filter(x => (e.a || []).includes(x) || det.a.includes(x));
+// ---------- Freidoras y planchas compartidas (3.8) ----------
+// Lo que se cocina en el mismo aceite o la misma plancha llega a cada componente por contacto
+// directo: no es una traza y cuenta aunque el cliente permita trazas.
+// - Lo que se cocina en un equipo sale de la carta PUBLICADA (los componentes que lo indican) más
+//   lo que el local añade a mano (e.a, e.f). Así se mantiene al día solo.
+// - A cada componente solo le afecta lo que cocinan los DEMÁS (no él mismo).
+// - Lo que llega del equipo cuenta como alérgeno del propio componente. Sale ADAPTABLE si:
+//   hay otra freidora/plancha libre de lo que evitas; el local marca que ese componente se puede
+//   cocinar aparte (cazo con aceite limpio o sartén limpia); o el componente se puede quitar.
+//   Si no, NO APTO.
+// Alérgenos de un componente tal como los cuenta el evaluador (marcados + los que dice su texto)
+function ingAllergenList(ing) {
+  const det = memoDetect("a", `${ing.n || ""} . ${ing.sub || ""}`);
+  const declared = new Set(ing.a || []);
+  return ALLERGENS.filter(x => declared.has(x) || det.a.includes(x));
 }
-function equipHits(e, S) {
-  if (!e) return [];
-  const hits = equipAllergens(e).filter(x => S.al.has(x));
-  const f = String(e.f || "");
-  if (f) S.cu.forEach(c => {
-    const ci = customHitInfo(f, c);
-    if (!ci) return;
-    const T = String(c).toUpperCase();
-    const same = normText(ci.via) === normText(c);
-    hits.push(ci.kind === "maybe" ? `quizá ${T} («${ci.via}»)` : same ? T : `${T} («${ci.via}»)`);
+// Índice: cada equipo con los componentes de la carta que se cocinan en él
+function buildEquipIndex(equipList, menu) {
+  const list = Array.isArray(equipList) ? equipList : [];
+  const byId = new Map(list.map(e => [e.i, e]));
+  const src = new Map(list.map(e => [e.i, []]));
+  (Array.isArray(menu) ? menu : []).forEach(d => (d.ings || []).forEach(ing => (ing.eq || []).forEach(id => {
+    const arr = src.get(id);
+    if (arr) arr.push({ dish: d, ing, al: ingAllergenList(ing) });
+  })));
+  return { list, byId, src, cu: new Map() };
+}
+// Alérgenos que pasan por un equipo → de dónde vienen (nombres de plato, u «otros» si es a mano).
+// selfIng: el componente que se evalúa (no se contamina a sí mismo). skipDish: plato que no cuenta.
+function equipContents(E, eqx, selfIng, skipDish) {
+  const m = new Map();
+  const add = (x, who) => { let a = m.get(x); if (!a) m.set(x, a = []); if (!a.includes(who)) a.push(who); };
+  (E.a || []).forEach(x => add(x, "otros"));
+  if (E.f) memoDetect("a", E.f).a.forEach(x => add(x, "otros"));
+  (eqx.src.get(E.i) || []).forEach(s => {
+    if (s.ing === selfIng || (skipDish && s.dish === skipDish)) return;
+    s.al.forEach(x => add(x, s.dish.name));
   });
-  return hits;
+  return new Map(ALLERGENS.filter(x => m.has(x)).map(x => [x, m.get(x)]));
 }
-// Otro equipo del mismo tipo en el que no se cocina nada de lo que evitas
-function equipAlternative(e, list, S) {
-  return (Array.isArray(list) ? list : []).find(x => x && x.k === e.k && x.i !== e.i && !equipHits(x, S).length) || null;
+// Lo que el cliente evita (fuera de los 14) que se cocina en el equipo: se calcula una vez por equipo y término
+function equipCustomSources(E, eqx, term) {
+  const key = E.i + "|" + term;
+  let v = eqx.cu.get(key);
+  if (!v) {
+    v = [];
+    if (E.f) { const ci = customHitInfo(E.f, term); if (ci) v.push({ who: "otros", ci, ing: null, dish: null }); }
+    (eqx.src.get(E.i) || []).forEach(s => {
+      const ci = customHitInfo(`${s.ing.n || ""} . ${s.ing.sub || ""}`, term);
+      if (ci) v.push({ who: s.dish.name, ci, ing: s.ing, dish: s.dish });
+    });
+    eqx.cu.set(key, v);
+  }
+  return v;
 }
-// Texto para la ficha del plato: dónde se hace y qué más se cocina ahí
-function equipLine(e) {
-  const K = EQUIP_KINDS[e.k] || EQUIP_KINDS.freidora;
-  const al = equipAllergens(e);
-  return `${K.icon} ${e.n} · ${al.length ? K.shared + " con " + al.join(", ") : "ninguno de los 14 alérgenos declarado"}${e.f ? " · se cocina: " + e.f : ""}`;
+function niceName(s) {
+  s = String(s || "").trim().toLowerCase();
+  s = s.charAt(0).toUpperCase() + s.slice(1);
+  return s.length > 28 ? s.slice(0, 27) + "…" : s;
+}
+function originText(who) {
+  const a = [...new Set(who)];
+  return a.length ? ` (${a.slice(0, 2).map(w => w === "otros" ? "otros" : niceName(w)).join(", ")}${a.length > 2 ? "…" : ""})` : "";
+}
+// «GLUTEN, HUEVO (Croquetas); MOLUSCOS (Calamares)»: alérgenos agrupados por su origen
+function allergensByOrigin(m) {
+  const groups = new Map();
+  m.forEach((who, x) => { const k = originText(who); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(x); });
+  return [...groups.entries()].map(([k, xs]) => xs.join(", ") + k).join("; ");
+}
+// Qué de lo que evita el cliente le llega a este componente desde el equipo E
+function equipHitsFor(E, eqx, ing, ownA, txt, S) {
+  const out = [];
+  if (S.al.size) {
+    equipContents(E, eqx, ing).forEach((who, x) => { if (S.al.has(x) && !ownA.includes(x)) out.push(x + originText(who)); });
+  }
+  S.cu.forEach(c => {
+    if (customHitInfo(txt, c)) return;                       // lo lleva el propio componente: ya se avisa
+    const hs = equipCustomSources(E, eqx, c).filter(h => h.ing !== ing);
+    if (!hs.length) return;
+    const sure = hs.filter(h => h.ci.kind === "sure");
+    const use = sure.length ? sure : hs;
+    out.push((sure.length ? "" : "quizá ") + String(c).toUpperCase() + originText(use.map(h => h.who)));
+  });
+  return out;
+}
+// Otro equipo del mismo tipo en el que este componente no recibiría nada de lo que evitas
+function equipAlternativeFor(E, eqx, ing, ownA, txt, S) {
+  return eqx.list.find(x => x.k === E.k && x.i !== E.i && !equipHitsFor(x, eqx, ing, ownA, txt, S).length) || null;
+}
+function equipEval(ing, ownA, txt, S, eqx, rem, blk) {
+  (ing.eq || []).forEach(id => {
+    const E = eqx.byId.get(id);
+    if (!E) return;
+    const hits = equipHitsFor(E, eqx, ing, ownA, txt, S);
+    if (!hits.length) return;
+    const K = EQUIP_KINDS[E.k] || EQUIP_KINDS.freidora;
+    const why = `${E.n}: ${K.shared} con ${hits.join(", ")}`;
+    const alt = equipAlternativeFor(E, eqx, ing, ownA, txt, S);
+    const nm = esc(ing.n || "Componente");
+    if (alt) rem.push(`${nm}: pedir que lo hagan en ${K.icon} ${esc(alt.n)} (${esc(why)})`);
+    else if ((ing.ap || []).includes(E.i)) rem.push(`${nm}: ${K.apart} (${esc(why)})`);
+    else if (ing.mod) rem.push(`${esc(ing.note || ("Sin " + ing.n))} (${esc(why)})`);
+    else blk.push(`${nm}: ${K.icon} ${esc(why)}`);
+  });
+}
+// Texto informativo (igual para todos): dónde se cocinan estos componentes y qué más pasa por ahí
+// Alérgenos que le llegan a un componente desde sus equipos (sin los suyos propios): [{ E, al: [x] }]
+function ingEquipAllergens(ing, eqx) {
+  if (!eqx || !ing.eq || !ing.eq.length) return [];
+  const own = ingAllergenList(ing);
+  return ing.eq.map(id => eqx.byId.get(id)).filter(Boolean).map(E => {
+    const al = [];
+    equipContents(E, eqx, ing).forEach((who, x) => { if (!own.includes(x)) al.push(x); });
+    return { E, al };
+  });
+}
+function equipLineFor(E, compNames, eqx, skipDish) {
+  const K = EQUIP_KINDS[E.k] || EQUIP_KINDS.freidora;
+  const al = equipContents(E, eqx, null, skipDish);
+  const head = `${K.icon} ${E.n}${compNames.length ? " (" + [...new Set(compNames)].join(", ") + ")" : ""}`;
+  if (!al.size) return `${head}: sin otros alérgenos declarados`;
+  return `${head}: ${K.shared} con ${allergensByOrigin(al)}`;
+}
+function dishEquipLines(d, eqx) {
+  if (!eqx) return [];
+  const by = new Map();
+  (d.ings || []).forEach(ing => (ing.eq || []).forEach(id => {
+    if (!eqx.byId.has(id)) return;
+    if (!by.has(id)) by.set(id, []);
+    const K = EQUIP_KINDS[eqx.byId.get(id).k] || EQUIP_KINDS.freidora;
+    by.get(id).push((ing.n || "componente") + ((ing.ap || []).includes(id) ? ": " + K.apartShort : ""));
+  }));
+  return [...by.entries()].map(([id, names]) => equipLineFor(eqx.byId.get(id), names, eqx, d));
 }
 
 // ============================================================
@@ -2657,18 +2838,22 @@ async function pipeBytes(bytes, stream) {
 }
 
 async function encodeMenuPayload(r) {
-  // Freidoras y planchas (3.7): lista «e» y, en cada plato, la posición de sus equipos en esa lista
+  // Freidoras y planchas: lista «e» y, en cada componente, la posición de sus equipos en esa lista
   const eqList = sanitizeEquip(r.equip);
   const eqIdx = new Map(eqList.map((e, k) => [e.i, k]));
   const compact = {
     v: 2, i: r.id, n: r.name || "", c: r.city || "", p: r.phone || "", y: r.lat, x: r.lng, d: r.lastVerified || "",
-    m: publicMenu(r).map(d => {
-      const row = [d.cat || "", d.name || "", d.protocol || "", bitMask(d.traces, ALLERGENS),
-        (d.ings || []).map(i => [i.n || "", i.sub || "", i.mod ? 1 : 0, i.note || "", bitMask(i.a, ALLERGENS), bitMask(i.tags, DIET_IDS)])];
-      const ix = (d.eq || []).map(e => eqIdx.get(e.i)).filter(k => k !== undefined);
-      if (ix.length) row.push(ix);
-      return row;
-    })
+    m: publicMenu(r).map(d => [d.cat || "", d.name || "", d.protocol || "", bitMask(d.traces, ALLERGENS),
+      (d.ings || []).map(i => {
+        const row = [i.n || "", i.sub || "", i.mod ? 1 : 0, i.note || "", bitMask(i.a, ALLERGENS), bitMask(i.tags, DIET_IDS)];
+        const ix = (i.eq || []).map(id => eqIdx.get(id)).filter(k => k !== undefined);
+        if (ix.length) {
+          row.push(ix);                         // en qué freidoras o planchas se cocina este componente
+          const ap = (i.ap || []).map(id => eqIdx.get(id)).filter(k => k !== undefined);
+          if (ap.length) row.push(ap);          // y en cuáles se puede cocinar aparte
+        }
+        return row;
+      })])
   };
   if (eqList.length) compact.e = eqList.map(e => [e.k === "plancha" ? 1 : 0, e.n, bitMask(e.a, ALLERGENS), e.f]);
   const json = new TextEncoder().encode(JSON.stringify(compact));
@@ -2686,13 +2871,21 @@ async function decodeMenuPayload(s) {
   return {
     id: o.i, name: o.n, city: o.c, phone: o.p, lat: o.y, lng: o.x, lastVerified: o.d, equip,
     menu: (o.m || []).map((d, k) => {
-      const dish = {
+      const ids = list => (Array.isArray(list) ? list : []).map(ix => equip[ix] && equip[ix].i).filter(Boolean);
+      const old = ids(d[5]);                    // enlaces de la 3.7: el plato entero en un equipo
+      return {
         id: k + 1, cat: d[0], name: d[1], protocol: d[2], traces: fromMask(d[3], ALLERGENS),
-        ings: (d[4] || []).map(i => ({ n: i[0], sub: i[1], mod: !!i[2], note: i[3], a: fromMask(i[4], ALLERGENS), tags: fromMask(i[5], DIET_IDS) }))
+        ings: (d[4] || []).map(i => {
+          const ing = { n: i[0], sub: i[1], mod: !!i[2], note: i[3], a: fromMask(i[4], ALLERGENS), tags: fromMask(i[5], DIET_IDS) };
+          const eq = ids(i[6]).length ? ids(i[6]) : old;
+          if (eq.length) {
+            ing.eq = eq;
+            const ap = ids(i[7]).filter(id => eq.includes(id));
+            if (ap.length) ing.ap = ap;
+          }
+          return ing;
+        })
       };
-      const eq = (Array.isArray(d[5]) ? d[5] : []).map(ix => equip[ix]).filter(Boolean);
-      if (eq.length) dish.eq = eq;
-      return dish;
     })
   };
 }
@@ -2701,8 +2894,13 @@ async function decodeMenuPayload(s) {
 // NAVEGACIÓN, PERFIL PERSONAL, COMENSAL (MODO GESTIÓN) Y CUENTA DE HOSTELERÍA
 // ============================================================
 function showView(v, fromBack) {
+  // Hostelería con PIN: la pestaña abre directamente la vista del camarero de su local
+  if (v === "owner" && openWaiterIfPin(fromBack)) return;
   if (!fromBack) navRemember(v);           // para el botón «atrás» del móvil
   if (v !== "app" && isStaffUnlocked) { isStaffUnlocked = false; resetStaffGuest(); }   // salir de la carta cierra el modo propietario
+  if ((v !== "app" && v !== "owner") || (v === "app" && !isStaffUnlocked)) pinOpen = false;   // salir de hostelería bloquea las herramientas
+  const wb = $("btnWaiterCard");
+  if (wb) wb.style.display = (v === "owner" || (v === "app" && isStaffUnlocked)) ? "none" : "inline-flex";
   currentView = v;
   ["discoverView","homeView","ownerView","profileView","appView"].forEach(id => {
     const el = $(id);
@@ -2863,6 +3061,7 @@ function renderOwnerSessionView() {
   const logged = ownerLoggedIn();
   $("ownerAuthCard").style.display = logged ? "none" : "block";
   $("ownerLoggedPanel").style.display = logged ? "block" : "none";
+  if (renderWaiterPick()) return;            // con PIN: solo se eligen los locales (vista del camarero)
   $("authTabs").style.display = isCloudMode() ? "grid" : "none";
   if (!logged) { if (!isCloudMode()) authTab = "login"; setAuthTab(authTab); renderLaunchInfo(); return; }
   if (!isCloudMode()) adoptLegacyRestaurants();
@@ -2945,6 +3144,7 @@ function loginWithEmail() {
   if (!validEmail(email)) { toast("Escribe un email válido.", "err"); return; }
   if (pass.length < 4) { toast("La contraseña debe tener al menos 4 caracteres.", "err"); return; }
   appState.currentUser = { name: email.split("@")[0], email };
+  pinForget("local:" + email);
   $("authPassInput").value = "";
   saveAppState();
   renderOwnerSessionView();
@@ -2952,6 +3152,7 @@ function loginWithEmail() {
 }
 async function logoutOwnerSession() {
   isStaffUnlocked = false;
+  pinOpen = false;
   authTab = "login";
   if (cloudOwner()) { try { await cloud.A.signOut(cloud.auth); } catch (e) {} }
   appState.currentUser = null;
@@ -3936,7 +4137,13 @@ function renderRoiMetrics(r) {
 function renderRestaurantApp() {
   const r = getActiveRest();
   $("headerMainTitle").innerText = r.name;
-  $("headerSubTitle").innerText = isStaffUnlocked ? "Modo propietario" : (r.city || "Carta de alérgenos");
+  const waiter = isStaffUnlocked && !pinOpen;            // vista del camarero: solo alergias de la mesa y carta
+  $("headerSubTitle").innerText = isStaffUnlocked ? (pinOpen ? "Modo propietario" : "Vista del camarero") : (r.city || "Carta de alérgenos");
+  $("restInfoCard").style.display = waiter ? "none" : "block";
+  $("menuLegalBanner").style.display = waiter ? "none" : "block";
+  $("btnShareMenu").style.display = isStaffUnlocked ? "none" : "inline-flex";
+  $("reviewsSection").style.display = waiter ? "none" : "block";
+  $("btnWaiterCard").style.display = isStaffUnlocked ? "none" : "inline-flex";
   $("activeRestCity").innerText = r.city ? `📍 ${r.city}` : "";
   $("activeRestBadge").className = r.unclaimed ? "community-badge" : "verified-badge";
   $("activeRestBadge").innerText = r.demo ? "🧪 Carta de ejemplo (no es un restaurante real)" : (r.unclaimed ? "💡 Sugerido por la comunidad" : (r.imported ? "📱 Carta recibida por Bidi" : (r.cloud ? "🛡️ Carta publicada por el restaurante" : "📋 Carta guardada en este móvil"))) + (r.founder ? " · 🏅 Fundador" : "") + verifiedLabel(r);
@@ -3946,7 +4153,7 @@ function renderRestaurantApp() {
   $("staffBar").classList.toggle("show", isStaffUnlocked);
   updateMenuAiButton();
   $("topAllergenBar").style.display = isStaffUnlocked ? "none" : "flex";
-  if (isStaffUnlocked) { renderRoiMetrics(r); renderStaffGuestPanel(); }
+  if (isStaffUnlocked) { renderStaffToolsBar(); if (pinOpen) renderRoiMetrics(r); renderStaffGuestPanel(); }
   $("syncStatus").style.display = (isStaffUnlocked && r.cloud) ? "inline" : "none";
   $("btnBookingAction").style.display = (!r.unclaimed && r.phone) ? "inline-flex" : "none";
   $("btnReportDiscrepancy").style.display = (!r.unclaimed && publicMenu(r).length && !menuLockedForDiner(r) && !isOwnCloudRest(r)) ? "inline-flex" : "none";
@@ -3980,17 +4187,20 @@ function renderDishes() {
     $("tab-aptos").innerText = "COMPATIBLES (0)";
     $("tab-mod").innerText = "ADAPTABLES (0)";
     $("tab-proh").innerText = "NO APTOS (0)";
-    $("dishList").innerHTML = `<div style="text-align:center; padding:20px; color:var(--muted); font-size:0.8rem;">${isStaffUnlocked ? "Tu carta está vacía. Pulsa «📸 Subir carta con foto» para cargarla de una vez, o añade los platos uno a uno." : "Este local aún no tiene platos cargados."}</div>`;
+    $("dishList").innerHTML = `<div style="text-align:center; padding:20px; color:var(--muted); font-size:0.8rem;">${isStaffUnlocked && !pinOpen ? "La carta aún no tiene platos publicados." : isStaffUnlocked ? "Tu carta está vacía. Pulsa «📸 Subir carta con foto» para cargarla de una vez, o añade los platos uno a uno." : "Este local aún no tiene platos cargados."}</div>`;
     return;
   }
   const q = normalizeStr($("searchInput").value);
   const cat = $("catFilter").value || "ALL";
   const counts = { aptos: 0, mod: 0, proh: 0 };
-  let html = isStaffUnlocked ? draftsBarHtml(r) : "";
+  const staffEdit = isStaffUnlocked && pinOpen;           // con las herramientas abiertas se edita; el camarero solo mira
+  let html = staffEdit ? draftsBarHtml(r) : "";
+  // Freidoras y planchas: lo que se cocina en cada una sale de la carta publicada
+  const eqx = (r.equip || []).length ? buildEquipIndex(r.equip, publicMenu(r)) : null;
   menu.forEach(d => {
     if (cat !== "ALL" && d.cat !== cat) return;
     if (q && !normalizeStr(d.name + " " + (d.ings || []).map(i => i.n + " " + i.sub).join(" ")).includes(q)) return;
-    const res = evaluateDish(d, isStaffUnlocked ? true : strictTracesEnabled, r.equip);
+    const res = evaluateDish(d, isStaffUnlocked ? true : strictTracesEnabled, eqx);
     counts[res.status]++;
     if (res.status !== currentTab) return;
     let badge = "";
@@ -3998,15 +4208,18 @@ function renderDishes() {
     if (res.status === "proh") badge = `<div class="mod-box danger">⛔ NO APTO: ${res.blk.join(" · ")}</div>`;
     if (res.tr.length && res.status !== "proh") badge += `<div class="mod-box trace">ℹ️ Trazas en cocina: ${esc(res.tr.join(", "))}</div>`;
     if (d.protocol) badge += `<div class="mod-box protocol">👩‍🍳 ${esc(d.protocol)}</div>`;
-    (d.eq || []).forEach(e => { badge += `<div class="mod-box equip">${esc(equipLine(e))}</div>`; });
-    if (isStaffUnlocked) { const g = dishGaps(d); if (g.none || g.names.length) badge += `<div class="mod-box warn">📋 Detalla los ingredientes: ${g.none ? "este plato no tiene ingredientes desglosados" : "no dicen qué llevan «" + g.names.map(esc).join("», «") + "»"}.</div>`; }
+    dishEquipLines(d, eqx).forEach(l => { badge += `<div class="mod-box equip">${esc(l)}</div>`; });
+    if (staffEdit) { const g = dishGaps(d); if (g.none || g.names.length) badge += `<div class="mod-box warn">📋 Detalla los ingredientes: ${g.none ? "este plato no tiene ingredientes desglosados" : "no dicen qué llevan «" + g.names.map(esc).join("», «") + "»"}.</div>`; }
     const pills = (d.ings || []).map((i, k) => {
-      const al = i.a && i.a.length ? ` <span style="color:var(--accent);">[${esc(i.a.join(", "))}]</span>` : "";
-      return isStaffUnlocked
+      // Lo que le llega de su freidora o plancha también es alérgeno de este ingrediente
+      const fromEq = ingEquipAllergens(i, eqx).filter(x => x.al.length).map(x => `${(EQUIP_KINDS[x.E.k] || EQUIP_KINDS.freidora).icon} ${x.al.join(", ")}`);
+      const al = (i.a && i.a.length ? ` <span style="color:var(--accent);">[${esc(i.a.join(", "))}]</span>` : "")
+        + (fromEq.length ? ` <span style="color:#fdba74;">[${esc(fromEq.join(" · "))}]</span>` : "");
+      return staffEdit
         ? `<span class="ing-pill ing-toggle" onclick="toggleIngMod(${d.id}, ${k})" title="Tocar para cambiar entre Fijo y Adaptable">${i.mod ? "🔄" : "🔒"} <b>${esc(i.n)}</b>${al}</span>`
         : `<span class="ing-pill"><b>${esc(i.n)}</b>${al}</span>`;
     }).join("");
-    const staffBtns = isStaffUnlocked ? `<button class="btn ${d.draft ? "btn-green" : "btn-outline"} dish-pub-btn" style="padding:2px 6px;font-size:0.65rem;" onclick="toggleDishDraft(${d.id})">${d.draft ? "📢 Publicar" : "📝 A borrador"}</button><button class="btn btn-outline" style="padding:2px 6px;font-size:0.65rem;" onclick="openDishModal(${d.id})" aria-label="Editar plato">✏️</button><button class="btn btn-danger" style="padding:2px 6px;font-size:0.65rem;" onclick="deleteDishById(${d.id})" aria-label="Borrar plato">🗑️</button>` : "";
+    const staffBtns = staffEdit ? `<button class="btn ${d.draft ? "btn-green" : "btn-outline"} dish-pub-btn" style="padding:2px 6px;font-size:0.65rem;" onclick="toggleDishDraft(${d.id})">${d.draft ? "📢 Publicar" : "📝 A borrador"}</button><button class="btn btn-outline" style="padding:2px 6px;font-size:0.65rem;" onclick="openDishModal(${d.id})" aria-label="Editar plato">✏️</button><button class="btn btn-danger" style="padding:2px 6px;font-size:0.65rem;" onclick="deleteDishById(${d.id})" aria-label="Borrar plato">🗑️</button>` : "";
     const draftBadge = d.draft ? `<div class="draft-badge">📝 BORRADOR · solo lo ves tú</div>` : "";
     html += `<div class="dish-card ${res.status}${d.draft ? " is-draft" : ""}">${draftBadge}<div class="dish-header"><h3 class="dish-name">${esc(d.name)}</h3><div style="display:flex;gap:4px;align-items:center;">${staffBtns}<span class="dish-cat">${esc(d.cat)}</span></div></div>${badge}<div class="ing-pills">${pills}</div></div>`;
   });
@@ -4075,8 +4288,6 @@ function openDishModal(dishId = null) {
   $("restOcrStatusBox").style.display = "none";
   editorTraces = new Set(d ? d.traces || [] : []);
   renderEditorTraces();
-  editorEquip = new Set(d ? (d.eq || []).map(e => e.i) : []);
-  renderEditorEquip();
   $("dishModalTitle").innerText = d ? "✏️ Editar Plato" : "➕ Nuevo Plato";
   $("editDishId").value = d ? d.id : "";
   $("editName").value = d ? d.name : "";
@@ -4086,6 +4297,7 @@ function openDishModal(dishId = null) {
   if (d) [...(d.ings || [])].reverse().forEach(ing => addIngRow(ing, false));   // se insertan arriba: así se mantiene el orden
   else addIngRow(null, false);
   updateNameHint();
+  refreshEditorEquip();
   openModal("dishModal");
   rememberModalState("dishModal");
 }
@@ -4109,7 +4321,7 @@ function addIngRow(ing = null, autoDetect = true) {
   card.innerHTML = `
     <div style="display:flex; gap:6px; margin-bottom:5px;">
       <input type="text" class="ing-n" placeholder="Componente (ej. Salsa brava)" maxlength="160" style="flex:1; padding:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff;">
-      <button type="button" class="btn btn-danger" onclick="this.closest('.ing-editor-card').remove()" aria-label="Quitar componente">✕</button>
+      <button type="button" class="btn btn-danger" onclick="this.closest('.ing-editor-card').remove(); refreshEditorEquip()" aria-label="Quitar componente">✕</button>
     </div>
     <input type="text" class="ing-sub" placeholder="Lo que lleva (ej. harina, leche, ajo)" maxlength="800" style="width:100%; padding:5px; margin-bottom:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#cbd5e1; font-size:0.72rem;">
     <div class="seg">
@@ -4118,9 +4330,10 @@ function addIngRow(ing = null, autoDetect = true) {
     </div>
     <input type="text" class="ing-note" placeholder="Cómo se adapta, lo verá el cliente (ej. Servir sin salsa)" maxlength="200" style="width:100%; padding:5px; margin-top:6px; border-radius:6px; border:1px solid var(--amber); background:#1c2541; color:#fde68a; font-size:0.72rem;">
     <div class="mini-label">Alérgenos de este componente:</div>
-    <div class="mini-chips ing-al-box">${ALLERGENS.map(a => `<div class="mini-chip" data-al="${esc(a)}" onclick="this.classList.toggle('selected'); updateNameHint()">${esc(a)}</div>`).join("")}</div>
+    <div class="mini-chips ing-al-box">${ALLERGENS.map(a => `<div class="mini-chip" data-al="${esc(a)}" onclick="this.classList.toggle('selected'); updateNameHint(); refreshEditorEquip()">${esc(a)}</div>`).join("")}</div>
     <div class="mini-label">Dietas:</div>
     <div class="mini-chips ing-diet-box">${DIET_IDS.map(d => `<div class="mini-chip" data-diet="${d}" onclick="this.classList.toggle('diet-sel'); updateNameHint()">${DIET_TAG_LABELS[d]}</div>`).join("")}</div>
+    <div class="ing-eq-wrap" style="display:none;"><div class="mini-label">🍟 Dónde se cocina este componente:</div><div class="mini-chips ing-eq-box"></div><div class="ing-eq-detail"></div></div>
     <div class="ing-auto-hint" style="display:none;"></div>`;
   card.querySelector(".ing-n").value = base.n;
   card.querySelector(".ing-sub").value = base.sub;
@@ -4128,10 +4341,13 @@ function addIngRow(ing = null, autoDetect = true) {
   card.querySelectorAll(".ing-al-box .mini-chip").forEach(el => { if (base.a.includes(el.dataset.al)) el.classList.add("selected"); });
   card.querySelectorAll(".ing-diet-box .mini-chip").forEach(el => { if (base.tags.includes(el.dataset.diet)) el.classList.add("diet-sel"); });
   setRowMod(card, base.mod);
+  card._eq = new Set(base.eq || []);
+  card._ap = new Set(base.ap || []);
+  renderIngEquip(card);
   // Se marca mientras se escribe (no al salir del campo): si el aviso apareciera al tocar
   // «Guardar», el botón se movería y el toque caería fuera
   let tickTimer = null;
-  const tickSoon = () => { clearTimeout(tickTimer); tickTimer = setTimeout(() => autoTickRow(card), 350); };
+  const tickSoon = () => { clearTimeout(tickTimer); tickTimer = setTimeout(() => { autoTickRow(card); refreshEditorEquip(); }, 350); };
   ["input", "change"].forEach(ev => {
     card.querySelector(".ing-n").addEventListener(ev, ev === "input" ? tickSoon : () => { clearTimeout(tickTimer); autoTickRow(card); });
     card.querySelector(".ing-sub").addEventListener(ev, ev === "input" ? tickSoon : () => { clearTimeout(tickTimer); autoTickRow(card); });
@@ -4187,6 +4403,7 @@ async function saveDishFromModal() {
   const protocol = str($("editProtocol").value.trim(), 300);
   if (!name) { toast("Escribe el nombre del plato.", "err"); $("editName").focus(); return; }
   const ings = [], warnings = [];
+  const equipIds = new Set((r.equip || []).map(e => e.i));
   document.querySelectorAll("#ingredientsEditor .ing-editor-card").forEach(card => {
     const n = str(card.querySelector(".ing-n").value.trim(), 160);
     if (!n) return;
@@ -4197,7 +4414,9 @@ async function saveDishFromModal() {
     const tags = [...card.querySelectorAll(".ing-diet-box .mini-chip.diet-sel")].map(el => el.dataset.diet);
     const missing = detectAllergens(n + " . " + sub).a.filter(x => !a.includes(x));
     if (missing.length) warnings.push(`• ${n}: menciona ${missing.join(", ")}`);
-    ings.push({ n, sub, mod, note, a, tags });
+    const eq = [...(card._eq || [])].filter(id => equipIds.has(id));
+    const ap = [...(card._ap || [])].filter(id => eq.includes(id));
+    ings.push({ n, sub, mod, note, a, tags, ...(eq.length ? { eq } : {}), ...(ap.length ? { ap } : {}) });
   });
   if (!ings.length) { toast("Añade al menos un componente con nombre.", "err"); return; }
   // Si ya hay ingredientes de verdad, el aviso «Ingredientes sin detallar» de la lectura con IA sobra
@@ -4216,13 +4435,11 @@ async function saveDishFromModal() {
   }
   const traces = ALLERGENS.filter(a => editorTraces.has(a));
   const draft = !$("editPublished").checked;
-  const eq = editorEquipList();
-  const withEq = d => { if (eq.length) d.eq = eq; else delete d.eq; return d; };
   if (editId) {
     const idx = r.menu.findIndex(d => String(d.id) === String(editId));
-    if (idx > -1) r.menu[idx] = withEq({ ...r.menu[idx], cat, name, protocol, traces, ings, draft });
+    if (idx > -1) { r.menu[idx] = { ...r.menu[idx], cat, name, protocol, traces, ings, draft }; delete r.menu[idx].eq; }
   } else {
-    r.menu.unshift(withEq({ id: Date.now(), cat, name, protocol, traces, ings, draft }));
+    r.menu.unshift({ id: Date.now(), cat, name, protocol, traces, ings, draft });
   }
   saveAppState(); closeRestDishModal(); renderRestaurantApp();
   toast(draft ? "📝 Guardado como borrador: solo lo ves tú. Publícalo cuando esté listo."
@@ -4444,29 +4661,47 @@ function importRestaurantData(d) {
 }
 
 // ============================================================
-// FREIDORAS Y PLANCHAS DEL LOCAL (3.7)
-// - El restaurante da de alta cada equipo y escribe lo que se cocina en él.
-// - En cada plato elige en qué equipo se hace (como mucho 3).
-// - Lo que se cocina en ese equipo llega al plato por contacto (aceite o superficie compartida):
-//   el comensal lo ve y la app lo evalúa con su perfil (ver evaluateDish).
-// - Al cambiar un equipo, se actualiza la copia que guarda cada plato.
+// FREIDORAS Y PLANCHAS DEL LOCAL (3.8)
+// - El restaurante da de alta cada equipo y elige de su carta qué ingredientes se cocinan en él
+//   («➕ Elegir de mi carta»), o lo indica en cada componente al editar el plato.
+// - Lo que se cocina en cada equipo se calcula de la carta publicada: si cambias un plato, se
+//   actualiza solo. A mano solo se añade lo que no está en la carta («Otros»).
+// - Los cambios de la ventana se preparan aparte (eqStage) y se aplican al pulsar «Guardar».
 // ============================================================
-let editorEquip = new Set();
+let eqStage = new Map();          // id del equipo -> Set de «idPlato:posición del componente»
+let eqApStage = new Map();        // id del equipo -> Set de claves que se pueden cocinar aparte (cazo o sartén)
+let eqPick = null;                // equipo abierto en «Elegir de mi carta»
 const FRIED_RE = /\b(frit[oa]s?|fritura|frituras|rebozad[oa]s?|empanad[oa]s?|tempura|croquetas?|churros?|bunuelos?|a la romana|calamares|chopitos|puntillitas|boquerones|patatas bravas|nuggets|fingers)\b/;
 const GRILL_RE = /\b(a la plancha|plancha)\b/;
 
-function equipUsage(r, id) { return ((r && r.menu) || []).filter(d => (d.eq || []).some(e => e.i === id)); }
+const ingKey = (dishId, k) => dishId + ":" + k;
+function stageSignature() { return JSON.stringify([eqStage, eqApStage].map(m => [...m.entries()].map(([id, s]) => [id, [...s].sort()]))); }
+function markStage() { const m = $("equipModal"); if (m) m.dataset.stage = stageSignature(); }
+function linkedKeys(r, id, field = "eq") {
+  const s = new Set();
+  ((r && r.menu) || []).forEach(d => (d.ings || []).forEach((ing, k) => { if ((ing[field] || []).includes(id)) s.add(ingKey(d.id, k)); }));
+  return s;
+}
+function keyTarget(r, key) {
+  const [did, k] = key.split(":");
+  const dish = ((r && r.menu) || []).find(d => String(d.id) === did);
+  const ing = dish && (dish.ings || [])[Number(k)];
+  return ing ? { dish, ing } : null;
+}
 
 function openEquipModal() {
   const r = getActiveRest();
   if (!r) return;
+  eqStage = new Map((r.equip || []).map(e => [e.i, linkedKeys(r, e.i)]));
+  eqApStage = new Map((r.equip || []).map(e => [e.i, linkedKeys(r, e.i, "ap")]));
+  markStage();
   $("equipList").innerHTML = "";
   (r.equip || []).forEach(e => addEquipRow(e.k, e));
   updateEquipEmpty();
   openModal("equipModal");
   rememberModalState("equipModal");
 }
-function closeEquipModal() { closeModal("equipModal"); }
+function closeEquipModal() { closeModal("equipModal"); closeModal("equipPickModal"); eqPick = null; }
 function updateEquipEmpty() {
   const n = document.querySelectorAll("#equipList .equip-card").length;
   $("equipEmpty").style.display = n ? "none" : "block";
@@ -4475,11 +4710,12 @@ function updateEquipEmpty() {
 
 function addEquipRow(kind, e = null) {
   if (document.querySelectorAll("#equipList .equip-card").length >= MAX_EQUIP) { toast(`Como máximo ${MAX_EQUIP} equipos.`, "err"); return null; }
-  const r = getActiveRest();
   const K = EQUIP_KINDS[kind] || EQUIP_KINDS.freidora;
   const same = document.querySelectorAll(`#equipList .equip-card[data-k="${kind}"]`).length;
   const base = e ? sanitizeEquipItem(e) : sanitizeEquipItem({ k: kind, n: `${K.label} ${same + 1}` });
-  const used = e ? equipUsage(r, base.i).length : 0;
+  if (!eqStage.has(base.i)) eqStage.set(base.i, new Set());
+  if (!eqApStage.has(base.i)) eqApStage.set(base.i, new Set());
+  const fr = base.k === "freidora";
   const card = document.createElement("div");
   card.className = "equip-card";
   card.dataset.id = base.i;
@@ -4490,24 +4726,29 @@ function addEquipRow(kind, e = null) {
       <input type="text" class="eq-n" maxlength="40" placeholder="Nombre (ej. ${K.label} 2 · solo sin gluten)" aria-label="Nombre de la ${K.label.toLowerCase()}" style="flex:1; padding:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#fff;">
       <button type="button" class="btn btn-danger" onclick="removeEquipRow(this)" aria-label="Quitar">✕</button>
     </div>
-    <div class="mini-label">${base.k === "freidora" ? "¿Qué se fríe en esta freidora? (todo lo que comparte el aceite)" : "¿Qué se hace en esta plancha?"}</div>
-    <input type="text" class="eq-f" maxlength="300" placeholder="${base.k === "freidora" ? "Ej. croquetas, calamares, patatas, pimientos de padrón" : "Ej. gambas, pan, carne, verduras"}" style="width:100%; padding:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#cbd5e1; font-size:0.74rem;">
-    <div class="mini-label">Alérgenos que pasan al ${base.k === "freidora" ? "aceite" : "plato por la plancha"}:</div>
-    <div class="mini-chips eq-al-box">${ALLERGENS.map(a => `<div class="mini-chip" data-al="${esc(a)}" onclick="this.classList.toggle('selected')">${esc(a)}</div>`).join("")}</div>
+    <div class="mini-label">${fr ? "Qué se fríe aquí, de tu carta:" : "Qué se hace aquí, de tu carta:"}</div>
+    <div class="eq-linked"></div>
+    <button type="button" class="btn btn-purple eq-pick-btn" style="width:100%; margin:6px 0 4px;" onclick="openEquipPick(this)">➕ Elegir de mi carta</button>
+    <div class="mini-label">Otros que se ${fr ? "fríen" : "hacen"} aquí y no están en tu carta (opcional):</div>
+    <input type="text" class="eq-f" maxlength="300" placeholder="${fr ? "Ej. comida del personal, rebozados fuera de carta" : "Ej. pan tostado, marisco fuera de carta"}" style="width:100%; padding:6px; border-radius:6px; border:1px solid #475569; background:#1c2541; color:#cbd5e1; font-size:0.74rem;">
+    <div class="mini-label">Alérgenos de esos otros:</div>
+    <div class="mini-chips eq-al-box">${ALLERGENS.map(a => `<div class="mini-chip" data-al="${esc(a)}" onclick="this.classList.toggle('selected'); refreshEquipCard(this.closest('.equip-card'))">${esc(a)}</div>`).join("")}</div>
     <div class="ing-auto-hint eq-hint" style="display:none;"></div>
-    <div class="eq-used">${used ? `Se usa en ${used} plato${used === 1 ? "" : "s"}.` : "Aún no la usa ningún plato: elígela al editar cada plato."}</div>`;
+    <div class="eq-total"></div>`;
   card.querySelector(".eq-n").value = base.n;
   card.querySelector(".eq-f").value = base.f;
   card.querySelectorAll(".eq-al-box .mini-chip").forEach(el => { if (base.a.includes(el.dataset.al)) el.classList.add("selected"); });
   let t = null;
   card.querySelector(".eq-f").addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => autoTickEquip(card), 350); });
   card.querySelector(".eq-f").addEventListener("change", () => { clearTimeout(t); autoTickEquip(card); });
+  card.querySelector(".eq-n").addEventListener("input", () => refreshEquipCard(card));
   $("equipList").appendChild(card);
+  refreshEquipCard(card);
   updateEquipEmpty();
-  if (!e) card.querySelector(".eq-f").focus();
+  markStage();
   return card;
 }
-// Marca (sin desmarcar nunca) los alérgenos que detecta en lo que se cocina
+// Marca (sin desmarcar nunca) los alérgenos que detecta en «Otros»
 function autoTickEquip(card) {
   const det = detectAllergens(card.querySelector(".eq-f").value);
   const added = [];
@@ -4516,15 +4757,139 @@ function autoTickEquip(card) {
   });
   const hint = card.querySelector(".eq-hint");
   if (added.length) { hint.style.display = "block"; hint.textContent = "🔍 Marcado automáticamente según el texto: " + added.join(", ") + ". Revísalo."; }
+  refreshEquipCard(card);
 }
 async function removeEquipRow(btn) {
   const card = btn.closest(".equip-card");
-  const used = equipUsage(getActiveRest(), card.dataset.id).length;
-  if (used && !await uiConfirm(`«${card.querySelector(".eq-n").value || "Este equipo"}» se usa en ${used} plato${used === 1 ? "" : "s"}. Si lo quitas, esos platos dejarán de indicar dónde se cocinan.\n\n¿Quitarlo?`, { okText: "Quitar", danger: true })) return;
+  const used = (eqStage.get(card.dataset.id) || new Set()).size;
+  if (used && !await uiConfirm(`«${card.querySelector(".eq-n").value || "Este equipo"}» tiene ${used} ingrediente${used === 1 ? "" : "s"} de tu carta. Si lo quitas, dejarán de indicar dónde se cocinan.\n\n¿Quitarlo?`, { okText: "Quitar", danger: true })) return;
+  eqStage.delete(card.dataset.id);
+  eqApStage.delete(card.dataset.id);
   card.remove();
   updateEquipEmpty();
+  markStage();
 }
 
+// Resumen de una tarjeta: ingredientes elegidos de la carta y lo que pasa al aceite o a la plancha
+function refreshEquipCard(card) {
+  if (!card) return;
+  const r = getActiveRest();
+  const keys = [...(eqStage.get(card.dataset.id) || [])];
+  const items = keys.map(k => ({ k, t: keyTarget(r, k) })).filter(x => x.t);
+  const dishes = new Set(items.map(x => x.t.dish.id));
+  const drafts = items.filter(x => x.t.dish.draft).length;
+  const box = card.querySelector(".eq-linked");
+  if (!items.length) box.innerHTML = `<div class="eq-none">Ningún ingrediente de tu carta todavía.</div>`;
+  else box.innerHTML = `<details class="eq-linked-list"><summary>${items.length} ingrediente${items.length === 1 ? "" : "s"} de ${dishes.size} plato${dishes.size === 1 ? "" : "s"}${drafts ? ` (${drafts} en borrador)` : ""} · ver</summary>`
+    + items.map(x => `<div class="eq-link-item"><span>${esc(niceName(x.t.dish.name))} · <b>${esc(x.t.ing.n || "componente")}</b>${(eqApStage.get(card.dataset.id) || new Set()).has(x.k) ? " · 🔄 aparte" : ""}${x.t.dish.draft ? " <i>(borrador)</i>" : ""}</span><button type="button" class="btn btn-outline" style="padding:1px 7px; font-size:0.7rem;" onclick="unlinkEquip(this, '${esc(x.k)}')" aria-label="Quitar de esta ${card.dataset.k}">✕</button></div>`).join("")
+    + `</details>`;
+  // Lo que pasa por el equipo: lo elegido de la carta (publicado) + lo añadido a mano
+  const al = new Map();
+  const add = (x, who) => { let a = al.get(x); if (!a) al.set(x, a = []); if (!a.includes(who)) a.push(who); };
+  card.querySelectorAll(".eq-al-box .mini-chip.selected").forEach(el => add(el.dataset.al, "otros"));
+  const f = card.querySelector(".eq-f").value;
+  if (f) detectAllergens(f).a.forEach(x => add(x, "otros"));
+  items.filter(x => !x.t.dish.draft).forEach(x => ingAllergenList(x.t.ing).forEach(a => add(a, x.t.dish.name)));
+  const K = EQUIP_KINDS[card.dataset.k] || EQUIP_KINDS.freidora;
+  const list = ALLERGENS.filter(x => al.has(x));
+  card.querySelector(".eq-total").innerHTML = list.length
+    ? `<b>Pasa${card.dataset.k === "freidora" ? " al aceite" : " por la plancha"}:</b> ${esc(allergensByOrigin(new Map(list.map(x => [x, al.get(x)]))))}`
+    : `<b>${K.label} sin alérgenos declarados.</b> Los clientes la verán como libre de los 14 alérgenos.`;
+  if (drafts) card.querySelector(".eq-total").innerHTML += `<br><span style="color:var(--muted);">Los platos en borrador no cuentan hasta que los publiques.</span>`;
+}
+function refreshAllEquipCards() { document.querySelectorAll("#equipList .equip-card").forEach(refreshEquipCard); }
+function unlinkEquip(btn, key) {
+  const card = btn.closest(".equip-card");
+  const s = eqStage.get(card.dataset.id);
+  if (s) s.delete(key);
+  const ap = eqApStage.get(card.dataset.id);
+  if (ap) ap.delete(key);
+  const open = card.querySelector(".eq-linked-list") && card.querySelector(".eq-linked-list").open;
+  refreshEquipCard(card);
+  if (open && card.querySelector(".eq-linked-list")) card.querySelector(".eq-linked-list").open = true;
+  markStage();
+}
+
+// ---------- «➕ Elegir de mi carta» ----------
+function cardOf(id) { return [...document.querySelectorAll("#equipList .equip-card")].find(c => c.dataset.id === id) || null; }
+function openEquipPick(btn) {
+  const card = btn.closest(".equip-card");
+  const r = getActiveRest();
+  if (!((r && r.menu) || []).length) { toast("Tu carta aún no tiene platos. Añádelos y vuelve aquí.", "err"); return; }
+  const K = EQUIP_KINDS[card.dataset.k] || EQUIP_KINDS.freidora;
+  eqPick = { id: card.dataset.id, k: card.dataset.k };
+  $("epTitle").textContent = `${K.icon} ${card.querySelector(".eq-n").value.trim() || K.label}`;
+  $("epInfo").innerHTML = card.dataset.k === "freidora"
+    ? "Marca los ingredientes que se fríen en esta freidora. Si todo el plato se fríe aquí, marca el plato. Un ingrediente solo puede estar en una freidora: si ya estaba en otra, se cambia a esta."
+    : "Marca los ingredientes que se hacen en esta plancha. Si todo el plato se hace aquí, marca el plato. Un ingrediente solo puede estar en una plancha: si ya estaba en otra, se cambia a esta.";
+  $("epSearch").value = "";
+  renderEquipPick();
+  openModal("equipPickModal");
+}
+function closeEquipPick() {
+  closeModal("equipPickModal");
+  eqPick = null;
+  refreshAllEquipCards();
+  markStage();
+}
+function renderEquipPick() {
+  if (!eqPick) return;
+  const r = getActiveRest();
+  const q = normText($("epSearch").value).trim();
+  const mine = eqStage.get(eqPick.id) || new Set();
+  // Dónde está cada ingrediente ahora (en otro equipo del mismo tipo)
+  const elsewhere = key => [...eqStage.entries()].filter(([id, s]) => id !== eqPick.id && s.has(key))
+    .map(([id]) => cardOf(id)).filter(c => c && c.dataset.k === eqPick.k).map(c => c.querySelector(".eq-n").value.trim() || EQUIP_KINDS[c.dataset.k].label);
+  const scroller = $("equipPickModal");
+  const top = scroller.scrollTop;
+  let html = "", shown = 0;
+  (r.menu || []).forEach(d => {
+    const ings = d.ings || [];
+    if (!ings.length) return;
+    if (q && !normText(d.name).includes(q) && !ings.some(i => normText(i.n + " " + i.sub).includes(q))) return;
+    shown++;
+    const keys = ings.map((_, k) => ingKey(d.id, k));
+    const n = keys.filter(k => mine.has(k)).length;
+    html += `<div class="ep-dish"><label class="ep-dish-head"><input type="checkbox" ${n === keys.length ? "checked" : ""} data-part="${n > 0 && n < keys.length ? 1 : 0}" onchange="epToggleDish(${d.id}, this.checked)"> <span><b>${esc(d.name)}</b> <span class="dish-cat">${esc(d.cat)}</span>${d.draft ? ' <span class="draft-badge" style="margin:0;">BORRADOR</span>' : ""}</span></label>`
+      + ings.map((ing, k) => {
+        const key = ingKey(d.id, k), other = mine.has(key) ? [] : elsewhere(key);
+        const apOn = (eqApStage.get(eqPick.id) || new Set()).has(key);
+        return `<label class="ep-ing"><input type="checkbox" ${mine.has(key) ? "checked" : ""} onchange="epToggleIng(${d.id}, ${k}, this.checked)"> <span>${esc(ing.n || "componente")}${ing.sub ? ` <small>${esc(ing.sub.slice(0, 60))}${ing.sub.length > 60 ? "…" : ""}</small>` : ""}${other.length ? ` <small class="ep-other">ahora en ${esc(other.join(", "))}</small>` : ""}</span></label>`
+          + (mine.has(key) ? `<label class="ep-ap"><input type="checkbox" ${apOn ? "checked" : ""} onchange="epToggleApart(${d.id}, ${k}, this.checked)"> 🔄 Adaptable: ${esc(EQUIP_KINDS[eqPick.k].apartShort)}</label>` : "");
+      }).join("") + `</div>`;
+  });
+  $("epList").innerHTML = html || `<p style="text-align:center; color:var(--muted); font-size:0.8rem;">Ningún plato coincide con la búsqueda.</p>`;
+  $("epList").querySelectorAll('input[data-part="1"]').forEach(el => { el.indeterminate = true; });
+  scroller.scrollTop = top;
+}
+function epSet(key, on) {
+  const mine = eqStage.get(eqPick.id);
+  if (!mine) return;
+  if (on) {
+    // Un ingrediente, en un solo equipo de cada tipo
+    eqStage.forEach((s, id) => { if (id !== eqPick.id) { const c = cardOf(id); if (c && c.dataset.k === eqPick.k) { s.delete(key); (eqApStage.get(id) || new Set()).delete(key); } } });
+    mine.add(key);
+  } else { mine.delete(key); (eqApStage.get(eqPick.id) || new Set()).delete(key); }
+}
+function epToggleApart(dishId, k, on) {
+  if (!eqPick) return;
+  const s = eqApStage.get(eqPick.id);
+  if (!s) return;
+  const key = ingKey(dishId, k);
+  if (on && (eqStage.get(eqPick.id) || new Set()).has(key)) s.add(key); else s.delete(key);
+  markStage();
+}
+function epToggleIng(dishId, k, on) { if (!eqPick) return; epSet(ingKey(dishId, k), on); renderEquipPick(); markStage(); }
+function epToggleDish(dishId, on) {
+  if (!eqPick) return;
+  const d = (getActiveRest().menu || []).find(x => x.id === dishId);
+  if (!d) return;
+  (d.ings || []).forEach((_, k) => epSet(ingKey(dishId, k), on));
+  renderEquipPick();
+  markStage();
+}
+
+// ---------- Guardar ----------
 function equipFromModal() {
   return [...document.querySelectorAll("#equipList .equip-card")].map(card => sanitizeEquipItem({
     i: card.dataset.id, k: card.dataset.k,
@@ -4542,64 +4907,289 @@ async function saveEquipFromModal() {
   const notes = [];
   list.forEach(e => {
     const missing = detectAllergens(e.f).a.filter(x => !e.a.includes(x));
-    if (missing.length) notes.push(`• ${e.n}: el texto menciona ${missing.join(", ")} y no está marcado`);
-    if (!e.f && !e.a.length) notes.push(`• ${e.n}: no dice qué se cocina. Se mostrará como libre de los 14 alérgenos: confírmalo solo si es exclusiva`);
+    if (missing.length) notes.push(`• ${e.n}: «Otros» menciona ${missing.join(", ")} y no está marcado`);
+    if (!(eqStage.get(e.i) || new Set()).size && !e.f && !e.a.length) notes.push(`• ${e.n}: no tiene nada de tu carta ni otros alimentos. Se mostrará como libre de los 14 alérgenos`);
   });
   if (notes.length && !await uiConfirm("⚠️ Revisa antes de guardar:\n\n" + notes.join("\n") + "\n\nLos clientes verán estos datos y la información es responsabilidad del restaurante.\n\n¿Guardar igualmente?", { okText: "Guardar igual", cancelText: "Revisar" })) return;
   r.equip = sanitizeEquip(list);
-  syncDishEquip(r);
+  applyEquipStage(r);
   saveAppState();
   closeEquipModal();
-  if ($("dishModal").style.display === "block") renderEditorEquip();
   renderRestaurantApp();
   toast(list.length ? "💾 Freidoras y planchas guardadas. Los platos que las usan se han actualizado." : "💾 Guardado: no hay freidoras ni planchas.");
 }
-// Cada plato guarda una copia de sus equipos: se pone al día (o se quita si el equipo ya no existe)
-function syncDishEquip(r) {
-  const by = new Map((r.equip || []).map(e => [e.i, e]));
-  (r.menu || []).forEach(d => {
-    if (!d.eq) return;
-    const eq = d.eq.map(x => by.get(x.i)).filter(Boolean).map(e => ({ ...e, a: [...e.a] }));
-    if (eq.length) d.eq = eq; else delete d.eq;
-  });
+// Cada componente apunta a los equipos donde se cocina (y deja de apuntar a los que ya no existen)
+function applyEquipStage(r) {
+  const ids = (r.equip || []).map(e => e.i);
+  (r.menu || []).forEach(d => (d.ings || []).forEach((ing, k) => {
+    const key = ingKey(d.id, k);
+    const eq = ids.filter(id => (eqStage.get(id) || new Set()).has(key)).slice(0, MAX_ING_EQ);
+    const ap = eq.filter(id => (eqApStage.get(id) || new Set()).has(key));
+    if (eq.length) ing.eq = eq; else delete ing.eq;
+    if (ap.length) ing.ap = ap; else delete ing.ap;
+  }));
 }
 
 // ---------- En el editor de cada plato ----------
-function renderEditorEquip() {
+// Lo que llega a cada componente desde su freidora o plancha se le suma como alérgeno, y el local
+// decide si ese componente se puede cocinar aparte (cazo con aceite limpio o sartén limpia).
+let editorEqx = null;             // equipos con lo que se cocina en ellos (sin el plato que se edita)
+function renderIngEquip(card) {
   const r = getActiveRest();
-  const box = $("editDishEquip"), hint = $("editDishEquipHint");
   const list = (r && r.equip) || [];
-  [...editorEquip].forEach(id => { if (!list.some(e => e.i === id)) editorEquip.delete(id); });
-  if (!list.length) {
-    box.innerHTML = `<span style="font-size:0.72rem; color:var(--muted);">Aún no has dado de alta tus freidoras ni planchas.</span> <button type="button" class="btn btn-outline" style="padding:3px 8px; font-size:0.7rem;" onclick="openEquipModal()">🍟 Darlas de alta</button>`;
-    hint.style.display = "none";
-    return;
-  }
-  box.innerHTML = list.map(e => `<div class="mini-chip ${editorEquip.has(e.i) ? "equip-sel" : ""}" onclick="toggleEditorEquip('${esc(e.i)}')">${EQUIP_KINDS[e.k].icon} ${esc(e.n)}</div>`).join("")
-    + `<button type="button" class="btn btn-outline" style="padding:3px 8px; font-size:0.66rem;" onclick="openEquipModal()">✏️ Editar equipos</button>`;
-  const sel = list.filter(e => editorEquip.has(e.i));
-  hint.style.display = sel.length ? "block" : "none";
-  hint.textContent = sel.map(equipLine).join("\n");
+  const wrap = card.querySelector(".ing-eq-wrap");
+  if (!wrap) return;
+  if (!list.length) { wrap.style.display = "none"; return; }
+  wrap.style.display = "block";
+  [...card._eq].forEach(id => { if (!list.some(e => e.i === id)) card._eq.delete(id); });
+  [...card._ap].forEach(id => { if (!card._eq.has(id)) card._ap.delete(id); });
+  card.querySelector(".ing-eq-box").innerHTML = list.map(e => `<div class="mini-chip ${card._eq.has(e.i) ? "equip-sel" : ""}" data-eq="${esc(e.i)}" onclick="toggleIngEquip(this)">${EQUIP_KINDS[e.k].icon} ${esc(e.n)}</div>`).join("");
+  const det = card.querySelector(".ing-eq-detail");
+  const ing = { n: card.querySelector(".ing-n").value, sub: card.querySelector(".ing-sub").value, a: [...card.querySelectorAll(".ing-al-box .mini-chip.selected")].map(el => el.dataset.al) };
+  const own = ingAllergenList(ing);
+  det.innerHTML = list.filter(e => card._eq.has(e.i)).map(E => {
+    const K = EQUIP_KINDS[E.k];
+    const al = editorEqx && editorEqx.byId.has(E.i) ? new Map([...equipContents(editorEqx.byId.get(E.i), editorEqx, null, null).entries()].filter(([x]) => !own.includes(x))) : new Map();
+    const txt = al.size ? `Le llega de ${esc(E.n)}: <b>${esc(allergensByOrigin(al))}</b>. Cuenta como alérgeno de este componente.`
+      : `${esc(E.n)}: no le llega ningún otro alérgeno declarado.`;
+    return `<div class="ing-eq-line">${K.icon} ${txt}
+      <label class="ing-eq-ap"><input type="checkbox" ${card._ap.has(E.i) ? "checked" : ""} onchange="toggleIngApart(this, '${esc(E.i)}')"> 🔄 Adaptable: ${esc(K.apartShort)}</label></div>`;
+  }).join("");
 }
-function toggleEditorEquip(id) {
-  if (editorEquip.has(id)) editorEquip.delete(id);
-  else if (editorEquip.size >= MAX_DISH_EQ) { toast(`Como máximo ${MAX_DISH_EQ} equipos por plato.`, "err"); return; }
-  else editorEquip.add(id);
-  renderEditorEquip();
-}
-function editorEquipList() {
+function toggleIngEquip(el) {
+  const card = el.closest(".ing-editor-card");
   const r = getActiveRest();
-  return ((r && r.equip) || []).filter(e => editorEquip.has(e.i)).map(e => ({ ...e, a: [...e.a] }));
+  const id = el.dataset.eq, E = (r.equip || []).find(e => e.i === id);
+  if (!card || !E) return;
+  if (card._eq.has(id)) card._eq.delete(id);
+  else { r.equip.forEach(o => { if (o.k === E.k) { card._eq.delete(o.i); card._ap.delete(o.i); } }); card._eq.add(id); }   // una freidora y una plancha como mucho
+  renderIngEquip(card);
 }
-// Aviso al guardar: el plato parece frito o a la plancha y no dice en qué equipo se hace
+function toggleIngApart(el, id) {
+  const card = el.closest(".ing-editor-card");
+  if (!card) return;
+  if (el.checked) card._ap.add(id); else card._ap.delete(id);
+}
+function refreshEditorEquip() {
+  const grp = $("editDishEquipGroup");
+  if (!grp) return;
+  const r = getActiveRest();
+  const list = (r && r.equip) || [];
+  $("editDishEquipInfo").textContent = list.length
+    ? "En cada componente (más abajo), elige en qué freidora o plancha se cocina. Lo que le llega de ahí cuenta como alérgeno suyo."
+    : "Aún no has dado de alta tus freidoras ni planchas. Cierra este plato y pulsa «🍟 Freidoras y planchas» en la barra de tu restaurante.";
+  const editId = $("editDishId").value;
+  editorEqx = list.length ? buildEquipIndex(list, publicMenu(r).filter(d => String(d.id) !== String(editId))) : null;
+  document.querySelectorAll("#ingredientsEditor .ing-editor-card").forEach(card => { if (card._eq) renderIngEquip(card); });
+}
+// Aviso al guardar: componentes que parecen fritos o a la plancha y no dicen en qué equipo
 function equipMissingNote(name, ings) {
   const r = getActiveRest();
   const list = (r && r.equip) || [];
-  if (!list.length || editorEquip.size) return "";
-  const t = " " + normText([name, ...ings.map(i => i.n + " " + i.sub)].join(" . ")) + " ";
-  if (FRIED_RE.test(t) && list.some(e => e.k === "freidora")) return "🍟 Este plato parece frito, pero no has elegido en qué freidora se hace. Si comparte aceite, los clientes deben saberlo.";
-  if (GRILL_RE.test(t) && list.some(e => e.k === "plancha")) return "🍳 Este plato parece hecho a la plancha, pero no has elegido en qué plancha.";
-  return "";
+  if (!list.length) return "";
+  const kindOf = id => { const e = list.find(x => x.i === id); return e ? e.k : ""; };
+  const has = (i, k) => (i.eq || []).some(id => kindOf(id) === k);
+  const notes = [];
+  [["freidora", FRIED_RE, "🍟 Parece frito, pero no has elegido en qué freidora se hace"], ["plancha", GRILL_RE, "🍳 Parece hecho a la plancha, pero no has elegido en qué plancha"]].forEach(([k, re, msg]) => {
+    if (!list.some(e => e.k === k) || ings.some(i => has(i, k))) {
+      // Algún componente ya está en un equipo de este tipo: se avisa solo de los que lo dicen y no lo tienen
+      const miss = ings.filter(i => re.test(" " + normText(i.n + " " + i.sub) + " ") && !has(i, k));
+      if (list.some(e => e.k === k) && miss.length) notes.push(`${msg}: ${miss.map(i => "«" + i.n + "»").join(", ")}.`);
+      return;
+    }
+    const t = " " + normText([name, ...ings.map(i => i.n + " " + i.sub)].join(" . ")) + " ";
+    if (re.test(t)) notes.push(msg + ".");
+  });
+  return notes.length ? notes.join("\n") + "\nSi comparte aceite o plancha con otros alimentos, los clientes deben saberlo." : "";
+}
+
+// ============================================================
+// HOSTELERÍA: VISTA DEL CAMARERO Y HERRAMIENTAS CON PIN (3.9)
+// - El camarero solo ve el panel de alergias de la mesa, la carta publicada (sin editar) y
+//   «📲 Enviar a cocina».
+// - Las herramientas (platos, freidoras, estadísticas, Bidi, opiniones…) van plegadas arriba y
+//   se abren con un PIN de este móvil. Se bloquean al plegarlas, al salir de hostelería o tras
+//   un minuto con la app en segundo plano.
+// - Con PIN puesto, la pestaña Hostelería abre directamente la vista del camarero; «Mis
+//   restaurantes» (alta, cerrar sesión, eliminar cuenta…) queda detrás del PIN.
+// - El PIN se guarda resumido (SHA-256 con sal) solo en este móvil. Si se olvida: cerrar sesión y
+//   volver a entrar con la contraseña de la cuenta lo borra.
+// ============================================================
+const PIN_STORE_KEY = "tusalergias_pin_v1";
+let pinFails = 0, pinBlockedUntil = 0, appHiddenAt = 0;
+let holdOwnerPanel = false;       // al volver del pago: no saltar a la vista del camarero (se pide el PIN)
+
+function pinAccount() {
+  if (isCloudMode()) return cloudOwner() ? "u:" + cloudUser.uid : null;
+  return appState.currentUser ? "local:" + appState.currentUser.email : null;
+}
+function pinStore() { try { return JSON.parse(localStorage.getItem(PIN_STORE_KEY)) || {}; } catch (e) { return {}; } }
+function pinSave(st) { try { localStorage.setItem(PIN_STORE_KEY, JSON.stringify(st)); } catch (e) {} }
+function pinIsSet() { const k = pinAccount(); return !!(k && pinStore()[k]); }
+function pinForget(key) { const st = pinStore(); if (key && st[key]) { delete st[key]; pinSave(st); } }
+async function pinHash(pin, salt) {
+  const data = new TextEncoder().encode(salt + "|" + pin);
+  try {
+    const b = await crypto.subtle.digest("SHA-256", data);
+    return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, "0")).join("");
+  } catch (e) {
+    let h = 2166136261;
+    data.forEach(x => { h ^= x; h = Math.imul(h, 16777619) >>> 0; });
+    return "f" + h.toString(16);
+  }
+}
+const PIN_INPUT = { inputType: "password", inputMode: "numeric", placeholder: "PIN" };
+async function pinCreate() {
+  const k = pinAccount();
+  if (!k) return false;
+  const a = await uiPrompt("🔑 Crea un PIN para este móvil (de 4 a 8 cifras).\n\nCon él se abren las herramientas del restaurante: subir y editar platos, freidoras, estadísticas, código Bidi, opiniones y tu cuenta. Dáselo solo a quien gestiona la carta: el camarero verá solo el panel de alergias.", "", { okText: "Siguiente", ...PIN_INPUT });
+  if (a === null) return false;
+  if (!/^\d{4,8}$/.test(a.trim())) { toast("El PIN debe tener de 4 a 8 cifras.", "err"); return false; }
+  const b = await uiPrompt("Repite el PIN:", "", { okText: "Guardar PIN", ...PIN_INPUT });
+  if (b === null) return false;
+  if (b.trim() !== a.trim()) { toast("Los PIN no coinciden. Inténtalo otra vez.", "err"); return false; }
+  const salt = Array.from(crypto.getRandomValues(new Uint8Array(8)), x => x.toString(16).padStart(2, "0")).join("");
+  const st = pinStore();
+  st[k] = { s: salt, h: await pinHash(a.trim(), salt) };
+  pinSave(st);
+  toast("🔑 PIN guardado en este móvil.");
+  return true;
+}
+async function pinAsk() {
+  if (Date.now() < pinBlockedUntil) { toast(`Demasiados intentos. Espera ${Math.ceil((pinBlockedUntil - Date.now()) / 1000)} segundos.`, "err"); return false; }
+  const v = await uiPrompt("🔒 Escribe el PIN para abrir las herramientas del restaurante:", "", { okText: "Abrir", ...PIN_INPUT });
+  if (v === null) return false;
+  const rec = pinStore()[pinAccount()];
+  if (rec && await pinHash(v.trim(), rec.s) === rec.h) { pinFails = 0; return true; }
+  pinFails++;
+  if (pinFails >= 5) { pinBlockedUntil = Date.now() + 30000; pinFails = 0; }
+  toast("❌ PIN incorrecto.", "err");
+  return false;
+}
+// Abre las herramientas (pide el PIN, o lo crea si este móvil aún no tiene)
+async function pinUnlock() {
+  if (pinOpen) return true;
+  if (!pinAccount()) { pinOpen = true; return true; }     // sin cuenta no hay nada que proteger
+  const ok = pinIsSet() ? await pinAsk() : await pinCreate();
+  if (ok) pinOpen = true;
+  return ok;
+}
+async function changePin() {
+  if (!pinOpen) return;
+  if (await pinCreate()) renderRestaurantApp();
+}
+async function forgotPin() {
+  const ok = await uiConfirm("Para borrar el PIN de este móvil, cierra la sesión y vuelve a entrar con el email y la contraseña de la cuenta (o con Google). Después podrás crear un PIN nuevo.\n\n¿Cerrar la sesión ahora?", { okText: "Cerrar sesión" });
+  if (!ok) return;
+  pinOpen = false;
+  await logoutOwnerSession();
+  showView("owner");
+}
+
+// ---------- Herramientas plegadas, arriba de la carta ----------
+async function toggleStaffTools() {
+  if (pinOpen) {
+    pinOpen = false;
+    renderRestaurantApp();
+    window.scrollTo(0, 0);
+    toast("🔒 Herramientas cerradas.");
+    return;
+  }
+  if (await pinUnlock()) renderRestaurantApp();
+}
+function renderStaffToolsBar() {
+  $("staffToolsBody").style.display = pinOpen ? "block" : "none";
+  $("staffToolsToggle").innerHTML = pinOpen
+    ? "⚙️ Gestión del restaurante <span class='stt-state'>▲ Cerrar y bloquear</span>"
+    : `⚙️ Gestión del restaurante: datos y herramientas <span class='stt-state'>${pinIsSet() ? "🔒 PIN" : "🔑 Crear PIN"}</span>`;
+  $("staffToolsToggle").classList.toggle("open", pinOpen);
+  $("staffForgotPin").style.display = !pinOpen && pinIsSet() ? "inline" : "none";
+}
+
+// ---------- Pestaña Hostelería con PIN: directa a la vista del camarero ----------
+function waiterRestaurants() { return appState.restaurants.filter(r => ownsRestaurant(r) && !r.suggestion && !r.unclaimed); }
+function openWaiterIfPin(fromBack) {
+  if (pinOpen || holdOwnerPanel || !ownerLoggedIn() || !pinIsSet()) return false;
+  const list = waiterRestaurants();
+  if (list.length !== 1) return false;                    // con varios (o ninguno) se elige en la pestaña
+  openWaiterView(list[0].id, fromBack);
+  return true;
+}
+function openWaiterView(id, fromBack) {
+  const r = getRest(id);
+  if (!r) return;
+  activeRestId = id; isStaffUnlocked = true; pinOpen = false; resetStaffGuest();
+  showView("app", fromBack);
+  if (r.cloud) cloudPullRestaurant(id).then(res => { if (res === true && currentView === "app" && activeRestId === id) renderRestaurantApp(); });
+}
+function renderWaiterPick() {
+  const show = ownerLoggedIn() && pinIsSet() && !pinOpen;
+  $("waiterPickCard").style.display = show ? "block" : "none";
+  if (!show) return false;
+  $("ownerLoggedPanel").style.display = "none";
+  const list = waiterRestaurants();
+  $("waiterPickList").innerHTML = list.length
+    ? list.map(r => `<button class="btn btn-primary waiter-pick-btn" onclick="openWaiterView('${esc(r.id)}')">🍽️ ${esc(r.name)}</button>`).join("")
+    : `<div style="font-size:0.78rem; color:var(--muted);">Cargando tus locales… Si no aparece ninguno, abre la gestión con el PIN.</div>`;
+  if (list.length === 1 && currentView === "owner" && !holdOwnerPanel) setTimeout(() => { if (currentView === "owner" && !pinOpen && !holdOwnerPanel) openWaiterView(list[0].id, true); }, 0);
+  return true;
+}
+async function unlockOwnerPanel() {
+  if (await pinUnlock()) renderOwnerSessionView();
+}
+
+// Un minuto con la app en segundo plano bloquea las herramientas
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") { appHiddenAt = Date.now(); return; }
+  if (pinOpen && appHiddenAt && Date.now() - appHiddenAt > 60000) {
+    pinOpen = false;
+    if (currentView === "app" && isStaffUnlocked) renderRestaurantApp();
+    else if (currentView === "owner") renderOwnerSessionView();
+  }
+  appHiddenAt = 0;
+});
+
+// ---------- «📲 Enviar a cocina»: los platos de la carta según las alergias marcadas ----------
+function htmlText(s) { const d = document.createElement("div"); d.innerHTML = String(s || ""); return d.textContent.replace(/\s+/g, " ").trim(); }
+function cut(s, n) { return s.length > n ? s.slice(0, n - 1) + "…" : s; }
+function kitchenMessage(r, mesa) {
+  const S = activeSets();
+  const labels = [...ALLERGENS.filter(a => S.al.has(a)), ...DIETS.filter(d => S.di.has(d.id)).map(d => d.label), ...[...S.cu].map(c => "Sin " + c)];
+  const eqx = (r.equip || []).length ? buildEquipIndex(r.equip, publicMenu(r)) : null;
+  const groups = { aptos: [], mod: [], proh: [] };
+  publicMenu(r).forEach(d => {
+    const res = evaluateDish(d, true, eqx);
+    const why = res.status === "mod" ? res.rem : res.status === "proh" ? res.blk : [];
+    groups[res.status].push({ name: d.name, why: why.map(htmlText).join(" · ") });
+  });
+  const build = withReasons => {
+    const lines = [`🛡️ ${r.name}${mesa ? " · MESA " + mesa : ""}`, `Alergias: ${labels.join(", ")}`, ""];
+    const block = (title, list, reasons) => {
+      lines.push(`${title} (${list.length})`);
+      if (!list.length) lines.push("• Ninguno");
+      list.forEach(x => lines.push("• " + x.name + (reasons && x.why ? ": " + cut(x.why, 110) : "")));
+      lines.push("");
+    };
+    block("✅ COMPATIBLES", groups.aptos, false);
+    block("🔄 ADAPTABLES", groups.mod, true);
+    block("⛔ NO APTOS", groups.proh, withReasons);
+    lines.push("⚠️ Orientativo según los datos de la carta. Confirmadlo en cocina antes de servir.");
+    return lines.join("\n");
+  };
+  let text = build(true);
+  if (text.length > 6000) text = build(false);       // cartas muy largas: los no aptos, sin el motivo
+  return { text, labels, counts: { aptos: groups.aptos.length, mod: groups.mod.length, proh: groups.proh.length } };
+}
+async function sendToKitchen() {
+  const r = getActiveRest();
+  const S = activeSets();
+  if (!S.al.size && !S.di.size && !S.cu.size) { toast("Marca primero las alergias de la mesa.", "err"); return; }
+  if (!publicMenu(r).length) { toast("La carta no tiene platos publicados.", "err"); return; }
+  const mesa = await uiPrompt("📲 Enviar a cocina por WhatsApp.\n\nNúmero o nombre de la mesa (opcional):", "", { okText: "Enviar", placeholder: "Ej. 7 o Terraza 3" });
+  if (mesa === null) return;
+  const { text } = kitchenMessage(r, str(mesa.trim(), 30));
+  const url = "https://wa.me/?text=" + encodeURIComponent(text);
+  if (!window.open(url, "_blank")) location.href = url;
 }
 
 // ============================================================
@@ -5326,7 +5916,10 @@ function authErrorText(e) {
   if (/cancel-failed/.test(c)) return e.message;
   return "Error: " + (c || (e && e.message) || e);
 }
-async function cloudSignIn(email, pass) { await cloud.A.signInWithEmailAndPassword(cloud.auth, email, pass); }
+async function cloudSignIn(email, pass) {
+  const cred = await cloud.A.signInWithEmailAndPassword(cloud.auth, email, pass);
+  if (cred && cred.user) pinForget("u:" + cred.user.uid);      // entrar con la contraseña borra el PIN de este móvil
+}
 async function cloudSignUp(email, pass) {
   registeringOwner = true;
   try {
@@ -5357,6 +5950,7 @@ async function cloudGoogle() {
   let user;
   try { user = (await cloud.A.signInWithPopup(cloud.auth, new cloud.A.GoogleAuthProvider())).user; }
   finally { registeringOwner = false; }
+  pinForget("u:" + user.uid);                                    // entrar con Google borra el PIN de este móvil
   const s = await cloud.F.getDoc(cloud.F.doc(cloud.db, "owners", user.uid));
   if (s.exists()) { ownerProfile = s.data(); renderOwnerSessionView(); toast("✅ Sesión iniciada."); }
   else openCompleteRegistration();
@@ -5721,6 +6315,7 @@ async function handlePaymentReturn() {
   if (!m) return;
   try { history.replaceState(null, "", location.pathname + location.hash); } catch (e) {}
   if (m[1] === "cancelado") { toast("Pago cancelado. No se ha cobrado nada.", "info"); return; }
+  holdOwnerPanel = true;            // la suscripción está en la gestión: se pedirá el PIN, no se salta a la vista del camarero
   toast("⏳ Pago recibido. Activando tu suscripción…", "info");
   await initCloud();
   for (let i = 0; i < 8; i++) {
@@ -5730,6 +6325,11 @@ async function handlePaymentReturn() {
   if (ownerPaidUntilMs() > Date.now()) {
     toast("✅ Suscripción activada. ¡Gracias!");
     try { await callFn("sincronizarPlan", {}); } catch (e) {}
+  }
+  holdOwnerPanel = false;
+  if (currentView === "owner" && ownerLoggedIn() && pinIsSet() && !pinOpen) {
+    toast("🔒 Escribe tu PIN para ver tu suscripción.", "info");
+    await unlockOwnerPanel();
   }
   if (currentView === "owner") renderOwnerSessionView();
 }
@@ -5846,7 +6446,7 @@ function formSnapshot(id) {
   if (!el) return "";
   const vals = [...el.querySelectorAll("input, textarea, select")].map(i => i.type === "checkbox" ? i.checked : i.value);
   const chips = [...el.querySelectorAll(".selected, .diet-sel, .on")].length;
-  return JSON.stringify([vals, chips, el.querySelectorAll(".ing-editor-card, .home-ing-row").length]);
+  return JSON.stringify([vals, chips, el.querySelectorAll(".ing-editor-card, .home-ing-row, .equip-card").length, el.dataset.stage || "", [...el.querySelectorAll(".equip-sel")].length]);
 }
 function rememberModalState(id) { setTimeout(() => { modalSnapshots[id] = formSnapshot(id); }, 60); }
 async function closeIfNoChanges(id, closer) {
@@ -5862,6 +6462,8 @@ const BACK_CLOSERS = {
   uiDialog: () => closeUiDialog(false),
   universalScanModal: () => closeUniversalScanner(),
   dishModal: () => closeIfNoChanges("dishModal", closeRestDishModal),
+  equipModal: () => closeIfNoChanges("equipModal", closeEquipModal),
+  equipPickModal: () => closeEquipPick(),
   homeDishModal: () => closeIfNoChanges("homeDishModal", closeHomeDishModal),
   allergenWarningModal: () => cancelAddUnsafeProduct(),
   registerModal: () => cancelRegistration(),
