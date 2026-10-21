@@ -1,0 +1,510 @@
+rules_version = '2';
+
+// =====================================================================
+// REGLAS DE SEGURIDAD DE TUSALERGIAS (versión 3.7)
+// Pégalas en: Consola de Firebase → Firestore Database → Reglas → Publicar.
+//
+// Antes de publicarlas, revisa la línea marcada con «ADMINISTRACIÓN»:
+// es el email con el que entrarás en admin.html.
+//
+// Resumen:
+// - Las cartas, locales, opiniones y sugerencias son públicas para leer.
+// - Solo el dueño puede escribir sus locales. Cada cuenta tiene como máximo
+//   3 locales: sus documentos se llaman "<uid>_1", "<uid>_2" y "<uid>_3".
+// - Fundadores (máximo 30): solo cuentas con el email verificado. El contador
+//   sube de uno en uno a la vez que la cuenta recibe su número. Si la
+//   administración retira una plaza, queda libre para otra cuenta.
+// - Opiniones: una por persona y local, más un aviso de carta. Solo las borran
+//   su autor y la administración. El dueño no puede valorar su propio local;
+//   puede responder, marcar un aviso como corregido y denunciar.
+// - Denuncias, reclamaciones de locales y el registro de locales borrados solo
+//   los ve la administración (y cada persona, lo suyo).
+// - Solo la administración marca un local como verificado. Si el dueño cambia
+//   el nombre o la localidad, deja de estar verificado.
+// - Las estadísticas solo pueden subir de 1 en 1 y solo las ve el dueño.
+// - Los datos de salud de los clientes no llegan aquí: se quedan en su móvil.
+// - Cobro (apagado hasta que pongas una fecha en admin.html): desde esa fecha
+//   solo se sirven las cartas de los locales con la suscripción al día o de
+//   Fundadores en su año gratis. La fecha exige 30 días de aviso.
+// - Las suscripciones solo las escribe el servidor (Cloud Functions), nunca
+//   la app: así nadie puede darse de alta como pagado sin pagar.
+// - Cada carta lleva una versión: un móvil con la carta vieja no puede pisar
+//   los cambios hechos desde otro dispositivo.
+// - Cada carta puede llevar las freidoras y planchas del local (máximo 12).
+// =====================================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ADMINISTRACIÓN: email de la cuenta que gestiona TusAlergias desde admin.html.
+    // La cuenta debe tener el email verificado (admin.html te ayuda a hacerlo).
+    function adminEmail() { return 'frankymazineoficial@gmail.com'; }
+
+    function signedIn() { return request.auth != null; }
+    // Cuenta real de restaurante (email o Google), no un usuario anónimo
+    function isOwnerUser() {
+      return signedIn() && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+    function emailVerified() { return request.auth.token.get('email_verified', false) == true; }
+    function isAdmin() {
+      return isOwnerUser()
+        && request.auth.token.get('email', '') == adminEmail()
+        && emailVerified();
+    }
+    function ownsRid(rid) { return isOwnerUser() && rid.matches(request.auth.uid + '_[1-3]'); }
+    function isStr(v, max) { return v is string && v.size() <= max; }
+    function ownerDoc() { return /databases/$(database)/documents/owners/$(request.auth.uid); }
+    function foundersDoc() { return /databases/$(database)/documents/meta/founders; }
+    function planPath() { return /databases/$(database)/documents/meta/plan; }
+    function founderMark() { return /databases/$(database)/documents/founderMarks/$(request.auth.uid); }
+    function restDoc(rid) { return /databases/$(database)/documents/restaurants/$(rid); }
+
+    // ---------- Cobro ----------
+    // Hay cobro si existe meta/plan con una fecha de inicio ya alcanzada
+    function billingOn() {
+      return exists(planPath())
+        && get(planPath()).data.get('billingStartsAt', null) != null
+        && request.time >= get(planPath()).data.billingStartsAt;
+    }
+    // Un local se muestra al público si su cuenta paga, si es Fundador en su año gratis
+    // o durante los 7 días de margen tras el inicio del cobro (o tras el año gratis)
+    function restaurantPaid(rid) {
+      let start = get(planPath()).data.billingStartsAt;
+      let r = get(restDoc(rid)).data;
+      return request.time < start + duration.value(7, 'd')
+        || (r.get('founder', false) == true && request.time < start + duration.value(372, 'd'))
+        || r.get('paidUntil', timestamp.value(0)) > request.time;
+    }
+
+    // ---------- Perfil de cada restaurante (privado) ----------
+    match /owners/{uid} {
+      allow read: if (isOwnerUser() && request.auth.uid == uid) || isAdmin();
+      allow create: if isOwnerUser() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'plan', 'founderNumber', 'termsVersion', 'termsAcceptedAt', 'createdAt'])
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.plan == 'lanzamiento'
+        && isStr(request.resource.data.termsVersion, 20)
+        && request.resource.data.termsAcceptedAt == request.time
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.founderNumber is int
+        && (request.resource.data.founderNumber == 0 || founderClaimOk(request.resource.data.founderNumber));
+      // El plan y la suscripción (campos sub, paidUntil, stripeCustomer...) solo los cambia el servidor.
+      allow update: if (isOwnerUser() && request.auth.uid == uid && (
+          // Aceptar unas condiciones nuevas
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['termsVersion', 'termsAcceptedAt'])
+            && isStr(request.resource.data.termsVersion, 20)
+            && request.resource.data.termsAcceptedAt == request.time)
+          // Conseguir la plaza de Fundador después del registro (al verificar el email)
+          || (resource.data.get('founderNumber', 0) == 0
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['founderNumber'])
+            && request.resource.data.founderNumber is int
+            && founderClaimOk(request.resource.data.founderNumber))))
+        // La administración puede retirar una plaza de Fundador
+        || (isAdmin()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['founderNumber', 'founderRevokedAt'])
+          && request.resource.data.founderNumber == 0
+          && request.resource.data.founderRevokedAt == request.time);
+      allow delete: if isOwnerUser() && request.auth.uid == uid;
+    }
+    // Plaza de Fundador nº n: email verificado, la cuenta no tuvo plaza antes (marca) y,
+    // en esta misma operación, el contador pasa de n-1 a n sin superar las plazas libres
+    function founderClaimOk(n) {
+      return emailVerified()
+        && !exists(founderMark()) && existsAfter(founderMark())
+        && n >= 1
+        && getAfter(foundersDoc()).data.count == n
+        && n <= 30 + getAfter(foundersDoc()).data.get('revoked', 0)
+        && (exists(foundersDoc()) ? get(foundersDoc()).data.count + 1 == n : n == 1);
+    }
+    // La cuenta aún no tiene número de Fundador
+    function noFounderYet() { return !exists(ownerDoc()) || get(ownerDoc()).data.get('founderNumber', 0) == 0; }
+
+    // ---------- Marca de Fundador (una por cuenta, para siempre; sin datos personales) ----------
+    // Así una cuenta no puede gastar plazas borrando y volviendo a crear su perfil,
+    // ni recuperar una plaza que le retiró la administración.
+    match /founderMarks/{uid} {
+      allow read: if isAdmin() || (isOwnerUser() && request.auth.uid == uid);
+      allow create: if isOwnerUser() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['n'])
+        && request.resource.data.n is int
+        && request.resource.data.n >= 1
+        && getAfter(ownerDoc()).data.founderNumber == request.resource.data.n;
+    }
+
+    // ---------- Contador público de plazas de Fundador ----------
+    // count: números de Fundador dados; revoked: plazas retiradas por la administración.
+    // Plazas ocupadas = count - revoked (máximo 30).
+    match /meta/founders {
+      allow read: if true;
+      allow create: if isOwnerUser()
+        && request.resource.data.keys().hasOnly(['count', 'revoked'])
+        && request.resource.data.count == 1
+        && request.resource.data.get('revoked', 0) == 0
+        && noFounderYet()
+        && getAfter(ownerDoc()).data.founderNumber == 1;
+      allow update: if (isOwnerUser()
+          && request.resource.data.keys().hasOnly(['count', 'revoked'])
+          && request.resource.data.count == resource.data.count + 1
+          && request.resource.data.get('revoked', 0) == resource.data.get('revoked', 0)
+          && request.resource.data.count <= 30 + request.resource.data.get('revoked', 0)
+          && noFounderYet()
+          && getAfter(ownerDoc()).data.founderNumber == request.resource.data.count)
+        // La administración apunta las plazas retiradas (así quedan libres)
+        || (isAdmin()
+          && request.resource.data.keys().hasOnly(['count', 'revoked'])
+          && request.resource.data.count == resource.data.count
+          && request.resource.data.revoked is int
+          && request.resource.data.revoked >= 0
+          && request.resource.data.revoked <= request.resource.data.count);
+    }
+
+    // ---------- Fecha de inicio del cobro y aviso (lo cambia admin.html) ----------
+    match /meta/plan {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['billingStartsAt', 'noticeText', 'playBilling', 'webBilling', 'updatedAt'])
+        && (request.resource.data.billingStartsAt == null || request.resource.data.billingStartsAt is timestamp)
+        && isStr(request.resource.data.noticeText, 600)
+        && request.resource.data.playBilling is bool
+        && request.resource.data.webBilling is bool
+        && request.resource.data.updatedAt == request.time
+        // Las condiciones prometen 30 días de aviso: una fecha nueva debe estar a 30 días o más
+        && (request.resource.data.billingStartsAt == null
+          || (resource != null && request.resource.data.billingStartsAt == resource.data.get('billingStartsAt', null))
+          || request.resource.data.billingStartsAt >= request.time + duration.value(30, 'd'));
+    }
+
+    // ---------- Locales (públicos) ----------
+    // instance: identificador de cada alta; si el local se borra y se vuelve a crear, cambia.
+    function validRestaurant(d, uid) {
+      return d.keys().hasOnly(['ownerUid', 'name', 'city', 'phone', 'lat', 'lng', 'lastVerified', 'published', 'dishCount', 'updatedAt', 'createdAt', 'founder', 'fromSuggestion', 'paidUntil', 'verified', 'verifiedAt', 'instance'])
+        && d.ownerUid == uid
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 120
+        && isStr(d.city, 200) && isStr(d.phone, 20) && isStr(d.lastVerified, 40)
+        && d.lat is number && d.lng is number
+        && d.lat >= -90 && d.lat <= 90 && d.lng >= -180 && d.lng <= 180
+        && d.published is bool
+        && d.dishCount is int && d.dishCount >= 0 && d.dishCount <= 300
+        && d.get('founder', false) is bool
+        && d.get('verified', false) is bool
+        && isStr(d.get('fromSuggestion', ''), 40)
+        && isStr(d.get('instance', ''), 40)
+        && d.updatedAt == request.time;
+    }
+    // Registro del borrado de cada alta de un local (lo ve solo la administración)
+    function deletedLog(rid, inst) { return /databases/$(database)/documents/deletedLocals/$(rid + '_' + inst); }
+    match /restaurants/{rid} {
+      allow read: if true;
+      allow create: if (ownsRid(rid)
+          && validRestaurant(request.resource.data, request.auth.uid)
+          && !('paidUntil' in request.resource.data)
+          && !('verified' in request.resource.data) && !('verifiedAt' in request.resource.data)
+          && request.resource.data.get('instance', '').size() >= 8
+          && request.resource.data.createdAt == request.time
+          // Un hueco cuyo local se traspasó a otra cuenta no se reutiliza (sus QR impresos llevan al local traspasado)
+          && !exists(/databases/$(database)/documents/redirects/$(rid))
+          && (request.resource.data.get('founder', false) == false || get(ownerDoc()).data.founderNumber > 0))
+        // Traspaso de un local a otra cuenta, tras aprobar una reclamación (admin.html)
+        || (isAdmin()
+          && validRestaurant(request.resource.data, request.resource.data.ownerUid)
+          && rid.matches(request.resource.data.ownerUid + '_[1-3]')
+          && request.resource.data.createdAt is timestamp);
+      allow update: if (ownsRid(rid)
+          && validRestaurant(request.resource.data, request.auth.uid)
+          && request.resource.data.createdAt == resource.data.createdAt
+          && request.resource.data.get('fromSuggestion', '') == resource.data.get('fromSuggestion', '')
+          && request.resource.data.get('paidUntil', null) == resource.data.get('paidUntil', null)
+          && request.resource.data.get('instance', '') == resource.data.get('instance', '')
+          && request.resource.data.get('verifiedAt', null) == resource.data.get('verifiedAt', null)
+          // Si cambia el nombre o la localidad, deja de estar verificado
+          && request.resource.data.get('verified', false) == (resource.data.get('verified', false)
+            && request.resource.data.name == resource.data.name
+            && request.resource.data.city == resource.data.city)
+          // Fundador: el dueño no se lo quita, y solo se lo pone si su cuenta es Fundadora
+          && (request.resource.data.get('founder', false) == resource.data.get('founder', false)
+            || (request.resource.data.get('founder', false) == true && get(ownerDoc()).data.founderNumber > 0)))
+        // La administración verifica locales y retira la insignia de Fundador
+        || (isAdmin()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['verified', 'verifiedAt', 'founder'])
+          && request.resource.data.get('verified', false) is bool
+          && request.resource.data.get('founder', false) is bool);
+      // La administración puede retirar un local falso o ilegal (condiciones, punto 9).
+      // El dueño, dejando constancia del borrado en deletedLocals en la misma operación.
+      allow delete: if isAdmin()
+        || (ownsRid(rid) && getAfter(deletedLog(rid, resource.data.get('instance', 'legacy'))).data.at == request.time);
+
+      // ---------- Opiniones y avisos de clientes (públicos) ----------
+      // Una opinión por persona y local (el documento se llama como su usuario) y un aviso de
+      // carta (<usuario>_aviso). Si vuelve a opinar, sustituye a la anterior.
+      // delHash: resumen (SHA-256, 64 caracteres en hexadecimal) de una llave secreta que solo
+      // guarda el móvil que la publicó, para poder borrarla aunque cambie su usuario.
+      match /reviews/{revId} {
+        function keyDoc() { return /databases/$(database)/documents/restaurants/$(rid)/reviewDeletes/$(revId); }
+        function reviewOk(d) {
+          return d.keys().hasOnly(['author', 'stars', 'allergens', 'comment', 'isAlert', 'authorUid', 'createdAt', 'delHash'])
+            && (!('delHash' in d) || (d.delHash is string && d.delHash.size() == 64))
+            && d.authorUid == request.auth.uid
+            && isStr(d.author, 60)
+            && d.stars is int && d.stars >= 1 && d.stars <= 5
+            && isStr(d.allergens, 200)
+            && d.comment is string && d.comment.size() >= 1 && d.comment.size() <= 1000
+            && d.isAlert is bool
+            && d.createdAt == request.time;
+        }
+        function reviewIdOk(d) {
+          return (revId == request.auth.uid && d.isAlert == false)
+            || (revId == request.auth.uid + '_aviso' && d.isAlert == true);
+        }
+        allow read: if true;
+        allow create: if (isAdmin()
+            // Copia al traspasar el local a otra cuenta
+            && request.resource.data.keys().hasOnly(['author', 'stars', 'allergens', 'comment', 'isAlert', 'authorUid', 'createdAt', 'delHash', 'reply', 'replyAt', 'resolvedAt']))
+          || (signedIn() && !ownsRid(rid)
+            && reviewIdOk(request.resource.data)
+            && reviewOk(request.resource.data)
+            && exists(restDoc(rid)));
+        allow update: if
+          // Su autor la sustituye por otra (se quitan la respuesta del local y el «corregido»)
+          (signedIn() && resource.data.authorUid == request.auth.uid
+            && reviewIdOk(request.resource.data)
+            && reviewOk(request.resource.data))
+          // El dueño del local responde, cambia su respuesta o la quita
+          || (ownsRid(rid)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reply', 'replyAt'])
+            && ((request.resource.data.get('reply', '') is string
+                && request.resource.data.get('reply', '').size() >= 1
+                && request.resource.data.get('reply', '').size() <= 500
+                && request.resource.data.get('replyAt', null) == request.time)
+              || (!('reply' in request.resource.data) && !('replyAt' in request.resource.data))))
+          // El dueño marca un aviso de carta como corregido
+          || (ownsRid(rid) && resource.data.isAlert == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resolvedAt'])
+            && request.resource.data.resolvedAt == request.time)
+          // La administración puede quitar la respuesta del local o el «corregido»
+          || (isAdmin()
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reply', 'replyAt', 'resolvedAt']));
+        // La borran su autor o la administración. El dueño solo al borrar el local entero.
+        allow delete: if (signedIn() && (resource.data.authorUid == request.auth.uid || isAdmin()))
+          || (ownsRid(rid) && !existsAfter(restDoc(rid)))
+          // Con la llave: en la misma operación se apunta en reviewDeletes la llave cuyo resumen coincide
+          || (resource.data.get('delHash', '') != ''
+            && hashing.sha256(getAfter(keyDoc()).data.key.toUtf8()).toHexString().lower() == resource.data.delHash);
+      }
+
+      // Llaves de borrado: solo se apuntan a la vez que se borra la opinión con esa llave. Nadie las lee.
+      match /reviewDeletes/{revId} {
+        allow read, delete: if isAdmin();
+        allow create, update: if request.resource.data.keys().hasOnly(['key', 'at'])
+          && request.resource.data.key is string
+          && request.resource.data.key.size() >= 32 && request.resource.data.key.size() <= 100
+          && request.resource.data.at == request.time
+          && exists(/databases/$(database)/documents/restaurants/$(rid)/reviews/$(revId))
+          && !existsAfter(/databases/$(database)/documents/restaurants/$(rid)/reviews/$(revId));
+      }
+    }
+
+    // ---------- Locales traspasados: los QR impresos del local anterior llevan al nuevo ----------
+    match /redirects/{rid} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['to', 'at'])
+        && request.resource.data.to is string && request.resource.data.to.size() <= 60
+        && request.resource.data.at == request.time;
+      allow delete: if isAdmin();
+    }
+
+    // ---------- Registro de locales borrados por su dueño (solo lo ve la administración) ----------
+    // Uno por cada alta borrada: sirve para detectar a quien borra un local y lo vuelve
+    // a crear para quitarse las opiniones. Sin datos de clientes.
+    match /deletedLocals/{logId} {
+      allow read, delete: if isAdmin();
+      allow create: if request.resource.data.keys().hasOnly(['rid', 'name', 'city', 'ownerUid', 'reviews', 'at'])
+        && request.resource.data.rid is string
+        && ownsRid(request.resource.data.rid)
+        && logId == request.resource.data.rid + '_' + get(restDoc(request.resource.data.rid)).data.get('instance', 'legacy')
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.name == get(restDoc(request.resource.data.rid)).data.name
+        && request.resource.data.city == get(restDoc(request.resource.data.rid)).data.city
+        && request.resource.data.reviews is int && request.resource.data.reviews >= 0
+        && request.resource.data.at == request.time
+        && !existsAfter(restDoc(request.resource.data.rid));
+    }
+
+    // ---------- Denuncias de opiniones (las revisa la administración) ----------
+    // Una por persona y opinión. Quien denuncia ve el estado de la suya.
+    match /reports/{reportId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['rid', 'revId', 'uid', 'byOwner', 'reason', 'text', 'createdAt', 'status'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.rid is string && request.resource.data.rid.size() <= 60
+        && request.resource.data.revId is string && request.resource.data.revId.size() <= 60
+        && reportId == request.resource.data.rid + '__' + request.resource.data.revId + '__' + request.auth.uid
+        && request.resource.data.byOwner == ownsRid(request.resource.data.rid)
+        && request.resource.data.reason in ['falsa', 'ofensiva', 'datos', 'spam', 'otro']
+        && isStr(request.resource.data.text, 1000)
+        && (request.resource.data.byOwner == false || request.resource.data.text.size() >= 10)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.status == 'pendiente'
+        && exists(/databases/$(database)/documents/restaurants/$(request.resource.data.rid)/reviews/$(request.resource.data.revId));
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'resolvedAt'])
+        && request.resource.data.status in ['pendiente', 'retirada', 'respuesta-retirada', 'descartada']
+        && request.resource.data.resolvedAt == request.time;
+      // Quien denuncia puede retirar su denuncia (por ejemplo, al borrar su cuenta)
+      allow delete: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+    }
+
+    // ---------- Reclamaciones de un local ya registrado por otra cuenta ----------
+    // Las decide la administración tras comprobarlo con el local. Quien reclama ve la suya.
+    match /claims/{claimId} {
+      allow read: if isAdmin() || (isOwnerUser() && resource.data.uid == request.auth.uid);
+      allow create: if isOwnerUser()
+        && request.resource.data.keys().hasOnly(['rid', 'uid', 'name', 'role', 'email', 'phone', 'message', 'createdAt', 'status'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.rid is string && request.resource.data.rid.size() <= 60
+        && claimId == request.resource.data.rid + '__' + request.auth.uid
+        && !ownsRid(request.resource.data.rid)
+        && request.resource.data.name is string && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 80
+        && isStr(request.resource.data.role, 40)
+        && request.resource.data.email is string && request.resource.data.email.size() >= 5 && request.resource.data.email.size() <= 120
+        && request.resource.data.phone is string && request.resource.data.phone.size() >= 9 && request.resource.data.phone.size() <= 20
+        && isStr(request.resource.data.message, 1000)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.status == 'pendiente'
+        && exists(restDoc(request.resource.data.rid));
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'resolvedAt', 'newRid'])
+        && request.resource.data.status in ['pendiente', 'aprobada', 'rechazada']
+        && request.resource.data.resolvedAt == request.time;
+      // Quien reclama puede retirar su reclamación; la administración, borrarla
+      allow delete: if isAdmin() || (isOwnerUser() && resource.data.uid == request.auth.uid);
+    }
+
+    // ---------- Cartas (una por local) ----------
+    match /menus/{rid} {
+      function menuOk(d) {
+        return d.keys().hasOnly(['menu', 'updatedAt', 'ver', 'base', 'equip'])
+          && d.menu is list && d.menu.size() <= 300
+          && (!('equip' in d) || (d.equip is list && d.equip.size() <= 12))
+          && d.updatedAt == request.time
+          && d.ver is string && d.ver.size() >= 8 && d.ver.size() <= 40
+          && d.base is string && d.base.size() <= 40
+          && d.ver != d.base;
+      }
+      // Públicas durante el lanzamiento. Con el cobro activo, solo si el local está al día.
+      allow read: if !billingOn() || ownsRid(rid) || isAdmin() || restaurantPaid(rid);
+      // (la administración la crea al traspasar un local a otra cuenta)
+      allow create: if (ownsRid(rid) || isAdmin()) && menuOk(request.resource.data);
+      // Solo se guarda encima de la última versión: si otro dispositivo cambió la carta, se rechaza
+      allow update: if ownsRid(rid) && menuOk(request.resource.data)
+        && request.resource.data.base == resource.data.get('ver', '');
+      allow delete: if ownsRid(rid) || isAdmin();
+    }
+
+    // ---------- Borradores de carta: platos aún sin publicar (solo los ve su dueño) ----------
+    match /drafts/{rid} {
+      allow read: if ownsRid(rid);
+      allow create, update: if ownsRid(rid)
+        && request.resource.data.keys().hasOnly(['menu', 'order', 'updatedAt'])
+        && request.resource.data.menu is list
+        && request.resource.data.menu.size() <= 300
+        && request.resource.data.order is list
+        && request.resource.data.order.size() <= 300
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if ownsRid(rid) || isAdmin();
+    }
+
+    // ---------- Estadísticas de cada local (solo las ve el dueño) ----------
+    match /stats/{rid} {
+      function incOk(k) {
+        return request.resource.data.get(k, 0) == resource.data.get(k, 0)
+          || request.resource.data.get(k, 0) == resource.data.get(k, 0) + 1;
+      }
+      allow read: if ownsRid(rid) || isAdmin();
+      // Cualquiera (aunque no tenga cuenta) puede sumar 1 a un contador.
+      // La administración las copia al traspasar un local a otra cuenta.
+      allow create: if (isAdmin() && request.resource.data.keys().hasOnly(['views', 'saves', 'bookings', 'alerts']))
+        || (request.resource.data.keys().hasOnly(['views', 'saves', 'bookings', 'alerts'])
+          && request.resource.data.size() == 1
+          && request.resource.data.get('views', 1) == 1 && request.resource.data.get('saves', 1) == 1
+          && request.resource.data.get('bookings', 1) == 1 && request.resource.data.get('alerts', 1) == 1
+          && exists(restDoc(rid)));
+      allow update: if request.resource.data.keys().hasOnly(['views', 'saves', 'bookings', 'alerts'])
+        && request.resource.data.diff(resource.data).affectedKeys().size() == 1
+        && incOk('views') && incOk('saves') && incOk('bookings') && incOk('alerts');
+      allow delete: if ownsRid(rid) || isAdmin();
+    }
+
+    // ---------- Locales sugeridos por clientes (públicos) ----------
+    match /suggestions/{sid} {
+      function voteDoc() { return /databases/$(database)/documents/suggestions/$(sid)/votes/$(request.auth.uid); }
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['name', 'city', 'lat', 'lng', 'createdBy', 'requests', 'claimed', 'createdAt'])
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 120
+        && isStr(request.resource.data.city, 200)
+        && request.resource.data.lat is number && request.resource.data.lng is number
+        && request.resource.data.requests == 1
+        && request.resource.data.claimed == false
+        && request.resource.data.createdAt == request.time
+        && existsAfter(voteDoc());
+      allow update: if signedIn() && (
+        // "Solicitar que suba su carta": un voto por persona
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['requests'])
+          && request.resource.data.requests == resource.data.requests + 1
+          && !exists(voteDoc())
+          && existsAfter(voteDoc()))
+        ||
+        // Un restaurante la reclama al darse de alta (en la misma operación crea su local)
+        (isOwnerUser()
+          && resource.data.claimed == false
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimed', 'claimedBy', 'claimedRid'])
+          && request.resource.data.claimed == true
+          && request.resource.data.claimedBy == request.auth.uid
+          && request.resource.data.claimedRid is string
+          && request.resource.data.claimedRid.matches(request.auth.uid + '_[1-3]')
+          && existsAfter(restDoc(request.resource.data.claimedRid)))
+      );
+      allow delete: if signedIn() && ((resource.data.createdBy == request.auth.uid && resource.data.claimed == false) || isAdmin());
+
+      match /votes/{voterUid} {
+        allow read: if false;
+        allow create: if signedIn() && voterUid == request.auth.uid
+          && request.resource.data.keys().hasOnly(['at'])
+          && request.resource.data.at == request.time;
+      }
+    }
+
+    // ---------- Estadísticas anónimas de uso (una por móvil) ----------
+    // Solo el propio móvil escribe su ficha, como mucho una vez cada 6 horas; solo la administración ve el total.
+    function usageInfoOk(d) {
+      return d.mode in ['play', 'pwa', 'web'] && d.platform in ['android', 'ios', 'otro'];
+    }
+    match /users/{uid} {
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['firstSeen', 'lastSeen', 'days', 'mode', 'platform'])
+        && request.resource.data.firstSeen == request.time
+        && request.resource.data.lastSeen == request.time
+        && request.resource.data.days == 1
+        && usageInfoOk(request.resource.data);
+      allow update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastSeen', 'days', 'mode', 'platform'])
+        && request.resource.data.lastSeen == request.time
+        && request.resource.data.days == resource.data.days + 1
+        && resource.data.lastSeen < request.time - duration.value(6, 'h')
+        && usageInfoOk(request.resource.data);
+      allow delete: if signedIn() && request.auth.uid == uid;
+    }
+
+    // ---------- Lecturas de cartas con IA (las escribe solo el servidor; la administración las ve) ----------
+    match /aiUsage/{id} {
+      allow read: if isAdmin();
+    }
+
+    // ---------- Compras (solo el servidor) ----------
+    // purchases/{id}: relación entre cada compra de Google Play o de la web y su cuenta.
+    // Sin reglas = nadie puede leerlo ni escribirlo desde la app; Cloud Functions sí.
+  }
+}
