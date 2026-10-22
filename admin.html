@@ -411,7 +411,8 @@ El equipo de TusAlergias`;
     catch (e) { msg("ownersMsg", list); }
   };
   $("btnCsv").onclick = () => {
-    const q = v => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
+    // 3.9.3 (auditoría B5): un valor que empiece por = + - @ no se ejecuta como fórmula al abrirlo en Excel
+    const q = v => { let t = String(v == null ? "" : v); if (/^[=+\-@\t\r]/.test(t)) t = "'" + t; return `"${t.replace(/"/g, '""')}"`; };
     const rows = [["email", "fundador", "alta", "suscripcion_hasta"]].concat(owners.map(o => [o.email, o.founderNumber || "", tsMs(o.createdAt) ? new Date(tsMs(o.createdAt)).toISOString().slice(0, 10) : "", tsMs(o.paidUntil) ? new Date(tsMs(o.paidUntil)).toISOString().slice(0, 10) : ""]));
     const blob = new Blob(["﻿" + rows.map(r => r.map(q).join(";")).join("\r\n")], { type: "text/csv;charset=utf-8" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `tusalergias_cuentas_${new Date().toISOString().slice(0, 10)}.csv`;

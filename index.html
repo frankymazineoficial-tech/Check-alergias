@@ -203,6 +203,9 @@
   .staff-tools-toggle .stt-state { font-size:0.72rem; white-space:nowrap; }
   .staff-forgot { font-size:0.7rem; color:var(--muted); text-align:right; }
   #staffToolsBody { display:flex; flex-direction:column; gap:10px; }
+  .profile-bar-info { min-height:32px; box-sizing:border-box; padding:8px 0; }
+  .app-copyright { font-size:0.68rem; color:var(--muted); text-align:center; margin:14px 0 4px; line-height:1.5; }
+  .review-actions .btn { min-height:30px; }
   #staffToolsBody > * { margin-bottom:10px; }
   .waiter-pick-btn { width:100%; padding:12px; font-size:0.9rem; }
   .aptos-note { font-size:0.72rem; line-height:1.4; color:#bbf7d0; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.35); border-radius:8px; padding:7px 9px; margin-bottom:8px; }
@@ -376,6 +379,7 @@
     <div><b>🗑️ Borrar todos mis datos</b><br><span style="font-size:0.74rem; color:var(--muted);">Elimina de este móvil tu perfil, platos, rutas, reseñas y la cuenta de hostelería</span></div>
     <button class="btn btn-danger" onclick="deleteAllMyData()">Borrar datos</button>
   </div>
+  <p class="app-copyright">© 2026 Francisco José Ureña Castillo. TusAlergias, su diseño y su código son de su titular. <a href="LICENCIAS-LIBRERIAS.txt" target="_blank" rel="noopener">Licencias de las librerías</a></p>
 </div>
 
 <!-- VISTA INTERNA: CARTA DEL RESTAURANTE -->
@@ -443,7 +447,7 @@
     <div id="menuInteractiveZone">
       <div class="controls-bar">
         <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar plato o ingrediente..." oninput="renderDishes()">
-        <select id="catFilter" class="cat-filter" onchange="renderDishes()"></select>
+        <select id="catFilter" class="cat-filter" onchange="renderDishes()" aria-label="Filtrar la carta por sección"></select>
         <button class="btn btn-green" id="btnShareMenu" onclick="shareWhatsApp()">📲 Compartir</button>
       </div>
       <div class="legal-banner" id="menuLegalBanner">
@@ -486,10 +490,10 @@
 </nav>
 
 <!-- MODAL 1: CONFIGURADOR UNIFICADO DE MIS ALERGIAS, DIETAS Y TRAZAS -->
-<div class="modal" id="allergyProfileModal">
+<div class="modal" id="allergyProfileModal" role="dialog" aria-modal="true" aria-labelledby="allergyProfileModalTitle">
   <div class="modal-content" style="border:2px solid var(--amber);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <h2 style="margin:0; font-size:1rem; color:var(--amber);">🛡️ Mi Perfil de Alergias y Dietas</h2>
+      <h2 style="margin:0; font-size:1rem; color:var(--amber);" id="allergyProfileModalTitle">🛡️ Mi Perfil de Alergias y Dietas</h2>
       <button class="btn btn-green" onclick="closeModal('allergyProfileModal')">✅ Listo</button>
     </div>
     <div class="section-title" style="margin-top:4px;">1. Toca los alérgenos que debes evitar:</div>
@@ -517,10 +521,10 @@
 </div>
 
 <!-- MODAL 2: ESCÁNER UNIVERSAL (SEMÁFORO DE PRODUCTOS + LECTOR BIDI) -->
-<div class="modal" id="universalScanModal">
+<div class="modal" id="universalScanModal" role="dialog" aria-modal="true" aria-labelledby="universalScanModalTitle">
   <div class="modal-content" style="border:2px solid var(--green);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem; color:var(--green);">📷 Escáner Inteligente (Producto o Bidi)</h2>
+      <h2 style="margin:0; font-size:1rem; color:var(--green);" id="universalScanModalTitle">📷 Escáner Inteligente (Producto o Bidi)</h2>
       <button class="btn btn-outline" onclick="closeUniversalScanner()">✕</button>
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:8px;">
@@ -552,7 +556,7 @@
 </div>
 
 <!-- MODAL 3: CREAR / EDITAR PLATO EN CASA -->
-<div class="modal" id="homeDishModal">
+<div class="modal" id="homeDishModal" role="dialog" aria-modal="true" aria-labelledby="homeDishModalTitle">
   <div class="modal-content" style="border:2px solid var(--amber);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <h2 style="margin:0; font-size:1rem; color:var(--amber);" id="homeDishModalTitle">🍲 Plato en Casa</h2>
@@ -607,10 +611,10 @@
 </div>
 
 <!-- MODAL 4: ALERTA ROJA DE CONFLICTO AL ESCANEAR -->
-<div class="modal" id="allergenWarningModal" style="z-index:4000;">
+<div class="modal" id="allergenWarningModal" style="z-index:4000;" role="dialog" aria-modal="true" aria-labelledby="allergenWarningModalTitle">
   <div class="modal-content" style="border:3px solid var(--red); background:#1a0b12; text-align:center;">
     <div style="font-size:2.3rem; margin-bottom:4px;">⛔</div>
-    <h2 style="margin:0 0 8px; font-size:1.08rem; color:#fca5a5;">¡NO APTO SEGÚN TU PERFIL!</h2>
+    <h2 style="margin:0 0 8px; font-size:1.08rem; color:#fca5a5;" id="allergenWarningModalTitle">¡NO APTO SEGÚN TU PERFIL!</h2>
     <p id="allergenWarningText" style="font-size:0.85rem; color:#fff; line-height:1.45; margin:0 0 14px;"></p>
     <p style="font-size:0.78rem; color:#fde047; font-weight:700; margin:0 0 14px;">¿Deseas seguir añadiendo este producto al plato de todos modos?</p>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
@@ -621,7 +625,7 @@
 </div>
 
 <!-- MODAL 5: EDITOR DE PLATO DE RESTAURANTE -->
-<div class="modal" id="dishModal">
+<div class="modal" id="dishModal" role="dialog" aria-modal="true" aria-labelledby="dishModalTitle">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <h2 style="margin:0; font-size:1rem;" id="dishModalTitle">✏️ Plato de la Carta</h2>
@@ -665,7 +669,7 @@
 </div>
 
 <!-- MODAL 6: ALTA / EDICIÓN / SUGERENCIA DE RESTAURANTE -->
-<div class="modal" id="restModal">
+<div class="modal" id="restModal" role="dialog" aria-modal="true" aria-labelledby="restModalTitle">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <h2 style="margin:0; font-size:1rem;" id="restModalTitle">🏪 Datos del Restaurante</h2>
@@ -696,10 +700,10 @@
 </div>
 
 <!-- MODALES AUXILIARES: RUTAS, CAMARERO, RESERVA, RESEÑA, QR Y AVISO LEGAL OBLIGATORIO -->
-<div class="modal" id="saveRouteModal">
+<div class="modal" id="saveRouteModal" role="dialog" aria-modal="true" aria-labelledby="saveRouteModalTitle">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;">🎒 Guardar en Mis Rutas</h2>
+      <h2 style="margin:0; font-size:1rem;" id="saveRouteModalTitle">🎒 Guardar en Mis Rutas</h2>
       <button class="btn btn-outline" onclick="closeModal('saveRouteModal')">✕</button>
     </div>
     <div id="routeFolderSelectorList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;"></div>
@@ -707,10 +711,10 @@
   </div>
 </div>
 
-<div class="modal" id="waiterCardModal">
+<div class="modal" id="waiterCardModal" role="dialog" aria-modal="true" aria-labelledby="waiterCardModalTitle">
   <div class="modal-content" style="border:2px solid var(--purple);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <h2 style="margin:0; font-size:1rem;">🗣️ Tarjeta para el Camarero</h2>
+      <h2 style="margin:0; font-size:1rem;" id="waiterCardModalTitle">🗣️ Tarjeta para el Camarero</h2>
       <button class="btn btn-outline" onclick="closeModal('waiterCardModal')">✕</button>
     </div>
     <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
@@ -723,10 +727,10 @@
   </div>
 </div>
 
-<div class="modal" id="bookingModal">
+<div class="modal" id="bookingModal" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;">📅 Pre-aviso de Alergias a Cocina</h2>
+      <h2 style="margin:0; font-size:1rem;" id="bookingModalTitle">📅 Pre-aviso de Alergias a Cocina</h2>
       <button class="btn btn-outline" onclick="closeModal('bookingModal')">✕</button>
     </div>
     <div class="form-group"><label>Nombre y Comensales:</label><input type="text" id="bookName" placeholder="Ej. Laura (4 personas)"></div>
@@ -736,10 +740,10 @@
   </div>
 </div>
 
-<div class="modal" id="reviewModal">
+<div class="modal" id="reviewModal" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;">✍️ Valorar Seguridad del Local</h2>
+      <h2 style="margin:0; font-size:1rem;" id="reviewModalTitle">✍️ Valorar Seguridad del Local</h2>
       <button class="btn btn-outline" onclick="closeModal('reviewModal')">✕</button>
     </div>
     <div class="form-group"><label>Tu Nombre:</label><input type="text" id="revAuthor"></div>
@@ -752,10 +756,10 @@
   </div>
 </div>
 
-<div class="modal" id="qrModal">
+<div class="modal" id="qrModal" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
   <div class="modal-content" style="text-align:center;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;">📱 Código Bidi Oficial de Mesa</h2>
+      <h2 style="margin:0; font-size:1rem;" id="qrModalTitle">📱 Código Bidi Oficial de Mesa</h2>
       <button class="btn btn-outline" onclick="closeModal('qrModal')">✕</button>
     </div>
     <div id="qrBox" style="background:#fff; padding:12px; border-radius:14px; display:inline-block; margin-bottom:10px; min-width:220px; min-height:220px;"></div>
@@ -770,7 +774,7 @@
   </div>
 </div>
 
-<div class="modal" id="ownerPassModal" style="z-index:3500;">
+<div class="modal" id="ownerPassModal" style="z-index:3500;" role="dialog" aria-modal="true" aria-labelledby="ownerPassTitle">
   <div class="modal-content" style="border:2px solid var(--accent);">
     <h2 id="ownerPassTitle" style="margin:0 0 8px; font-size:1rem; color:var(--accent);">🔐 Contraseña del local</h2>
     <div class="form-group"><label>Contraseña (demo: 2026):</label><input type="password" id="ownerPassInput" onkeydown="if(event.key==='Enter') confirmOwnerPassword()"></div>
@@ -782,15 +786,15 @@
   </div>
 </div>
 
-<div class="modal" id="privacyModal" style="z-index:5200;">
+<div class="modal" id="privacyModal" style="z-index:5200;" role="dialog" aria-modal="true" aria-labelledby="privacyModalTitle">
   <div class="modal-content" style="border:2px solid var(--accent);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <h2 style="margin:0; font-size:1.02rem; color:var(--accent);">🔒 Política de Privacidad</h2>
+      <h2 style="margin:0; font-size:1.02rem; color:var(--accent);" id="privacyModalTitle">🔒 Política de Privacidad</h2>
       <button class="btn btn-outline" onclick="closeModal('privacyModal')">✕</button>
     </div>
     <div class="privacy-text">
 <p id="privacyLocalNote" class="todo-note" style="display:none;">🧪 Esta copia de la app funciona sin servidor: ahora mismo ningún dato sale de tu móvil. El resto de esta política describe la versión con servidor.</p>
-<p><b>Última actualización:</b> 21 de octubre de 2026.</p>
+<p><b>Última actualización:</b> 22 de octubre de 2026.</p>
 <h3>Responsable</h3>
 <p>Francisco José Ureña Castillo · Lorca (Murcia), España · Contacto: tusalergiasapp@gmail.com</p>
 
@@ -799,12 +803,13 @@
   <li><b>Tu perfil de alergias, dietas e ingredientes a evitar, tus platos caseros y tus rutas se guardan solo en tu móvil.</b> No los recibimos ni se envían a ningún servidor.</li>
   <li><b>Estadísticas anónimas de uso, solo si lo permites:</b> si marcas la casilla en la bienvenida o en Mi Perfil → «Estadísticas anónimas», guardamos en tu móvil un identificador técnico anónimo y apuntamos el primer y el último día en que usaste la app, cuántos días la has usado y si es Android, iPhone, la app de Google Play o la web. No incluye tu nombre, tu email, tu perfil de alergias, lo que miras ni tu ubicación. Sirve para saber cuántas personas usan TusAlergias y mostrar cifras globales a posibles patrocinadores e inversores. Si no lo permites, no se cuenta nada. Si lo desactivas después, se borra lo apuntado de tu móvil.</li>
   <li>Si publicas una <b>opinión, un aviso de cambio en una carta o una sugerencia de local</b>, guardamos lo que escribes (el nombre que indiques, la puntuación y el texto) y un identificador anónimo técnico de tu dispositivo. <b>Las opiniones son públicas</b>: no incluyas datos que no quieras que otros vean. Tus alergias solo se publican junto a tu opinión si marcas la casilla «Quiero publicar mis alergias»; entonces también serán públicas. El restaurante puede publicar una respuesta debajo. Junto a cada opinión se guarda el resumen criptográfico de una llave que solo tiene tu móvil, para que puedas borrarla desde él.</li>
+  <li><b>Cámara y fotos de etiquetas:</b> el escáner de códigos de barras y de QR, y la lectura de la lista de ingredientes de una foto, funcionan dentro de tu móvil. Las imágenes no se envían a ningún sitio. Solo cuando buscas un producto se envía su código de barras o el texto que buscas a Open Food Facts (más abajo).</li>
   <li>Si <b>denuncias</b> una opinión, guardamos el motivo, lo que escribas y un identificador anónimo técnico de tu dispositivo. Solo lo ve la administración, para decidir si la retira.</li>
 </ul>
 
 <h3>Si usas la app como restaurante</h3>
 <ul>
-  <li>Tu email y tu cuenta de acceso.</li>
+  <li>Tu email y tu cuenta de acceso. Si entras con Google, Google nos facilita también tu nombre y tu foto de perfil: el servicio de cuentas los guarda, pero la app solo usa el email.</li>
   <li>Los datos de tus locales (nombre, dirección, teléfono y ubicación) y sus cartas. <b>Son públicos</b>: cualquiera puede verlos en la app, en sus enlaces y en los códigos QR. Los platos que guardas como borrador no son públicos: solo los ves tú.</li>
   <li>Estadísticas de tu carta: visitas, guardados, pre-avisos y avisos.</li>
   <li>Tu aceptación de las condiciones y tu número de Fundador, si lo tienes (o la fecha en que se retiró).</li>
@@ -813,6 +818,7 @@
   <li>Si verificamos tu local, la fecha de la verificación. Si borras un local, un registro con su nombre, localidad, número de opiniones y fecha, para evitar que se borre un local para quitarse sus opiniones.</li>
   <li>Si retiramos o limitamos algo tuyo (un local, una respuesta, la verificación o la condición de Fundador), te escribimos a tu email con los motivos, y guardamos ese email y tu respuesta.</li>
   <li>Cuando empiece el cobro, si te suscribes: el plan elegido, su estado y sus fechas. El pago lo gestionan Google Play o, con tarjeta en la web, Stripe: <b>nosotros nunca vemos los datos de tu tarjeta</b>.</li>
+  <li><b>Vista del camarero y «Enviar a cocina»:</b> las alergias y dietas de un comensal que marcas en «Comprobar la carta para un comensal» se quedan en la pantalla de ese móvil: no se guardan, no nos llegan y se borran al pulsar «🧹 Limpiar» o al cerrar la app. Si pulsas «📲 Enviar a cocina», se abre WhatsApp con un mensaje con las alergias de la mesa y los platos, y eres tú quien elige a qué chat lo envías. Son datos de salud del cliente: envíalos solo al chat de tu cocina y para atender a ese cliente. Ese uso lo decide y lo hace el restaurante; TusAlergias no recibe el mensaje.</li>
   <li><b>«Subir carta con foto»:</b> si usas esta función, las fotos o el PDF de tu carta pasan por nuestro servidor (Google Cloud, en Bélgica) hasta la inteligencia artificial Gemini de Google Cloud, que lee los platos. No guardamos esas imágenes: solo los platos que tú revisas y añades, y cuántas lecturas hace cada cuenta al día (para el límite de uso). Google actúa como encargado del tratamiento y, en este servicio de pago, no usa tus imágenes para entrenar sus modelos; la lectura puede hacerse en servidores de Google fuera de la UE, con las garantías indicadas más abajo. No incluyas en las fotos datos personales que no sean necesarios.</li>
 </ul>
 
@@ -836,7 +842,7 @@
 <ul>
   <li><b>Open Food Facts</b> (Francia): recibe el código de barras o el texto que buscas.</li>
   <li><b>OpenStreetMap</b> (Reino Unido): dibuja el mapa solo después de que pulses «Mostrar el mapa», y recibe tu dirección IP. <b>Nominatim</b>, del mismo proyecto, recibe las direcciones que buscas.</li>
-  <li><b>WhatsApp:</b> solo cuando envías un pre-aviso o compartes una carta; el mensaje lleva lo que tú decides enviar.</li>
+  <li><b>WhatsApp:</b> solo cuando envías un pre-aviso, compartes una carta o, si eres restaurante, usas «Enviar a cocina». El mensaje lleva lo que tú decides enviar, al chat que tú eliges.</li>
   <li><b>Google (gstatic.com):</b> sirve el programa de Firebase que la app necesita para conectarse a su base de datos, y recibe tu dirección IP como cualquier web.</li>
 </ul>
 <p>Ninguno de estos servicios recibe tu perfil de alergias.</p>
@@ -845,6 +851,7 @@
 <ul>
   <li>Tu perfil de alergias, tus platos caseros, tus rutas y tus preferencias (por ejemplo, si quieres ver el mapa), y una copia de las cartas para poder usarlas sin conexión. Son necesarios para que funcione lo que pides.</li>
   <li>Si publicas una opinión o tienes cuenta de restaurante, la sesión de acceso de Firebase y la llave para borrar tus opiniones. También son necesarias.</li>
+  <li>Si tienes cuenta de restaurante y creas el <b>PIN de gestión</b>: un resumen cifrado del PIN (no el PIN), los intentos fallidos y el tiempo de bloqueo. Se quedan en ese móvil y no nos llegan. Sirven para que solo quien conoce el PIN pueda cambiar la carta desde ese móvil.</li>
   <li>Solo si lo permites, el identificador anónimo de las estadísticas de uso.</li>
 </ul>
 <p>La app no usa cookies de publicidad ni herramientas de analítica de terceros.</p>
@@ -871,10 +878,10 @@
   </div>
 </div>
 
-<div class="modal" id="termsModal" style="z-index:5300;">
+<div class="modal" id="termsModal" style="z-index:5300;" role="dialog" aria-modal="true" aria-labelledby="termsModalTitle">
   <div class="modal-content" style="border:2px solid var(--green);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <h2 style="margin:0; font-size:1.02rem; color:var(--green);">📄 Aviso legal y condiciones de uso</h2>
+      <h2 style="margin:0; font-size:1.02rem; color:var(--green);" id="termsModalTitle">📄 Aviso legal y condiciones de uso</h2>
       <button class="btn btn-outline" onclick="closeModal('termsModal')">✕</button>
     </div>
     <div class="privacy-text">
@@ -914,9 +921,9 @@
   </div>
 </div>
 
-<div class="modal" id="registerModal" style="z-index:3600;">
+<div class="modal" id="registerModal" style="z-index:3600;" role="dialog" aria-modal="true" aria-labelledby="registerModalTitle">
   <div class="modal-content" style="border:2px solid var(--green);">
-    <h2 style="margin:0 0 8px; font-size:1.02rem; color:var(--green);">👨‍🍳 Completa tu registro</h2>
+    <h2 style="margin:0 0 8px; font-size:1.02rem; color:var(--green);" id="registerModalTitle">👨‍🍳 Completa tu registro</h2>
     <p style="font-size:0.8rem; color:#cbd5e1; margin:0 0 10px;">Has entrado como <b id="regEmail"></b>. Para dar de alta tus restaurantes, acepta las condiciones de la fase de lanzamiento.</p>
     <div id="regLaunchInfo" class="info-box"></div>
     <label style="display:block; font-size:0.76rem; color:#cbd5e1; margin-bottom:12px; line-height:1.4;"><input type="checkbox" id="regTermsCheck"> He leído y acepto las <a href="#" onclick="openTermsModal(); return false;" style="color:var(--accent);">condiciones</a> y la <a href="#" onclick="openPrivacyModal(); return false;" style="color:var(--accent);">política de privacidad</a>.</label>
@@ -927,10 +934,10 @@
   </div>
 </div>
 
-<div class="modal" id="menuAiModal" style="z-index:3200;">
+<div class="modal" id="menuAiModal" style="z-index:3200;" role="dialog" aria-modal="true" aria-labelledby="menuAiModalTitle">
   <div class="modal-content" style="border:2px solid var(--purple);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <h2 style="margin:0; font-size:1.02rem; color:#e9d5ff;">📸 Subir la carta con fotos</h2>
+      <h2 style="margin:0; font-size:1.02rem; color:#e9d5ff;" id="menuAiModalTitle">📸 Subir la carta con fotos</h2>
       <button class="btn btn-outline" onclick="closeMenuAiModal()" aria-label="Cerrar">✕</button>
     </div>
 
@@ -970,10 +977,10 @@
   </div>
 </div>
 
-<div class="modal" id="helpModal" style="z-index:3300;">
+<div class="modal" id="helpModal" style="z-index:3300;" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
   <div class="modal-content" style="border:2px solid var(--accent);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <h2 style="margin:0; font-size:1.04rem; color:var(--accent);">📖 Cómo se usa TusAlergias</h2>
+      <h2 style="margin:0; font-size:1.04rem; color:var(--accent);" id="helpModalTitle">📖 Cómo se usa TusAlergias</h2>
       <button class="btn btn-outline" onclick="closeModal('helpModal')" aria-label="Cerrar">✕</button>
     </div>
     <p style="font-size:0.78rem; color:var(--muted); margin:0 0 6px; line-height:1.45;">Toca un apartado para abrirlo. Lo que va entre «comillas» es el texto del botón que verás en la app.</p>
@@ -1203,6 +1210,7 @@
           <li><b>🔄 Adaptable</b>: se puede quitar o cambiar. Escribe cómo (por ejemplo, «Sin picatostes»). El cliente lo verá y el plato le saldrá ADAPTABLE.</li>
         </ul>
         <p class="help-warn">Marca como adaptable <b>solo lo que de verdad podéis quitar sin riesgo</b> en cocina.</p>
+        <p><b>¿Tenéis versión sin gluten o sin lactosa?</b> No lo pongas como texto («Pan, opción sin gluten disponible»): la app entiende que el pan normal lleva gluten y el plato sale NO APTO para celíacos. Pon el pan como <b>🔄 Adaptable</b>, con sus alérgenos marcados, y escribe «Pedir pan sin gluten». Así le saldrá ADAPTABLE y sabrá qué pedir.</p>
       </div>
     </details>
 
@@ -1285,10 +1293,10 @@
   </div>
 </div>
 
-<div class="modal" id="reportModal" style="z-index:3700;">
+<div class="modal" id="reportModal" style="z-index:3700;" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
   <div class="modal-content" style="border:2px solid var(--amber);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <h2 style="margin:0; font-size:1rem; color:var(--amber);">🚩 Denunciar esta opinión</h2>
+      <h2 style="margin:0; font-size:1rem; color:var(--amber);" id="reportModalTitle">🚩 Denunciar esta opinión</h2>
       <button class="btn btn-outline" onclick="closeModal('reportModal')" aria-label="Cerrar">✕</button>
     </div>
     <div id="reportQuote" class="info-box" style="font-style:italic;"></div>
@@ -1307,10 +1315,10 @@
   </div>
 </div>
 
-<div class="modal" id="replyModal" style="z-index:3700;">
+<div class="modal" id="replyModal" style="z-index:3700;" role="dialog" aria-modal="true" aria-labelledby="replyModalTitle">
   <div class="modal-content" style="border:2px solid var(--accent);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <h2 style="margin:0; font-size:1rem; color:var(--accent);">💬 Responder a esta opinión</h2>
+      <h2 style="margin:0; font-size:1rem; color:var(--accent);" id="replyModalTitle">💬 Responder a esta opinión</h2>
       <button class="btn btn-outline" onclick="closeModal('replyModal')" aria-label="Cerrar">✕</button>
     </div>
     <div id="replyQuote" class="info-box" style="font-style:italic;"></div>
@@ -1323,10 +1331,10 @@
   </div>
 </div>
 
-<div class="modal" id="claimModal" style="z-index:3700;">
+<div class="modal" id="claimModal" style="z-index:3700;" role="dialog" aria-modal="true" aria-labelledby="claimModalTitle">
   <div class="modal-content" style="border:2px solid var(--green);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <h2 style="margin:0; font-size:1rem; color:var(--green);">🔑 Reclamar este local</h2>
+      <h2 style="margin:0; font-size:1rem; color:var(--green);" id="claimModalTitle">🔑 Reclamar este local</h2>
       <button class="btn btn-outline" onclick="closeModal('claimModal')" aria-label="Cerrar">✕</button>
     </div>
     <div class="info-box">«<b id="claimRestName"></b>» ya lo dio de alta otra cuenta. Si es tu local, cuéntanos quién eres: <b>la administración de TusAlergias lo comprobará con el local</b> (llamando o escribiendo a su teléfono o email públicos, no solo a los que pongas aquí). Además, <b>te pediremos por email un documento que acredite tu relación con el local</b> (por ejemplo, la cabecera de una factura del local o su licencia de apertura), o que nos escribas desde el email del propio local. Si se confirma, el local pasará a tu cuenta con su carta y sus opiniones. Mientras tanto, lo sigue gestionando la cuenta actual.</div>
@@ -1345,10 +1353,10 @@
   </div>
 </div>
 
-<div class="modal" id="equipModal" style="z-index:3300;">
+<div class="modal" id="equipModal" style="z-index:3300;" role="dialog" aria-modal="true" aria-labelledby="equipModalTitle">
   <div class="modal-content" style="border:2px solid var(--amber);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-      <h2 style="margin:0; font-size:1.02rem; color:#fde68a;">🍟 Freidoras y planchas</h2>
+      <h2 style="margin:0; font-size:1.02rem; color:#fde68a;" id="equipModalTitle">🍟 Freidoras y planchas</h2>
       <button class="btn btn-outline" onclick="closeIfNoChanges('equipModal', closeEquipModal)" aria-label="Cerrar">✕</button>
     </div>
     <div class="info-box">Da de alta cada freidora y plancha. Después pulsa <b>«➕ Elegir de mi carta»</b> y marca los ingredientes de tus platos que se cocinan en ella. También puedes indicarlo al editar cada plato, en cada componente.<br><br>Lo que se fríe en el mismo aceite o se hace en la misma plancha pasa a los demás alimentos: la app lo tiene en cuenta con las alergias de cada cliente. Si tienes otra freidora libre de su alergia, se lo propone («pide que lo hagan en la Freidora 2»).<br><br>Lo que se cocina en cada equipo <b>se calcula de tu carta</b>: si cambias un plato, se actualiza solo. Añade a mano solo lo que no está en la carta. Esta información es responsabilidad del restaurante.</div>
@@ -1362,10 +1370,10 @@
   </div>
 </div>
 
-<div class="modal" id="equipPickModal" style="z-index:3400;">
+<div class="modal" id="equipPickModal" style="z-index:3400;" role="dialog" aria-modal="true" aria-labelledby="equipPickModalTitle">
   <div class="modal-content" style="border:2px solid var(--purple);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px;">
-      <h2 style="margin:0; font-size:1rem; color:#e9d5ff;">Elegir de mi carta · <span id="epTitle"></span></h2>
+      <h2 style="margin:0; font-size:1rem; color:#e9d5ff;" id="equipPickModalTitle">Elegir de mi carta · <span id="epTitle"></span></h2>
       <button class="btn btn-outline" onclick="closeEquipPick()" aria-label="Cerrar">✕</button>
     </div>
     <div class="info-box" id="epInfo"></div>
@@ -1387,9 +1395,9 @@
 </div>
 <div id="toastBox" aria-live="polite" style="position:fixed; left:12px; right:12px; bottom:84px; z-index:8000; display:flex; flex-direction:column; align-items:center; gap:6px; pointer-events:none;"></div>
 
-<div class="modal" id="legalModal" style="z-index:5000;">
+<div class="modal" id="legalModal" style="z-index:5000;" role="dialog" aria-modal="true" aria-labelledby="legalModalTitle">
   <div class="modal-content" style="border:2px solid var(--amber);">
-    <h2 style="margin:0 0 8px; font-size:1.05rem; color:var(--amber);">⚖️ Antes de empezar</h2>
+    <h2 style="margin:0 0 8px; font-size:1.05rem; color:var(--amber);" id="legalModalTitle">⚖️ Antes de empezar</h2>
     <div style="font-size:0.78rem; color:#cbd5e1; line-height:1.45;">
       <p style="margin:0 0 8px;">1. <b>Las cartas las publica cada restaurante</b>, que es quien responde de sus ingredientes y alérgenos. Los filtros y avisos de TusAlergias son <b>orientativos</b> y pueden contener errores o estar desactualizados.</p>
       <p style="margin:0 0 8px;">2. <b>Avisa siempre de tus alergias al personal del local y confírmalas con el camarero</b> antes de pedir. Si tu alergia es grave, sigue las indicaciones de tu médico.</p>
@@ -1403,7 +1411,7 @@
 </div>
 
 <script>
-const APP_VERSION = "3.9.2";
+const APP_VERSION = "3.9.4";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
@@ -1798,7 +1806,9 @@ function kwStrip(list) { return new RegExp("(^|[^a-z0-9])(?:" + kwSource(list) +
 
 const NEGATION_RE = /(^|[^a-z0-9])(?:sin|libre de|libres de|exento de|exenta de|exentos de|exentas de|without|free from|sans|senza|ohne)\s+(?:(?:trazas|restos|rastros|presencia) de\s+|anadid[oa]s? de\s+)?[a-z0-9]+(?:\s+(?:ni|nor)\s+[a-z0-9]+)*/g;
 const FREE_SUFFIX_RE = /(^|[^a-z0-9])[a-z]+[\s-]free(?=[^a-z0-9]|$)/g;
-const TRACE_MARK_RE = /(?:pueden? contener|podria contener|trazas|elaborad[oa] en (?:una )?(?:fabrica|planta|instalaciones?)|fabricad[oa] en (?:una )?(?:fabrica|planta)|may contain|traces|peut contenir|puo contenere|tracce|kann spuren|spuren von|enthalt spuren)/;
+// 3.9.4: avisos de contaminación cruzada de cocina u obrador («se manipulan frutos secos», «posible contaminación
+// cruzada», «puede tener restos de») = trazas. La freidora o el aceite compartido NO: es contacto directo.
+const TRACE_MARK_RE = /(?:pueden? tener (?:restos|trazas)|posibles? (?:restos|trazas)|contaminacion cruzada|contacto cruzado|cross[\s-]contamina[a-z]*|cross[\s-]contact|se manipulan?|elaborad[oa] en (?:una |un )?(?:cocina|obrador)|(?:cocina|obrador|fabrica|planta) (?:donde|que|en (?:la|el) que) (?:se )?(?:manipulan?|utilizan?|usan?|elaboran?)|pueden? contener|podria contener|trazas|elaborad[oa] en (?:una )?(?:fabrica|planta|instalaciones?)|fabricad[oa] en (?:una )?(?:fabrica|planta)|may contain|traces|peut contenir|puo contenere|tracce|kann spuren|spuren von|enthalt spuren)/;
 
 const AL_RULES = {
   "GLUTEN": {
@@ -1811,7 +1821,9 @@ const AL_RULES = {
            "fettuccine","tagliatelle","penne","rigatoni","fusilli","tortellini","linguine","pappardelle","bocadillo","bocata","montadito","sandwich","tosta","mollete","panecillo","bollo","bolleria","ensaimada","sobao","roscon","berlina",
            "brownie","muffin","cupcake","crumble","profiterol","eclair","lionesa","vol au vent","volovan","quiche","samosa","rollito de primavera","rollitos de primavera","spring roll","tortita","pancake","pita","wrap","burrito",
            "katsu","tonkatsu","milanesa","a la romana","enharinado","enharinada","cachopo","san jacobo","flamenquin","pestino","porra","gazpacho","ajoblanco","sopa de ajo","sopas de ajo","hoisin","ponzu",
-           "albondiga","coulant","gofio","paparajote","pastel de carne","pastel de cierva","marinera","marinero","ensalada cesar","salsa cesar"],
+           "albondiga","coulant","gofio","paparajote","pastel de carne","pastel de cierva","marinera","marinero","ensalada cesar","salsa cesar",
+           // Murcia y bares (3.9.4)
+           "bicicleta","crespillo","torta de pascua","tortas de pascua","pan de calatrava","leche frita","a la andaluza","alfajor","clara de limon","clara con limon","clara de cerveza"],
     free: /(^|[^a-z0-9])(?:sin gluten|libre de gluten|exento de gluten|gluten[\s-]free|sans gluten|senza glutine|glutenfrei|apto para celiacos|apto celiacos)(?=[^a-z0-9]|$)/,
     excl: ["re:harina\\s+de\\s+(?:arroz|maiz|garbanzos?|almendras?|cocos?|soja|patatas?|yuca|tapioca|quinoa|teff|castanas?|guisantes?|lentejas?|mandioca|trigo\\s+sarraceno|alforfon|sorgo|mijo|habas?|altramuz|algarroba|platano|lino|chia|amaranto|cacahuetes?)",
            "re:trigo\\s+sarraceno", "buckwheat", "sarrasin", "re:grano\\s+saraceno",
@@ -1834,17 +1846,20 @@ const AL_RULES = {
              "huevo","egg","oeuf","eier","uovo","uova","yema","clara de huevo","albumina","ovoalbumina","ovoproducto","lisozima","lysozyme","e1105","huevina"],
     // Preparaciones que por receta llevan huevo
     weak: ["salsa tartara","tartara","salsa holandesa","holandesa","natilla","creme brulee","crema quemada","tempura","waldorf","pasta fresca","cheesecake",
-           "mayonesa","mayonnaise","merengue","meringue","alioli","tortilla","flan","natillas","crema pastelera","crema catalana","tiramisu","carbonara","ensaladilla","a la romana","torrija","quiche","profiterol","eclair","lionesa","crepe","crep","gofre","waffle","tortita","pancake","bizcocho","magdalena","brioche","mousse","milanesa","cachopo","san jacobo","flamenquin","croqueta","bunuelo","revuelto","zarangollo","paparajote","merengada","tocino de cielo","tocinillo de cielo","salsa rosa","salsa golf","albondiga","coulant","pastel de carne","pastel de cierva","marinera","marinero","ensalada murciana","ensalada cesar","salsa cesar"],
+           "mayonesa","mayonnaise","merengue","meringue","alioli","tortilla","flan","natillas","crema pastelera","crema catalana","tiramisu","carbonara","ensaladilla","a la romana","torrija","quiche","profiterol","eclair","lionesa","crepe","crep","gofre","waffle","tortita","pancake","bizcocho","magdalena","brioche","mousse","milanesa","cachopo","san jacobo","flamenquin","croqueta","bunuelo","revuelto","zarangollo","paparajote","merengada","tocino de cielo","tocinillo de cielo","salsa rosa","salsa golf","albondiga","coulant","pastel de carne","pastel de cierva","marinera","marinero","ensalada murciana","ensalada cesar","salsa cesar",
+           // 3.9.4: otras grafías del alioli, «mus» (mousse) y dulces murcianos
+           "allioli","all i oli","ali oli","ajoaceite","ajo aceite","mus","bicicleta","cordial","pan de calatrava","leche frita","tarta de la abuela"],
     free: /(^|[^a-z0-9])(?:sin huevos?|libre de huevos?|egg[\s-]free|sans oeufs?|senza uova|ohne eier?)(?=[^a-z0-9]|$)/,
-    excl: ["re:(?:mayonesas?|mayonnaise|alioli)\\s+(?:vegana|vegetal)", "re:tortillas?\\s+(?:de\\s+)?(?:maiz|trigo|harina|mexicanas?|wraps?|fajitas?)", "re:revueltos?\\s+(?:vegan[oa]s?|de\\s+tofu)", "re:(?:a\\s+la|salsa)\\s+marinera"]
+    excl: ["re:(?:mayonesas?|mayonnaise|alioli|allioli|all\\s+i\\s+oli|ali\\s+oli|ajoaceite|ajo\\s+aceite)\\s+(?:vegan[oa]s?|vegetal(?:es)?)", "re:tortillas?\\s+(?:de\\s+)?(?:maiz|trigo|harina|mexicanas?|wraps?|fajitas?)", "re:revueltos?\\s+(?:vegan[oa]s?|de\\s+tofu)", "re:(?:a\\s+la|salsa)\\s+marinera"]
   },
   "PESCADO": {
     strong: ["pescado","fish","poisson","fisch*","pesce","salmon","atun","tuna","bonito","anchoa","anchovy","boqueron","boqueroncito","bacalao","merluza","pescadilla","corvina","sardina","sardinilla","caballa","jurel","lubina","rodaballo","trucha","lenguado","rape","mero","cazon","emperador","pez espada","pez","peces","panga","tilapia","abadejo","eglefino","arenque","palometa","salmonete","besugo","sargo","mojama","surimi","huevas","caviar","worcestershire","perrins","garum","dashi","katsuobushi","nuoc mam",
              "dorada","gallo","raya","cabracho","rascacio","melva","anguila","angula","gulas","congrio","bacaladilla","urta","pargo","denton","gallineta","ventresca","kokotxa","cococha","chanquete","tintorera","caella","marrajo","pintarroja","tiburon","esturion",
              "breca","chicharro","cherne","cherna","mujol","skrei","pijota","acedia","brotola","lenguadina","japuta","botarga","fumet","sashimi","pescaito","pescadito","nam pla","tonnato",
-             "arroz a banda","arroz caldero","caldero del mar menor","caldero murciano","marinera","marinero","ensalada murciana"],
+             "arroz a banda","arroz caldero","caldero del mar menor","caldero murciano","marinera","marinero","ensalada murciana",
+             "hueva","salazon","morralla"],
     weak: ["sushi","nigiri","maki","uramaki","poke","ensaladilla","marmitako",
-           "fideua","pad thai","ensalada cesar","salsa cesar"],
+           "fideua","pad thai","ensalada cesar","salsa cesar","caldero","bicicleta"],
     excl: ["re:pico\\s+de\\s+gallo", "re:(?:a\\s+la|salsa)\\s+marinera", "re:fideuas?\\s+(?:de\\s+(?:verduras?|pollo|carne|setas)|vegetal|vegana)", "re:gallos?\\s+(?:de\\s+corral|campero|capon|de\\s+pelea)", "re:caldo\\s+de\\s+gallo",
            // «dorada» como adjetivo (cebolla dorada, patatas doradas…) no es el pescado
            "re:(?:cebollas?|cebolletas?|chalotas?|patatas?|papas|piel|pieles|costras?|cortezas?|masas?|harinas?|mantequillas?|pechugas?|alitas?|croquetas?|empanadas?|empanadillas?|tostadas?|rebanadas?|almendras?|avellanas?|setas?|berenjenas?|calabazas?|manzanas?|peras?|pinas?|uvas?|pasas|laminas?|lascas?|capas?|salsas?|virutas?|migas?|tiras?|rodajas?|cortinas?|carnes?|panceta|cebollita|cebollitas)\\s+doradas?"]
@@ -1855,9 +1870,10 @@ const AL_RULES = {
     strong: ["lacteo","leche","milk","lait","milch*","latte","lactosa","lactose","lattosio","laktose","lactoserum","suero","whey","caseina","caseinato","casein","caseinate","queso","quesito","cheese","fromage","kase","formaggio","nata","cream","creme fraiche","mantequilla","butter","beurre","ghee","yogur","yogurt","yoghurt","yaourt","joghurt","kefir","requeson","mozzarella","parmesano","parmigiano","parmesan","burrata","ricotta","mascarpone","cuajada","lactoalbumina","lactoglobulina",
              // Quesos que suelen escribirse sin la palabra «queso»
              "cheddar","brie","camembert","gouda","edam","gorgonzola","roquefort","provolone","feta","stracciatella","scamorza","emmental","gruyere","halloumi","pecorino","grana padano","taleggio","fontina","manchego","idiazabal","cabrales","tetilla","roncal","torta del casar","payoyo","majorero","rulo de cabra","philadelphia","labneh","labne","skyr","paneer","cottage","raclette",
-             "chantilly","capuchino","cappuccino","cafe bombon","cafe asiatico","cafe cortado","crema de orujo","crema de whisky","baileys","leche merengada"],
+             "chantilly","crema agria","sour cream","capuchino","cappuccino","cafe bombon","cafe asiatico","cafe cortado","crema de orujo","crema de whisky","baileys","leche merengada"],
     weak: ["natilla","holandesa","creme brulee","crema quemada","crepe","torrija","pizza margarita","pizza margherita","mahon","salsa alfredo","cheesecake",
-           "bechamel","besamel","flan","natillas","crema catalana","helado","pesto","ganache","croqueta","lasana","lasagna","canelon","canelones","gratinado","gratinada","gratinados","gratinadas","au gratin","gratin","fondue","tiramisu","panna cotta","pannacotta","profiterol","carbonara","quiche","crema pastelera","batido","mousse","cachopo","san jacobo","brioche","croissant","cruasan","coulant","risotto","paparajote","ensalada cesar","salsa cesar"],
+           "bechamel","besamel","flan","natillas","crema catalana","helado","pesto","ganache","croqueta","lasana","lasagna","canelon","canelones","gratinado","gratinada","gratinados","gratinadas","au gratin","gratin","fondue","tiramisu","panna cotta","pannacotta","profiterol","carbonara","quiche","crema pastelera","batido","mousse","cachopo","san jacobo","brioche","croissant","cruasan","coulant","risotto","paparajote","ensalada cesar","salsa cesar",
+           "graten","mus","pan de calatrava","tarta al whisky","tarta de la abuela"],
     free: /(^|[^a-z0-9])(?:sin leche|sin lacteos?|libre de lacteos?|libre de leche|dairy[\s-]free|milk[\s-]free|sans lait|senza latte|ohne milch|sin proteinas? de leche)(?=[^a-z0-9]|$)/,
     excl: ["re:leche\\s+de\\s+(?:coco|almendras?|avena|soja|arroz|avellanas?|anacardos?|tigre|chufa|canamo|quinoa|espelta|guisantes?|nuez|nueces)",
            "re:leches?\\s+vegetal(?:es)?", "re:(?:coconut|almond|oat|soy|soya|rice|cashew|hazelnut|pea)\\s+milk",
@@ -1872,7 +1888,7 @@ const AL_RULES = {
   },
   "FRUTOS CON CÁSCARA": {
     strong: ["ajo blanco","frutos de cascara","fruto de cascara","frutos secos","fruto seco","nut","tree nuts","noix","fruits a coque","frutta a guscio","schalenfruchte","almendra","almond","amande","mandorla","mandorle","mandel*","avellana","hazelnut","noisette","nocciola","nocciole","haselnuss*","nuez","nueces","walnut","noce","noci","walnuss*","pecana","pacana","pecan","anacardo","cashew","cajou","anacardi","pistacho","pistachio","pistache","pistacchio","pistacchi","macadamia","nuez de brasil","castana de brasil","castana de para","brazil nut","praline","gianduja","gianduia","turron","mazapan","marzipan","nougat","pinon","pinones","pine nut",
-             "marcona","frangipane","macaron","baklava","dukkah","nocilla","nutella","crocanti","carquinyoli","carquinoli","panellet","tarta de santiago","ajoblanco"],
+             "marcona","frangipane","macaron","baklava","dukkah","nocilla","nutella","crocanti","carquinyoli","carquinoli","panellet","tarta de santiago","ajoblanco","cordial"],
     weak: ["picada","waldorf","romesco","pesto","amaretto","amaretti","garrapinada","polvoron","alfajor"],
     excl: ["re:nuez\\s+moscada", "nutmeg", "re:noix\\s+de\\s+(?:coco|muscade)", "re:noce\\s+(?:moscata|di\\s+cocco)", "re:nuez\\s+de\\s+coco"]
   },
@@ -1883,7 +1899,7 @@ const AL_RULES = {
     strong: [// Vinos por variedad o denominación, y frutas desecadas (3.9.1)
              "tempranillo","garnacha","monastrell","syrah","cabernet","merlot","chardonnay","sauvignon","riesling","verdejo","albarino","godello","mencia","moscatel","lambrusco","prosecco",
              "jumilla","yecla","bullas","rioja","ribera del duero","rias baixas","priorat","penedes","orejones","pasas","fruta desecada","fruta deshidratada",
-             "sulfito","sulfite","sulphite","solfito","solfiti","sulfit","dioxido de azufre","anhidrido sulfuroso","sulphur dioxide","sulfur dioxide","anhydride sulfureux","anidride solforosa","schwefeldioxid","metabisulfito","bisulfito","metabisulfite","bisulfite","vino","wine","vin","vinagre","vinagreta","vinegar","vinaigre","vinaigrette","aceto","sidra","cava","champan","vermut",
+             "sulfito","sulfite","sulphite","solfito","solfiti","sulfit","dioxido de azufre","anhidrido sulfuroso","sulphur dioxide","sulfur dioxide","anhydride sulfureux","anidride solforosa","schwefeldioxid","metabisulfito","bisulfito","metabisulfite","bisulfite","vino","wine","vin","vinagre","vinagreta","vinegar","vinaigre","vinaigrette","aceto","sidra","cava","champan","vermut","vermu","vermouth","mistela",
              "jerez","pedro ximenez","oporto","marsala","sangria","tinto de verano","kalimotxo","calimocho","rebujito"],
     extra: /(^|[^a-z0-9])e[\s-]?22[0-8](?=[^0-9]|$)/
   },
@@ -1933,9 +1949,37 @@ const FREE_WORDS = {
 const TRACE_END_RE = /(?:^|[^a-z0-9])(?:contiene|contienen|lleva|llevan|incluye|incluyen|elaborad[oa] con|preparad[oa] con|hech[oa] con|contains|includes|contient|con ingredientes?)(?=[^a-z0-9]|$)/;
 // «sin gluten salvo el pan»: lo que viene tras la excepción SÍ está en el plato
 const EXCEPTION_RE = /(?:^|[^a-z0-9])(?:salvo|excepto|exceptuando|a excepcion de|con excepcion de|except for|except|apart from|ausser)\s+([^.;\n()]*)/g;
+// 3.9.4: «sin X» que es una OPCIÓN no quita X del plato. «Pan (opción sin gluten disponible)», «con o sin queso»,
+// «pizza, posibilidad de masa sin gluten», «(también sin gluten)», «pan sin gluten +1 €»: el plato normal SÍ lo
+// lleva, así que no se trata como negación (el cliente debe pedirlo así). «Pan sin gluten» o «Versión sin gluten»
+// a secas siguen siendo negaciones.
+const OPT_NEG_WORD = /(^|[^a-z0-9])(?:sin|libres? de|exent[oa]s? de|without|sans|senza|ohne)(?=\s)/g;
+const OPT_FREE_WORD = /(^|[^a-z0-9])([a-z]+)[\s-]free(?=[^a-z0-9]|$)/g;
+const OPT_NEG_TEST = new RegExp(OPT_NEG_WORD.source), OPT_FREE_TEST = new RegExp(OPT_FREE_WORD.source);
+const OPT_MARK_RE = /(?:^|[^a-z0-9])(?:disponibles?|available|posibilidad|posible|consultar|consulta|consultanos|consultenos|preguntar?|preguntanos|preguntenos|(?:bajo|a|previa) peticion|por encargo|(?:bajo|a) demanda|(?:on|upon) request|sur demande|se pueden? (?:hacer|pedir|preparar|servir|elaborar|adaptar|cambiar)|pueden? (?:hacerse|pedirse|prepararse|servirse|elaborarse|adaptarse|ser)|podemos|tenemos|disponemos|ofrecemos|hay|existen?|a elegir|elegir|elige|suplemento|ask for|request)(?![a-z0-9])|\+\s*\d/;
+const OPT_NEXT_RE = /^\s*(?:disponibles?|available|bajo peticion|a peticion|previa peticion|por encargo|consultar|(?:con )?suplemento|on request|\+\s*\d)/;
+const OPT_ALSO_RE = /^\s*(?:y\s+)?tambien\s+(?:en\s+(?:version|opcion)\s+|disponible\s+)?(?:sin|libres? de|exent[oa]s? de)\s/;
+function neutralizeOptional(t) {
+  const neutral = seg => seg.replace(OPT_NEG_WORD, "$1~").replace(OPT_FREE_WORD, "$1$2 ~");
+  // «con o sin X», «normal o sin gluten»
+  t = t.replace(/(^|[^a-z0-9])(o|or|ou)\s+(?:sin|without|sans|senza|ohne)(?=\s+(?!(?:sin|libres?|exent[oa]s?|without|sans|senza|ohne)(?![a-z0-9]))[a-z0-9])/g, "$1$2 ~");
+  if (!OPT_NEG_TEST.test(t) && !OPT_FREE_TEST.test(t)) return t;
+  return t.split(/([.;\n()[\]]+)/).map((sent, si) => {
+    if (si % 2) return sent;
+    const segs = sent.split(",");
+    return segs.map((seg, i) => {
+      if (!OPT_NEG_TEST.test(seg) && !OPT_FREE_TEST.test(seg)) return seg;
+      const opt = OPT_MARK_RE.test(seg) || OPT_ALSO_RE.test(seg) || (i + 1 < segs.length && OPT_NEXT_RE.test(segs[i + 1]));
+      return opt ? neutral(seg) : seg;
+    }).join(",");
+  }).join("");
+}
 function stripNegations(t) { return t.replace(NEGATION_RE, "$1 ").replace(FREE_SUFFIX_RE, "$1 "); }
+// Un aviso de «trazas» que habla de la freidora, el aceite o la plancha es contacto directo: cuenta entero
+const SHARED_EQUIP_RE = /(?:^|[^a-z0-9])(?:freidoras?|aceites?|planchas?|fritur[ao]s?|frit[oa]s? en|fries? en|parrillas?|fryer|frying oil|same oil)(?![a-z0-9])/;
 function splitTraces(t) {
-  const main = [], trace = [];
+  const main = [], tr0 = [];
+  const trace = { push: x => (SHARED_EQUIP_RE.test(x) ? main : tr0).push(x) };
   t.split(/[.;\n]+/).forEach(seg => {
     let rest = seg;
     for (;;) {
@@ -1956,23 +2000,25 @@ function splitTraces(t) {
       rest = after.slice(close + 1);
     }
   });
-  return { main: " " + main.join(" . ") + " ", trace: " " + trace.join(" . ") + " " };
+  return { main: " " + main.join(" . ") + " ", trace: " " + tr0.join(" . ") + " " };
 }
 
 // Una excepción («sin gluten salvo el pan») cuenta con sus propias negaciones y sin la regla «sin X» general
-function hitException(al, r, exc) {
+function hitException(al, r, exc, strongOnly) {
   const t = stripNegations(r.exclRe ? exc.replace(r.exclRe, "$1 ") : exc);
   if (r.strongRe.test(t)) return true;
   if (r.extra && r.extra.test(t)) return true;
   const own = (r.free && r.free.test(exc)) || (FREE_WORDS[al] || []).some(w => negatedWords(exc).has(w));
-  return !!(r.weakRe && !own && r.weakRe.test(t));
+  return !!(r.weakRe && !strongOnly && !own && r.weakRe.test(t));
 }
 // Devuelve { a: alérgenos presentes, tr: alérgenos solo como trazas }
 // ctx (opcional): más texto del mismo plato que solo sirve para entender negaciones.
 // Así «PAN CON TOMATE» con el componente «Pan sin gluten» no se marca como GLUTEN.
-function detectAllergens(raw, ctx) {
-  const full = " " + normText(raw) + " ";
-  const ctxFull = ctx ? " " + normText(ctx) + " " : "";
+// strongOnly (3.9.4): solo lo que lo dice claramente («queso», «gamba»), no los platos que suelen llevarlo
+// («bocadillo», «tarta»). Sirve para saber si un componente quitable explica el nombre del plato.
+function detectAllergens(raw, ctx, strongOnly) {
+  const full = neutralizeOptional(" " + normText(raw) + " ");
+  const ctxFull = ctx ? neutralizeOptional(" " + normText(ctx) + " ") : "";
   const base = splitTraces(stripNegations(full));
   const neg = negatedWords(full + ctxFull);
   const a = [], tr = [];
@@ -1987,17 +2033,15 @@ function detectAllergens(raw, ctx) {
       const x = r.exclRe ? txt.replace(r.exclRe, "$1 ") : txt;
       if (r.strongRe.test(x)) return true;
       if (r.extra && r.extra.test(x)) return true;
-      if (r.weakRe && !freeOf && r.weakRe.test(x)) return true;
+      if (r.weakRe && !strongOnly && !freeOf && r.weakRe.test(x)) return true;
       return false;
     };
     if (hit(parts.main)) a.push(al);
-    else if (excText && hitException(al, r, excText)) a.push(al);
+    else if (excText && hitException(al, r, excText, strongOnly)) a.push(al);
     else if (hit(parts.trace)) tr.push(al);
   });
   return { a, tr };
 }
-// Compatibilidad: solo los alérgenos presentes
-function detectAllergensFromString(str) { return detectAllergens(str).a; }
 
 // ---------- DIETAS ----------
 const DIET_TAG_LABELS = { CRUDO_EMBARAZO:"🤰 No apto embarazo", NO_VEGANO:"🌱 No vegano", NO_VEGETARIANO:"🥚 No vegetariano", CERDO:"🐷 Lleva cerdo", PICANTE:"🌶️ Picante" };
@@ -2059,7 +2103,7 @@ function inferDietsFromAllergens(allergens, set) {
 
 // Devuelve las etiquetas de dieta que incumple un texto
 function detectDiets(raw, allergens) {
-  const full = " " + normText(raw) + " ";
+  const full = neutralizeOptional(" " + normText(raw) + " ");
   const t = stripNegations(full);
   const found = new Set();
   Object.keys(DIET_RULES).forEach(id => {
@@ -2137,11 +2181,57 @@ function memoDetect(kind, txt, extra) {
   const key = kind + "\u0001" + txt + "\u0001" + (extra || "");
   let v = detMemo.get(key);
   if (v === undefined) {
-    v = kind === "a" ? detectAllergens(txt, extra) : detectDiets(txt, extra ? extra.split(",") : []);
+    v = kind === "a" ? detectAllergens(txt, extra) : kind === "s" ? detectAllergens(txt, extra, true) : detectDiets(txt, extra ? extra.split(",") : []);
     if (detMemo.size > 6000) detMemo.clear();
     detMemo.set(key, v);
   }
   return v;
+}
+
+// 3.9.3: el nombre del plato sin las palabras de unos componentes («Ensalada con queso de cabra» menos
+// «Queso de cabra» → «ensalada con , , ,»). Admite singular y plural (croqueta/croquetas). Nunca quita
+// palabras de negación («sin gluten» sigue diciendo «sin»).
+const NAME_KEEP_WORDS = new Set(["sin", "libre", "libres", "exento", "exenta", "without", "free", "sans", "senza", "ohne", "ni", "nor", "con", "del", "las", "los", "una", "uno", "por", "para", "and", "the", "with"]);
+function nameWithout(name, texts) {
+  const words = new Set();
+  texts.forEach(t => normText(t).split(/[^a-z0-9]+/).forEach(w => { if (w.length >= 3 && !NAME_KEEP_WORDS.has(w)) words.add(w); }));
+  const gone = w => {
+    if (w.length < 3 || NAME_KEEP_WORDS.has(w)) return false;
+    for (const c of words) {
+      if (w === c) return true;
+      if (w.length >= 4 && c.length >= 4 && (w.startsWith(c) || c.startsWith(w))) return true;
+    }
+    return false;
+  };
+  return normText(name).split(/([^a-z0-9]+)/).map((p, i) => (i % 2 === 0 && p && gone(p)) ? " , " : p).join("");
+}
+
+// 3.9.4: palabras de TIPO de plato que indican carne pero no cuál («HAMBURGUESA de ternera» con la «Carne de
+// ternera» cambiable por una vegetal). Si un componente quitable explica la dieta, estas no la vuelven a marcar.
+const DIET_TYPE_RE = kwStrip(["hamburguesa","burger","albondiga","nuggets","kebab","shawarma","gyros","doner","hot dog","perrito caliente","bolonesa","bolognese","ragu"]);
+function dietsLeft(n, ctx) { const t = n.replace(DIET_TYPE_RE, "$1 "); return detectDiets(t, detectAllergens(t, ctx).a); }
+
+// 3.9.3: lo que el nombre indica y SOLO lleva un componente que se puede quitar con otras palabras
+// («TARTA DE QUESO» con la «Nata» quitable). Los clientes lo verán NO APTO por el nombre: el editor avisa.
+function nameModOnly(name, ings, cat) {
+  const list = (ings || []).filter(i => i && i.n);
+  const ctx = [cat || "", ...list.map(i => `${i.n || ""} . ${i.sub || ""}`)].join(" . ");
+  const info = list.map(i => {
+    const txt = `${i.n || ""} . ${i.sub || ""}`;
+    const a = new Set([...(i.a || []), ...detectAllergens(txt).a]);
+    const d = new Set([...ingDiets(i), ...detectDiets(txt, [...a])]);
+    return { i, txt, a, d };
+  });
+  const nd = detectAllergens(name, ctx);
+  const out = [];
+  const check = (key, has, test) => {
+    if (info.some(x => !x.i.mod && has(x))) return;
+    const mods = info.filter(x => x.i.mod && has(x)).map(x => x.txt);
+    if (mods.length && test(nameWithout(name, mods))) out.push(key);
+  };
+  nd.a.forEach(x => check(x, y => y.a.has(x), n => detectAllergens(n, ctx, true).a.includes(x)));
+  detectDiets(name, nd.a).forEach(t => check(DIET_TAG_LABELS[t] || t, y => y.d.has(t), n => dietsLeft(n, ctx).includes(t)));
+  return out;
 }
 
 // Evalúa un plato de restaurante con el perfil activo (el tuyo, o el del comensal en modo gestión).
@@ -2152,7 +2242,11 @@ function evaluateDish(dish, strict, eqx) {
   const S = activeSets();
   if (!S.al.size && !S.di.size && !S.cu.size) return { status:"aptos", rem:[], blk:[], tr:[] };
   const rem = [], blk = [];
-  const covered = new Set();                     // "A:GLUTEN", "D:CERDO", "C:ajo": ya explicado por un componente
+  // "A:GLUTEN", "D:CERDO", "C:ajo" ya explicados por un componente. 3.9.3: se distingue si el componente es
+  // FIJO (covered) o se puede QUITAR (coveredMod, con su texto): quitar la «nata» no explica el «queso» del
+  // nombre «TARTA DE QUESO» (auditoría M1)
+  const covered = new Set(), coveredMod = new Map();
+  const isCov = k => covered.has(k) || coveredMod.has(k);
   const ings = Array.isArray(dish.ings) ? dish.ings : [];
   const traces = new Set((dish.traces || []).filter(t => S.al.has(t)));
   ings.forEach(ing => {
@@ -2161,10 +2255,14 @@ function evaluateDish(dish, strict, eqx) {
     const declared = new Set(ing.a || []);
     const allA = ALLERGENS.filter(x => declared.has(x) || det.a.includes(x));
     const diets = new Set([...ingDiets(ing), ...memoDetect("d", txt, allA.join(","))]);
-    const labels = [];
-    allA.forEach(x => { if (S.al.has(x)) { covered.add("A:" + x); labels.push(declared.has(x) ? x : `${x} (según la descripción)`); } });
-    diets.forEach(t => { if (S.di.has(t)) { covered.add("D:" + t); labels.push(DIET_TAG_LABELS[t] || t); } });
-    S.cu.forEach(c => { const ci = customHitInfo(txt, c); if (ci) { covered.add("C:" + c); labels.push(customWhy(ci, c)); } });
+    const labels = [], keys = [];
+    allA.forEach(x => { if (S.al.has(x)) { keys.push("A:" + x); labels.push(declared.has(x) ? x : `${x} (según la descripción)`); } });
+    diets.forEach(t => { if (S.di.has(t)) { keys.push("D:" + t); labels.push(DIET_TAG_LABELS[t] || t); } });
+    S.cu.forEach(c => { const ci = customHitInfo(txt, c); if (ci) { keys.push("C:" + c); labels.push(customWhy(ci, c)); } });
+    keys.forEach(k => {
+      if (!ing.mod) covered.add(k);
+      else { if (!coveredMod.has(k)) coveredMod.set(k, []); coveredMod.get(k).push(txt); }
+    });
     det.tr.forEach(t => { if (S.al.has(t) && !allA.includes(t)) traces.add(t); });
     if (!labels.length) {
       // Componente que en sí encaja: su freidora o plancha puede pasarle lo que evitas (3.8)
@@ -2193,10 +2291,24 @@ function evaluateDish(dish, strict, eqx) {
     const nd = memoDetect("a", name, ctx);
     const nDiets = memoDetect("d", name, nd.a.join(","));
     const hits = [];
-    nd.a.forEach(x => { if (S.al.has(x) && !covered.has("A:" + x)) { hits.push(x); named.add("A:" + x); } });
-    nDiets.forEach(t => { if (S.di.has(t) && !covered.has("D:" + t)) { hits.push(DIET_TAG_LABELS[t] || t); named.add("D:" + t); } });
-    S.cu.forEach(c => { if (covered.has("C:" + c)) return; const ci = customHitInfo(name, c); if (ci) { hits.push(customWhy(ci, c)); named.add("C:" + c); } });
-    nd.tr.forEach(t => { if (S.al.has(t) && !covered.has("A:" + t)) traces.add(t); });
+    // Lo explica un componente quitable solo si son sus palabras las que lo dicen en el nombre
+    // («Ensalada con queso de cabra» + «Queso de cabra» quitable sí; «Tarta de queso» + «Nata» no)
+    const stillNamed = (k, test) => {
+      if (covered.has(k)) return false;
+      if (!coveredMod.has(k)) return true;
+      return test(nameWithout(name, coveredMod.get(k)));
+    };
+    // 3.9.4: lo que queda del nombre solo cuenta si lo dice claramente («queso»); «BOCADILLO» con el «Pan» quitable
+    // (pedir pan sin gluten) queda explicado, «TARTA DE QUESO» con la «Nata» quitable no
+    nd.a.forEach(x => { if (S.al.has(x) && stillNamed("A:" + x, t => memoDetect("s", t, ctx).a.includes(x))) { hits.push(x); named.add("A:" + x); } });
+    nDiets.forEach(t => {
+      if (S.di.has(t) && stillNamed("D:" + t, n => dietsLeft(n, ctx).includes(t))) { hits.push(DIET_TAG_LABELS[t] || t); named.add("D:" + t); }
+    });
+    S.cu.forEach(c => {
+      const ci = customHitInfo(name, c);
+      if (ci && stillNamed("C:" + c, n => !!customHitInfo(n, c))) { hits.push(customWhy(ci, c)); named.add("C:" + c); }
+    });
+    nd.tr.forEach(t => { if (S.al.has(t) && !isCov("A:" + t)) traces.add(t); });
     if (hits.length) blk.push(`Según su nombre: ${esc(hits.join(", "))}. Confírmalo con el camarero`);
   }
   // Sin ingredientes detallados no se puede saber si encaja con tu dieta o lo que evitas
@@ -2204,8 +2316,8 @@ function evaluateDish(dish, strict, eqx) {
     const allergenInfo = ings.some(i => (i.a || []).length) || (dish.traces || []).length > 0;
     const unknown = [];
     if (S.al.size && !allergenInfo) unknown.push("alérgenos");
-    S.di.forEach(t => { if (!covered.has("D:" + t) && !named.has("D:" + t)) unknown.push(DIET_ASK[t] || t); });
-    S.cu.forEach(c => { if (!covered.has("C:" + c) && !named.has("C:" + c)) unknown.push("sin " + c); });
+    S.di.forEach(t => { if (!isCov("D:" + t) && !named.has("D:" + t)) unknown.push(DIET_ASK[t] || t); });
+    S.cu.forEach(c => { if (!isCov("C:" + c) && !named.has("C:" + c)) unknown.push("sin " + c); });
     if (unknown.length) blk.push(`No detalla sus ingredientes: pregunta al camarero (${esc(unknown.join(", "))})`);
   }
   let tr = [];
@@ -2667,7 +2779,7 @@ function customHitInfo(text, term) {
   const k = famNorm(term);
   if (!k) return null;
   const R = famRules(k);
-  let t = " " + normText(text) + " ";
+  let t = neutralizeOptional(" " + normText(text) + " ");
   if (R.exRe) t = t.replace(R.exRe, "$1 ");
   t = stripNegations(t);
   let m = R.sureRe && R.sureRe.exec(t);
@@ -2962,7 +3074,11 @@ async function encodeMenuPayload(r) {
 async function decodeMenuPayload(s) {
   const kind = String(s || "")[0];
   let bytes = bytesFromB64url(String(s).slice(1));
-  if (kind === "z") bytes = await pipeBytes(bytes, new DecompressionStream("deflate"));
+  if (kind === "z") {
+    // 3.9.3 (auditoría B4): navegadores antiguos sin DecompressionStream (WebView de Android viejos)
+    if (typeof DecompressionStream === "undefined") { const e = new Error("Navegador sin descompresión"); e.code = "old-browser"; throw e; }
+    bytes = await pipeBytes(bytes, new DecompressionStream("deflate"));
+  }
   else if (kind !== "j") throw new Error("Formato de carta desconocido");
   const o = JSON.parse(new TextDecoder().decode(bytes));
   const equip = (Array.isArray(o.e) ? o.e : []).slice(0, MAX_EQUIP).map((e, k) => sanitizeEquipItem({ i: "e" + k, k: e[0] === 1 ? "plancha" : "freidora", n: e[1], a: fromMask(e[2], ALLERGENS), f: e[3] }));
@@ -4407,6 +4523,7 @@ function closeRestDishModal() { stopBarcodeScanner(); closeModal("dishModal"); }
 
 function setRowMod(card, mod) {
   card.dataset.mod = mod ? "1" : "0";
+  setTimeout(() => { try { updateNameHint(); } catch (e) {} }, 0);
   card.querySelector(".seg-fixed").classList.toggle("on", !mod);
   card.querySelector(".seg-mod").classList.toggle("on", !!mod);
   card.querySelector(".ing-note").style.display = mod ? "block" : "none";
@@ -4474,7 +4591,12 @@ function autoTickRow(card) {
   });
   addEditorTraces(det.tr);
   const hint = card.querySelector(".ing-auto-hint");
-  if (added.length) { hint.style.display = "block"; hint.textContent = "🔍 Marcado automáticamente según el texto: " + added.join(", ") + ". Revísalo."; }
+  if (added.length) {
+    // 3.9.4: «opción sin gluten disponible» → se marca GLUTEN (el normal lo lleva) y se explica cómo ofrecer la versión
+    const raw = " " + normText(text) + " ";
+    const opt = card.dataset.mod !== "1" && neutralizeOptional(raw) !== raw ? " Si tenéis versión «sin…», pon este componente como 🔄 Adaptable y escribe qué pedir." : "";
+    hint.style.display = "block"; hint.textContent = "🔍 Marcado automáticamente según el texto: " + added.join(", ") + ". Revísalo." + opt;
+  }
   updateNameHint();
 }
 
@@ -4483,18 +4605,28 @@ function editorComponents() {
   return [...document.querySelectorAll("#ingredientsEditor .ing-editor-card")].map(card => ({
     n: card.querySelector(".ing-n").value.trim(), sub: card.querySelector(".ing-sub").value.trim(),
     a: [...card.querySelectorAll(".ing-al-box .mini-chip.selected")].map(el => el.dataset.al),
-    tags: [...card.querySelectorAll(".ing-diet-box .mini-chip.diet-sel")].map(el => el.dataset.diet)
+    tags: [...card.querySelectorAll(".ing-diet-box .mini-chip.diet-sel")].map(el => el.dataset.diet),
+    mod: card.dataset.mod === "1"
   })).filter(i => i.n);
 }
 function updateNameHint() {
   const el = $("editNameHint");
   if (!el) return;
   const name = $("editName").value.trim().toUpperCase();
-  const info = name ? nameComponent(name, editorComponents(), true, $("editCat").value) : { ing: null };
-  if (!info.ing) { el.style.display = "none"; el.textContent = ""; return; }
-  const tags = info.ing.tags.filter(t => !(t === "NO_VEGANO" && info.ing.tags.includes("NO_VEGETARIANO")));
+  const comps = name ? editorComponents() : [];
+  const info = name ? nameComponent(name, comps, true, $("editCat").value) : { ing: null };
+  // 3.9.3: lo que el nombre indica y solo lleva un componente quitable con otras palabras (auditoría M1)
+  const modOnly = name ? nameModOnly(name, comps, $("editCat").value).filter(x => !(info.ing && (info.ing.a.includes(x) || info.ing.tags.some(t => (DIET_TAG_LABELS[t] || t) === x)))) : [];
+  const lines = [];
+  if (info.ing) {
+    const tags = info.ing.tags.filter(t => !(t === "NO_VEGANO" && info.ing.tags.includes("NO_VEGETARIANO")));
+    lines.push(`🔍 Por el nombre del plato, la app avisará a los clientes de: ${[...info.ing.a, ...tags.map(t => DIET_TAG_LABELS[t] || t)].join(", ")}. Si el plato lo lleva, márcalo en su componente; si no, cambia el nombre.`);
+  }
+  if (modOnly.length) lines.push(`🔍 El nombre indica ${modOnly.join(", ")} y solo lo lleva un componente que se puede quitar. Los clientes que lo evitan verán el plato NO APTO por el nombre. Si otro componente lo lleva, márcalo allí; si al quitarlo el plato ya no lo lleva, marca ese componente como fijo o cambia el nombre.`);
+  if (!lines.length) { el.style.display = "none"; el.textContent = ""; return; }
   el.style.display = "block";
-  el.textContent = `🔍 Por el nombre del plato, la app avisará a los clientes de: ${[...info.ing.a, ...tags.map(t => DIET_TAG_LABELS[t] || t)].join(", ")}. Si el plato lo lleva, márcalo en su componente; si no, cambia el nombre.`;
+  el.style.whiteSpace = "pre-line";
+  el.textContent = lines.join("\n");
 }
 
 async function saveDishFromModal() {
@@ -4515,7 +4647,12 @@ async function saveDishFromModal() {
     const a = [...card.querySelectorAll(".ing-al-box .mini-chip.selected")].map(el => el.dataset.al);
     const tags = [...card.querySelectorAll(".ing-diet-box .mini-chip.diet-sel")].map(el => el.dataset.diet);
     const missing = detectAllergens(n + " . " + sub).a.filter(x => !a.includes(x));
-    if (missing.length) warnings.push(`• ${n}: menciona ${missing.join(", ")}`);
+    if (missing.length) {
+      // 3.9.4: «Pan, opción sin gluten disponible»: el pan normal lleva gluten. Se explica cómo hacerlo bien
+      const raw = " " + normText(n + " . " + sub) + " ";
+      const opt = neutralizeOptional(raw) !== raw ? " (si tenéis versión «sin…», márcalo y pon el componente como 🔄 Adaptable: «Pedir … sin …»)" : "";
+      warnings.push(`• ${n}: menciona ${missing.join(", ")}${opt}`);
+    }
     const eq = [...(card._eq || [])].filter(id => equipIds.has(id));
     const ap = [...(card._ap || [])].filter(id => eq.includes(id));
     ings.push({ n, sub, mod, note, a, tags, ...(eq.length ? { eq } : {}), ...(ap.length ? { ap } : {}) });
@@ -4725,7 +4862,8 @@ async function processIncomingUrl(rawUrl) {
       data = { id: d.id, name: d.n, city: d.c, phone: d.p, lat: d.lat, lng: d.lng, menu: d.m };
     }
   } catch (e) {
-    uiAlert("⚠️ No se pudo leer la carta de este código. Puede estar incompleto o dañado: pide al local que lo genere de nuevo.");
+    if (e && e.code === "old-browser") uiAlert("⚠️ Tu navegador es demasiado antiguo para abrir esta carta. Actualiza Google Chrome (y «Android System WebView») desde Google Play y vuelve a escanear el código.");
+    else uiAlert("⚠️ No se pudo leer la carta de este código. Puede estar incompleto o dañado: pide al local que lo genere de nuevo.");
     return false;
   }
   if (!data) {
@@ -5314,6 +5452,8 @@ document.addEventListener("visibilitychange", () => {
 // ---------- «📲 Enviar a cocina»: los platos de la carta según las alergias marcadas ----------
 function htmlText(s) { const d = document.createElement("div"); d.innerHTML = String(s || ""); return d.textContent.replace(/\s+/g, " ").trim(); }
 function cut(s, n) { return s.length > n ? s.slice(0, n - 1) + "…" : s; }
+// Tope del mensaje (caracteres). Con acentos y emojis, el enlace de WhatsApp mide como mucho unas 3 veces más.
+const KITCHEN_MAX_CHARS = 4000;
 function kitchenMessage(r, mesa) {
   const S = activeSets();
   const labels = [...ALLERGENS.filter(a => S.al.has(a)), ...DIETS.filter(d => S.di.has(d.id)).map(d => d.label), ...[...S.cu].map(c => "Sin " + c)];
@@ -5324,22 +5464,30 @@ function kitchenMessage(r, mesa) {
     const why = res.status === "mod" ? res.rem : res.status === "proh" ? res.blk : [];
     groups[res.status].push({ name: d.name, why: why.map(htmlText).join(" · ") });
   });
-  const build = withReasons => {
+  // 3.9.3 (auditoría M2): tope real. Cuanto más larga la carta, más se resume, por niveles:
+  // 1) todo con motivos; 2) los no aptos sin motivo; 3) los no aptos solo contados; 4) listas recortadas.
+  // Nunca se quita nada de los compatibles y adaptables sin decir cuántos faltan.
+  const MAX = KITCHEN_MAX_CHARS;
+  const build = (level, cap = Infinity) => {
     const lines = [`🛡️ ${r.name}${mesa ? " · MESA " + mesa : ""}`, `Alergias: ${labels.join(", ")}`, ""];
     const block = (title, list, reasons) => {
       lines.push(`${title} (${list.length})`);
       if (!list.length) lines.push("• Ninguno");
-      list.forEach(x => lines.push("• " + x.name + (reasons && x.why ? ": " + cut(x.why, 110) : "")));
+      list.slice(0, cap).forEach(x => lines.push("• " + x.name + (reasons && x.why ? ": " + cut(x.why, 110) : "")));
+      if (list.length > cap) lines.push(`• … y ${list.length - cap} más (míralos en la app)`);
       lines.push("");
     };
     block("✅ COMPATIBLES", groups.aptos, false);
     block("🔄 ADAPTABLES", groups.mod, true);
-    block("⛔ NO APTOS", groups.proh, withReasons);
+    if (level >= 3) lines.push(`⛔ NO APTOS: ${groups.proh.length} platos. No se listan para que el mensaje quepa: sirve solo los de arriba.`, "");
+    else block("⛔ NO APTOS", groups.proh, level === 1);
     lines.push("⚠️ Orientativo según los datos de la carta. Confirmadlo en cocina antes de servir.");
     return lines.join("\n");
   };
-  let text = build(true);
-  if (text.length > 6000) text = build(false);       // cartas muy largas: los no aptos, sin el motivo
+  let text = build(1);
+  for (let level = 2; text.length > MAX && level <= 3; level++) text = build(level);
+  for (const cap of [25, 15, 10, 5, 3]) { if (text.length <= MAX) break; text = build(4, cap); }
+  if (text.length > MAX) text = text.slice(0, MAX - 1) + "…";      // nombres de local o de platos desmesurados
   return { text, labels, counts: { aptos: groups.aptos.length, mod: groups.mod.length, proh: groups.proh.length } };
 }
 async function sendToKitchen() {
@@ -5765,6 +5913,14 @@ function newVer() {
   catch (e) { return Math.random().toString(36).slice(2, 12) + Date.now().toString(36); }
 }
 const resolvingConflict = {};
+// 3.9.3 (auditoría M5): Firestore no admite documentos de más de 1 MiB. Se mide antes de subir, con margen,
+// para explicar qué pasa en vez de un error técnico.
+const CLOUD_DOC_MAX = 900 * 1024;
+function docBytes(o) {
+  const j = JSON.stringify(o);
+  try { return new TextEncoder().encode(j).length; } catch (e) { return j.length * 3; }
+}
+const tooBigWarned = {};
 function pushOwnedChanges() {
   if (!cloudOwner()) return;
   const { F, db } = cloud;
@@ -5776,6 +5932,20 @@ function pushOwnedChanges() {
     setSync("saving");
     const all = sanitizeMenu(r.menu);
     const pub = all.filter(d => !d.draft), drafts = all.filter(d => d.draft);
+    const equip = sanitizeEquip(r.equip);
+    const bigPub = docBytes({ menu: withoutDraftFlag(pub), equip }), bigDr = docBytes({ menu: withoutDraftFlag(drafts), order: all.map(d => d.id) });
+    if (bigPub > CLOUD_DOC_MAX || bigDr > CLOUD_DOC_MAX) {
+      setSync("error");
+      const kb = Math.ceil(Math.max(bigPub, bigDr) / 1024), which = bigPub > CLOUD_DOC_MAX ? "La carta publicada" : "Los borradores";
+      const prev = tooBigWarned[r.id];
+      tooBigWarned[r.id] = kb;
+      if (prev !== undefined && kb <= prev) toast(`⚠️ Aún ocupa ${kb} KB (máximo ${Math.floor(CLOUD_DOC_MAX / 1024)} KB): sigue sin guardarse en la nube.`, "err");
+      else {
+        uiAlert(`⚠️ ${which} de «${r.name}» ocupa demasiado para guardarse en la nube: ${kb} KB, y el máximo son ${Math.floor(CLOUD_DOC_MAX / 1024)} KB.\n\nTus últimos cambios se quedan solo en este móvil: no se guardan en la nube ni los ven los clientes.\n\nAcorta las descripciones más largas de los platos o pasa parte de la carta a otro local.`);
+      }
+      return;
+    }
+    delete tooBigWarned[r.id];
     const base = r.ver || "", ver = newVer();
     r.ver = ver;
     try { localStorage.setItem(STATE_KEY, JSON.stringify(appState)); } catch (e) {}
@@ -5783,7 +5953,6 @@ function pushOwnedChanges() {
     const nc = ncOf(r), unverify = verifiedPatch(r);
     b.set(F.doc(db, "restaurants", r.id), { ...restSummary(r), ...unverify }, { merge: true });
     // Las freidoras y planchas solo se escriben si hay alguna (así las reglas anteriores siguen aceptando la carta)
-    const equip = sanitizeEquip(r.equip);
     b.set(F.doc(db, "menus", r.id), { menu: withoutDraftFlag(pub), updatedAt: F.serverTimestamp(), ver, base, ...(equip.length ? { equip } : {}) });
     // Borradores: documento privado aparte, en la misma operación (todo o nada)
     const withDrafts = drafts.length > 0 || draftsInCloud[r.id];
@@ -7059,7 +7228,6 @@ function openHelpModal(section) {
 // - Fundadores: la plaza exige el email verificado.
 // - Locales verificados por la administración: insignia y primero en las listas.
 // ============================================================
-const REPORT_REASONS = { falsa: "No es real (no es un cliente, es falsa o es de la competencia)", ofensiva: "Insultos, amenazas u ofensas", datos: "Datos personales de alguien", spam: "Publicidad o spam", otro: "Otro motivo" };
 const REPORT_STATUS = { pendiente: "pendiente de revisar", retirada: "retirada por la administración", "respuesta-retirada": "revisada", descartada: "revisada: se mantiene" };
 const CLAIM_STATUS = { pendiente: "pendiente de comprobar", aprobada: "aprobada", rechazada: "no aprobada" };
 
@@ -7300,6 +7468,51 @@ async function cloudDeleteMyReports() {
     for (const d of qs.docs) await F.deleteDoc(d.ref);
   } catch (e) { console.warn("borrar denuncias:", e); }
 }
+
+// ---------- 3.9.3 · Accesibilidad (auditoría M4) ----------
+// Muchos elementos que se pulsan son <div> o <span> con onclick (chips de alergias, pestañas, tarjetas
+// de locales...). Sin esto no se alcanzan con el teclado ni los anuncia el lector de pantalla (TalkBack)
+// como botones. Se marcan solos al aparecer en pantalla, también los que se pintan después.
+const A11Y_NATIVE = /^(BUTTON|A|INPUT|SELECT|TEXTAREA|LABEL|SUMMARY|OPTION|DETAILS)$/;
+function a11yMark(el) {
+  if (!el || el.nodeType !== 1 || A11Y_NATIVE.test(el.tagName)) return;
+  if (!el.hasAttribute("onclick") || el.classList.contains("modal") || el.classList.contains("modal-content")) return;
+  if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0");
+  if (!el.hasAttribute("role")) el.setAttribute("role", "button");
+  // Chips y pestañas que se activan: el lector dice si están marcados
+  if (el.classList.contains("chip") || el.classList.contains("mini-chip") || el.classList.contains("tab")) {
+    const on = el.classList.contains("active") || el.classList.contains("selected") || el.classList.contains("diet-sel");
+    if (el.getAttribute("aria-pressed") !== String(on)) el.setAttribute("aria-pressed", String(on));
+  }
+}
+function a11yScan(root) {
+  if (!root || root.nodeType !== 1) return;
+  a11yMark(root);
+  root.querySelectorAll("[onclick]").forEach(a11yMark);
+}
+// Intro o espacio sobre uno de esos elementos hace lo mismo que tocarlo
+document.addEventListener("keydown", e => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const el = e.target;
+  if (!el || el.nodeType !== 1 || A11Y_NATIVE.test(el.tagName) || el.getAttribute("role") !== "button" || !el.hasAttribute("onclick")) return;
+  e.preventDefault();
+  el.click();
+});
+(function a11yStart() {
+  const go = () => {
+    a11yScan(document.body);
+    try {
+      new MutationObserver(list => {
+        list.forEach(m => {
+          if (m.type === "childList") m.addedNodes.forEach(a11yScan);
+          else if (m.type === "attributes" && m.target.hasAttribute && m.target.hasAttribute("role")) a11yMark(m.target);
+        });
+      }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+    } catch (e) {}
+  };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go);
+  else go();
+})();
 
 // ============================================================
 // TARJETA DEL CAMARERO (4 IDIOMAS, CON ALÉRGENOS Y DIETAS TRADUCIDOS)
