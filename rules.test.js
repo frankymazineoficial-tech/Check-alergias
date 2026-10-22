@@ -1,4 +1,4 @@
-// Pruebas de las reglas de seguridad de TusAlergias contra el EMULADOR OFICIAL de Firestore.
+// Pruebas de las reglas de seguridad de Comeclaro (3.12) contra el EMULADOR OFICIAL de Firestore.
 // Cada «debe FALLAR» va acompañado de un «debe FUNCIONAR» parecido, para que un fallo de la
 // propia prueba no pase por seguridad.
 const fs = require('fs');
@@ -19,11 +19,20 @@ const db = {
   anon: () => env.unauthenticatedContext().firestore(),          // sin sesión
   guest: uid => env.authenticatedContext(uid, { firebase: { sign_in_provider: 'anonymous' } }).firestore(), // cliente anónimo
   owner: (uid, verified = true) => env.authenticatedContext(uid, { email: uid + '@ejemplo.es', email_verified: verified, firebase: { sign_in_provider: 'password' } }).firestore(),
-  admin: () => env.authenticatedContext('adm', { email: ADMIN_EMAIL, email_verified: true, firebase: { sign_in_provider: 'password' } }).firestore(),
+  admin: () => env.authenticatedContext('adm', { email: ADMIN_EMAIL, email_verified: true, firebase: { sign_in_provider: 'google.com' } }).firestore(),
+  adminWithPassword: () => env.authenticatedContext('adm', { email: ADMIN_EMAIL, email_verified: true, firebase: { sign_in_provider: 'password' } }).firestore(),
   fakeAdminUnverified: () => env.authenticatedContext('adm2', { email: ADMIN_EMAIL, email_verified: false, firebase: { sign_in_provider: 'password' } }).firestore(),
   fakeAdminOtherMail: () => env.authenticatedContext('adm3', { email: 'otro@gmail.com', email_verified: true, firebase: { sign_in_provider: 'password' } }).firestore()
 };
 const seed = fn => env.withSecurityRulesDisabled(c => fn(c.firestore()));
+// 3.12: cada opinión, sugerencia y denuncia nueva suma 1 en quotas/{uid} en la misma operación
+function qset(d, uid, kind, ref, path, data, extra = []) {
+  const b = d.batch();
+  b.set(d.doc(path), data);
+  extra.forEach(([pp, dd]) => b.set(d.doc(pp), dd));
+  b.set(d.doc('quotas/' + uid), { win: ST(), rev: 0, sug: 0, rep: 0, [kind]: 1, at: ST(), ref });
+  return b.commit();
+}
 
 const CREATED = TS.fromMillis(Date.now() - 10 * DAY);
 const rest = (uid, n, extra = {}) => ({
@@ -166,19 +175,19 @@ const R = (db_, p) => db_.doc(p);
   sec('5) Opiniones y avisos');
   const seedR = () => seedRest('own1');
   await t('opiniones: lectura pública', () => seed(async d => { await d.doc('restaurants/own1_1').set(rest('own1', 1)); await d.doc('restaurants/own1_1/reviews/c1').set(review('c1')); }), () => assertSucceeds(R(db.anon(), 'restaurants/own1_1/reviews/c1').get()));
-  await t('un cliente anónimo publica su opinión', seedR, () => assertSucceeds(R(db.guest('c1'), 'restaurants/own1_1/reviews/c1').set(reviewNew('c1'))));
+  await t('un cliente anónimo publica su opinión', seedR, () => assertSucceeds(qset(db.guest('c1'), 'c1', 'rev', 'own1_1/c1', 'restaurants/own1_1/reviews/c1', reviewNew('c1'))));
   await t('sin sesión NO se opina', seedR, () => assertFails(R(db.anon(), 'restaurants/own1_1/reviews/c1').set(reviewNew('c1'))));
-  await t('NO se opina con el identificador de otra persona', seedR, () => assertFails(R(db.guest('c1'), 'restaurants/own1_1/reviews/c2').set(reviewNew('c2'))));
-  await t('NO se opina con authorUid falso', seedR, () => assertFails(R(db.guest('c1'), 'restaurants/own1_1/reviews/c1').set(reviewNew('c2'))));
-  await t('NO 6 estrellas', seedR, () => assertFails(R(db.guest('c1'), 'restaurants/own1_1/reviews/c1').set(reviewNew('c1', { stars: 6 }))));
-  await t('NO comentario vacío', seedR, () => assertFails(R(db.guest('c1'), 'restaurants/own1_1/reviews/c1').set(reviewNew('c1', { comment: '' }))));
-  await t('NO comentario de más de 1000 caracteres', seedR, () => assertFails(R(db.guest('c1'), 'restaurants/own1_1/reviews/c1').set(reviewNew('c1', { comment: 'a'.repeat(1001) }))));
-  await t('NO campos extra en la opinión', seedR, () => assertFails(R(db.guest('c1'), 'restaurants/own1_1/reviews/c1').set(reviewNew('c1', { admin: true }))));
-  await t('NO opinión con fecha falsa', seedR, () => assertFails(R(db.guest('c1'), 'restaurants/own1_1/reviews/c1').set(reviewNew('c1', { createdAt: inDays(-100) }))));
-  await t('NO opinar en un local que no existe', null, () => assertFails(R(db.guest('c1'), 'restaurants/nadie_1/reviews/c1').set(reviewNew('c1'))));
-  await t('aviso de carta (<uid>_aviso) con isAlert true', seedR, () => assertSucceeds(R(db.guest('c1'), 'restaurants/own1_1/reviews/c1_aviso').set(reviewNew('c1', { isAlert: true }))));
-  await t('aviso con isAlert false en id _aviso se RECHAZA', seedR, () => assertFails(R(db.guest('c1'), 'restaurants/own1_1/reviews/c1_aviso').set(reviewNew('c1', { isAlert: false }))));
-  await t('el DUEÑO no valora su propio local', seedR, () => assertFails(R(db.owner('own1'), 'restaurants/own1_1/reviews/own1').set(reviewNew('own1'))));
+  await t('NO se opina con el identificador de otra persona', seedR, () => assertFails(qset(db.guest('c1'), 'c1', 'rev', 'own1_1/c2', 'restaurants/own1_1/reviews/c2', reviewNew('c2'))));
+  await t('NO se opina con authorUid falso', seedR, () => assertFails(qset(db.guest('c1'), 'c1', 'rev', 'own1_1/c1', 'restaurants/own1_1/reviews/c1', reviewNew('c2'))));
+  await t('NO 6 estrellas', seedR, () => assertFails(qset(db.guest('c1'), 'c1', 'rev', 'own1_1/c1', 'restaurants/own1_1/reviews/c1', reviewNew('c1', { stars: 6 }))));
+  await t('NO comentario vacío', seedR, () => assertFails(qset(db.guest('c1'), 'c1', 'rev', 'own1_1/c1', 'restaurants/own1_1/reviews/c1', reviewNew('c1', { comment: '' }))));
+  await t('NO comentario de más de 1000 caracteres', seedR, () => assertFails(qset(db.guest('c1'), 'c1', 'rev', 'own1_1/c1', 'restaurants/own1_1/reviews/c1', reviewNew('c1', { comment: 'a'.repeat(1001) }))));
+  await t('NO campos extra en la opinión', seedR, () => assertFails(qset(db.guest('c1'), 'c1', 'rev', 'own1_1/c1', 'restaurants/own1_1/reviews/c1', reviewNew('c1', { admin: true }))));
+  await t('NO opinión con fecha falsa', seedR, () => assertFails(qset(db.guest('c1'), 'c1', 'rev', 'own1_1/c1', 'restaurants/own1_1/reviews/c1', reviewNew('c1', { createdAt: inDays(-100) }))));
+  await t('NO opinar en un local que no existe', null, () => assertFails(qset(db.guest('c1'), 'c1', 'rev', 'nadie_1/c1', 'restaurants/nadie_1/reviews/c1', reviewNew('c1'))));
+  await t('aviso de carta (<uid>_aviso) con isAlert true', seedR, () => assertSucceeds(qset(db.guest('c1'), 'c1', 'rev', 'own1_1/c1_aviso', 'restaurants/own1_1/reviews/c1_aviso', reviewNew('c1', { isAlert: true }))));
+  await t('aviso con isAlert false en id _aviso se RECHAZA', seedR, () => assertFails(qset(db.guest('c1'), 'c1', 'rev', 'own1_1/c1_aviso', 'restaurants/own1_1/reviews/c1_aviso', reviewNew('c1', { isAlert: false }))));
+  await t('el DUEÑO no valora su propio local', seedR, () => assertFails(qset(db.owner('own1'), 'own1', 'rev', 'own1_1/own1', 'restaurants/own1_1/reviews/own1', reviewNew('own1'))));
   const seedRv = () => seed(async d => { await d.doc('restaurants/own1_1').set(rest('own1', 1)); await d.doc('restaurants/own1_1/reviews/c1').set(review('c1')); });
   await t('el autor borra su opinión', seedRv, () => assertSucceeds(R(db.guest('c1'), 'restaurants/own1_1/reviews/c1').delete()));
   await t('otra persona NO borra la opinión', seedRv, () => assertFails(R(db.guest('c2'), 'restaurants/own1_1/reviews/c1').delete()));
@@ -208,10 +217,12 @@ const R = (db_, p) => db_.doc(p);
 
   sec('7) Locales sugeridos');
   const sug = (uid) => ({ name: 'Bar X', city: 'Lorca', lat: 37.6, lng: -1.7, createdBy: uid, requests: 1, claimed: false, createdAt: ST() });
-  const createSug = (uid, withVote = true) => { const d = db.guest(uid), b = d.batch(); b.set(d.doc('suggestions/s1'), sug(uid)); if (withVote) b.set(d.doc('suggestions/s1/votes/' + uid), { at: ST() }); return b.commit(); };
+  const createSug = (uid, withVote = true, withQuota = true) => { const d = db.guest(uid), b = d.batch(); b.set(d.doc('suggestions/s1'), sug(uid)); if (withVote) b.set(d.doc('suggestions/s1/votes/' + uid), { at: ST() }); if (withQuota) b.set(d.doc('quotas/' + uid), { win: ST(), rev: 0, sug: 1, rep: 0, at: ST(), ref: 's1' }); return b.commit(); };
   await t('sugerir un local con su voto', null, () => assertSucceeds(createSug('c1')));
   await t('sugerir SIN su voto se rechaza', null, () => assertFails(createSug('c1', false)));
-  await t('NO sugerir con requests 50', null, () => assertFails((() => { const d = db.guest('c1'), b = d.batch(); b.set(d.doc('suggestions/s1'), { ...sug('c1'), requests: 50 }); b.set(d.doc('suggestions/s1/votes/c1'), { at: ST() }); return b.commit(); })()));
+  await t('NO sugerir con requests 50', null, () => assertFails((() => { const d = db.guest('c1'), b = d.batch(); b.set(d.doc('suggestions/s1'), { ...sug('c1'), requests: 50 }); b.set(d.doc('suggestions/s1/votes/c1'), { at: ST() }); b.set(d.doc('quotas/c1'), { win: ST(), rev: 0, sug: 1, rep: 0, at: ST(), ref: 's1' }); return b.commit(); })()));
+  await t('3.12: NO sugerir sin sumar en el contador del día', null, () => assertFails(createSug('c1', true, false)));
+  await t('3.12: NO sugerir con coordenadas imposibles', null, () => assertFails((() => { const d = db.guest('c1'), b = d.batch(); b.set(d.doc('suggestions/s1'), { ...sug('c1'), lat: 999 }); b.set(d.doc('suggestions/s1/votes/c1'), { at: ST() }); b.set(d.doc('quotas/c1'), { win: ST(), rev: 0, sug: 1, rep: 0, at: ST(), ref: 's1' }); return b.commit(); })()));
   const seedSug = (extra = {}) => seed(d => d.doc('suggestions/s1').set({ name: 'Bar X', city: 'Lorca', lat: 37.6, lng: -1.7, createdBy: 'c1', requests: 1, claimed: false, createdAt: TS.now(), ...extra }));
   const vote = uid => { const d = db.guest(uid), b = d.batch(); b.update(d.doc('suggestions/s1'), { requests: 2 }); b.set(d.doc('suggestions/s1/votes/' + uid), { at: ST() }); return b.commit(); };
   await t('otra persona vota una vez', seedSug, () => assertSucceeds(vote('c2')));
@@ -223,13 +234,13 @@ const R = (db_, p) => db_.doc(p);
 
   sec('8) Denuncias y reclamaciones');
   const rep = (uid, extra = {}) => ({ rid: 'own1_1', revId: 'c1', uid, byOwner: false, reason: 'spam', text: '', createdAt: ST(), status: 'pendiente', ...extra });
-  await t('denunciar una opinión', seedRv, () => assertSucceeds(R(db.guest('c2'), 'reports/own1_1__c1__c2').set(rep('c2'))));
-  await t('NO denunciar con el identificador mal formado', seedRv, () => assertFails(R(db.guest('c2'), 'reports/cualquiera').set(rep('c2'))));
-  await t('NO denunciar con un motivo inventado', seedRv, () => assertFails(R(db.guest('c2'), 'reports/own1_1__c1__c2').set(rep('c2', { reason: 'xx' }))));
-  await t('NO denunciar como otra persona', seedRv, () => assertFails(R(db.guest('c2'), 'reports/own1_1__c1__c3').set(rep('c3'))));
-  await t('NO denunciar una opinión que no existe', seedR, () => assertFails(R(db.guest('c2'), 'reports/own1_1__zz__c2').set(rep('c2', { revId: 'zz' }))));
-  await t('el dueño denuncia con texto de 10+ caracteres', seedRv, () => assertSucceeds(R(db.owner('own1'), 'reports/own1_1__c1__own1').set(rep('own1', { byOwner: true, text: 'Esta opinión es falsa, no vino.' }))));
-  await t('el dueño NO denuncia sin explicación', seedRv, () => assertFails(R(db.owner('own1'), 'reports/own1_1__c1__own1').set(rep('own1', { byOwner: true, text: '' }))));
+  await t('denunciar una opinión', seedRv, () => assertSucceeds(qset(db.guest('c2'), 'c2', 'rep', 'own1_1__c1__c2', 'reports/own1_1__c1__c2', rep('c2'))));
+  await t('NO denunciar con el identificador mal formado', seedRv, () => assertFails(qset(db.guest('c2'), 'c2', 'rep', 'cualquiera', 'reports/cualquiera', rep('c2'))));
+  await t('NO denunciar con un motivo inventado', seedRv, () => assertFails(qset(db.guest('c2'), 'c2', 'rep', 'own1_1__c1__c2', 'reports/own1_1__c1__c2', rep('c2', { reason: 'xx' }))));
+  await t('NO denunciar como otra persona', seedRv, () => assertFails(qset(db.guest('c2'), 'c2', 'rep', 'own1_1__c1__c3', 'reports/own1_1__c1__c3', rep('c3'))));
+  await t('NO denunciar una opinión que no existe', seedR, () => assertFails(qset(db.guest('c2'), 'c2', 'rep', 'own1_1__zz__c2', 'reports/own1_1__zz__c2', rep('c2', { revId: 'zz' }))));
+  await t('el dueño denuncia con texto de 10+ caracteres', seedRv, () => assertSucceeds(qset(db.owner('own1'), 'own1', 'rep', 'own1_1__c1__own1', 'reports/own1_1__c1__own1', rep('own1', { byOwner: true, text: 'Esta opinión es falsa, no vino.' }))));
+  await t('el dueño NO denuncia sin explicación', seedRv, () => assertFails(qset(db.owner('own1'), 'own1', 'rep', 'own1_1__c1__own1', 'reports/own1_1__c1__own1', rep('own1', { byOwner: true, text: '' }))));
   const seedRep = () => seed(async d => { await d.doc('restaurants/own1_1').set(rest('own1', 1)); await d.doc('restaurants/own1_1/reviews/c1').set(review('c1')); await d.doc('reports/own1_1__c1__c2').set({ rid: 'own1_1', revId: 'c1', uid: 'c2', byOwner: false, reason: 'spam', text: '', createdAt: TS.now(), status: 'pendiente' }); });
   await t('la administración lee las denuncias', seedRep, () => assertSucceeds(R(db.admin(), 'reports/own1_1__c1__c2').get()));
   await t('quien denunció ve la suya', seedRep, () => assertSucceeds(R(db.guest('c2'), 'reports/own1_1__c1__c2').get()));
@@ -261,6 +272,32 @@ const R = (db_, p) => db_.doc(p);
   await t('la administración lee fichas', () => seed(d => d.doc('users/c2').set({ days: 1 })), () => assertSucceeds(R(db.admin(), 'users/c2').get()));
   await t('NO actualizar antes de 6 horas', () => seed(d => d.doc('users/c1').set({ firstSeen: TS.now(), lastSeen: TS.now(), days: 1, mode: 'pwa', platform: 'android' })), () => assertFails(R(db.guest('c1'), 'users/c1').update({ lastSeen: ST(), days: 2 })));
   await t('actualizar pasadas 6 horas', () => seed(d => d.doc('users/c1').set({ firstSeen: TS.now(), lastSeen: TS.fromMillis(Date.now() - 7 * 3600000), days: 1, mode: 'pwa', platform: 'android' })), () => assertSucceeds(R(db.guest('c1'), 'users/c1').update({ lastSeen: ST(), days: 2 })));
+
+  sec('12) 3.12 · Administración solo con Google y límites diarios por cuenta');
+  await t('el email de administración con CONTRASEÑA NO administra', () => seed(d => d.doc('aiUsage/a').set({ x: 1 })), () => assertFails(R(db.adminWithPassword(), 'aiUsage/a').get()));
+  await t('con Google sí', () => seed(d => d.doc('aiUsage/a').set({ x: 1 })), () => assertSucceeds(R(db.admin(), 'aiUsage/a').get()));
+  const seedR2 = () => seed(async d => { await d.doc('restaurants/own1_1').set(rest('own1', 1)); await d.doc('restaurants/own2_1').set(rest('own2', 1)); });
+  await t('NO opinar sin sumar en el contador', seedR2, () => assertFails(R(db.guest('c1'), 'restaurants/own1_1/reviews/c1').set(reviewNew('c1'))));
+  await t('NO opinar con la suma apuntando a otra publicación', seedR2, () => assertFails(qset(db.guest('c1'), 'c1', 'rev', 'own2_1/c1', 'restaurants/own1_1/reviews/c1', reviewNew('c1'))));
+  await t('NO dos publicaciones con una sola suma', seedR2, () => assertFails(qset(db.guest('c1'), 'c1', 'rev', 'own2_1/c1', 'restaurants/own1_1/reviews/c1', reviewNew('c1'), [['restaurants/own2_1/reviews/c1', reviewNew('c1')]])));
+  let qWin = null;
+  const seedQ = (n, winMsAgo = 60000) => { qWin = TS.fromMillis(Date.now() - winMsAgo); return seed(async d => { await d.doc('restaurants/own1_1').set(rest('own1', 1)); await d.doc('quotas/c1').set({ win: qWin, rev: n, sug: 0, rep: 0, at: qWin, ref: 'x' }); }); };
+  await t('la opinión 20 del día SÍ', () => seedQ(19), async () => { const d = db.guest('c1'), w = qWin; const b = d.batch(); b.set(d.doc('restaurants/own1_1/reviews/c1'), reviewNew('c1')); b.set(d.doc('quotas/c1'), { win: w, rev: 20, sug: 0, rep: 0, at: ST(), ref: 'own1_1/c1' }); return assertSucceeds(b.commit()); });
+  await t('la opinión 21 del día NO', () => seedQ(20), async () => { const d = db.guest('c1'), w = qWin; const b = d.batch(); b.set(d.doc('restaurants/own1_1/reviews/c1'), reviewNew('c1')); b.set(d.doc('quotas/c1'), { win: w, rev: 21, sug: 0, rep: 0, at: ST(), ref: 'own1_1/c1' }); return assertFails(b.commit()); });
+  await t('NO reiniciar la ventana antes de 24 horas', () => seedQ(20), () => assertFails(qset(db.guest('c1'), 'c1', 'rev', 'own1_1/c1', 'restaurants/own1_1/reviews/c1', reviewNew('c1'))));
+  await t('pasadas 24 horas SÍ se reinicia', () => seedQ(20, 25 * 3600000), () => assertSucceeds(qset(db.guest('c1'), 'c1', 'rev', 'own1_1/c1', 'restaurants/own1_1/reviews/c1', reviewNew('c1'))));
+  await t('NO bajar el contador', () => seedQ(5), async () => { const w = qWin; return assertFails(R(db.guest('c1'), 'quotas/c1').set({ win: w, rev: 0, sug: 0, rep: 0, at: ST(), ref: 'x' })); });
+  await t('NO subir de 2 en 2', () => seedQ(5), async () => { const w = qWin; return assertFails(R(db.guest('c1'), 'quotas/c1').set({ win: w, rev: 7, sug: 0, rep: 0, at: ST(), ref: 'x' })); });
+  await t('NO borrar el contador con la ventana abierta', () => seedQ(20), () => assertFails(R(db.guest('c1'), 'quotas/c1').delete()));
+  await t('SÍ borrarlo con la ventana cerrada', () => seedQ(20, 25 * 3600000), () => assertSucceeds(R(db.guest('c1'), 'quotas/c1').delete()));
+  await t('NO tocar el contador de otra persona', () => seedQ(5), () => assertFails(R(db.guest('c2'), 'quotas/c1').set({ win: ST(), rev: 0, sug: 0, rep: 0, at: ST(), ref: 'x' })));
+  await t('NO leer el contador de otra persona', () => seedQ(5), () => assertFails(R(db.guest('c2'), 'quotas/c1').get()));
+  await t('NO campos extra en el contador', null, () => assertFails(R(db.guest('c1'), 'quotas/c1').set({ win: ST(), rev: 0, sug: 0, rep: 0, at: ST(), ref: 'x', vip: true })));
+  await t('NO denunciar sin sumar', seedRv, () => assertFails(R(db.guest('c2'), 'reports/own1_1__c1__c2').set(rep('c2'))));
+  const seedS9 = () => seed(async d => { await d.doc('restaurants/own1_1').set(rest('own1', 1)); await d.doc('suggestions/s9').set({ name: 'Bar X', city: 'Lorca', lat: 37.6, lng: -1.7, createdBy: 'c1', requests: 1, claimed: false, createdAt: TS.now() }); });
+  await t('NO reclamar una sugerencia apuntándola a un local que ya existía', seedS9, () => assertFails(R(db.owner('own1'), 'suggestions/s9').update({ claimed: true, claimedBy: 'own1', claimedRid: 'own1_1' })));
+  await t('NO dar de alta un local «desde una sugerencia» sin reclamarla', seedS9, () => assertFails(R(db.owner('own1'), 'restaurants/own1_2').set(restNew('own1', { fromSuggestion: 's9' }))));
+  await t('alta del local + reclamar su sugerencia a la vez, SÍ', seedS9, () => { const d = db.owner('own1'), b = d.batch(); b.set(d.doc('restaurants/own1_2'), restNew('own1', { fromSuggestion: 's9' })); b.update(d.doc('suggestions/s9'), { claimed: true, claimedBy: 'own1', claimedRid: 'own1_2' }); return assertSucceeds(b.commit()); });
 
   await env.cleanup();
   console.log(`\n==== ${pass} correctas, ${fail} fallos ====`);

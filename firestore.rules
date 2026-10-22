@@ -1,7 +1,7 @@
 rules_version = '2';
 
 // =====================================================================
-// REGLAS DE SEGURIDAD DE TUSALERGIAS (versión 3.7)
+// REGLAS DE SEGURIDAD DE COMECLARO (versión 3.12)
 // Pégalas en: Consola de Firebase → Firestore Database → Reglas → Publicar.
 //
 // Antes de publicarlas, revisa la línea marcada con «ADMINISTRACIÓN»:
@@ -31,12 +31,15 @@ rules_version = '2';
 // - Cada carta lleva una versión: un móvil con la carta vieja no puede pisar
 //   los cambios hechos desde otro dispositivo.
 // - Cada carta puede llevar las freidoras y planchas del local (máximo 12).
+// - 3.12 · La administración solo entra con Google (así la protege la verificación en
+//   dos pasos de tu cuenta de Google). Cada cuenta puede publicar como mucho 20
+//   opiniones, 5 sugerencias de locales y 20 denuncias cada 24 horas (quotas/).
 // =====================================================================
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ADMINISTRACIÓN: email de la cuenta que gestiona TusAlergias desde admin.html.
-    // La cuenta debe tener el email verificado (admin.html te ayuda a hacerlo).
+    // ADMINISTRACIÓN: email de la cuenta que gestiona Comeclaro desde admin.html.
+    // Hay que entrar con «Entrar con Google» (3.12): la contraseña sola no basta.
     function adminEmail() { return 'frankymazineoficial@gmail.com'; }
 
     function signedIn() { return request.auth != null; }
@@ -48,7 +51,24 @@ service cloud.firestore {
     function isAdmin() {
       return isOwnerUser()
         && request.auth.token.get('email', '') == adminEmail()
-        && emailVerified();
+        && emailVerified()
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+
+    // ---------- Límites diarios por cuenta (3.12) ----------
+    // quotas/{uid}: cada opinión nueva, sugerencia de local o denuncia suma 1 en la misma operación.
+    // win: inicio de la ventana de 24 horas. ref: a qué publicación corresponde la última suma
+    // (así una misma suma no vale para varias publicaciones a la vez). Sin datos personales.
+    function quotaPath() { return /databases/$(database)/documents/quotas/$(request.auth.uid); }
+    function quotaOpen() {
+      return exists(quotaPath()) && request.time < get(quotaPath()).data.win + duration.value(1, 'd');
+    }
+    function quotaBefore(k) { return quotaOpen() ? get(quotaPath()).data.get(k, 0) : 0; }
+    function quotaTaken(k, ref) {
+      return existsAfter(quotaPath())
+        && getAfter(quotaPath()).data.at == request.time
+        && getAfter(quotaPath()).data.ref == ref
+        && getAfter(quotaPath()).data.get(k, 0) == quotaBefore(k) + 1;
     }
     function ownsRid(rid) { return isOwnerUser() && rid.matches(request.auth.uid + '_[1-3]'); }
     function isStr(v, max) { return v is string && v.size() <= max; }
@@ -202,7 +222,10 @@ service cloud.firestore {
           && request.resource.data.createdAt == request.time
           // Un hueco cuyo local se traspasó a otra cuenta no se reutiliza (sus QR impresos llevan al local traspasado)
           && !exists(/databases/$(database)/documents/redirects/$(rid))
-          && (request.resource.data.get('founder', false) == false || get(ownerDoc()).data.founderNumber > 0))
+          && (request.resource.data.get('founder', false) == false || get(ownerDoc()).data.founderNumber > 0)
+          // 3.12: si viene de una sugerencia, la reclama en esta misma operación
+          && (request.resource.data.get('fromSuggestion', '') == ''
+            || getAfter(/databases/$(database)/documents/suggestions/$(request.resource.data.fromSuggestion)).data.get('claimedRid', '') == rid))
         // Traspaso de un local a otra cuenta, tras aprobar una reclamación (admin.html)
         || (isAdmin()
           && validRestaurant(request.resource.data, request.resource.data.ownerUid)
@@ -261,7 +284,9 @@ service cloud.firestore {
           || (signedIn() && !ownsRid(rid)
             && reviewIdOk(request.resource.data)
             && reviewOk(request.resource.data)
-            && exists(restDoc(rid)));
+            && exists(restDoc(rid))
+            // 3.12: como mucho 20 opiniones y avisos nuevos al día por cuenta
+            && quotaTaken('rev', rid + '/' + revId));
         allow update: if
           // Su autor la sustituye por otra (se quitan la respuesta del local y el «corregido»)
           (signedIn() && resource.data.authorUid == request.auth.uid
@@ -345,7 +370,9 @@ service cloud.firestore {
         && (request.resource.data.byOwner == false || request.resource.data.text.size() >= 10)
         && request.resource.data.createdAt == request.time
         && request.resource.data.status == 'pendiente'
-        && exists(/databases/$(database)/documents/restaurants/$(request.resource.data.rid)/reviews/$(request.resource.data.revId));
+        && exists(/databases/$(database)/documents/restaurants/$(request.resource.data.rid)/reviews/$(request.resource.data.revId))
+        // 3.12: como mucho 20 denuncias al día por cuenta
+        && quotaTaken('rep', reportId);
       allow update: if isAdmin()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'resolvedAt'])
         && request.resource.data.status in ['pendiente', 'retirada', 'respuesta-retirada', 'descartada']
@@ -445,10 +472,14 @@ service cloud.firestore {
         && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 120
         && isStr(request.resource.data.city, 200)
         && request.resource.data.lat is number && request.resource.data.lng is number
+        && request.resource.data.lat >= -90 && request.resource.data.lat <= 90
+        && request.resource.data.lng >= -180 && request.resource.data.lng <= 180
         && request.resource.data.requests == 1
         && request.resource.data.claimed == false
         && request.resource.data.createdAt == request.time
-        && existsAfter(voteDoc());
+        && existsAfter(voteDoc())
+        // 3.12: como mucho 5 sugerencias al día por cuenta
+        && quotaTaken('sug', sid);
       allow update: if signedIn() && (
         // "Solicitar que suba su carta": un voto por persona
         (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['requests'])
@@ -464,7 +495,11 @@ service cloud.firestore {
           && request.resource.data.claimedBy == request.auth.uid
           && request.resource.data.claimedRid is string
           && request.resource.data.claimedRid.matches(request.auth.uid + '_[1-3]')
-          && existsAfter(restDoc(request.resource.data.claimedRid)))
+          && existsAfter(restDoc(request.resource.data.claimedRid))
+          // 3.12: solo al dar de alta ese local en esta misma operación y desde esta sugerencia
+          // (así nadie puede vaciar el mapa de sugerencias apuntándolas a un local suyo que ya existe)
+          && !exists(restDoc(request.resource.data.claimedRid))
+          && getAfter(restDoc(request.resource.data.claimedRid)).data.get('fromSuggestion', '') == sid)
       );
       allow delete: if signedIn() && ((resource.data.createdBy == request.auth.uid && resource.data.claimed == false) || isAdmin());
 
@@ -496,6 +531,26 @@ service cloud.firestore {
         && resource.data.lastSeen < request.time - duration.value(6, 'h')
         && usageInfoOk(request.resource.data);
       allow delete: if signedIn() && request.auth.uid == uid;
+    }
+
+    // ---------- Límites diarios por cuenta (3.12): cada cuenta suma de 1 en 1 en la suya ----------
+    // Nadie puede bajar sus contadores ni borrarlos; la ventana se reinicia sola a las 24 horas.
+    match /quotas/{uid} {
+      function qReset() { return resource == null || request.time >= resource.data.win + duration.value(1, 'd'); }
+      function qCountOk(k, max) {
+        let before = qReset() ? 0 : resource.data.get(k, 0);
+        let after = request.resource.data.get(k, 0);
+        return after is int && (after == before || after == before + 1) && after <= max;
+      }
+      allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['win', 'rev', 'sug', 'rep', 'at', 'ref'])
+        && request.resource.data.at == request.time
+        && isStr(request.resource.data.ref, 200)
+        && request.resource.data.win == (qReset() ? request.time : resource.data.win)
+        && qCountOk('rev', 20) && qCountOk('sug', 5) && qCountOk('rep', 20);
+      // Al borrar sus datos, cada cuenta puede borrar el suyo, pero solo con la ventana ya cerrada (así no sirve para saltarse el límite)
+      allow delete: if (signedIn() && request.auth.uid == uid && request.time >= resource.data.win + duration.value(1, 'd')) || isAdmin();
     }
 
     // ---------- Lecturas de cartas con IA (las escribe solo el servidor; la administración las ve) ----------
