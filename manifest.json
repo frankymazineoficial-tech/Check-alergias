@@ -1,11 +1,11 @@
 {
   "id": "./",
-  "name": "TusAlergias: alérgenos y carta",
-  "short_name": "TusAlergias",
+  "name": "Comeclaro: cartas según tus alergias",
+  "short_name": "Comeclaro",
   "description": "Filtra cartas de restaurantes y productos según tus alergias, intolerancias y dieta.",
   "lang": "es",
   "dir": "ltr",
-  "start_url": "./?source=pwa",
+  "start_url": "./app.html?source=pwa",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -40,7 +40,7 @@
     {
       "name": "Escanear producto",
       "short_name": "Escanear",
-      "url": "./?accion=escanear",
+      "url": "./app.html?accion=escanear",
       "icons": [
         {
           "src": "icon-192.png",
@@ -51,7 +51,7 @@
     {
       "name": "Mis platos en casa",
       "short_name": "En casa",
-      "url": "./?accion=casa",
+      "url": "./app.html?accion=casa",
       "icons": [
         {
           "src": "icon-192.png",

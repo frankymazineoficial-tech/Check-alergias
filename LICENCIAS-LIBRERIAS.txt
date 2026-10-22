@@ -1,4 +1,4 @@
-Librerías de terceros que usa TusAlergias, servidas desde este mismo sitio, junto a index.html
+Librerías de terceros que usa Comeclaro, servidas desde este mismo sitio, junto a index.html
 (así ningún servidor externo recibe la dirección IP de quien usa la app al cargarlas).
 
 - Leaflet 1.9.4 (mapa) · BSD 2-Clause · © 2010-2023 Volodymyr Agafonkin, © 2010-2011 CloudMade · https://leafletjs.com
@@ -13,3 +13,6 @@ Librerías de terceros que usa TusAlergias, servidas desde este mismo sitio, jun
   Archivo: spa.traineddata.gz
 
 Texto de la licencia Apache 2.0: https://www.apache.org/licenses/LICENSE-2.0
+- Inter 4 (letra de la página de inicio, inicio.html) · SIL Open Font License 1.1 · © 2016-2023 The Inter Project Authors · https://github.com/rsms/inter
+  Archivos: fuente-inter-400.woff, fuente-inter-600.woff, fuente-inter-800.woff (solo los caracteres del español)
+  Texto de la licencia OFL 1.1: https://openfontlicense.org

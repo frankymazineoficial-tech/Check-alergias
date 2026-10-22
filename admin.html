@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>TusAlergias · Administración</title>
+<title>Comeclaro · Administración</title>
 <link rel="icon" type="image/png" href="favicon-32.png">
 <style>
   :root { --bg:#0b132b; --card:#1c2541; --card-alt:#060b19; --text:#f8fafc; --muted:#94a3b8; --green:#10b981; --amber:#f59e0b; --red:#ef4444; --accent:#38bdf8; --border:#2d3a5d; }
@@ -48,7 +48,7 @@
 <script src="firebase-config.js"></script>
 </head>
 <body>
-<header><h1>TusAlergias · Administración</h1><span id="whoami">Panel privado</span></header>
+<header><h1>Comeclaro · Administración</h1><span id="whoami">Panel privado</span></header>
 <main>
   <section class="card" id="noConfig" hidden>
     <h2>Falta conectar el servidor</h2>
@@ -361,11 +361,11 @@ if (!cfg || !okVal(cfg.apiKey) || !okVal(cfg.projectId) || !okVal(cfg.appId)) {
   function buildMailText(b) {
     const fecha = b ? fmtDate(b) : "[FECHA]";
     const finFundador = b ? fmtDate(b + 365 * DAY) : "[FECHA + 1 AÑO]";
-    $("mailText").value = `Asunto: TusAlergias: el ${fecha} termina la fase gratuita
+    $("mailText").value = `Asunto: Comeclaro: el ${fecha} termina la fase gratuita
 
 Hola:
 
-Gracias por publicar tu carta de alérgenos en TusAlergias durante la fase de lanzamiento.
+Gracias por publicar tu carta de alérgenos en Comeclaro durante la fase de lanzamiento.
 
 Te escribimos, como prometen las condiciones, con al menos 30 días de antelación: a partir del ${fecha}, el servicio para restaurantes costará ${PRICES.monthly} al mes o ${PRICES.yearly} al año (IVA incluido) por cuenta, con hasta 3 locales.
 
@@ -377,7 +377,7 @@ Te escribimos, como prometen las condiciones, con al menos 30 días de antelaci�
 Si tienes cualquier duda, responde a este email.
 
 Un saludo,
-El equipo de TusAlergias`;
+El equipo de Comeclaro`;
   }
   $("btnCopyMail").onclick = async () => { try { await navigator.clipboard.writeText($("mailText").value); msg("ownersMsg", "✅ Texto copiado.", "ok"); } catch (e) { $("mailText").select(); } };
 
@@ -415,7 +415,7 @@ El equipo de TusAlergias`;
     const q = v => { let t = String(v == null ? "" : v); if (/^[=+\-@\t\r]/.test(t)) t = "'" + t; return `"${t.replace(/"/g, '""')}"`; };
     const rows = [["email", "fundador", "alta", "suscripcion_hasta"]].concat(owners.map(o => [o.email, o.founderNumber || "", tsMs(o.createdAt) ? new Date(tsMs(o.createdAt)).toISOString().slice(0, 10) : "", tsMs(o.paidUntil) ? new Date(tsMs(o.paidUntil)).toISOString().slice(0, 10) : ""]));
     const blob = new Blob(["﻿" + rows.map(r => r.map(q).join(";")).join("\r\n")], { type: "text/csv;charset=utf-8" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `tusalergias_cuentas_${new Date().toISOString().slice(0, 10)}.csv`;
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `comeclaro_cuentas_${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(a); a.click(); a.remove();
   };
 
@@ -477,7 +477,7 @@ El equipo de TusAlergias`;
       b.delete(F.doc(db, "menus", rid)); b.delete(F.doc(db, "stats", rid)); b.delete(F.doc(db, "restaurants", rid));
       await b.commit();
       tr.remove(); msg("modMsg", `✅ «${name}» retirado.`, "ok");
-      mailLink($("modMsg"), to, `TusAlergias: hemos retirado «${name}»`, reasonLines(name, "retirar el local de TusAlergias, con su carta, sus opiniones y sus estadísticas. Sus códigos QR han dejado de funcionar.", why, "el punto C9 (Retirada de contenido)"));
+      mailLink($("modMsg"), to, `Comeclaro: hemos retirado «${name}»`, reasonLines(name, "retirar el local de Comeclaro, con su carta, sus opiniones y sus estadísticas. Sus códigos QR han dejado de funcionar.", why, "el punto C9 (Retirada de contenido)"));
     } catch (e) { msg("modMsg", errText(e), "err"); }
   }
   $("btnSuggs").onclick = async () => {
@@ -524,12 +524,12 @@ El equipo de TusAlergias`;
     return String(r).trim() || def || "";
   }
   function reasonLines(name, done, reason, clause) {
-    return ["Hola:", "", name ? `Te escribimos desde TusAlergias sobre tu local «${name}».` : "Te escribimos desde TusAlergias sobre tu cuenta de restaurante.", "",
+    return ["Hola:", "", name ? `Te escribimos desde Comeclaro sobre tu local «${name}».` : "Te escribimos desde Comeclaro sobre tu cuenta de restaurante.", "",
       "Qué hemos hecho: " + done, "Motivo: " + reason,
       `En qué nos basamos: ${clause} de las condiciones de uso (${termsUrl()}).`,
-      "La decisión la ha tomado una persona del equipo de TusAlergias, sin medios automatizados.", "",
+      "La decisión la ha tomado una persona del equipo de Comeclaro, sin medios automatizados.", "",
       "Si no estás de acuerdo, responde a este email explicando por qué y lo revisaremos. También puedes acudir a los tribunales.", "",
-      "TusAlergias · tusalergiasapp@gmail.com"];
+      "Comeclaro · tusalergiasapp@gmail.com"];
   }
   function mailLink(parent, to, subject, lines, label) {
     if (!to || /cuenta borrada/.test(to)) { parent.appendChild(el("div", "⚠️ No consta el email de esa cuenta: si puedes, avísale por otra vía.", "msg")); return null; }
@@ -590,11 +590,11 @@ El equipo de TusAlergias`;
       button(row, "Retirar opinión", "btn-danger", () => { if (confirm("¿Retirar esta opinión? Se borra para todos y no se puede deshacer.")) done(b => b.delete(revRef), "retirada", "✅ Opinión retirada."); });
       if (v.reply) button(row, "Quitar solo la respuesta del local", "btn-outline", () => {
         if (!confirm("¿Quitar la respuesta del local? La opinión se mantiene.")) return;
-        const why = askReason("Quitar la respuesta del local", "Tu respuesta incumplía las normas de TusAlergias (era ofensiva o incluía datos personales).");
+        const why = askReason("Quitar la respuesta del local", "Tu respuesta incumplía las normas de Comeclaro (era ofensiva o incluía datos personales).");
         if (why === null) return;
         const local = rs && rs.exists() ? rs.data() : null;
         done(b => b.update(revRef, { reply: F.deleteField(), replyAt: F.deleteField() }), "respuesta-retirada", "✅ Respuesta del local quitada.", async () => {
-          if (local) mailLink(card, await emailOf(local.ownerUid), "TusAlergias: hemos retirado tu respuesta a una opinión",
+          if (local) mailLink(card, await emailOf(local.ownerUid), "Comeclaro: hemos retirado tu respuesta a una opinión",
             reasonLines(local.name, `retirar tu respuesta pública a una opinión («${String(v.reply).slice(0, 120)}»). La opinión sigue publicada.`, why, "el punto C7 (Opiniones de clientes)"));
         });
       });
@@ -632,10 +632,10 @@ El equipo de TusAlergias`;
     if (c.message) card.appendChild(el("div", "«" + c.message + "»", "q"));
     card.appendChild(el("div", "Antes de aprobar: 1) llama al teléfono público del local (búscalo en Google Maps, no uses el de la reclamación) y 2) pide por email un documento que acredite su relación con el local (cabecera de una factura del local, licencia de apertura…) o que te escriba desde el email del propio local. Cuando decidas, borra ese documento de tu correo.", "who"));
     const ask = el("div"); card.appendChild(ask);
-    mailLink(ask, c.email, `TusAlergias: tu reclamación de «${r ? r.name : "un local"}»`, ["Hola:", "",
-      `Hemos recibido tu reclamación del local «${r ? r.name : ""}» en TusAlergias.`, "",
+    mailLink(ask, c.email, `Comeclaro: tu reclamación de «${r ? r.name : "un local"}»`, ["Hola:", "",
+      `Hemos recibido tu reclamación del local «${r ? r.name : ""}» en Comeclaro.`, "",
       "Para comprobar que lo gestionas, responde a este email adjuntando un documento que acredite tu relación con el local (por ejemplo, la cabecera de una factura a nombre del local o su licencia de apertura) o escríbenos desde el email del propio local.",
-      "Solo lo usaremos para resolver la reclamación y lo borraremos después.", "", "TusAlergias · tusalergiasapp@gmail.com"], "📧 Pedir el documento");
+      "Solo lo usaremos para resolver la reclamación y lo borraremos después.", "", "Comeclaro · tusalergiasapp@gmail.com"], "📧 Pedir el documento");
     const row = el("div", null, "row"); row.style.marginTop = "8px";
     if (r) button(row, "Aprobar y traspasar el local", "btn-green", async () => {
       const oldEmail = await emailOf(r.ownerUid);
@@ -645,9 +645,9 @@ El equipo de TusAlergias`;
       try {
         await transferLocal(c);
         card.replaceChildren(el("div", "✅ Local traspasado y verificado. Sus QR impresos siguen funcionando.", "msg ok"));
-        mailLink(card, oldEmail, `TusAlergias: «${r.name}» ha pasado a otra cuenta`, reasonLines(r.name, "traspasar el local, con su carta, opiniones y estadísticas, a la cuenta de quien lo ha reclamado. Tu cuenta ya no lo gestiona.", why, "el punto C8 (Verificación y reclamación de locales)"), "📧 Avisar con los motivos a la cuenta anterior");
+        mailLink(card, oldEmail, `Comeclaro: «${r.name}» ha pasado a otra cuenta`, reasonLines(r.name, "traspasar el local, con su carta, opiniones y estadísticas, a la cuenta de quien lo ha reclamado. Tu cuenta ya no lo gestiona.", why, "el punto C8 (Verificación y reclamación de locales)"), "📧 Avisar con los motivos a la cuenta anterior");
         card.appendChild(el("div"));
-        mailLink(card, c.email, `TusAlergias: reclamación aprobada`, ["Hola:", "", `Hemos aprobado tu reclamación: «${r.name}» ya está en tu cuenta de TusAlergias, verificado. Lo verás en la pestaña Hostelería.`, "", "TusAlergias · tusalergiasapp@gmail.com"], "📧 Avisar a quien reclama");
+        mailLink(card, c.email, `Comeclaro: reclamación aprobada`, ["Hola:", "", `Hemos aprobado tu reclamación: «${r.name}» ya está en tu cuenta de Comeclaro, verificado. Lo verás en la pestaña Hostelería.`, "", "Comeclaro · tusalergiasapp@gmail.com"], "📧 Avisar a quien reclama");
       }
       catch (e) { alert(e && e.message && !e.code ? e.message : errText(e)); }
     });
@@ -658,7 +658,7 @@ El equipo de TusAlergias`;
       try {
         await F.updateDoc(c.ref, { status: "rechazada", resolvedAt: F.serverTimestamp() });
         card.replaceChildren(el("div", "Reclamación rechazada.", "msg"));
-        mailLink(card, c.email, "TusAlergias: tu reclamación", ["Hola:", "", `Hemos revisado tu reclamación del local «${r ? r.name : ""}» y no la hemos aprobado.`, "Motivo: " + why, "", "Si crees que es un error, responde a este email con la información que lo acredite y lo revisaremos.", "", "TusAlergias · tusalergiasapp@gmail.com"], "📧 Avisar a quien reclama");
+        mailLink(card, c.email, "Comeclaro: tu reclamación", ["Hola:", "", `Hemos revisado tu reclamación del local «${r ? r.name : ""}» y no la hemos aprobado.`, "Motivo: " + why, "", "Si crees que es un error, responde a este email con la información que lo acredite y lo revisaremos.", "", "Comeclaro · tusalergiasapp@gmail.com"], "📧 Avisar a quien reclama");
       }
       catch (e) { alert(errText(e)); }
     });
@@ -712,7 +712,7 @@ El equipo de TusAlergias`;
         if (on) { why = askReason("Quitar la verificación del local", "No hemos podido confirmar con el local que lo gestiona esta cuenta."); if (why === null) return; }
         try {
           await F.updateDoc(ref, on ? { verified: false, verifiedAt: F.deleteField() } : { verified: true, verifiedAt: F.serverTimestamp() }); paint(!on);
-          if (on) mailLink(td, await emailOf(r.ownerUid), `TusAlergias: «${r.name}» ya no aparece como verificado`, reasonLines(r.name, "quitar la etiqueta «✓ Local verificado» (el local sigue publicado).", why, "el punto C8 (Verificación y reclamación de locales)"));
+          if (on) mailLink(td, await emailOf(r.ownerUid), `Comeclaro: «${r.name}» ya no aparece como verificado`, reasonLines(r.name, "quitar la etiqueta «✓ Local verificado» (el local sigue publicado).", why, "el punto C8 (Verificación y reclamación de locales)"));
         }
         catch (e) { alert(errText(e)); }
       });
@@ -809,7 +809,7 @@ El equipo de TusAlergias`;
       tr.children[1].textContent = "— (retirada)";
       tr.lastChild.textContent = "plaza retirada";
       msg("ownersMsg", "✅ Plaza retirada. Ha quedado libre para otra cuenta.", "ok");
-      mailLink($("ownersMsg"), o.email, "TusAlergias: hemos retirado tu plaza de Fundador", reasonLines(null, "retirar la condición de Restaurante Fundador de tu cuenta (tus locales siguen publicados).", why, "el punto C4 (Restaurantes Fundadores)"));
+      mailLink($("ownersMsg"), o.email, "Comeclaro: hemos retirado tu plaza de Fundador", reasonLines(null, "retirar la condición de Restaurante Fundador de tu cuenta (tus locales siguen publicados).", why, "el punto C4 (Restaurantes Fundadores)"));
       loadSummary();
     } catch (e) { msg("ownersMsg", errText(e), "err"); }
   }
