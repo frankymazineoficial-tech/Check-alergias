@@ -205,6 +205,23 @@
   #staffToolsBody { display:flex; flex-direction:column; gap:10px; }
   .profile-bar-info { min-height:32px; box-sizing:border-box; padding:8px 0; }
   .app-copyright { font-size:0.68rem; color:var(--muted); text-align:center; margin:14px 0 4px; line-height:1.5; }
+  @media (min-width: 1100px) {
+    body { padding-bottom:28px; padding-left:232px; }
+    header { margin-left:-232px; padding-left:22px; padding-right:22px; z-index:1600; }
+    .bottom-nav { top:0; bottom:0; right:auto; width:232px; height:auto; display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start; gap:4px; padding:86px 12px 16px; border-top:0; border-right:1px solid var(--border); }
+    .nav-item { flex:none; flex-direction:row; justify-content:flex-start; gap:12px; height:48px; padding:0 14px; border-radius:12px; font-size:0.9rem; }
+    .nav-item:hover { background:rgba(56,189,248,0.08); color:var(--text); }
+    .nav-item.active { background:rgba(56,189,248,0.14); }
+    .fab-scan { order:9; transform:none; width:auto; height:48px; margin:10px 0 0; border:0; border-radius:12px; flex-direction:row; justify-content:flex-start; gap:12px; padding:0 14px; font-size:0.9rem; letter-spacing:0.02em; box-shadow:none; }
+    .fab-scan span { font-size:1.25rem; }
+    .container { max-width:1080px; padding:20px 24px; }
+    .modal-content { max-width:720px; margin-top:40px; }
+    #dishList { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; align-items:start; }
+    #dishList > :not(.dish-card) { grid-column:1 / -1; }
+    #dishList .dish-card { margin-bottom:0; }
+    #dishList:has(.dish-pub-btn) { grid-template-columns:minmax(0, 1fr); }   /* editando la carta, una columna (más sitio para los botones) */
+    #toastBox { left:244px !important; bottom:24px !important; }
+  }
   .review-actions .btn { min-height:30px; }
   #staffToolsBody > * { margin-bottom:10px; }
   .waiter-pick-btn { width:100%; padding:12px; font-size:0.9rem; }
@@ -834,7 +851,7 @@
 <p>No vendemos ni cedemos tus datos, no usamos publicidad ni herramientas de analítica de terceros y no tomamos decisiones automatizadas sobre ti.</p>
 
 <h3>Dónde se guardan</h3>
-<p>La app se descarga desde <b>GitHub Pages</b> (GitHub, Inc., EE. UU.), que recibe, como cualquier web, tu dirección IP y los datos técnicos de tu navegador al abrirla; GitHub está adherida al Marco de Privacidad de Datos UE-EE. UU. Las librerías del mapa, del escáner y del lector de etiquetas se descargan de esa misma web, no de servidores de terceros.</p>
+<p>La app y la web (comeclaro.es) se descargan desde <b>GitHub Pages</b> (GitHub, Inc., EE. UU.), que recibe, como cualquier web, tu dirección IP y los datos técnicos de tu navegador al abrirla; GitHub está adherida al Marco de Privacidad de Datos UE-EE. UU. Las librerías del mapa, del escáner y del lector de etiquetas se descargan de esa misma web, no de servidores de terceros.</p>
 <p>Los datos de la app se guardan en los servidores de Google Firebase (Google Ireland Ltd., que actúa como encargado del tratamiento). La base de datos está alojada en la Unión Europea. El servicio de cuentas de acceso puede tratar datos fuera de la UE con las garantías del Marco de Privacidad de Datos UE-EE. UU. y de las cláusulas contractuales tipo.</p>
 <p>Los pagos de las suscripciones los procesan Google Play (Google Ireland Ltd.) o Stripe Payments Europe, Ltd. (Irlanda), según cómo pagues.</p>
 
@@ -851,6 +868,7 @@
 <ul>
   <li>Tu perfil de alergias, tus platos caseros, tus rutas y tus preferencias (por ejemplo, si quieres ver el mapa), y una copia de las cartas para poder usarlas sin conexión. Son necesarios para que funcione lo que pides.</li>
   <li>Si publicas una opinión o tienes cuenta de restaurante, la sesión de acceso de Firebase y la llave para borrar tus opiniones. También son necesarias.</li>
+  <li><b>En la web de restaurantes</b> (comeclaro.es/restaurantes.html), el navegador guarda tu perfil de alergias (el mismo que el de la app si usas las dos en el mismo navegador), si quieres ver el mapa y una copia de la lista de restaurantes para que cargue más rápido. No nos llega nada de esto. Si pulsas «Cerca de mí», tu ubicación se usa solo en tu navegador para ordenar la lista: no se guarda ni se envía.</li>
   <li>Si tienes cuenta de restaurante y creas el <b>PIN de gestión</b>: un resumen cifrado del PIN (no el PIN), los intentos fallidos y el tiempo de bloqueo. Se quedan en ese móvil y no nos llegan. Sirven para que solo quien conoce el PIN pueda cambiar la carta desde ese móvil.</li>
   <li>Solo si lo permites, el identificador anónimo de las estadísticas de uso.</li>
 </ul>
@@ -1411,7 +1429,7 @@
 </div>
 
 <script>
-const APP_VERSION = "3.10.0";
+const APP_VERSION = "3.11.0";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido

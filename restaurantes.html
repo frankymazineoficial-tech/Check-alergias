@@ -1,0 +1,2471 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Restaurantes con carta de alérgenos · Comeclaro</title>
+<meta name="description" content="Restaurantes de la Región de Murcia con su carta de alérgenos. Marca tus alergias y mira qué platos son compatibles, cuáles se pueden adaptar y cuáles no.">
+<meta name="theme-color" content="#0b132b">
+<link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="canonical" id="canonical" href="https://comeclaro.es/restaurantes.html">
+<meta property="og:type" content="website">
+<meta property="og:title" id="ogTitle" content="Restaurantes con carta de alérgenos · Comeclaro">
+<meta property="og:description" id="ogDesc" content="Marca tus alergias y mira qué platos de cada restaurante son para ti.">
+<meta property="og:url" id="ogUrl" content="https://comeclaro.es/restaurantes.html">
+<meta property="og:site_name" content="Comeclaro">
+<meta property="og:image" content="https://comeclaro.es/icon-512.png">
+<meta property="og:locale" content="es_ES">
+<script src="firebase-config.js"></script>
+<style>
+/* Letra Inter (licencia SIL OFL 1.1), servida desde esta misma web */
+@font-face { font-family: "Inter TA"; src: url("fuente-inter-400.woff") format("woff"); font-weight: 400 500; font-display: swap; }
+@font-face { font-family: "Inter TA"; src: url("fuente-inter-600.woff") format("woff"); font-weight: 600 700; font-display: swap; }
+@font-face { font-family: "Inter TA"; src: url("fuente-inter-800.woff") format("woff"); font-weight: 800 900; font-display: swap; }
+:root {
+  --navy: #0b132b; --navy-2: #1c2541; --navy-line: #2d3a5d;
+  --sky: #38bdf8; --sky-ink: #0e7490; --green: #10b981; --green-ink: #052e1c; --green-dark: #047857;
+  --ink: #0b132b; --text: #334155; --soft: #475569; --mute: #64748b; --line: #e2e8f0; --mist: #f1f5f9; --white: #ffffff;
+  --ok-bg: #d1fae5; --ok-ink: #065f46; --mod-bg: #fef3c7; --mod-ink: #92400e; --no-bg: #fee2e2; --no-ink: #991b1b;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--mist); color: var(--ink); font-family: "Inter TA", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+a { color: var(--sky-ink); }
+a:hover { color: var(--ink); }
+button { font: inherit; }
+:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; border-radius: 6px; }
+.skip { position: absolute; left: -999px; top: 8px; background: var(--white); color: var(--ink); padding: 10px 14px; border-radius: 8px; z-index: 50; }
+.skip:focus { left: 8px; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+h1, h2, h3, h4 { margin: 0; letter-spacing: -0.015em; }
+p { margin: 0; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Botones */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 10px; font-size: 15px; font-weight: 700; text-decoration: none; border: 1.5px solid transparent; cursor: pointer; background: none; color: var(--ink); }
+.btn-green { background: var(--green); color: var(--green-ink); }
+.btn-green:hover { background: #34d399; color: var(--green-ink); }
+.btn-navy { background: var(--navy); color: var(--white); }
+.btn-navy:hover { background: var(--navy-2); color: var(--white); }
+.btn-line { border-color: #cbd5e1; background: var(--white); color: var(--ink); }
+.btn-line:hover { border-color: var(--ink); color: var(--ink); }
+.btn-amber { background: #f59e0b; color: #1f1300; }
+.btn-amber:hover { background: #fbbf24; color: #1f1300; }
+.btn-sm { min-height: 36px; padding: 0 12px; font-size: 14px; border-radius: 9px; }
+
+/* Cabecera (igual que la portada) */
+.top-bar { background: var(--navy); color: #f8fafc; }
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding-top: 16px; padding-bottom: 16px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #f8fafc; font-size: 21px; font-weight: 800; letter-spacing: -0.02em; }
+.brand:hover { color: #f8fafc; }
+.brand img { width: 40px; height: 40px; border-radius: 10px; }
+.nav { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 22px; font-size: 15px; font-weight: 600; }
+.nav a { color: #e2e8f0; text-decoration: none; padding: 8px 0; }
+.nav a:hover, .nav a[aria-current="page"] { color: var(--white); }
+.nav a[aria-current="page"] { box-shadow: inset 0 -2px 0 var(--green); }
+.nav .nav-cta { background: var(--sky); color: var(--navy); padding: 10px 16px; border-radius: 10px; font-weight: 700; box-shadow: none; }
+.nav .nav-cta:hover { background: #7dd3fc; color: var(--navy); }
+
+/* Buscador */
+.search-band { background: var(--navy); color: #f8fafc; padding: 18px 0 30px; }
+.search-band h1 { font-size: clamp(26px, 3.4vw, 38px); line-height: 1.12; font-weight: 800; }
+.search-band .sub { color: #cbd5e1; margin-top: 6px; font-size: 16px; }
+.searchbox { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.search-field { flex: 1 1 360px; display: flex; align-items: center; gap: 10px; background: var(--white); border-radius: 12px; padding: 0 14px; min-height: 52px; }
+.search-field svg { flex: none; width: 20px; height: 20px; color: var(--mute); }
+.search-field input { flex: 1; border: 0; outline: 0; font: inherit; font-size: 16px; color: var(--ink); min-width: 0; background: none; padding: 12px 0; }
+.search-field:focus-within { box-shadow: 0 0 0 3px var(--sky); }
+.prof-btn { min-height: 52px; border-radius: 12px; padding: 0 20px; font-size: 16px; }
+.prof-line { margin-top: 12px; font-size: 14px; color: #cbd5e1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.prof-line .chipx { background: rgba(56,189,248,0.16); color: #e0f2fe; border: 1px solid rgba(56,189,248,0.45); border-radius: 999px; padding: 2px 10px; font-size: 13px; font-weight: 600; }
+.prof-line button { background: none; border: 0; color: var(--sky); font-weight: 700; cursor: pointer; padding: 4px 2px; text-decoration: underline; font-size: 14px; }
+
+/* Resultados: lista + mapa */
+.results { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr); gap: 24px; padding-top: 22px; padding-bottom: 40px; align-items: start; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.count { font-size: 15px; color: var(--soft); font-weight: 600; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.fchip { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 14px; border-radius: 999px; border: 1.5px solid #cbd5e1; background: var(--white); color: var(--ink); font-size: 14px; font-weight: 600; cursor: pointer; }
+.fchip:hover { border-color: var(--ink); }
+.fchip[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: var(--white); }
+select.fchip { padding-right: 10px; }
+.rlist { display: flex; flex-direction: column; gap: 12px; }
+.rcard { display: flex; gap: 16px; align-items: center; justify-content: space-between; background: var(--white); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; text-decoration: none; color: var(--ink); transition: border-color .15s, box-shadow .15s; }
+.rcard:hover, .rcard.hl { border-color: #94a3b8; box-shadow: 0 6px 18px rgba(15,23,42,0.08); color: var(--ink); }
+.rcard h2 { font-size: 19px; font-weight: 800; }
+.rcard .meta { font-size: 14px; color: var(--soft); margin-top: 4px; }
+.rcard .go { flex: none; font-weight: 700; color: var(--green-dark); font-size: 15px; white-space: nowrap; }
+.badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.badge { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; background: var(--mist); color: var(--soft); border: 1px solid var(--line); }
+.badge.ver { background: var(--ok-bg); color: var(--ok-ink); border-color: #a7f3d0; }
+.badge.fund { background: #ede9fe; color: #5b21b6; border-color: #ddd6fe; }
+.badge.demo { background: var(--mod-bg); color: var(--mod-ink); border-color: #fde68a; }
+.empty { background: var(--white); border: 1px dashed #cbd5e1; border-radius: 16px; padding: 28px 22px; text-align: center; color: var(--soft); display: flex; flex-direction: column; gap: 12px; align-items: center; }
+.empty strong { color: var(--ink); font-size: 18px; }
+.mapbox { position: sticky; top: 16px; height: calc(100vh - 32px); min-height: 420px; max-height: 820px; border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: #e2e8f0; }
+.mapbox #map { width: 100%; height: 100%; }
+.consent { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px; text-align: center; color: var(--soft); font-size: 14px; background: linear-gradient(180deg, #e0f2fe, #f1f5f9); }
+.consent .ico { font-size: 40px; }
+.maptoggle { display: none; }
+.leaflet-popup-content { font-family: "Inter TA", system-ui, sans-serif; font-size: 14px; }
+.leaflet-popup-content a.btn { min-height: 34px; margin-top: 8px; color: var(--green-ink); }
+
+/* Ficha del restaurante */
+.detail { padding-top: 18px; padding-bottom: 48px; }
+.back { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; text-decoration: none; color: var(--soft); min-height: 40px; }
+.back:hover { color: var(--ink); }
+.dgrid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 28px; align-items: start; margin-top: 6px; }
+.rhead { background: var(--white); border: 1px solid var(--line); border-radius: 20px; padding: 26px 26px 22px; display: flex; flex-direction: column; gap: 8px; }
+.rhead h1 { font-size: clamp(28px, 3.4vw, 40px); line-height: 1.08; font-weight: 800; }
+.rhead .meta { color: var(--soft); font-size: 15px; }
+.fresh { font-size: 14px; color: var(--ok-ink); font-weight: 600; }
+.fresh.stale { color: var(--mod-ink); }
+.ractions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.secnav { position: sticky; top: 0; z-index: 20; background: var(--mist); display: flex; gap: 4px; padding: 14px 0 10px; border-bottom: 1px solid var(--line); margin-top: 18px; }
+.secnav a { text-decoration: none; color: var(--soft); font-weight: 700; padding: 8px 14px; border-radius: 999px; font-size: 15px; }
+.secnav a:hover, .secnav a.on { background: var(--white); color: var(--ink); box-shadow: 0 1px 0 var(--line); }
+.sec { padding-top: 22px; scroll-margin-top: 70px; }
+.sec > h2 { font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+.panel { background: var(--white); border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
+.legal-note { font-size: 13.5px; color: var(--soft); background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 10px 14px; margin-bottom: 14px; }
+.profbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; margin-bottom: 14px; font-size: 15px; }
+.profbar b { color: var(--ink); }
+.seg { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.seg button { min-height: 40px; padding: 0 14px; border-radius: 10px; border: 1.5px solid #cbd5e1; background: var(--white); font-weight: 700; font-size: 14px; cursor: pointer; color: var(--ink); }
+.seg button[aria-pressed="true"].s-all { background: var(--navy); border-color: var(--navy); color: var(--white); }
+.seg button[aria-pressed="true"].s-aptos { background: var(--ok-ink); border-color: var(--ok-ink); color: var(--white); }
+.seg button[aria-pressed="true"].s-mod { background: #b45309; border-color: #b45309; color: var(--white); }
+.seg button[aria-pressed="true"].s-proh { background: #b91c1c; border-color: #b91c1c; color: var(--white); }
+.menu-tools { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+.menu-tools .search-field { flex: 1 1 260px; min-height: 44px; border: 1.5px solid #cbd5e1; border-radius: 10px; }
+.menu-tools select { min-height: 44px; border-radius: 10px; border: 1.5px solid #cbd5e1; padding: 0 10px; background: var(--white); font: inherit; font-size: 15px; color: var(--ink); max-width: 100%; }
+.cathead { font-size: 13px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--sky-ink); margin: 22px 0 10px; }
+.dishes { display: flex; flex-direction: column; gap: 10px; }
+.dish { background: var(--white); border: 1px solid var(--line); border-left: 5px solid #cbd5e1; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.dish.aptos { border-left-color: var(--green); }
+.dish.mod { border-left-color: #f59e0b; }
+.dish.proh { border-left-color: #ef4444; }
+.dish header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.dish h4 { font-size: 16.5px; font-weight: 800; }
+.st { flex: none; font-size: 12px; font-weight: 800; letter-spacing: 0.03em; padding: 4px 9px; border-radius: 8px; }
+.st.aptos { background: var(--ok-bg); color: var(--ok-ink); }
+.st.mod { background: var(--mod-bg); color: var(--mod-ink); }
+.st.proh { background: var(--no-bg); color: var(--no-ink); }
+.why { font-size: 14px; border-radius: 10px; padding: 8px 11px; }
+.why.mod { background: #fffbeb; color: var(--mod-ink); }
+.why.proh { background: #fef2f2; color: var(--no-ink); }
+.why.tr { background: #f0f9ff; color: #075985; }
+.why.eq { background: #fff7ed; color: #9a3412; }
+.why.pro { background: #f5f3ff; color: #5b21b6; }
+.comps { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 0; list-style: none; }
+.comps li { font-size: 13.5px; background: var(--mist); border: 1px solid var(--line); border-radius: 8px; padding: 4px 9px; color: var(--text); }
+.comps li b { color: var(--ink); font-weight: 600; }
+.comps .al { color: var(--sky-ink); font-weight: 700; }
+.comps .ale { color: #c2410c; font-weight: 700; }
+.comps .rm { color: var(--mod-ink); font-weight: 700; }
+.dal { font-size: 14px; color: var(--text); }
+.dal b { color: var(--ink); }
+.dal .maybe { color: var(--soft); }
+.aptos-note { font-size: 14px; color: var(--ok-ink); background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 10px 14px; margin-bottom: 4px; }
+.muted { color: var(--soft); font-size: 15px; }
+.lock { text-align: center; }
+/* Opiniones */
+.rsum { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+.rsum .big { font-size: 34px; font-weight: 800; }
+.stars { color: #f59e0b; letter-spacing: 1px; }
+.reviews { display: flex; flex-direction: column; gap: 10px; }
+.review { background: var(--white); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.review .rh { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; font-size: 14px; color: var(--soft); }
+.review .rh b { color: var(--ink); font-size: 15px; }
+.review p { font-size: 15px; color: var(--text); }
+.review .twin { font-size: 13px; font-weight: 700; color: var(--ok-ink); }
+.review .alls { font-size: 13px; color: var(--soft); }
+.review.alert { border-color: #fecaca; background: #fff7f7; }
+.review.alert.done { border-color: #a7f3d0; background: #f0fdf4; }
+.review .reply { border-left: 3px solid var(--sky); background: #f0f9ff; border-radius: 8px; padding: 8px 10px; font-size: 14px; color: var(--text); }
+.review .resolved { font-size: 13px; font-weight: 700; color: var(--ok-ink); }
+.rnote { font-size: 13px; color: var(--soft); margin-top: 10px; }
+/* Lateral */
+.aside { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 14px; }
+.aside .panel h2 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+.aside .panel p { font-size: 14.5px; color: var(--soft); }
+.aside .panel .btn { width: 100%; margin-top: 12px; }
+.minimap { height: 210px; border-radius: 12px; overflow: hidden; margin-top: 12px; background: #e2e8f0; }
+.minimap .consent { font-size: 13px; gap: 8px; padding: 12px; }
+.info-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 15px; }
+.info-list li { display: flex; gap: 10px; }
+.info-list li span:first-child { flex: none; width: 22px; text-align: center; }
+.loading { padding: 40px 0; text-align: center; color: var(--soft); }
+
+/* Panel «Mis alergias» */
+.ovl { position: fixed; inset: 0; background: rgba(2,6,23,0.55); z-index: 3000; display: none; align-items: flex-start; justify-content: center; padding: 4vh 12px; overflow-y: auto; }
+.ovl.open { display: flex; }
+.dlg { background: var(--white); border-radius: 20px; width: 100%; max-width: 720px; padding: 22px 22px 18px; box-shadow: 0 30px 80px rgba(0,0,0,0.35); }
+.dlg-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px; }
+.dlg-head h2 { font-size: 22px; font-weight: 800; }
+.xbtn { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--white); font-size: 20px; cursor: pointer; color: var(--ink); }
+.dlg h3 { font-size: 14px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sky-ink); margin: 18px 0 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { min-height: 38px; padding: 0 13px; border-radius: 999px; border: 1.5px solid #cbd5e1; background: var(--white); color: var(--ink); font-weight: 600; font-size: 14px; cursor: pointer; }
+.chip:hover { border-color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--no-bg); border-color: #f87171; color: var(--no-ink); }
+.chip.diet[aria-pressed="true"] { background: #ede9fe; border-color: #a78bfa; color: #5b21b6; }
+.chip.cus[aria-pressed="true"] { background: var(--mod-bg); border-color: #f59e0b; color: var(--mod-ink); }
+.addrow { display: flex; gap: 8px; margin-top: 10px; }
+.addrow input { flex: 1; min-width: 0; min-height: 44px; border: 1.5px solid #cbd5e1; border-radius: 10px; padding: 0 12px; font: inherit; font-size: 15px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.tag-x { min-height: 34px; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; border-radius: 999px; background: var(--mod-bg); color: var(--mod-ink); border: 1px solid #fcd34d; font-weight: 700; font-size: 13px; cursor: pointer; }
+.cinfo details { font-size: 14px; color: var(--soft); background: var(--mist); border-radius: 10px; padding: 8px 11px; margin-top: 8px; }
+.cinfo summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+.cinfo .sug { margin-top: 10px; font-size: 14px; color: var(--soft); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.strict { display: flex; gap: 10px; align-items: flex-start; margin-top: 18px; font-size: 15px; background: var(--mist); border-radius: 12px; padding: 12px; cursor: pointer; }
+.strict input { width: 20px; height: 20px; margin-top: 2px; flex: none; }
+.dlg-legal { font-size: 13px; color: var(--soft); margin-top: 14px; }
+.dlg-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-top: 16px; position: sticky; bottom: -18px; background: var(--white); padding: 12px 0 2px; }
+
+/* Pie */
+.warnline { padding: 26px 0 40px; }
+.warnline p { font-size: 14px; color: var(--soft); border-top: 1px solid var(--line); padding-top: 22px; }
+footer { background: var(--navy); color: #94a3b8; font-size: 14px; }
+footer .wrap { padding-top: 34px; padding-bottom: 34px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 24px; }
+footer nav { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+footer a { color: var(--sky); display: inline-block; padding: 6px 0; min-height: 24px; }
+footer a:hover { color: #7dd3fc; }
+
+@media (max-width: 1000px) {
+  .results { grid-template-columns: 1fr; }
+  .mapbox { display: none; position: relative; top: 0; height: 70vh; min-height: 380px; }
+  body.show-map .mapbox { display: block; }
+  body.show-map .rcol { display: none; }
+  .maptoggle { display: inline-flex; position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 2000; box-shadow: 0 10px 26px rgba(2,6,23,0.35); }
+  .dgrid { grid-template-columns: 1fr; }
+  .aside { position: static; }
+}
+@media (max-width: 640px) {
+  .wrap { padding: 0 16px; }
+  .nav { gap: 4px 16px; font-size: 14px; }
+  .rcard { padding: 16px; align-items: flex-start; flex-direction: column; gap: 10px; }
+  .rhead { padding: 20px 18px 18px; }
+  .secnav { overflow-x: auto; }
+  .dlg { padding: 18px 16px 14px; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<header class="top-bar"><div class="wrap top">
+<a class="brand" href="./" aria-label="Comeclaro, inicio"><img src="icon-192.png" alt="" width="40" height="40">Comeclaro</a>
+<nav class="nav" aria-label="Principal">
+<a href="restaurantes.html" aria-current="page">Restaurantes</a>
+<a href="./#casa">En casa</a>
+<a href="./#hosteleria">Para restaurantes</a>
+<a class="nav-cta" href="app.html?accion=hosteleria">Acceso hostelería</a>
+</nav>
+</div></header>
+
+<main id="contenido" tabindex="-1">
+<!-- LISTA DE RESTAURANTES -->
+<div id="listView">
+<section class="search-band" aria-labelledby="listTitle"><div class="wrap">
+<h1 id="listTitle">Restaurantes con carta de alérgenos</h1>
+<p class="sub">Región de Murcia · Marca tus alergias y cada carta te dice qué platos son para ti.</p>
+<div class="searchbox" role="search">
+<label class="search-field" for="q">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+<span class="sr">Buscar restaurante o localidad</span>
+<input id="q" type="search" autocomplete="off" placeholder="Nombre del restaurante o localidad">
+</label>
+<button class="btn btn-amber prof-btn" type="button" data-open-profile>Mis alergias</button>
+</div>
+<div class="prof-line" id="profLine" aria-live="polite"></div>
+</div></section>
+
+<div class="wrap results">
+<div class="rcol">
+<div class="toolbar">
+<p class="count" id="count" aria-live="polite">Cargando restaurantes…</p>
+<div class="filters">
+<button class="fchip" type="button" id="fVerified" aria-pressed="false">✓ Solo verificados</button>
+<button class="fchip" type="button" id="fNear" aria-pressed="false">📍 Cerca de mí</button>
+<label class="sr" for="sortSel">Ordenar</label>
+<select class="fchip" id="sortSel">
+<option value="rec">Recomendados</option>
+<option value="az">Nombre (A-Z)</option>
+<option value="near">Distancia</option>
+</select>
+</div>
+</div>
+<div class="rlist" id="rlist"></div>
+</div>
+<aside class="mapbox" id="mapBox" aria-label="Mapa de restaurantes"></aside>
+</div>
+<button class="btn btn-navy maptoggle" type="button" id="mapToggle" aria-pressed="false">🗺️ Ver mapa</button>
+</div>
+
+<!-- FICHA DE UN RESTAURANTE -->
+<div id="detailView" hidden>
+<div class="wrap detail" id="detail"></div>
+</div>
+
+<section class="wrap warnline" aria-label="Aviso importante">
+<p>La información de cada carta la publica el restaurante. Los filtros de Comeclaro son orientativos y pueden contener errores o estar desactualizados: avisa siempre de tus alergias al personal del local y confírmalas antes de pedir. Si tu alergia es grave, sigue las indicaciones de tu médico.</p>
+</section>
+</main>
+
+<!-- PANEL «MIS ALERGIAS» -->
+<div class="ovl" id="profOvl">
+<div class="dlg" role="dialog" aria-modal="true" aria-labelledby="profTitle">
+<div class="dlg-head"><h2 id="profTitle">Mis alergias</h2><button class="xbtn" type="button" data-close-profile aria-label="Cerrar">✕</button></div>
+<p class="muted">Marca lo que no puedes comer. Se guarda solo en este navegador; si usas la app en este mismo navegador, comparten el perfil.</p>
+<h3>Los 14 alérgenos</h3>
+<div class="chips" id="pAl"></div>
+<h3>Dieta</h3>
+<div class="chips" id="pDi"></div>
+<h3>Otros alimentos que te sientan mal</h3>
+<div class="chips" id="pQuick"></div>
+<form class="addrow" id="pAddForm">
+<label class="sr" for="pCustom">Añadir otro alimento</label>
+<input id="pCustom" maxlength="60" placeholder="Escribe otro alimento (p. ej., pimiento)" autocomplete="off">
+<button class="btn btn-navy btn-sm" type="submit">Añadir</button>
+</form>
+<div class="tags" id="pTags"></div>
+<div class="cinfo" id="pInfo"></div>
+<label class="strict"><input type="checkbox" id="pStrict"><span><b>Las trazas me afectan</b><br><span class="muted">Si lo marcas, los platos que pueden tener trazas de tus alérgenos salen como no aptos.</span></span></label>
+<p class="dlg-legal">Al usar el filtro aceptas el <a href="condiciones.html">aviso legal y las condiciones de uso</a>. Las cartas las publica cada restaurante, que responde de sus ingredientes y alérgenos; el resultado es orientativo. Lee también la <a href="privacidad.html">política de privacidad</a>.</p>
+<div class="dlg-foot">
+<button class="btn btn-line" type="button" id="pClear">Borrar todo</button>
+<button class="btn btn-green" type="button" data-close-profile>Ver resultados</button>
+</div>
+</div>
+</div>
+
+<footer>
+<div class="wrap">
+<span>© 2026 Francisco José Ureña Castillo · Lorca (Murcia)</span>
+<nav aria-label="Legal">
+<a href="condiciones.html">Aviso legal y condiciones</a>
+<a href="privacidad.html">Privacidad</a>
+<a href="mailto:tusalergiasapp@gmail.com">tusalergiasapp@gmail.com</a>
+</nav>
+</div>
+</footer>
+
+<script>
+const APP_VERSION = "3.11.0";
+// Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
+const PLAN = {
+  monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
+  founderMonthly: "9,99\u00a0€", founderYearly: "99,99\u00a0€",     // precio de Fundador, IVA incluido
+  founderMax: 30, founderFreeMonths: 12, maxRestaurants: 3, noticeDays: 30,
+  founderFreeDays: 365,      // los 12 meses gratis de los Fundadores, contados desde el inicio del cobro
+  graceDays: 7,              // días de margen tras el inicio del cobro (o tras el año gratis) antes de ocultar la carta
+  termsVersion: "2026-10-21"
+};
+// Versión del aviso legal y condiciones de uso que acepta en la bienvenida quien consulta cartas.
+// Si cambia, la bienvenida vuelve a salir para que se acepten las nuevas.
+const LEGAL_VERSION = "2026-10-21";
+const DAY_MS = 86400000;
+const ALLERGENS = ["GLUTEN","CRUSTÁCEOS","HUEVO","PESCADO","CACAHUETES","SOJA","LÁCTEO","FRUTOS CON CÁSCARA","APIO","MOSTAZA","SÉSAMO","SULFITOS","ALTRAMUCES","MOLUSCOS"];
+const DIETS = [{id:"CRUDO_EMBARAZO",label:"🤰 Embarazada"},{id:"NO_VEGANO",label:"🌱 Vegano"},{id:"NO_VEGETARIANO",label:"🥚 Vegetariano"},{id:"CERDO",label:"🚫🐷 Sin Cerdo"},{id:"PICANTE",label:"🌶️ Sin Picante"}];
+const DIET_IDS = DIETS.map(d => d.id);
+const QUICK_CUSTOM_INGS = ["Ajo","Cebolla","Manzana","Maíz","Aguacate","Tomate","Cilantro","Jengibre","Limón","Ñora","Setas"];
+
+const SAMPLE_12_DISHES = [
+  { id:1, cat:"ENTRANTES", name:"BURRATA ARTESANA CON PESTO", traces:[], protocol:"Sin pesto ni picatostes bajo pedido.", ings:[{n:"Burrata",a:["LÁCTEO"],tags:["NO_VEGANO"],sub:"leche",mod:false},{n:"Pesto casero",a:["FRUTOS CON CÁSCARA","LÁCTEO"],tags:["NO_VEGANO"],sub:"piñones, ajo, queso",mod:true,note:"Servir solo con AOVE"},{n:"Picatostes",a:["GLUTEN"],tags:[],sub:"trigo",mod:true,note:"Sin picatostes"}] },
+  { id:2, cat:"COMPARTIR", name:"PATATAS BRAVAS TRADICIONALES", traces:["GLUTEN"], protocol:"Freidora limpia exclusiva para celíacos.", ings:[{n:"Patata agria",a:[],tags:[],sub:"patata",mod:false},{n:"Salsa Brava velouté",a:["GLUTEN","SULFITOS"],tags:["PICANTE","NO_VEGANO"],sub:"caldo de ave, harina, pimentón, cayena, ajo",mod:true,note:"Sin salsa brava"},{n:"Alioli",a:["HUEVO"],tags:["NO_VEGANO"],sub:"ajo, huevo",mod:true,note:"Sin alioli"}] },
+  { id:3, cat:"COMPARTIR", name:"CROQUETAS CREMOSAS DE IBÉRICO", traces:[], protocol:"Bechamel tradicional no adaptable.", ings:[{n:"Bechamel y jamón",a:["GLUTEN","LÁCTEO","HUEVO"],tags:["CERDO","NO_VEGANO","NO_VEGETARIANO"],sub:"harina, leche, jamón",mod:false}] },
+  { id:4, cat:"ENTRANTES", name:"TARTAR DE ATÚN ROJO Y AGUACATE", traces:[], protocol:"Aliñar al natural con AOVE.", ings:[{n:"Atún y aguacate",a:["PESCADO"],tags:["CRUDO_EMBARAZO","NO_VEGANO","NO_VEGETARIANO"],sub:"atún, aguacate, lima",mod:false},{n:"Teriyaki",a:["GLUTEN","SOJA","SÉSAMO"],tags:[],sub:"soja, trigo",mod:true,note:"Aliñar solo con AOVE"}] },
+  { id:5, cat:"ENTRANTES", name:"ALCACHOFAS CONFITADAS A LA PLANCHA", traces:[], protocol:"Plancha limpia.", ings:[{n:"Alcachofa",a:[],tags:[],sub:"alcachofa",mod:false},{n:"Jamón ibérico",a:[],tags:["CERDO","NO_VEGANO","NO_VEGETARIANO"],sub:"jamón",mod:true,note:"Sin jamón"},{n:"Piñones",a:["FRUTOS CON CÁSCARA"],tags:[],sub:"piñones",mod:true,note:"Sin piñones"}] },
+  { id:6, cat:"ENTRANTES", name:"ENSALADA DE CABRA Y MANZANA", traces:["CACAHUETES"], protocol:"Bol limpio.", ings:[{n:"Brotes y manzana",a:[],tags:[],sub:"lechuga, manzana",mod:false},{n:"Queso cabra",a:["LÁCTEO"],tags:["NO_VEGANO"],sub:"leche",mod:true,note:"Sin queso"},{n:"Nueces",a:["FRUTOS CON CÁSCARA"],tags:[],sub:"nueces",mod:true,note:"Sin nueces"}] },
+  { id:7, cat:"ARROCES", name:"ARROZ DEL SEÑORET MEDITERRÁNEO", traces:[], protocol:"Caldo natural sin harinas.", ings:[{n:"Arroz, sepia y gamba roja",a:["CRUSTÁCEOS","MOLUSCOS","PESCADO"],tags:["NO_VEGANO","NO_VEGETARIANO"],sub:"arroz, gamba roja, sepia, ñora, ajo, tomate",mod:false},{n:"Alioli",a:["HUEVO"],tags:["NO_VEGANO"],sub:"ajo, huevo",mod:true,note:"Sin salsera de alioli"}] },
+  { id:8, cat:"ARROCES", name:"RISOTTO DE BOLETUS Y TRUFA", traces:[], protocol:"Terminar con AOVE sin lácteos bajo petición.", ings:[{n:"Arroz y setas",a:["SULFITOS"],tags:[],sub:"arroz, boletus, vino, ajo, cebolla",mod:false},{n:"Mantequilla y parmesano",a:["LÁCTEO"],tags:["NO_VEGANO"],sub:"leche",mod:true,note:"Sin mantecar con lácteos"}] },
+  { id:9, cat:"PRINCIPALES", name:"CORVINA SALVAJE A LA BRASA", traces:[], protocol:"Parrilla limpia.", ings:[{n:"Corvina y verduras",a:["PESCADO"],tags:["NO_VEGANO","NO_VEGETARIANO"],sub:"corvina, calabacín",mod:false},{n:"Refrito de ajo y guindilla",a:[],tags:["PICANTE"],sub:"ajo, guindilla",mod:true,note:"Sin refrito de ajo ni guindilla"}] },
+  { id:10, cat:"PRINCIPALES", name:"PRESA IBÉRICA GLASEADA", traces:[], protocol:"Bien pasada para embarazadas.", ings:[{n:"Presa y patata",a:[],tags:["CERDO","NO_VEGANO","NO_VEGETARIANO"],sub:"cerdo, patata",mod:false},{n:"Glaseado Teriyaki",a:["GLUTEN","SOJA","SÉSAMO"],tags:[],sub:"soja, trigo",mod:true,note:"Asar solo con sal en escamas"}] },
+  { id:11, cat:"POSTRES", name:"TARTA DE QUESO AL HORNO", traces:["FRUTOS CON CÁSCARA"], protocol:"Lácteos pasteurizados.", ings:[{n:"Crema queso y galleta",a:["GLUTEN","LÁCTEO","HUEVO"],tags:["NO_VEGANO"],sub:"queso, huevo, harina",mod:false}] },
+  { id:12, cat:"POSTRES", name:"CARPACCIO DE PIÑA Y COCO", traces:[], protocol:"100% vegetal sin gluten.", ings:[{n:"Piña y coco",a:[],tags:[],sub:"piña, coco, menta",mod:false},{n:"Garrapiñado de cacahuete y sésamo",a:["CACAHUETES","SÉSAMO"],tags:[],sub:"cacahuete, sésamo",mod:true,note:"Sin garrapiñado"}] }
+];
+
+function makePilotRest() {
+  return {
+    id: "pilot_1", name: "Restaurante Piloto (Muestra 12 Platos)", city: "Puerto de Mazarrón", phone: "34600000000", pass: "2026", lat: 37.5630, lng: -1.3090,
+    unclaimed: false, demo: true, lastVerified: "Hoy",
+    stats: { views: 145, saves: 36, bookings: 12, alerts: 0, requests: 0 },
+    reviews: [{ id: 1, author: "Elena G.", stars: 5, allergens: "GLUTEN, LÁCTEO", comment: "Controlan perfectamente las trazas y adaptaron la burrata y el arroz.", date: "Hoy", isAlert: false }],
+    menu: JSON.parse(JSON.stringify(SAMPLE_12_DISHES))
+  };
+}
+function makeDefaultHomeLists() {
+  return [{ id: "hl_default", name: "🍲 Mis Platos en Casa", dishes: [] }, { id: "hl_tuppers", name: "🍱 Cenas y Tuppers", dishes: [] }];
+}
+
+// ---------- Utilidades ----------
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, m => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[m])); }
+function closeModal(id) { const el = document.getElementById(id); if (el) el.style.display = "none"; }
+function openModal(id) { const el = document.getElementById(id); if (el) el.style.display = "block"; }
+function $(id) { return document.getElementById(id); }
+function uid(prefix) { return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+// Los identificadores viajan en atributos onclick: solo letras, números, "_" y "-"
+function safeId(x, prefix = "r_") { const s = String(x == null ? "" : x).replace(/[^A-Za-z0-9_-]/g, "").slice(0, 60); return s || uid(prefix); }
+function str(x, max = 400) { return String(x == null ? "" : x).slice(0, max); }
+function today() { return new Date().toLocaleDateString("es-ES"); }
+
+// ---------- Diálogos propios (Chrome puede bloquear alert/prompt y quedan feos en la app) ----------
+let uiDialogResolve = null, uiDialogIsPrompt = false;
+function openUiDialog({ msg, input = null, okText = "Aceptar", cancelText = "Cancelar", danger = false, showCancel = true, placeholder = "", inputType = "text", inputMode = "" }) {
+  return new Promise(resolve => {
+    if (uiDialogResolve) uiDialogResolve(uiDialogIsPrompt ? null : false);
+    uiDialogResolve = resolve; uiDialogIsPrompt = input !== null;
+    $("uiDialogMsg").textContent = msg;
+    const inp = $("uiDialogInput");
+    inp.style.display = uiDialogIsPrompt ? "block" : "none";
+    inp.type = inputType;
+    inp.inputMode = inputMode;
+    inp.autocomplete = inputType === "password" ? "off" : "";
+    inp.value = uiDialogIsPrompt ? input : "";
+    inp.placeholder = placeholder;
+    $("uiDialogCancel").style.display = showCancel ? "inline-flex" : "none";
+    $("uiDialogCancel").textContent = cancelText;
+    $("uiDialogOk").textContent = okText;
+    $("uiDialogOk").className = "btn " + (danger ? "btn-danger" : "btn-primary");
+    openModal("uiDialog");
+    setTimeout(() => (uiDialogIsPrompt ? inp : $("uiDialogOk")).focus(), 60);
+  });
+}
+function closeUiDialog(ok) {
+  const r = uiDialogResolve; uiDialogResolve = null;
+  closeModal("uiDialog");
+  if (r) r(ok ? (uiDialogIsPrompt ? $("uiDialogInput").value : true) : (uiDialogIsPrompt ? null : false));
+}
+function uiAlert(msg) { return openUiDialog({ msg, showCancel: false }); }
+function uiConfirm(msg, opts = {}) { return openUiDialog({ msg, ...opts }); }
+function uiPrompt(msg, def = "", opts = {}) { return openUiDialog({ msg, input: def, ...opts }); }
+function toast(msg, type = "ok") {
+  const box = $("toastBox");
+  if (!box) return;
+  while (box.children.length >= 3) box.firstChild.remove();   // como mucho 3 avisos a la vez
+  const t = document.createElement("div");
+  t.className = "toast toast-" + type;
+  t.textContent = msg;
+  box.appendChild(t);
+  setTimeout(() => { t.style.opacity = "0"; setTimeout(() => t.remove(), 300); }, 3200);
+}
+
+// ---------- Librerías (mapa, escáner, lector de etiquetas) ----------
+// Desde la 3.6.3 se sirven desde la propia web (junto a index.html) y solo cuando hacen falta:
+// así ningún servidor externo (unpkg, jsDelivr) recibe la dirección IP de quien usa la app.
+// Están en la misma carpeta que la app para que se suban a GitHub todos los archivos de una vez.
+const LIB_DIR = "./";
+function libUrl(file) { try { return new URL(LIB_DIR + (file || ""), location.href).href; } catch (e) { return LIB_DIR + (file || ""); } }
+const LIBS = {
+  leaflet: { test: () => typeof L !== "undefined" && !!L.map, js: [LIB_DIR + "leaflet.js"], css: LIB_DIR + "leaflet.css" },
+  scanner: { test: () => typeof Html5Qrcode !== "undefined", js: [LIB_DIR + "html5-qrcode.min.js"] },
+  ocr: { test: () => typeof Tesseract !== "undefined", js: [LIB_DIR + "tesseract.min.js"] }
+};
+// Opciones del lector de etiquetas: su programa, su núcleo y el idioma español, también desde la propia web
+function ocrOptions() { return { workerPath: libUrl("tesseract-worker.min.js"), corePath: libUrl(""), langPath: libUrl("").replace(/\/$/, "") }; }
+const libLoading = {};
+function loadScript(src, timeout = 15000) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = src; s.async = true;
+    const t = setTimeout(() => { s.remove(); reject(new Error("timeout")); }, timeout);
+    s.onload = () => { clearTimeout(t); resolve(); };
+    s.onerror = () => { clearTimeout(t); s.remove(); reject(new Error("load")); };
+    document.head.appendChild(s);
+  });
+}
+function ensureLib(name) {
+  const lib = LIBS[name];
+  if (lib.test()) return Promise.resolve(true);
+  if (!libLoading[name]) {
+    libLoading[name] = (async () => {
+      if (lib.css && !document.querySelector(`link[href="${lib.css}"]`)) {
+        const l = document.createElement("link"); l.rel = "stylesheet"; l.href = lib.css; document.head.appendChild(l);
+      }
+      for (const src of lib.js) {
+        try { await loadScript(src); if (lib.test()) return true; } catch (e) {}
+      }
+      return lib.test();
+    })().then(ok => { if (!ok) delete libLoading[name]; return ok; });
+  }
+  return libLoading[name];
+}
+// ¿Se está viendo dentro de una vista previa (por ejemplo, la de Claude) o desde un archivo descargado?
+function inPreview() {
+  if (!/^https?:$/.test(location.protocol)) return true;
+  try { return window.self !== window.top; } catch (e) { return true; }
+}
+function libFailText(what) {
+  if (inPreview()) return `${what} no funciona en esta vista previa porque no tiene acceso a internet. Abre la app desde su dirección web de GitHub Pages (la que empieza por https://).`;
+  if (navigator.onLine === false) return `${what} necesita internet y ahora no hay conexión.`;
+  return `No se pudo descargar ${what.toLowerCase()}. Puede que la red o un bloqueador de anuncios lo impida. Inténtalo de nuevo o prueba con otra conexión (wifi o datos).`;
+}
+function netFailText() {
+  if (inPreview()) return "Esta vista previa no tiene acceso a internet: abre la app desde su dirección web de GitHub Pages.";
+  if (navigator.onLine === false) return "No hay conexión a internet.";
+  return "Revisa tu conexión e inténtalo de nuevo.";
+}
+
+// Aviso visible si ocurre un error de programa (para poder diagnosticar en el móvil)
+window.addEventListener("error", e => {
+  let b = $("errBanner");
+  if (!b) {
+    b = document.createElement("div"); b.id = "errBanner";
+    b.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:9999;background:#7f1d1d;color:#fff;font-size:0.72rem;padding:6px 10px;";
+    b.onclick = () => b.remove(); document.body.appendChild(b);
+  }
+  b.textContent = "⚠️ Error: " + e.message + " (toca para cerrar)";
+});
+
+// ---------- Estado guardado en el móvil ----------
+const STATE_KEY = "tusalergias_v15_final", PROFILE_KEY = "tusalergias_profile_v1";
+
+function sanitizeIng(i) {
+  i = i || {};
+  const out = {
+    n: str(i.n, 160), sub: str(i.sub, 800), mod: !!i.mod, note: str(i.note, 200),
+    a: (Array.isArray(i.a) ? i.a : []).filter(x => ALLERGENS.includes(x)),
+    tags: (Array.isArray(i.tags) ? i.tags : []).filter(x => DIET_IDS.includes(x))
+  };
+  const eq = sanitizeEqIds(i.eq);
+  if (eq.length) {
+    out.eq = eq;                              // freidoras o planchas donde se cocina este componente
+    const ap = sanitizeEqIds(i.ap).filter(id => eq.includes(id));
+    if (ap.length) out.ap = ap;               // en cuáles se puede cocinar aparte (cazo o sartén limpios)
+  }
+  return out;
+}
+// ---------- Freidoras y planchas compartidas (3.8) ----------
+// El local da de alta cada equipo. Cada COMPONENTE de un plato dice en qué equipo se cocina
+// (ing.eq: ids). Lo que se cocina en un equipo se calcula de la carta publicada (y se mantiene al
+// día solo); a y f son lo que el local añade a mano porque no está en la carta (otros alérgenos y
+// otros alimentos; f se lee para detectar alérgenos y lo que cada cliente evita, p. ej. pimiento).
+const EQUIP_KINDS = {
+  freidora: { icon: "🍟", label: "Freidora", shared: "aceite compartido", apart: "pedir que lo frían aparte, en un cazo con aceite limpio", apartShort: "se puede freír aparte en un cazo con aceite limpio" },
+  plancha:  { icon: "🍳", label: "Plancha", shared: "plancha compartida", apart: "pedir que lo hagan aparte, en una sartén limpia", apartShort: "se puede hacer aparte en una sartén limpia" }
+};
+const MAX_EQUIP = 12, MAX_ING_EQ = 3;
+function cleanEqId(x) { return String(x == null ? "" : x).replace(/[^A-Za-z0-9_-]/g, "").slice(0, 24); }
+function sanitizeEqIds(list) {
+  return [...new Set((Array.isArray(list) ? list : []).map(cleanEqId).filter(Boolean))].slice(0, MAX_ING_EQ);
+}
+function sanitizeEquipItem(e) {
+  e = e || {};
+  const k = Object.prototype.hasOwnProperty.call(EQUIP_KINDS, e.k) ? e.k : "freidora";
+  return {
+    i: cleanEqId(e.i) || uid("e"), k,
+    n: str(e.n, 40) || EQUIP_KINDS[k].label,
+    a: ALLERGENS.filter(x => (Array.isArray(e.a) ? e.a : []).includes(x)),
+    f: str(e.f, 300)
+  };
+}
+function sanitizeEquip(list, max = MAX_EQUIP) {
+  const seen = new Set();
+  return (Array.isArray(list) ? list : []).slice(0, max).map(sanitizeEquipItem).filter(e => !seen.has(e.i) && seen.add(e.i));
+}
+function sanitizeMenu(menu) {
+  const used = new Set();
+  return (Array.isArray(menu) ? menu : []).slice(0, 300).map((d, k) => {
+    d = d || {};
+    let id = Math.floor(Number(d.id));
+    if (!Number.isFinite(id) || id <= 0 || used.has(id)) id = Date.now() + k;
+    used.add(id);
+    const ings = (Array.isArray(d.ings) ? d.ings : []).slice(0, 40).map(sanitizeIng);
+    // 3.7 guardaba la freidora en el plato entero: pasa a todos sus componentes
+    const old = sanitizeEqIds(Array.isArray(d.eq) ? d.eq.map(e => e && typeof e === "object" ? e.i : e) : []);
+    if (old.length) ings.forEach(i => { if (!i.eq) i.eq = old.slice(); });
+    return {
+      id, cat: str(d.cat, 60) || "CARTA", name: str(d.name, 160) || "PLATO", protocol: str(d.protocol, 300), draft: !!d.draft,
+      traces: (Array.isArray(d.traces) ? d.traces : []).filter(x => ALLERGENS.includes(x)),
+      ings
+    };
+  });
+}
+// Borradores: platos que el restaurante aún no publica. Solo los ve su dueño (modo propietario).
+function publicMenu(r) { return ((r && r.menu) || []).filter(d => !d.draft); }
+function draftMenu(r) { return ((r && r.menu) || []).filter(d => d.draft); }
+function viewMenu(r) { return isStaffUnlocked && pinOpen ? ((r && r.menu) || []) : publicMenu(r); }     // el camarero ve la carta publicada
+function withoutDraftFlag(menu) { return menu.map(({ draft, ...d }) => d); }
+function sanitizeRest(r) {
+  r = r || {};
+  const lat = Number(r.lat), lng = Number(r.lng);
+  const st = r.stats || {};
+  return {
+    id: safeId(r.id), name: str(r.name, 120) || "Restaurante", city: str(r.city, 200), phone: str(r.phone, 30).replace(/[^\d+]/g, ""),
+    pass: str(r.pass, 80) || "2026", lat: Number.isFinite(lat) ? lat : 37.563, lng: Number.isFinite(lng) ? lng : -1.309,
+    unclaimed: !!r.unclaimed, demo: !!r.demo || r.id === "pilot_1", imported: !!r.imported, ownerEmail: r.ownerEmail ? str(r.ownerEmail, 120) : null,
+    lastVerified: str(r.lastVerified, 40),
+    cloud: !!r.cloud, ownerUid: r.ownerUid ? safeId(r.ownerUid, "u_") : null, suggestion: !!r.suggestion, founder: !!r.founder,
+    verified: r.verified === true,                                         // verificado por la administración
+    createdAtMs: Math.max(0, Number(r.createdAtMs) || 0),                  // alta en la nube (para no mostrar opiniones de un local anterior)
+    cloudNC: typeof r.cloudNC === "string" ? str(r.cloudNC, 330) : undefined,   // nombre|localidad que hay en la nube
+    paidUntil: Math.max(0, Number(r.paidUntil) || 0),
+    syncedAt: Math.max(0, Number(r.syncedAt) || 0),                       // última vez que se comprobó en la nube
+    ver: typeof r.ver === "string" ? r.ver.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40) : "",   // versión de la carta en la nube
+    sid: r.sid ? safeId(r.sid, "s_") : null, createdBy: r.createdBy ? safeId(r.createdBy, "u_") : null,
+    stats: { views: +st.views || 0, saves: +st.saves || 0, bookings: +st.bookings || 0, alerts: +st.alerts || 0, requests: +st.requests || 0 },
+    reviews: (Array.isArray(r.reviews) ? r.reviews : []).slice(0, 300).map(rv => ({
+      id: rv && rv.id != null ? safeId(rv.id, "rv_") : uid("rv_"), author: str(rv && rv.author, 60) || "Anónimo",
+      stars: Math.min(5, Math.max(1, parseInt(rv && rv.stars) || 5)), allergens: str(rv && rv.allergens, 200),
+      comment: str(rv && rv.comment, 1000), date: str(rv && rv.date, 30), isAlert: !!(rv && rv.isAlert),
+      ts: Number(rv && rv.ts) || (/^\d{10,}$/.test(String(rv && rv.id)) ? Number(rv.id) : 0),
+      authorUid: rv && rv.authorUid ? safeId(rv.authorUid, "u_") : null,
+      reply: str(rv && rv.reply, 500), replyTs: Math.max(0, Number(rv && rv.replyTs) || 0), resolvedTs: Math.max(0, Number(rv && rv.resolvedTs) || 0)
+    })),
+    menu: sanitizeMenu(r.menu),
+    equip: sanitizeEquip(r.equip)
+  };
+}
+function sanitizeHomeProduct(p) {
+  p = p || {};
+  const out = { n: str(p.n, 200), sub: str(p.sub, 3000), a: (p.a || []).filter(x => ALLERGENS.includes(x)), tags: [] };
+  if (p.v2) {
+    out.v2 = true;
+    out.offA = (p.offA || []).filter(x => ALLERGENS.includes(x));
+    out.tr = (p.tr || []).filter(x => ALLERGENS.includes(x));
+    out.offDiets = (p.offDiets || []).filter(x => DIET_IDS.includes(x));
+  }
+  return out;
+}
+function normalizeState(s) {
+  s = (s && typeof s === "object") ? s : {};
+  const rests = (Array.isArray(s.restaurants) ? s.restaurants : []).map(sanitizeRest);
+  const seen = new Set();
+  const restaurants = rests.filter(r => !seen.has(r.id) && seen.add(r.id));
+  if (!restaurants.length) restaurants.push(makePilotRest());
+  const ids = new Set(restaurants.map(r => r.id));
+  const srcFolders = Array.isArray(s.routeFolders) ? s.routeFolders : [{ id: "f_fav", name: "⭐ Mis Favoritos y Sugeridos", restIds: restaurants.filter(r => r.demo).map(r => r.id) }, { id: "f_trip", name: "✈️ Próximos Viajes", restIds: [] }];
+  let routeFolders = srcFolders.map(f => ({
+    id: safeId(f && f.id, "f_"), name: str(f && f.name, 80) || "📍 Ruta",
+    restIds: Array.from(new Set((Array.isArray(f && f.restIds) ? f.restIds : []).map(x => safeId(x)).filter(x => ids.has(x))))
+  }));
+  if (!routeFolders.some(f => f.id === "f_fav")) routeFolders.unshift({ id: "f_fav", name: "⭐ Mis Favoritos y Sugeridos", restIds: restaurants.filter(r => r.demo).map(r => r.id) });
+  let homeLists = (Array.isArray(s.homeLists) ? s.homeLists : []).map(l => ({
+    id: safeId(l && l.id, "hl_"), name: str(l && l.name, 80) || "📋 Lista",
+    dishes: (Array.isArray(l && l.dishes) ? l.dishes : []).map((d, k) => ({
+      id: Number.isFinite(Number(d && d.id)) ? Math.floor(Number(d.id)) : Date.now() + k,
+      name: str(d && d.name, 120) || "PLATO", ings: (Array.isArray(d && d.ings) ? d.ings : []).map(sanitizeHomeProduct)
+    }))
+  }));
+  if (!homeLists.some(l => l.id === "hl_default")) homeLists = [...makeDefaultHomeLists().filter(l => !homeLists.some(x => x.id === l.id)), ...homeLists];
+  const cu = s.currentUser && s.currentUser.email ? { name: str(s.currentUser.name, 80), email: str(s.currentUser.email, 120), uid: s.currentUser.uid ? safeId(s.currentUser.uid, "u_") : null } : null;
+  return {
+    restaurants, routeFolders, homeLists,
+    votedRequests: (Array.isArray(s.votedRequests) ? s.votedRequests : []).map(x => safeId(x)),
+    myReviews: (Array.isArray(s.myReviews) ? s.myReviews : []).map(x => str(x, 200)).filter(x => /^[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+(?:\|[A-Za-z0-9_-]{32,100})?$/.test(x)).slice(-500),
+    // Opiniones que denunciaste desde este móvil ("local/opinión"), para no repetir la denuncia
+    myReports: (Array.isArray(s.myReports) ? s.myReports : []).map(x => str(x, 130)).filter(x => /^[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+$/.test(x)).slice(-500),
+    activeFolderId: routeFolders.some(f => f.id === s.activeFolderId) ? s.activeFolderId : "f_fav",
+    activeHomeListId: homeLists.some(l => l.id === s.activeHomeListId) ? s.activeHomeListId : "hl_default",
+    currentUser: cu, legalAccepted: !!s.legalAccepted,
+    legalVersion: typeof s.legalVersion === "string" ? s.legalVersion.slice(0, 20) : "",
+    // Hasta dónde está al día el mapa compartido (ver cloudPullPublic)
+    cloudSync: s.cloudSync && typeof s.cloudSync === "object" && s.cloudSync.p
+      ? { p: str(s.cloudSync.p, 100), r: Math.max(0, +s.cloudSync.r || 0), s: Math.max(0, +s.cloudSync.s || 0), full: Math.max(0, +s.cloudSync.full || 0) } : null,
+    // Última copia conocida de meta/plan (fecha de inicio del cobro y avisos), para funcionar sin conexión
+    planInfo: s.planInfo && typeof s.planInfo === "object"
+      ? { b: Math.max(0, +s.planInfo.b || 0), t: str(s.planInfo.t, 600), pb: !!s.planInfo.pb, wb: !!s.planInfo.wb } : { b: 0, t: "", pb: false, wb: false }
+  };
+}
+
+let appState;
+try { appState = normalizeState(JSON.parse(localStorage.getItem(STATE_KEY))); } catch (e) { appState = normalizeState(null); }
+
+let activeRestId = appState.restaurants[0].id;
+let isStaffUnlocked = false;
+let pinOpen = false;          // hostelería: herramientas abiertas con el PIN (si no, vista del camarero)
+let currentView = "discover", currentWaiterLang = "es";
+let leafletMap = null, markersLayer = null, userMarker = null, lastGeoPlaces = [], lastSupermarketProducts = [];
+let selectedAllergens = new Set(), selectedDiets = new Set(), customAvoidSet = new Set(), strictTracesEnabled = true;
+let currentTab = "aptos", currentHomeTab = "aptos";
+let tempHomeDishIngs = [];
+let pendingUnsafeProduct = null, lastUniversalProduct = null;
+let html5QrScanner = null;
+let staffAllergens = new Set(), staffDiets = new Set(), staffCustom = new Set();
+
+function saveAppState() {
+  try { localStorage.setItem(STATE_KEY, JSON.stringify(appState)); }
+  catch (e) { toast("⚠️ No se pudo guardar en el móvil (memoria llena o modo privado).", "err"); }
+  if (typeof schedulePush === "function") schedulePush();     // en modo nube, sube los cambios de tus locales
+}
+function getRest(id) { return appState.restaurants.find(r => r.id === id); }
+function getActiveRest() { return appState.restaurants.find(r => r.id === activeRestId) || appState.restaurants[0]; }
+function getActiveHomeList() { return appState.homeLists.find(l => l.id === appState.activeHomeListId) || appState.homeLists[0]; }
+
+// Perfil PERSONAL: se guarda en el móvil. La gestión de restaurante usa un perfil de comensal aparte.
+function profileData() { return { al: [...selectedAllergens], di: [...selectedDiets], cu: [...customAvoidSet], strict: strictTracesEnabled }; }
+function saveProfile() { try { localStorage.setItem(PROFILE_KEY, JSON.stringify(profileData())); } catch (e) {} }
+function applyProfile(d) {
+  if (!d) return;
+  selectedAllergens = new Set((d.al || []).filter(x => ALLERGENS.includes(x)));
+  selectedDiets = new Set((d.di || []).filter(x => DIET_IDS.includes(x)));
+  customAvoidSet = new Set((d.cu || []).map(x => str(x, 60).toLowerCase().trim()).filter(Boolean));
+  strictTracesEnabled = d.strict !== false;
+}
+try { applyProfile(JSON.parse(localStorage.getItem(PROFILE_KEY))); } catch (e) {}
+
+function activeSets() {
+  return isStaffUnlocked ? { al: staffAllergens, di: staffDiets, cu: staffCustom } : { al: selectedAllergens, di: selectedDiets, cu: customAvoidSet };
+}
+
+// ============================================================
+// MOTOR DE DETECCIÓN DE ALÉRGENOS Y DIETAS
+// - Busca palabras completas: "aceite" ya no es HUEVO, "panceta" no es GLUTEN,
+//   "manipulado" no es CACAHUETE, "peanuts" no es fruto de cáscara.
+// - Entiende negaciones: "sin gluten", "libre de leche", "gluten free", "sin X ni Y".
+//   OJO: "sin lactosa" solo quita la lactosa; la leche sin lactosa sigue siendo LÁCTEO.
+// - "Puede contener..." / "trazas de..." se clasifica como TRAZAS, no como ingrediente.
+// - Exclusiones por alérgeno: "leche de coco" no es lácteo, "nuez moscada" no es
+//   fruto de cáscara, "harina de arroz" no es gluten, "trigo sarraceno" no es trigo.
+// ============================================================
+
+function normText(s) {
+  return String(s || "").toLowerCase()
+    .replace(/œ/g, "oe").replace(/æ/g, "ae").replace(/ß/g, "ss")
+    .normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+function normalizeStr(s) { return normText(s); }
+
+function rxEscape(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+function kwSource(list) {
+  return list.map(k => {
+    if (/^re:/.test(k)) return k.slice(3);
+    const prefix = k.endsWith("*");                       // "weizen*" -> weizenmehl, weizenstarke...
+    const clean = normText(prefix ? k.slice(0, -1) : k);
+    let body = rxEscape(clean).replace(/\s+/g, "\\s+");
+    if (prefix) return body + "[a-z]*";
+    // Plural en -z → -ces: codorniz → codornices, perdiz → perdices, nuez → nueces
+    if (/[a-z]z$/.test(clean)) body = body.slice(0, -1) + "(?:z|ces)";
+    return body;
+  }).join("|");
+}
+// Palabra completa, admite plural en -s / -es
+function kwTest(list) { return new RegExp("(?:^|[^a-z0-9])(?:" + kwSource(list) + ")(?:s|es)?(?=[^a-z0-9]|$)"); }
+// Igual, pero global y conservando el carácter previo para poder borrar la frase
+function kwStrip(list) { return new RegExp("(^|[^a-z0-9])(?:" + kwSource(list) + ")(?:s|es)?(?=[^a-z0-9]|$)", "g"); }
+
+const NEGATION_RE = /(^|[^a-z0-9])(?:sin|libre de|libres de|exento de|exenta de|exentos de|exentas de|without|free from|sans|senza|ohne)\s+(?:(?:trazas|restos|rastros|presencia) de\s+|anadid[oa]s? de\s+)?[a-z0-9]+(?:\s+(?:ni|nor)\s+[a-z0-9]+)*/g;
+const FREE_SUFFIX_RE = /(^|[^a-z0-9])[a-z]+[\s-]free(?=[^a-z0-9]|$)/g;
+// 3.9.4: avisos de contaminación cruzada de cocina u obrador («se manipulan frutos secos», «posible contaminación
+// cruzada», «puede tener restos de») = trazas. La freidora o el aceite compartido NO: es contacto directo.
+const TRACE_MARK_RE = /(?:pueden? tener (?:restos|trazas)|posibles? (?:restos|trazas)|contaminacion cruzada|contacto cruzado|cross[\s-]contamina[a-z]*|cross[\s-]contact|se manipulan?|elaborad[oa] en (?:una |un )?(?:cocina|obrador)|(?:cocina|obrador|fabrica|planta) (?:donde|que|en (?:la|el) que) (?:se )?(?:manipulan?|utilizan?|usan?|elaboran?)|pueden? contener|podria contener|trazas|elaborad[oa] en (?:una )?(?:fabrica|planta|instalaciones?)|fabricad[oa] en (?:una )?(?:fabrica|planta)|may contain|traces|peut contenir|puo contenere|tracce|kann spuren|spuren von|enthalt spuren)/;
+
+const AL_RULES = {
+  "GLUTEN": {
+    strong: ["gluten","glutine","trigo","wheat","ble","weizen*","frumento","cebada","barley","orge","gersten*","gerste","orzo","centeno","rye","seigle","roggen*","segale","avena","oat","avoine","hafer*","espelta","spelt","epeautre","dinkel*","farro","kamut","triticale","malta","malt","seitan","cuscus","couscous","cous cous","bulgur"],
+    weak: [// Repostería y desayunos (3.9.1)
+           "tarta","tartaleta","tiramisu","cheesecake","napolitana","masa quebrada","masa brisa","oblea","muesli","granola","cereal","roux","rabas","tortillita de camarones",
+           "harina","flour","farine","mehl","farina","pan","bread","pain","pane","galleta","biscuit","cookie","cracker","pasta","fideo","fideua","noodle","rebozado","rebozada","empanado","empanada","empanadilla","pan rallado","breadcrumb","bechamel","besamel","picatoste","crouton","croqueta","bizcocho","semola","hojaldre","magdalena","croissant","cruasan","gofre","waffle","pizza","churro","polvoron","rosquilla","donut","bunuelo","crepe","crep","salmorejo","migas","torrija","tempura","lasana","lasagna","canelon","canelones","ravioli","espagueti","spaghetti","macarron","macarrones","tallarin","tallarines","noqui","gnocchi","romesco","salsa de soja","soy sauce","teriyaki","cerveza","beer","biere","bier","birra",
+           // Panes, masas y pastas que no llevan la palabra «pan» o «harina»
+           "panko","bao","gyoza","dumpling","wonton","wan tun","udon","ramen","yakisoba","soba","brioche","focaccia","ciabatta","chapata","baguette","picos","regana","colines","grissini","rosquilleta","biscote",
+           "fettuccine","tagliatelle","penne","rigatoni","fusilli","tortellini","linguine","pappardelle","bocadillo","bocata","montadito","sandwich","tosta","mollete","panecillo","bollo","bolleria","ensaimada","sobao","roscon","berlina",
+           "brownie","muffin","cupcake","crumble","profiterol","eclair","lionesa","vol au vent","volovan","quiche","samosa","rollito de primavera","rollitos de primavera","spring roll","tortita","pancake","pita","wrap","burrito",
+           "katsu","tonkatsu","milanesa","a la romana","enharinado","enharinada","cachopo","san jacobo","flamenquin","pestino","porra","gazpacho","ajoblanco","sopa de ajo","sopas de ajo","hoisin","ponzu",
+           "albondiga","coulant","gofio","paparajote","pastel de carne","pastel de cierva","marinera","marinero","ensalada cesar","salsa cesar",
+           // Murcia y bares (3.9.4)
+           "bicicleta","crespillo","torta de pascua","tortas de pascua","pan de calatrava","leche frita","a la andaluza","alfajor","clara de limon","clara con limon","clara de cerveza"],
+    free: /(^|[^a-z0-9])(?:sin gluten|libre de gluten|exento de gluten|gluten[\s-]free|sans gluten|senza glutine|glutenfrei|apto para celiacos|apto celiacos)(?=[^a-z0-9]|$)/,
+    excl: ["re:harina\\s+de\\s+(?:arroz|maiz|garbanzos?|almendras?|cocos?|soja|patatas?|yuca|tapioca|quinoa|teff|castanas?|guisantes?|lentejas?|mandioca|trigo\\s+sarraceno|alforfon|sorgo|mijo|habas?|altramuz|algarroba|platano|lino|chia|amaranto|cacahuetes?)",
+           "re:trigo\\s+sarraceno", "buckwheat", "sarrasin", "re:grano\\s+saraceno",
+           "re:(?:fideos?|noodles?|pasta|pan|tortitas?|tortillas?|crackers?|galletas?|semola)\\s+de\\s+(?:arroz|maiz|garbanzos?|lentejas?|quinoa|trigo\\s+sarraceno)",
+           "re:rice\\s+(?:flour|noodles?|paper)", "re:(?:farine|pain)\\s+de\\s+(?:riz|mais)", "re:semola\\s+de\\s+maiz",
+           "re:pasta\\s+de\\s+(?:tomates?|curry|miso|sesamo|cacahuetes?|almendras?|avellanas?|aceitunas?|pimientos?|ajo|anchoas?|wasabi|tamarindo|jengibre|chile|guindilla|dientes|soja|judias?|frutos\\s+secos|cacao|azucar|membrillo|dulce)",
+           "re:(?:tomato|curry)\\s+paste",
+           "re:picos\\s+de\\s+europa", "re:wraps?\\s+de\\s+(?:lechuga|col|arroz)", "re:gazpachos?\\s+sin\\s+pan", "re:pan\\s+de\\s+oro",
+           "re:(?:soba|ramen|udon)\\s+(?:de\\s+arroz|sin\\s+gluten)", "re:(?:a\\s+la|salsa)\\s+marinera"]
+  },
+  "CRUSTÁCEOS": {
+    strong: ["crustaceo","crustacean","crustace","krebstiere","crostaceo","crostacei","gamba","gambon","gambita","langostino","langosta","bogavante","cangrejo","centolla","centollo","buey de mar","necora","cigala","cigalita","camaron","quisquilla","carabinero","percebe","shrimp","prawn","crab","lobster","krill","crevette","homard","langoustine","scampi",
+             "txangurro","changurro","galera","santiaguino","cigarra de mar","bisque","salsa americana",
+             // «Marisco» puede ser crustáceo o molusco: se avisa de los dos
+             "marisco","mariscos","mariscada","seafood","fruits de mer","frutti di mare"],
+    excl: ["re:bisques?\\s+de\\s+(?:tomates?|calabazas?|setas|champinones|verduras?|pimientos?|zanahorias?)"]
+  },
+  "HUEVO": {
+    strong: ["tarta de santiago","claras montadas","clara montada","punto de nieve",
+             "huevo","egg","oeuf","eier","uovo","uova","yema","clara de huevo","albumina","ovoalbumina","ovoproducto","lisozima","lysozyme","e1105","huevina"],
+    // Preparaciones que por receta llevan huevo
+    weak: ["salsa tartara","tartara","salsa holandesa","holandesa","natilla","creme brulee","crema quemada","tempura","waldorf","pasta fresca","cheesecake",
+           "mayonesa","mayonnaise","merengue","meringue","alioli","tortilla","flan","natillas","crema pastelera","crema catalana","tiramisu","carbonara","ensaladilla","a la romana","torrija","quiche","profiterol","eclair","lionesa","crepe","crep","gofre","waffle","tortita","pancake","bizcocho","magdalena","brioche","mousse","milanesa","cachopo","san jacobo","flamenquin","croqueta","bunuelo","revuelto","zarangollo","paparajote","merengada","tocino de cielo","tocinillo de cielo","salsa rosa","salsa golf","albondiga","coulant","pastel de carne","pastel de cierva","marinera","marinero","ensalada murciana","ensalada cesar","salsa cesar",
+           // 3.9.4: otras grafías del alioli, «mus» (mousse) y dulces murcianos
+           "allioli","all i oli","ali oli","ajoaceite","ajo aceite","mus","bicicleta","cordial","pan de calatrava","leche frita","tarta de la abuela"],
+    free: /(^|[^a-z0-9])(?:sin huevos?|libre de huevos?|egg[\s-]free|sans oeufs?|senza uova|ohne eier?)(?=[^a-z0-9]|$)/,
+    excl: ["re:(?:mayonesas?|mayonnaise|alioli|allioli|all\\s+i\\s+oli|ali\\s+oli|ajoaceite|ajo\\s+aceite)\\s+(?:vegan[oa]s?|vegetal(?:es)?)", "re:tortillas?\\s+(?:de\\s+)?(?:maiz|trigo|harina|mexicanas?|wraps?|fajitas?)", "re:revueltos?\\s+(?:vegan[oa]s?|de\\s+tofu)", "re:(?:a\\s+la|salsa)\\s+marinera"]
+  },
+  "PESCADO": {
+    strong: ["pescado","fish","poisson","fisch*","pesce","salmon","atun","tuna","bonito","anchoa","anchovy","boqueron","boqueroncito","bacalao","merluza","pescadilla","corvina","sardina","sardinilla","caballa","jurel","lubina","rodaballo","trucha","lenguado","rape","mero","cazon","emperador","pez espada","pez","peces","panga","tilapia","abadejo","eglefino","arenque","palometa","salmonete","besugo","sargo","mojama","surimi","huevas","caviar","worcestershire","perrins","garum","dashi","katsuobushi","nuoc mam",
+             "dorada","gallo","raya","cabracho","rascacio","melva","anguila","angula","gulas","congrio","bacaladilla","urta","pargo","denton","gallineta","ventresca","kokotxa","cococha","chanquete","tintorera","caella","marrajo","pintarroja","tiburon","esturion",
+             "breca","chicharro","cherne","cherna","mujol","skrei","pijota","acedia","brotola","lenguadina","japuta","botarga","fumet","sashimi","pescaito","pescadito","nam pla","tonnato",
+             "arroz a banda","arroz caldero","caldero del mar menor","caldero murciano","marinera","marinero","ensalada murciana",
+             "hueva","salazon","morralla"],
+    weak: ["sushi","nigiri","maki","uramaki","poke","ensaladilla","marmitako",
+           "fideua","pad thai","ensalada cesar","salsa cesar","caldero","bicicleta"],
+    excl: ["re:pico\\s+de\\s+gallo", "re:(?:a\\s+la|salsa)\\s+marinera", "re:fideuas?\\s+(?:de\\s+(?:verduras?|pollo|carne|setas)|vegetal|vegana)", "re:gallos?\\s+(?:de\\s+corral|campero|capon|de\\s+pelea)", "re:caldo\\s+de\\s+gallo",
+           // «dorada» como adjetivo (cebolla dorada, patatas doradas…) no es el pescado
+           "re:(?:cebollas?|cebolletas?|chalotas?|patatas?|papas|piel|pieles|costras?|cortezas?|masas?|harinas?|mantequillas?|pechugas?|alitas?|croquetas?|empanadas?|empanadillas?|tostadas?|rebanadas?|almendras?|avellanas?|setas?|berenjenas?|calabazas?|manzanas?|peras?|pinas?|uvas?|pasas|laminas?|lascas?|capas?|salsas?|virutas?|migas?|tiras?|rodajas?|cortinas?|carnes?|panceta|cebollita|cebollitas)\\s+doradas?"]
+  },
+  "CACAHUETES": { strong: ["cacahuete","cacahuate","mani","peanut","arachide","arachidi","arachis","erdnuss*","groundnut"], weak: ["pad thai","satay","sate"] },
+  "SOJA": { strong: ["soja","soya","soy","soybean","soia","edamame","tofu","tempeh","miso","tamari","natto","shoyu","hoisin","ponzu","teriyaki","heura","yuba","okara","kikkoman"] },
+  "LÁCTEO": {
+    strong: ["lacteo","leche","milk","lait","milch*","latte","lactosa","lactose","lattosio","laktose","lactoserum","suero","whey","caseina","caseinato","casein","caseinate","queso","quesito","cheese","fromage","kase","formaggio","nata","cream","creme fraiche","mantequilla","butter","beurre","ghee","yogur","yogurt","yoghurt","yaourt","joghurt","kefir","requeson","mozzarella","parmesano","parmigiano","parmesan","burrata","ricotta","mascarpone","cuajada","lactoalbumina","lactoglobulina",
+             // Quesos que suelen escribirse sin la palabra «queso»
+             "cheddar","brie","camembert","gouda","edam","gorgonzola","roquefort","provolone","feta","stracciatella","scamorza","emmental","gruyere","halloumi","pecorino","grana padano","taleggio","fontina","manchego","idiazabal","cabrales","tetilla","roncal","torta del casar","payoyo","majorero","rulo de cabra","philadelphia","labneh","labne","skyr","paneer","cottage","raclette",
+             "chantilly","crema agria","sour cream","capuchino","cappuccino","cafe bombon","cafe asiatico","cafe cortado","crema de orujo","crema de whisky","baileys","leche merengada"],
+    weak: ["natilla","holandesa","creme brulee","crema quemada","crepe","torrija","pizza margarita","pizza margherita","mahon","salsa alfredo","cheesecake",
+           "bechamel","besamel","flan","natillas","crema catalana","helado","pesto","ganache","croqueta","lasana","lasagna","canelon","canelones","gratinado","gratinada","gratinados","gratinadas","au gratin","gratin","fondue","tiramisu","panna cotta","pannacotta","profiterol","carbonara","quiche","crema pastelera","batido","mousse","cachopo","san jacobo","brioche","croissant","cruasan","coulant","risotto","paparajote","ensalada cesar","salsa cesar",
+           "graten","mus","pan de calatrava","tarta al whisky","tarta de la abuela"],
+    free: /(^|[^a-z0-9])(?:sin leche|sin lacteos?|libre de lacteos?|libre de leche|dairy[\s-]free|milk[\s-]free|sans lait|senza latte|ohne milch|sin proteinas? de leche)(?=[^a-z0-9]|$)/,
+    excl: ["re:leche\\s+de\\s+(?:coco|almendras?|avena|soja|arroz|avellanas?|anacardos?|tigre|chufa|canamo|quinoa|espelta|guisantes?|nuez|nueces)",
+           "re:leches?\\s+vegetal(?:es)?", "re:(?:coconut|almond|oat|soy|soya|rice|cashew|hazelnut|pea)\\s+milk",
+           "re:lait\\s+de\\s+(?:coco|amandes?|soja|riz|avoine)", "re:latte\\s+di\\s+(?:cocco|mandorla|soia|riso|avena)",
+           "re:mantequilla\\s+de\\s+(?:cacahuetes?|mani|almendras?|anacardos?|cacao|karite)", "re:(?:peanut|cocoa|nut|almond|shea|cashew)\\s+butter",
+           "re:beurre\\s+de\\s+(?:cacahuetes?|cacao|karite)", "re:burro\\s+di\\s+cacao", "re:cream\\s+of\\s+tartar", "re:nata\\s+de\\s+coco",
+           // Alternativas vegetales que se llaman como el lácteo
+           "re:(?:quesos?|natas?|mantequillas?|yogur(?:es|t)?|leches?|helados?)\\s+(?:vegan[oa]s?|vegetal(?:es)?)",
+           "re:(?:quesos?|yogur(?:es|t)?|natas?)\\s+de\\s+(?:soja|avena|almendras?|anacardos?|arroz|coco)",
+           // «manchego» como adjetivo (de La Mancha), no el queso
+           "re:(?:pisto|asadillo|tiznao|morteruelo|atascaburras|cordero|cocido|ajo|ajoarriero|gazpacho|caldero|caldo|potaje|guiso|migas|duelos\\s+y\\s+quebrantos)\\s+manchegos?", "re:a\\s+la\\s+manchega"]
+  },
+  "FRUTOS CON CÁSCARA": {
+    strong: ["ajo blanco","frutos de cascara","fruto de cascara","frutos secos","fruto seco","nut","tree nuts","noix","fruits a coque","frutta a guscio","schalenfruchte","almendra","almond","amande","mandorla","mandorle","mandel*","avellana","hazelnut","noisette","nocciola","nocciole","haselnuss*","nuez","nueces","walnut","noce","noci","walnuss*","pecana","pacana","pecan","anacardo","cashew","cajou","anacardi","pistacho","pistachio","pistache","pistacchio","pistacchi","macadamia","nuez de brasil","castana de brasil","castana de para","brazil nut","praline","gianduja","gianduia","turron","mazapan","marzipan","nougat","pinon","pinones","pine nut",
+             "marcona","frangipane","macaron","baklava","dukkah","nocilla","nutella","crocanti","carquinyoli","carquinoli","panellet","tarta de santiago","ajoblanco","cordial"],
+    weak: ["picada","waldorf","romesco","pesto","amaretto","amaretti","garrapinada","polvoron","alfajor"],
+    excl: ["re:nuez\\s+moscada", "nutmeg", "re:noix\\s+de\\s+(?:coco|muscade)", "re:noce\\s+(?:moscata|di\\s+cocco)", "re:nuez\\s+de\\s+coco"]
+  },
+  "APIO": { weak: ["caldo de verduras","caldo de verdura","sopa de verduras","mirepoix","cubito de caldo","pastilla de caldo","bolonesa","bolognesa","bolognese","waldorf"], strong: ["apio","celery","celeri","celeriac","sedano","apionabo","sellerie*"] },
+  "MOSTAZA": { strong: ["mostaza","mustard","moutarde","senf*","senape","dijon"] },
+  "SÉSAMO": { weak: ["falafel"], strong: ["baba ganoush","baba ganush","babaganoush","babaghanoush","sesamo","sesame","sesam*","ajonjoli","tahini","tahina","tahin","gomasio","hummus","halva","furikake","dukkah","re:za.?atar"] },
+  "SULFITOS": {
+    strong: [// Vinos por variedad o denominación, y frutas desecadas (3.9.1)
+             "tempranillo","garnacha","monastrell","syrah","cabernet","merlot","chardonnay","sauvignon","riesling","verdejo","albarino","godello","mencia","moscatel","lambrusco","prosecco",
+             "jumilla","yecla","bullas","rioja","ribera del duero","rias baixas","priorat","penedes","orejones","pasas","fruta desecada","fruta deshidratada",
+             "sulfito","sulfite","sulphite","solfito","solfiti","sulfit","dioxido de azufre","anhidrido sulfuroso","sulphur dioxide","sulfur dioxide","anhydride sulfureux","anidride solforosa","schwefeldioxid","metabisulfito","bisulfito","metabisulfite","bisulfite","vino","wine","vin","vinagre","vinagreta","vinegar","vinaigre","vinaigrette","aceto","sidra","cava","champan","vermut","vermu","vermouth","mistela",
+             "jerez","pedro ximenez","oporto","marsala","sangria","tinto de verano","kalimotxo","calimocho","rebujito"],
+    extra: /(^|[^a-z0-9])e[\s-]?22[0-8](?=[^0-9]|$)/
+  },
+  "ALTRAMUCES": { strong: ["tramuz","tramuzo","chochos","altramuz","altramuces","lupin","lupine","lupino","lupini","lupinen"] },
+  "MOLUSCOS": {
+    strong: ["clochina","cloquina","poton","abalon","burgao","bigaro","lapa","ostion",
+             "molusco","mollusc","mollusk","mollusque","mollusco","molluschi","weichtiere","pulpo","pulpito","octopus","poulpe","polpo","calamar","calamarcito","squid","calmar","calamaro","sepia","seiche","chipiron","puntillita","puntilla","mejillon","mussel","moule","cozza","cozze","almeja","almejita","clam","palourde","vongole","ostra","ostion","oyster","huitre","ostrica","vieira","scallop","saint jacques","berberecho","cockle","navaja","navajita","caracol","snail","escargot","bigaro","lapa","zamburina","pota","abulon","oreja de mar",
+             "choco","jibia","raba","arroz negro","chopito","coquina","tellerina","tallarina","tellina","volandeira","canailla","canadilla","busano","chirla","longueiron","muergo","escupina","sepionet","concha fina",
+             "marisco","mariscos","mariscada","seafood","fruits de mer","frutti di mare"],
+    excl: ["re:choco\\s+(?:blanco|negro|crunch|chips?|cookies?|bombon)"]
+  }
+};
+Object.values(AL_RULES).forEach(r => {
+  r.strongRe = kwTest(r.strong);
+  r.weakRe = r.weak ? kwTest(r.weak) : null;
+  r.exclRe = r.excl ? kwStrip(r.excl) : null;
+});
+
+// Etiquetas oficiales de Open Food Facts -> alérgenos de la app
+const OFF_ALLERGEN_TAGS = {
+  "en:gluten":"GLUTEN", "en:crustaceans":"CRUSTÁCEOS", "en:eggs":"HUEVO", "en:fish":"PESCADO", "en:peanuts":"CACAHUETES",
+  "en:soybeans":"SOJA", "en:milk":"LÁCTEO", "en:nuts":"FRUTOS CON CÁSCARA", "en:celery":"APIO", "en:mustard":"MOSTAZA",
+  "en:sesame-seeds":"SÉSAMO", "en:sulphur-dioxide-and-sulphites":"SULFITOS", "en:lupin":"ALTRAMUCES", "en:molluscs":"MOLUSCOS"
+};
+function offTagsToAllergens(tags) {
+  return Array.from(new Set((tags || []).map(t => OFF_ALLERGEN_TAGS[String(t).toLowerCase()]).filter(Boolean)));
+}
+
+// Palabras negadas en el texto ("sin leche ni gluten" -> leche, gluten)
+function negatedWords(full) {
+  const out = new Set();
+  (full.match(NEGATION_RE) || []).forEach(m => m.replace(/^[^a-z0-9]+/, "").split(/\s+/).forEach(w => out.add(w)));
+  (full.match(FREE_SUFFIX_RE) || []).forEach(m => m.replace(/^[^a-z0-9]+/, "").split(/[\s-]+/).forEach(w => out.add(w)));
+  return out;
+}
+const FREE_WORDS = {
+  "GLUTEN": ["gluten","glutine","trigo","wheat"],
+  "LÁCTEO": ["leche","lacteo","lacteos","milk","dairy","lait","latte","milch"],
+  "HUEVO": ["huevo","huevos","egg","eggs","oeuf","oeufs","uova","eier"],
+  "FRUTOS CON CÁSCARA": ["frutos","fruto","nuts","nut","noix"],
+  "APIO": ["apio","celery","celeri"],
+  "PESCADO": ["pescado","pescados","fish","poisson"],
+  "SÉSAMO": ["sesamo","sesame","ajonjoli"]
+};
+// 3.9.1: la traza termina donde el texto vuelve a hablar de lo que SÍ lleva el plato
+// («puede contener trazas de pescado y lleva harina de trigo»: el trigo es ingrediente, no traza)
+const TRACE_END_RE = /(?:^|[^a-z0-9])(?:contiene|contienen|lleva|llevan|incluye|incluyen|elaborad[oa] con|preparad[oa] con|hech[oa] con|contains|includes|contient|con ingredientes?)(?=[^a-z0-9]|$)/;
+// «sin gluten salvo el pan»: lo que viene tras la excepción SÍ está en el plato
+const EXCEPTION_RE = /(?:^|[^a-z0-9])(?:salvo|excepto|exceptuando|a excepcion de|con excepcion de|except for|except|apart from|ausser)\s+([^.;\n()]*)/g;
+// 3.9.4: «sin X» que es una OPCIÓN no quita X del plato. «Pan (opción sin gluten disponible)», «con o sin queso»,
+// «pizza, posibilidad de masa sin gluten», «(también sin gluten)», «pan sin gluten +1 €»: el plato normal SÍ lo
+// lleva, así que no se trata como negación (el cliente debe pedirlo así). «Pan sin gluten» o «Versión sin gluten»
+// a secas siguen siendo negaciones.
+const OPT_NEG_WORD = /(^|[^a-z0-9])(?:sin|libres? de|exent[oa]s? de|without|sans|senza|ohne)(?=\s)/g;
+const OPT_FREE_WORD = /(^|[^a-z0-9])([a-z]+)[\s-]free(?=[^a-z0-9]|$)/g;
+const OPT_NEG_TEST = new RegExp(OPT_NEG_WORD.source), OPT_FREE_TEST = new RegExp(OPT_FREE_WORD.source);
+const OPT_MARK_RE = /(?:^|[^a-z0-9])(?:disponibles?|available|posibilidad|posible|consultar|consulta|consultanos|consultenos|preguntar?|preguntanos|preguntenos|(?:bajo|a|previa) peticion|por encargo|(?:bajo|a) demanda|(?:on|upon) request|sur demande|se pueden? (?:hacer|pedir|preparar|servir|elaborar|adaptar|cambiar)|pueden? (?:hacerse|pedirse|prepararse|servirse|elaborarse|adaptarse|ser)|podemos|tenemos|disponemos|ofrecemos|hay|existen?|a elegir|elegir|elige|suplemento|ask for|request)(?![a-z0-9])|\+\s*\d/;
+const OPT_NEXT_RE = /^\s*(?:disponibles?|available|bajo peticion|a peticion|previa peticion|por encargo|consultar|(?:con )?suplemento|on request|\+\s*\d)/;
+const OPT_ALSO_RE = /^\s*(?:y\s+)?tambien\s+(?:en\s+(?:version|opcion)\s+|disponible\s+)?(?:sin|libres? de|exent[oa]s? de)\s/;
+function neutralizeOptional(t) {
+  const neutral = seg => seg.replace(OPT_NEG_WORD, "$1~").replace(OPT_FREE_WORD, "$1$2 ~");
+  // «con o sin X», «normal o sin gluten»
+  t = t.replace(/(^|[^a-z0-9])(o|or|ou)\s+(?:sin|without|sans|senza|ohne)(?=\s+(?!(?:sin|libres?|exent[oa]s?|without|sans|senza|ohne)(?![a-z0-9]))[a-z0-9])/g, "$1$2 ~");
+  if (!OPT_NEG_TEST.test(t) && !OPT_FREE_TEST.test(t)) return t;
+  return t.split(/([.;\n()[\]]+)/).map((sent, si) => {
+    if (si % 2) return sent;
+    const segs = sent.split(",");
+    return segs.map((seg, i) => {
+      if (!OPT_NEG_TEST.test(seg) && !OPT_FREE_TEST.test(seg)) return seg;
+      const opt = OPT_MARK_RE.test(seg) || OPT_ALSO_RE.test(seg) || (i + 1 < segs.length && OPT_NEXT_RE.test(segs[i + 1]));
+      return opt ? neutral(seg) : seg;
+    }).join(",");
+  }).join("");
+}
+function stripNegations(t) { return t.replace(NEGATION_RE, "$1 ").replace(FREE_SUFFIX_RE, "$1 "); }
+// Un aviso de «trazas» que habla de la freidora, el aceite o la plancha es contacto directo: cuenta entero
+const SHARED_EQUIP_RE = /(?:^|[^a-z0-9])(?:freidoras?|aceites?|planchas?|fritur[ao]s?|frit[oa]s? en|fries? en|parrillas?|fryer|frying oil|same oil)(?![a-z0-9])/;
+function splitTraces(t) {
+  const main = [], tr0 = [];
+  const trace = { push: x => (SHARED_EQUIP_RE.test(x) ? main : tr0).push(x) };
+  t.split(/[.;\n]+/).forEach(seg => {
+    let rest = seg;
+    for (;;) {
+      const m = rest.match(TRACE_MARK_RE);
+      if (!m) { main.push(rest); break; }
+      main.push(rest.slice(0, m.index));
+      const after = rest.slice(m.index);
+      const close = after.search(/[)\]]/);
+      const restart = after.slice(m[0].length).search(TRACE_END_RE);
+      const restartAt = restart < 0 ? -1 : m[0].length + restart;
+      if (restartAt >= 0 && (close < 0 || restartAt < close)) {     // vuelve a hablar de ingredientes
+        trace.push(after.slice(0, restartAt));
+        rest = after.slice(restartAt);
+        continue;
+      }
+      if (close < 0) { trace.push(after); break; }
+      trace.push(after.slice(0, close));
+      rest = after.slice(close + 1);
+    }
+  });
+  return { main: " " + main.join(" . ") + " ", trace: " " + tr0.join(" . ") + " " };
+}
+
+// Una excepción («sin gluten salvo el pan») cuenta con sus propias negaciones y sin la regla «sin X» general
+function hitException(al, r, exc, strongOnly) {
+  const t = stripNegations(r.exclRe ? exc.replace(r.exclRe, "$1 ") : exc);
+  if (r.strongRe.test(t)) return true;
+  if (r.extra && r.extra.test(t)) return true;
+  const own = (r.free && r.free.test(exc)) || (FREE_WORDS[al] || []).some(w => negatedWords(exc).has(w));
+  return !!(r.weakRe && !strongOnly && !own && r.weakRe.test(t));
+}
+// Devuelve { a: alérgenos presentes, tr: alérgenos solo como trazas }
+// ctx (opcional): más texto del mismo plato que solo sirve para entender negaciones.
+// Así «PAN CON TOMATE» con el componente «Pan sin gluten» no se marca como GLUTEN.
+// strongOnly (3.9.4): solo lo que lo dice claramente («queso», «gamba»), no los platos que suelen llevarlo
+// («bocadillo», «tarta»). Sirve para saber si un componente quitable explica el nombre del plato.
+function detectAllergens(raw, ctx, strongOnly) {
+  const full = neutralizeOptional(" " + normText(raw) + " ");
+  const ctxFull = ctx ? neutralizeOptional(" " + normText(ctx) + " ") : "";
+  const base = splitTraces(stripNegations(full));
+  const neg = negatedWords(full + ctxFull);
+  const a = [], tr = [];
+  let excText = "";
+  full.replace(EXCEPTION_RE, (m0, g1) => { excText += " " + g1 + " "; return m0; });
+  ALLERGENS.forEach(al => {
+    const r = AL_RULES[al];
+    const freeOf = (r.free && (r.free.test(full) || (!!ctxFull && r.free.test(ctxFull)))) || (FREE_WORDS[al] || []).some(w => neg.has(w));
+    // Las excepciones se quitan antes y después de las negaciones («gazpacho sin pan» no es gluten)
+    const parts = r.exclRe ? splitTraces(stripNegations(full.replace(r.exclRe, "$1 "))) : base;
+    const hit = txt => {
+      const x = r.exclRe ? txt.replace(r.exclRe, "$1 ") : txt;
+      if (r.strongRe.test(x)) return true;
+      if (r.extra && r.extra.test(x)) return true;
+      if (r.weakRe && !strongOnly && !freeOf && r.weakRe.test(x)) return true;
+      return false;
+    };
+    if (hit(parts.main)) a.push(al);
+    else if (excText && hitException(al, r, excText, strongOnly)) a.push(al);
+    else if (hit(parts.trace)) tr.push(al);
+  });
+  return { a, tr };
+}
+
+// ---------- DIETAS ----------
+const DIET_TAG_LABELS = { CRUDO_EMBARAZO:"🤰 No apto embarazo", NO_VEGANO:"🌱 No vegano", NO_VEGETARIANO:"🥚 No vegetariano", CERDO:"🐷 Lleva cerdo", PICANTE:"🌶️ Picante" };
+const DIET_RULES = {
+  CERDO: {
+    kw: ["cerdo","porcino","porcina","pork","porc","schwein","schweinefleisch","maiale","suino","jamon","bacon","beicon","panceta","pancetta","tocino","torrezno","chorizo","chistorra","salchichon","fuet","sobrasada","morcilla","butifarra","longaniza","salchicha","frankfurt","mortadela","mortadella","salami","pepperoni","prosciutto","guanciale","lacon","cochinillo","manteca de cerdo","manteca iberica","lard","saindoux","strutto","iberico","iberica","gelatina","gelatine","gelatin","e441",
+         // Cortes, platos y productos que son cerdo aunque no lo digan
+         "lomo","costilla","codillo","manitas","oreja","morro","papada","carrillada","carrillera","jabali","cochinita","carnitas","porchetta","speck","coppa","lardo","lardon","chicharron","pringa","fabada","callos","olla podrida","pote asturiano","pote gallego",
+         "cocido madrileno","cocido montanes","cocido lebaniego","cocido maragato","cocido gallego","cocido andaluz","carbonara","tonkatsu","tonkotsu","char siu","cachopo","san jacobo","flamenquin","embutido","mantecado","polvoron","manteca colora","manteca colorada","morcon","pulled pork","michirones","chato murciano","pastel de carne"],
+    excl: ["re:jamon\\s+(?:de\\s+)?(?:pavo|pollo)", "re:(?:salchichas?|fiambres?|chorizos?|hamburguesas?|bacon|beicon|embutidos?)\\s+(?:de\\s+)?(?:pollo|pavo|ternera|vacuno|vegetal(?:es)?|veganos?|veganas?|veggie|tofu|soja)",
+           "re:gelatinas?\\s+(?:vegetal(?:es)?|de\\s+pescado|bovina|de\\s+vacuno|de\\s+ternera|halal|kosher)", "re:(?:bovine|fish|vegetable)\\s+gelatine?", "re:queso\\s+iberico",
+           // Mismo corte, otro animal
+           "re:lomos?\\s+(?:alto|bajo)", "re:(?:lomos?|costillas?|carrilladas?|carrilleras?|morros?|manitas|orejas?)\\s+(?:alt[oa]s?\\s+|baj[oa]s?\\s+)?de\\s+(?:ternera|vaca|buey|vacuno|novillo|toro|cordero|lechazo|cabrito|ciervo|venado|corzo|caballo|potro|atun|bonito|bacalao|salmon|merluza|rape|corvina|lubina|dorada|pez\\s+espada|emperador|pescado|pollo|pavo|conejo|mar)",
+           "re:chicharrones?\\s+de\\s+(?:pollo|pescado|calamar)", "re:callos\\s+de\\s+bacalao", "re:tocino\\s+de\\s+cielo", "re:carbonaras?\\s+(?:vegana|vegetariana|de\\s+setas|de\\s+calabacin)"]
+  },
+  NO_VEGETARIANO: {
+    kw: ["carne","meat","viande","fleisch","carni","pollo","chicken","poulet","pavo","turkey","dinde","ternera","vacuno","buey","beef","boeuf","manzo","cordero","lamb","agneau","lamm","agnello","cabrito","conejo","rabbit","lapin","pato","duck","canard","oca","ganso","goose","codorniz","perdiz","faisan","ciervo","venado","jabali","caballo","caldo de ave","fondo de ave","ave","extracto de carne","foie","higado","callos","chicharron","hamburguesa","albondiga","embutido","fiambre","gelatina","gelatine","gelatin","cuajo animal","e441",
+         // Cortes, piezas y platos de carne que no llevan la palabra «carne»
+         "solomillo","entrecot","chuleton","chuleta","bistec","filete","lomo","costilla","carrillada","carrillera","rabo","codillo","manitas","oreja","morro","pechuga","muslo","contramuslo","alitas","nuggets","kebab","shawarma","gyros","doner","burger","hot dog","perrito caliente",
+         "vaca","novillo","lechazo","chivo","choto","corzo","gamo","liebre","pichon","torcaz","avestruz","magret","gallina","capon","picanton","pularda","cecina","rinon","molleja","sesos","criadillas","zarajo","gallinejas","entresijos","morteruelo",
+         "pate","demi glace","demiglace","consome","puchero","fabada","olla podrida","pote asturiano","pote gallego","cocido madrileno","cocido montanes","cocido lebaniego","cocido maragato","cocido gallego","cocido andaluz","bolonesa","bolognese","ragu","pringa","picanha","escalope","vitello","paella valenciana","michirones","pastel de carne","pastel de cierva","erizo de mar","erizos de mar","huevas de erizo"],
+    excl: ["re:(?:hamburguesas?|albondigas?|salchichas?|carnes?|nuggets?|chorizos?|filetes?|escalopes?|burgers?|bolonesas?|bolognese|pates?|kebabs?)\\s+(?:vegetal(?:es)?|veganos?|veganas?|veggie|vegetarian[oa]s?|de\\s+(?:soja|seitan|tofu|heura|lentejas?|garbanzos?|quinoa|verduras?|setas|champinones|alubias|judias|remolacha|boniato|calabaza|espinacas|berenjenas?|aceitunas?|olivas?|pimientos?|tomates?|alcachofas?))",
+           "re:(?:veggie|vegan[oa]?|vegetal(?:es)?|vegetarian[oa]s?)\\s+(?:burgers?|hamburguesas?|nuggets?)",
+           "re:carne\\s+de\\s+(?:membrillo|soja)", "re:gelatinas?\\s+vegetal(?:es)?",
+           "re:(?:leches?|quesos?|natas?|mantequillas?|yogur(?:es|t)?)\\s+de\\s+vaca"]
+  },
+  NO_VEGANO: {
+    kw: ["miel","honey","miele","honig","jalea real","propoleo","propolis","cera de abeja","beeswax","carmin","cochinilla","e120","goma laca","shellac","e904","e901","lanolina","lanolin","cuajo","rennet","e542"],
+    excl: ["re:miel\\s+de\\s+(?:cana|palma|arroz|agave)", "re:cuajo\\s+(?:microbiano|vegetal|no\\s+animal)"]
+  },
+  CRUDO_EMBARAZO: {
+    rawRe: /(?:sin\s+pasteurizar|no\s+pasteurizad[oa]s?|leche\s+cruda|lait\s+cru|latte\s+crudo|unpasteuri[sz]ed|raw\s+milk|huevos?\s+crudos?)/,
+    kw: ["crudo","cruda","raw","ahumado","ahumada","smoked","fume","affumicato","tartar","tartare","carpaccio","tataki","sushi","sashimi","ceviche","cebiche","poke","foie gras","foie","jamon serrano","jamon iberico","jamon curado","jamon crudo","embutido","chorizo","salchichon","fuet","sobrasada","lomo embuchado","cecina","salami","prosciutto","mojama","pez espada","emperador","atun rojo","tiburon","cazon","marrajo","mielga","pintarroja","tintorera","lucio","mayonesa casera","poco hecha","poco hecho",
+         "nigiri","gravlax","caviar","huevas","marinado","marinada","boquerones en vinagre","boqueron en vinagre","anchoas en vinagre","ostra","ostras","huevo poche","huevos poche","huevo mollet","huevo a baja temperatura","tiramisu","pate","morcon","erizo de mar","erizos de mar","huevas de erizo"],
+    excl: ["re:(?:pimenton|paprika|sal|aceite|azucar|aroma|ajo|te)(?:\\s+[a-z]+){0,3}\\s+ahumad[oa]s?", "re:raw\\s+(?:cane\\s+)?sugar", "re:smoked\\s+(?:paprika|salt)", "re:aceite[a-z\\s]{0,40}en\\s+crudo", "re:(?:cacao|azucar)\\s+crud[oa]s?", "re:aroma\\s+de\\s+humo",
+           "re:(?:pollo|pollos|carnes?|cerdo|ternera|cordero|costillas?|alitas?|pechugas?|muslos?|contramuslos?|verduras?|tofu|setas|champinones|tempeh|seitan|pinchos?|brochetas?)\\s+marinad[oa]s?",
+           "re:ostras?\\s+(?:a\\s+la\\s+brasa|gratinadas?|fritas?|al\\s+horno|a\\s+la\\s+plancha|al\\s+vapor|cocinadas?|en\\s+tempura|rebozadas?)",
+           "re:pates?\\s+de\\s+(?:aceitunas?|olivas?|setas|champinones|berenjenas?|pimientos?|tomates?|verduras?|garbanzos?|alcachofas?)",
+           // Carpaccio de fruta o verdura: crudo, pero sin riesgo para el embarazo
+           "re:carpaccios?\\s+de\\s+(?:pina|frutas?|melon|sandia|mango|pera|manzana|fresas?|kiwi|naranja|remolacha|calabacin|tomates?|setas|champinones|boletus|alcachofas?|pepino|verduras?)"]
+  },
+  PICANTE: {
+    kw: ["picante","guindilla","cayena","chile","chili","chilli","jalapeno","habanero","chipotle","tabasco","sriracha","wasabi","harissa","piri piri","peri peri","gochujang","sambal","peperoncino","piment","spicy","hot sauce","scharf","rocoto","aji","brava","kimchi","nduja","arrabbiata","diavola","mojo picon","diabla","vindaloo","pimientos de padron","pimiento de padron","pil pil","pilpil"],
+    excl: ["re:(?:origen|producto|hecho|elaborado|fabricado|cosecha|vino)\\s*:?\\s*(?:de\\s+|en\\s+)?chile", "re:piment\\s+doux", "re:aji\\s+dulce"]
+  }
+};
+Object.values(DIET_RULES).forEach(r => { r.kwRe = kwTest(r.kw); r.exclRe = r.excl ? kwStrip(r.excl) : null; });
+
+// Inferencia segura: si lleva pescado/marisco no es vegetariano; si lleva leche o huevo no es vegano
+function inferDietsFromAllergens(allergens, set) {
+  (allergens || []).forEach(al => {
+    if (al === "PESCADO" || al === "CRUSTÁCEOS" || al === "MOLUSCOS") { set.add("NO_VEGETARIANO"); set.add("NO_VEGANO"); }
+    if (al === "LÁCTEO" || al === "HUEVO") set.add("NO_VEGANO");
+  });
+  if (set.has("CERDO")) set.add("NO_VEGETARIANO");
+  if (set.has("NO_VEGETARIANO")) set.add("NO_VEGANO");
+  return set;
+}
+
+// Devuelve las etiquetas de dieta que incumple un texto
+function detectDiets(raw, allergens) {
+  const full = neutralizeOptional(" " + normText(raw) + " ");
+  const t = stripNegations(full);
+  const found = new Set();
+  Object.keys(DIET_RULES).forEach(id => {
+    const r = DIET_RULES[id];
+    if (r.rawRe && r.rawRe.test(full)) { found.add(id); return; }
+    const x = r.exclRe ? t.replace(r.exclRe, "$1 ") : t;
+    if (r.kwRe.test(x)) found.add(id);
+  });
+  inferDietsFromAllergens(allergens || detectAllergens(raw).a, found);
+  return Array.from(found);
+}
+
+// Los ingredientes personalizados del usuario (ajo, pimiento, maíz...) y sus familias están en 02b_families.js
+
+// Perfil completo de un producto de casa (alérgenos, trazas y dietas)
+function productProfile(prod) {
+  const text = `${prod.n || ""} . ${prod.sub || ""}`;
+  const det = detectAllergens(text, prod.ctx);
+  const a = new Set([...(prod.offA || []), ...det.a]);
+  if (!prod.v2) (prod.a || []).forEach(x => a.add(x));       // productos guardados con versiones anteriores
+  const tr = new Set([...(prod.tr || []), ...det.tr].filter(x => !a.has(x)));
+  const di = new Set(detectDiets(text, Array.from(a)));
+  (prod.offDiets || []).forEach(x => di.add(x));
+  inferDietsFromAllergens([], di);
+  return { a, tr, di, text };
+}
+
+// Conflictos de un producto con TU perfil personal (En Casa y escáner)
+function checkProductConflicts(prod) {
+  const p = productProfile(prod);
+  const hits = [];
+  p.a.forEach(x => { if (selectedAllergens.has(x)) hits.push(x); });
+  if (strictTracesEnabled) p.tr.forEach(x => { if (selectedAllergens.has(x)) hits.push("Trazas de " + x); });
+  selectedDiets.forEach(d => { if (p.di.has(d)) hits.push(DIET_TAG_LABELS[d] || d); });
+  customAvoidSet.forEach(c => { const ci = customHitInfo(p.text, c); if (ci) { const w = customWhy(ci, c); hits.push(w.charAt(0).toUpperCase() + w.slice(1)); } });
+  return hits;
+}
+function productTraceInfo(prod) {
+  const p = productProfile(prod);
+  return Array.from(p.tr).filter(x => selectedAllergens.has(x));
+}
+
+// Dietas de un ingrediente de restaurante: las marcadas por el local + las deducidas de sus alérgenos
+function ingDiets(ing) { return inferDietsFromAllergens(ing.a || [], new Set(ing.tags || [])); }
+
+// Componentes que pone la app cuando la carta no detalla los ingredientes (lectura con IA)
+const ING_UNKNOWN = "Ingredientes sin detallar";
+const ING_LOOSE = "Alérgenos indicados en la carta";
+const ING_NAME = "Según el nombre del plato";
+const PLACEHOLDER_INGS = new Set([ING_UNKNOWN, ING_LOOSE, ING_NAME].map(x => normText(x)));
+function isPlaceholderIng(ing) { return PLACEHOLDER_INGS.has(normText(ing && ing.n).trim()); }
+// ¿Este componente dice de verdad qué lleva? «Salsa de la casa» sin más, «Aceite», «Especias»... no lo dicen:
+// el cliente que evita un alimento no puede saber si lo lleva. El restaurante debe desglosarlo.
+const VAGUE_NAME_RE = /(?:^|[^a-z0-9])(?:salsas?|alinos?|aderezos?|sofritos?|fondos?|caldos?|adobos?|especias?|condimentos?|sazonad(?:or|ores)|rebozad[oa]s?|empanad[oa]s?|tempura|rellenos?|marinad[oa]s?|mezclas?|picadas?|guisos?|estofados?|cremas?|masas?|fritura|aceites?|guarnicion(?:es)?|de la casa|casero|casera|caseros|caseras|al gusto|variad[oa]s?|surtid[oa]s?)(?![a-z0-9])/;
+const VAGUE_SUB_RE = /(?:^|[^a-z0-9])(?:etc|etcetera|especias|condimentos|aderezos|otros|otras|varios|varias|aromas|alinos)(?![a-z0-9])/;
+function ingGaps(ing) {
+  if (!ing || isPlaceholderIng(ing)) return false;
+  const n = normText(ing.n), sub = normText(ing.sub).trim();
+  const items = sub.split(/\s*(?:,|;|\sy\s|\se\s|\+|\/)\s*/).filter(x => x.length > 1);
+  if (sub && VAGUE_SUB_RE.test(sub)) return true;
+  if (!VAGUE_NAME_RE.test(n)) return false;
+  return items.length === 0 || (items.length === 1 && n.trim().split(/\s+/).length <= 2);
+}
+// Componentes de un plato que no dicen qué llevan (nombres) y si no detalla ninguno
+function dishGaps(d) {
+  const ings = Array.isArray(d && d.ings) ? d.ings : [];
+  const real = ings.filter(i => !isPlaceholderIng(i));
+  return { none: real.length === 0, names: real.filter(ingGaps).map(i => String(i.n || "").trim()).filter(Boolean) };
+}
+const DIET_ASK = { CRUDO_EMBARAZO: "embarazo", NO_VEGANO: "dieta vegana", NO_VEGETARIANO: "dieta vegetariana", CERDO: "sin cerdo", PICANTE: "sin picante" };
+
+// El detector es costoso: cada texto se analiza una sola vez
+const detMemo = new Map();
+function memoDetect(kind, txt, extra) {
+  const key = kind + "\u0001" + txt + "\u0001" + (extra || "");
+  let v = detMemo.get(key);
+  if (v === undefined) {
+    v = kind === "a" ? detectAllergens(txt, extra) : kind === "s" ? detectAllergens(txt, extra, true) : detectDiets(txt, extra ? extra.split(",") : []);
+    if (detMemo.size > 6000) detMemo.clear();
+    detMemo.set(key, v);
+  }
+  return v;
+}
+
+// 3.9.3: el nombre del plato sin las palabras de unos componentes («Ensalada con queso de cabra» menos
+// «Queso de cabra» → «ensalada con , , ,»). Admite singular y plural (croqueta/croquetas). Nunca quita
+// palabras de negación («sin gluten» sigue diciendo «sin»).
+const NAME_KEEP_WORDS = new Set(["sin", "libre", "libres", "exento", "exenta", "without", "free", "sans", "senza", "ohne", "ni", "nor", "con", "del", "las", "los", "una", "uno", "por", "para", "and", "the", "with"]);
+function nameWithout(name, texts) {
+  const words = new Set();
+  texts.forEach(t => normText(t).split(/[^a-z0-9]+/).forEach(w => { if (w.length >= 3 && !NAME_KEEP_WORDS.has(w)) words.add(w); }));
+  const gone = w => {
+    if (w.length < 3 || NAME_KEEP_WORDS.has(w)) return false;
+    for (const c of words) {
+      if (w === c) return true;
+      if (w.length >= 4 && c.length >= 4 && (w.startsWith(c) || c.startsWith(w))) return true;
+    }
+    return false;
+  };
+  return normText(name).split(/([^a-z0-9]+)/).map((p, i) => (i % 2 === 0 && p && gone(p)) ? " , " : p).join("");
+}
+
+// 3.9.4: palabras de TIPO de plato que indican carne pero no cuál («HAMBURGUESA de ternera» con la «Carne de
+// ternera» cambiable por una vegetal). Si un componente quitable explica la dieta, estas no la vuelven a marcar.
+const DIET_TYPE_RE = kwStrip(["hamburguesa","burger","albondiga","nuggets","kebab","shawarma","gyros","doner","hot dog","perrito caliente","bolonesa","bolognese","ragu"]);
+function dietsLeft(n, ctx) { const t = n.replace(DIET_TYPE_RE, "$1 "); return detectDiets(t, detectAllergens(t, ctx).a); }
+
+// 3.9.3: lo que el nombre indica y SOLO lleva un componente que se puede quitar con otras palabras
+// («TARTA DE QUESO» con la «Nata» quitable). Los clientes lo verán NO APTO por el nombre: el editor avisa.
+function nameModOnly(name, ings, cat) {
+  const list = (ings || []).filter(i => i && i.n);
+  const ctx = [cat || "", ...list.map(i => `${i.n || ""} . ${i.sub || ""}`)].join(" . ");
+  const info = list.map(i => {
+    const txt = `${i.n || ""} . ${i.sub || ""}`;
+    const a = new Set([...(i.a || []), ...detectAllergens(txt).a]);
+    const d = new Set([...ingDiets(i), ...detectDiets(txt, [...a])]);
+    return { i, txt, a, d };
+  });
+  const nd = detectAllergens(name, ctx);
+  const out = [];
+  const check = (key, has, test) => {
+    if (info.some(x => !x.i.mod && has(x))) return;
+    const mods = info.filter(x => x.i.mod && has(x)).map(x => x.txt);
+    if (mods.length && test(nameWithout(name, mods))) out.push(key);
+  };
+  nd.a.forEach(x => check(x, y => y.a.has(x), n => detectAllergens(n, ctx, true).a.includes(x)));
+  detectDiets(name, nd.a).forEach(t => check(DIET_TAG_LABELS[t] || t, y => y.d.has(t), n => dietsLeft(n, ctx).includes(t)));
+  return out;
+}
+
+// Evalúa un plato de restaurante con el perfil activo (el tuyo, o el del comensal en modo gestión).
+// Cuenta lo que marca el restaurante, lo que menciona el texto de cada componente y lo que dice el
+// NOMBRE del plato. Un plato sin ingredientes detallados nunca sale «compatible» si no se puede saber.
+// eqx: freidoras y planchas del local con lo que se cocina en cada una (buildEquipIndex).
+function evaluateDish(dish, strict, eqx) {
+  const S = activeSets();
+  if (!S.al.size && !S.di.size && !S.cu.size) return { status:"aptos", rem:[], blk:[], tr:[] };
+  const rem = [], blk = [];
+  // "A:GLUTEN", "D:CERDO", "C:ajo" ya explicados por un componente. 3.9.3: se distingue si el componente es
+  // FIJO (covered) o se puede QUITAR (coveredMod, con su texto): quitar la «nata» no explica el «queso» del
+  // nombre «TARTA DE QUESO» (auditoría M1)
+  const covered = new Set(), coveredMod = new Map();
+  const isCov = k => covered.has(k) || coveredMod.has(k);
+  const ings = Array.isArray(dish.ings) ? dish.ings : [];
+  const traces = new Set((dish.traces || []).filter(t => S.al.has(t)));
+  ings.forEach(ing => {
+    const txt = `${ing.n || ""} . ${ing.sub || ""}`;
+    const det = memoDetect("a", txt);
+    const declared = new Set(ing.a || []);
+    const allA = ALLERGENS.filter(x => declared.has(x) || det.a.includes(x));
+    const diets = new Set([...ingDiets(ing), ...memoDetect("d", txt, allA.join(","))]);
+    const labels = [], keys = [];
+    allA.forEach(x => { if (S.al.has(x)) { keys.push("A:" + x); labels.push(declared.has(x) ? x : `${x} (según la descripción)`); } });
+    diets.forEach(t => { if (S.di.has(t)) { keys.push("D:" + t); labels.push(DIET_TAG_LABELS[t] || t); } });
+    S.cu.forEach(c => { const ci = customHitInfo(txt, c); if (ci) { keys.push("C:" + c); labels.push(customWhy(ci, c)); } });
+    keys.forEach(k => {
+      if (!ing.mod) covered.add(k);
+      else { if (!coveredMod.has(k)) coveredMod.set(k, []); coveredMod.get(k).push(txt); }
+    });
+    det.tr.forEach(t => { if (S.al.has(t) && !allA.includes(t)) traces.add(t); });
+    if (!labels.length) {
+      // Componente que en sí encaja: su freidora o plancha puede pasarle lo que evitas (3.8)
+      if (eqx && ing.eq && ing.eq.length) equipEval(ing, allA, txt, S, eqx, rem, blk);
+      // Un componente que no dice qué lleva no permite saber si encaja con lo que evitas: se pregunta
+      if ((S.cu.size || S.di.size) && ingGaps(ing)) {
+        const what = [...S.cu].map(c => c.toUpperCase()).concat([...S.di].map(t => DIET_ASK[t] || t));
+        if (ing.mod) rem.push(`${esc(ing.note || ("Sin " + ing.n))} (no detalla qué lleva: ${esc(what.join(", "))})`);
+        else blk.push(`${esc(ing.n)}: no detalla qué lleva, pregunta al camarero (${esc(what.join(", "))})`);
+      }
+      return;
+    }
+    // 3.9.2: el componente ya lleva lo que evitas. No tiene sentido proponer cocinarlo en otra freidora:
+    // lo que le llega de la suya se añade al mismo aviso (y se resuelve igual, quitándolo o no pidiéndolo)
+    const extra = eqx && ing.eq && ing.eq.length ? equipNotes(ing, allA, txt, S, eqx) : [];
+    const why = labels.join(", ") + (extra.length ? "; además, " + extra.join("; ") : "");
+    if (ing.mod) rem.push(`${esc(ing.note || ("Sin " + ing.n))} (${esc(why)})`);
+    else blk.push(`${esc(ing.n)} (${esc(why)})`);
+  });
+  // Lo que dice el nombre y no explica ningún componente («TARTA DE QUESO» sin el lácteo marcado)
+  const named = new Set();
+  const name = String(dish.name || "").trim();
+  if (name) {
+    // La sección y los componentes sirven de contexto («SIN GLUTEN», «Pan sin gluten»)
+    const ctx = [dish.cat || "", ...ings.map(i => `${i.n || ""} . ${i.sub || ""}`)].join(" . ");
+    const nd = memoDetect("a", name, ctx);
+    const nDiets = memoDetect("d", name, nd.a.join(","));
+    const hits = [];
+    // Lo explica un componente quitable solo si son sus palabras las que lo dicen en el nombre
+    // («Ensalada con queso de cabra» + «Queso de cabra» quitable sí; «Tarta de queso» + «Nata» no)
+    const stillNamed = (k, test) => {
+      if (covered.has(k)) return false;
+      if (!coveredMod.has(k)) return true;
+      return test(nameWithout(name, coveredMod.get(k)));
+    };
+    // 3.9.4: lo que queda del nombre solo cuenta si lo dice claramente («queso»); «BOCADILLO» con el «Pan» quitable
+    // (pedir pan sin gluten) queda explicado, «TARTA DE QUESO» con la «Nata» quitable no
+    nd.a.forEach(x => { if (S.al.has(x) && stillNamed("A:" + x, t => memoDetect("s", t, ctx).a.includes(x))) { hits.push(x); named.add("A:" + x); } });
+    nDiets.forEach(t => {
+      if (S.di.has(t) && stillNamed("D:" + t, n => dietsLeft(n, ctx).includes(t))) { hits.push(DIET_TAG_LABELS[t] || t); named.add("D:" + t); }
+    });
+    S.cu.forEach(c => {
+      const ci = customHitInfo(name, c);
+      if (ci && stillNamed("C:" + c, n => !!customHitInfo(n, c))) { hits.push(customWhy(ci, c)); named.add("C:" + c); }
+    });
+    nd.tr.forEach(t => { if (S.al.has(t) && !isCov("A:" + t)) traces.add(t); });
+    if (hits.length) blk.push(`Según su nombre: ${esc(hits.join(", "))}. Confírmalo con el camarero`);
+  }
+  // Sin ingredientes detallados no se puede saber si encaja con tu dieta o lo que evitas
+  if (!ings.some(i => !isPlaceholderIng(i))) {
+    const allergenInfo = ings.some(i => (i.a || []).length) || (dish.traces || []).length > 0;
+    const unknown = [];
+    if (S.al.size && !allergenInfo) unknown.push("alérgenos");
+    S.di.forEach(t => { if (!isCov("D:" + t) && !named.has("D:" + t)) unknown.push(DIET_ASK[t] || t); });
+    S.cu.forEach(c => { if (!isCov("C:" + c) && !named.has("C:" + c)) unknown.push("sin " + c); });
+    if (unknown.length) blk.push(`No detalla sus ingredientes: pregunta al camarero (${esc(unknown.join(", "))})`);
+  }
+  let tr = [];
+  const trHits = ALLERGENS.filter(x => traces.has(x));
+  if (trHits.length) {
+    if (strict) blk.push(`Trazas en cocina (${esc(trHits.join(", "))})`);
+    else tr = trHits;
+  }
+  if (blk.length) return { status:"proh", rem, blk, tr };
+  if (rem.length) return { status:"mod", rem, blk, tr };
+  return { status:"aptos", rem, blk, tr };
+}
+
+// ---------- Freidoras y planchas compartidas (3.8) ----------
+// Lo que se cocina en el mismo aceite o la misma plancha llega a cada componente por contacto
+// directo: no es una traza y cuenta aunque el cliente permita trazas.
+// - Lo que se cocina en un equipo sale de la carta PUBLICADA (los componentes que lo indican) más
+//   lo que el local añade a mano (e.a, e.f). Así se mantiene al día solo.
+// - A cada componente solo le afecta lo que cocinan los DEMÁS (no él mismo).
+// - Lo que llega del equipo cuenta como alérgeno del propio componente. Sale ADAPTABLE si:
+//   hay otra freidora/plancha libre de lo que evitas; el local marca que ese componente se puede
+//   cocinar aparte (cazo con aceite limpio o sartén limpia); o el componente se puede quitar.
+//   Si no, NO APTO.
+// Alérgenos de un componente tal como los cuenta el evaluador (marcados + los que dice su texto)
+function ingAllergenList(ing) {
+  const det = memoDetect("a", `${ing.n || ""} . ${ing.sub || ""}`);
+  const declared = new Set(ing.a || []);
+  return ALLERGENS.filter(x => declared.has(x) || det.a.includes(x));
+}
+// 3.9.2: dietas que pasan por el aceite o la plancha compartidos. Cuentan igual que un alérgeno:
+// unas patatas fritas en el aceite de los torreznos no son aptas para quien no come cerdo.
+const EQUIP_DIETS = ["CERDO", "NO_VEGETARIANO", "NO_VEGANO"];
+const EQUIP_DIET_LABELS = { CERDO: "🐷 cerdo", NO_VEGETARIANO: "carne o pescado", NO_VEGANO: "productos de origen animal" };
+// Dietas de un componente tal como las cuenta el evaluador (etiquetas + lo que dice su texto + sus alérgenos)
+function ingDietList(ing, allA) {
+  const a = allA || ingAllergenList(ing);
+  const set = new Set([...ingDiets(ing), ...memoDetect("d", `${ing.n || ""} . ${ing.sub || ""}`, a.join(","))]);
+  return EQUIP_DIETS.filter(d => set.has(d));
+}
+// Índice: cada equipo con los componentes de la carta que se cocinan en él
+function buildEquipIndex(equipList, menu) {
+  const list = Array.isArray(equipList) ? equipList : [];
+  const byId = new Map(list.map(e => [e.i, e]));
+  const src = new Map(list.map(e => [e.i, []]));
+  (Array.isArray(menu) ? menu : []).forEach(d => (d.ings || []).forEach(ing => (ing.eq || []).forEach(id => {
+    const arr = src.get(id);
+    if (arr) { const al = ingAllergenList(ing); arr.push({ dish: d, ing, al, di: ingDietList(ing, al) }); }
+  })));
+  return { list, byId, src, cu: new Map() };
+}
+// Alérgenos que pasan por un equipo → de dónde vienen (nombres de plato, u «otros» si es a mano).
+// selfIng: el componente que se evalúa (no se contamina a sí mismo). skipDish: plato que no cuenta.
+function equipContents(E, eqx, selfIng, skipDish) {
+  const m = new Map();
+  const add = (x, who) => { let a = m.get(x); if (!a) m.set(x, a = []); if (!a.includes(who)) a.push(who); };
+  (E.a || []).forEach(x => add(x, "otros"));
+  if (E.f) memoDetect("a", E.f).a.forEach(x => add(x, "otros"));
+  (eqx.src.get(E.i) || []).forEach(s => {
+    if (s.ing === selfIng || (skipDish && s.dish === skipDish)) return;
+    s.al.forEach(x => add(x, s.dish.name));
+  });
+  return new Map(ALLERGENS.filter(x => m.has(x)).map(x => [x, m.get(x)]));
+}
+// Dietas que pasan por un equipo → de dónde vienen (como equipContents)
+function equipDietContents(E, eqx, selfIng, skipDish) {
+  const m = new Map();
+  const add = (x, who) => { let a = m.get(x); if (!a) m.set(x, a = []); if (!a.includes(who)) a.push(who); };
+  const fA = E.f ? memoDetect("a", E.f).a : [];
+  const manual = new Set(E.f ? memoDetect("d", E.f, [...new Set([...(E.a || []), ...fA])].join(",")) : []);
+  inferDietsFromAllergens(E.a || [], manual);
+  EQUIP_DIETS.forEach(d => { if (manual.has(d)) add(d, "otros"); });
+  (eqx.src.get(E.i) || []).forEach(s => {
+    if (s.ing === selfIng || (skipDish && s.dish === skipDish)) return;
+    (s.di || []).forEach(d => add(d, s.dish.name));
+  });
+  return m;
+}
+// Avisos de dieta para quien evita «diets»: cada origen se nombra una vez, con la etiqueta más concreta
+// (los torreznos salen como «cerdo», no además como «carne» y «origen animal»). ownDi: lo que ya lleva el componente.
+function equipDietHits(E, eqx, selfIng, ownDi, diets, skipDish) {
+  return dietHitList(equipDietContents(E, eqx, selfIng, skipDish), diets, ownDi);
+}
+function dietHitList(m, diets, ownDi) {
+  const out = [], told = new Set();
+  EQUIP_DIETS.forEach(d => {
+    if (!diets.has(d) || ownDi.includes(d) || !m.has(d)) return;
+    const who = m.get(d).filter(w => !told.has(w));
+    if (!who.length) return;
+    who.forEach(w => told.add(w));
+    out.push(EQUIP_DIET_LABELS[d] + originText(who));
+  });
+  return out;
+}
+// Lo que el cliente evita (fuera de los 14) que se cocina en el equipo: se calcula una vez por equipo y término
+function equipCustomSources(E, eqx, term) {
+  const key = E.i + "|" + term;
+  let v = eqx.cu.get(key);
+  if (!v) {
+    v = [];
+    if (E.f) { const ci = customHitInfo(E.f, term); if (ci) v.push({ who: "otros", ci, ing: null, dish: null }); }
+    (eqx.src.get(E.i) || []).forEach(s => {
+      const ci = customHitInfo(`${s.ing.n || ""} . ${s.ing.sub || ""}`, term);
+      if (ci) v.push({ who: s.dish.name, ci, ing: s.ing, dish: s.dish });
+    });
+    eqx.cu.set(key, v);
+  }
+  return v;
+}
+function niceName(s) {
+  s = String(s || "").trim().toLowerCase();
+  s = s.charAt(0).toUpperCase() + s.slice(1);
+  return s.length > 28 ? s.slice(0, 27) + "…" : s;
+}
+function originText(who) {
+  const a = [...new Set(who)];
+  return a.length ? ` (${a.slice(0, 2).map(w => w === "otros" ? "otros" : niceName(w)).join(", ")}${a.length > 2 ? "…" : ""})` : "";
+}
+// «GLUTEN, HUEVO (Croquetas); MOLUSCOS (Calamares)»: alérgenos agrupados por su origen
+function allergensByOrigin(m) {
+  const groups = new Map();
+  m.forEach((who, x) => { const k = originText(who); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(x); });
+  return [...groups.entries()].map(([k, xs]) => xs.join(", ") + k).join("; ");
+}
+// Qué de lo que evita el cliente le llega a este componente desde el equipo E
+function equipHitsFor(E, eqx, ing, ownA, txt, S) {
+  const out = [];
+  if (S.al.size) {
+    equipContents(E, eqx, ing).forEach((who, x) => { if (S.al.has(x) && !ownA.includes(x)) out.push(x + originText(who)); });
+  }
+  if (S.di.size) equipDietHits(E, eqx, ing, ingDietList(ing, ownA), S.di).forEach(t => out.push(t));
+  S.cu.forEach(c => {
+    if (customHitInfo(txt, c)) return;                       // lo lleva el propio componente: ya se avisa
+    const hs = equipCustomSources(E, eqx, c).filter(h => h.ing !== ing);
+    if (!hs.length) return;
+    const sure = hs.filter(h => h.ci.kind === "sure");
+    const use = sure.length ? sure : hs;
+    out.push((sure.length ? "" : "quizá ") + String(c).toUpperCase() + originText(use.map(h => h.who)));
+  });
+  return out;
+}
+// Otro equipo del mismo tipo en el que este componente no recibiría nada de lo que evitas
+function equipAlternativeFor(E, eqx, ing, ownA, txt, S) {
+  return eqx.list.find(x => x.k === E.k && x.i !== E.i && !equipHitsFor(x, eqx, ing, ownA, txt, S).length) || null;
+}
+// Para un componente que ya lleva lo que evitas: qué más le llega de su freidora o plancha (solo informa)
+function equipNotes(ing, ownA, txt, S, eqx) {
+  const out = [];
+  (ing.eq || []).forEach(id => {
+    const E = eqx.byId.get(id);
+    if (!E) return;
+    const hits = equipHitsFor(E, eqx, ing, ownA, txt, S);
+    const K = EQUIP_KINDS[E.k] || EQUIP_KINDS.freidora;
+    if (hits.length) out.push(`${K.icon} ${E.n}: ${K.shared} con ${hits.join(", ")}`);
+  });
+  return out;
+}
+function equipEval(ing, ownA, txt, S, eqx, rem, blk) {
+  (ing.eq || []).forEach(id => {
+    const E = eqx.byId.get(id);
+    if (!E) return;
+    const hits = equipHitsFor(E, eqx, ing, ownA, txt, S);
+    if (!hits.length) return;
+    const K = EQUIP_KINDS[E.k] || EQUIP_KINDS.freidora;
+    const why = `${E.n}: ${K.shared} con ${hits.join(", ")}`;
+    const alt = equipAlternativeFor(E, eqx, ing, ownA, txt, S);
+    const nm = esc(ing.n || "Componente");
+    if (alt) rem.push(`${nm}: pedir que lo hagan en ${K.icon} ${esc(alt.n)} (${esc(why)})`);
+    else if ((ing.ap || []).includes(E.i)) rem.push(`${nm}: ${K.apart} (${esc(why)})`);
+    else if (ing.mod) rem.push(`${esc(ing.note || ("Sin " + ing.n))} (${esc(why)})`);
+    else blk.push(`${nm}: ${K.icon} ${esc(why)}`);
+  });
+}
+// Texto informativo (igual para todos): dónde se cocinan estos componentes y qué más pasa por ahí
+// Alérgenos que le llegan a un componente desde sus equipos (sin los suyos propios): [{ E, al: [x] }]
+function ingEquipAllergens(ing, eqx) {
+  if (!eqx || !ing.eq || !ing.eq.length) return [];
+  const own = ingAllergenList(ing);
+  return ing.eq.map(id => eqx.byId.get(id)).filter(Boolean).map(E => {
+    const al = [];
+    equipContents(E, eqx, ing).forEach((who, x) => { if (!own.includes(x)) al.push(x); });
+    return { E, al };
+  });
+}
+function equipLineFor(E, compNames, eqx, skipDish) {
+  const K = EQUIP_KINDS[E.k] || EQUIP_KINDS.freidora;
+  const al = equipContents(E, eqx, null, skipDish);
+  const S = typeof activeSets === "function" ? activeSets() : null;
+  const dt = S && S.di && S.di.size ? equipDietHits(E, eqx, null, [], S.di, skipDish) : [];
+  const head = `${K.icon} ${E.n}${compNames.length ? " (" + [...new Set(compNames)].join(", ") + ")" : ""}`;
+  const parts = (al.size ? [allergensByOrigin(al)] : []).concat(dt);
+  if (!parts.length) return `${head}: sin otros alérgenos declarados`;
+  return `${head}: ${K.shared} con ${parts.join("; ")}`;
+}
+function dishEquipLines(d, eqx) {
+  if (!eqx) return [];
+  const by = new Map();
+  (d.ings || []).forEach(ing => (ing.eq || []).forEach(id => {
+    if (!eqx.byId.has(id)) return;
+    if (!by.has(id)) by.set(id, []);
+    const K = EQUIP_KINDS[eqx.byId.get(id).k] || EQUIP_KINDS.freidora;
+    by.get(id).push((ing.n || "componente") + ((ing.ap || []).includes(id) ? ": " + K.apartShort : ""));
+  }));
+  return [...by.entries()].map(([id, names]) => equipLineFor(eqx.byId.get(id), names, eqx, d));
+}
+
+// ============================================================
+// FAMILIAS DE ALIMENTOS (v3.6.4)
+// Lo que escribe el comensal en «Otros alimentos que te sientan mal» se amplía así:
+//   m   = el alimento y sus nombres/derivados directos. Si el plato los menciona → «lleva X en «pimentón»».
+//   x   = ingredientes SOSPECHOSOS que pueden llevarlo sin decirlo (fructosa → maíz). → «puede llevar X por «fructosa»».
+//   rel = otras familias que a veces dan reacción cruzada: la app las SUGIERE, no las añade sola.
+//   incl= familias que quedan dentro de esta (pimiento incluye la ñora).
+// Es una base de partida, no una fuente médica: no cubre todos los alimentos del mundo. Por eso la app
+// muestra qué busca exactamente y le dice al comensal que añada él cada alimento que le siente mal.
+// Para ampliarla basta añadir una línea famDef(...) más.
+// ============================================================
+const famList = s => String(s || "").split(",").map(x => x.trim()).filter(Boolean);
+const FOOD_FAMILIES = [];
+function famDef(id, m, x, rel, o) {
+  FOOD_FAMILIES.push(Object.assign({ id, n: id, m: famList(m), x: Array.isArray(x) ? x : famList(x), rel: famList(rel), incl: [], ex: [] }, o || {}));
+}
+// Ingredientes genéricos que pueden esconder casi cualquier cosa
+const X_SAZON = famList("sofrito, adobo, sazonador, condimento, especias, mezcla de especias");
+const X_CALDO = famList("caldo, fondo, consomé, bouillon, pastilla de caldo");
+const X_FRUTA = famList("fruta, fruta de temporada, fruta fresca, macedonia, ensalada de frutas");
+const X_ROJOS = famList("frutos rojos, frutas del bosque, frutos del bosque, coulis");
+const X_HIERBAS = famList("hierbas, hierbas aromáticas, hierbas provenzales, finas hierbas, mezcla de hierbas, especias, mezcla de especias, condimento, sazonador, adobo");
+// «aceite» a secas o «aceite vegetal»: puede ser girasol o maíz. «Aceite de oliva» y los de origen indicado no entran.
+const X_OIL = [...famList("aceite vegetal, aceites vegetales, aceite de semillas, grasa vegetal, grasas vegetales, aceite refinado"),
+  "re:aceites?(?![a-z])(?!\\s+(?:de|del)\\s+(?:oliva|olivas|aove|girasol|maiz|colza|coco|sesamo|argan|lino|palma|cacahuete|cacahuetes|mani|nuez|nueces|almendra|almendras|aguacate|soja|avellana|avellanas|pistacho|trufa|ajo|chile|guindilla|pimenton|picante|hierbas|romero|albahaca|limon|naranja|pepita|pepitas|calabaza|uva|arroz))"];
+
+// ---------- Hortalizas ----------
+famDef("pimiento", "pimiento, pimentón, paprika, pimiento del piquillo, piquillo, padrón, pimiento morrón, morrón, guindilla, cayena, cayenne, chile, chili, chilli, ají, jalapeño, habanero, chipotle, tabasco, sriracha, harissa, piri piri, peri peri, peperoncino, peperone, peperoni, piment, choricero, gochugaru, gochujang, sambal, rocoto, capsicum, bell pepper, poivron, paprikaschote, pepperoncini",
+  [...famList("chorizo, sobrasada, longaniza, pepperoni, embutido, pisto, escalivada, romesco, brava, bravas, kimchi, pico de gallo, picante, curry, cajún, cajun, tex mex, fajitas, paella, marmitako, callos, vizcaína"), ...X_SAZON],
+  "tomate, berenjena, patata", { incl: ["nora"] });
+famDef("nora", "ñora", "romesco", "pimiento", { n: "ñora" });
+famDef("tomate", "tomate, tomatito, tomatina, tomate frito, ketchup, catsup, salmorejo, gazpacho, tumaca, tumaka, bolonesa, boloñesa, bolognese, marinara, arrabbiata, arrabiata, pomodoro, pomodori, concassé, tomato, tomaten, passata, salsa napolitana, a la napolitana, napoletana, tomate seco, pico de gallo",
+  "pisto, sofrito, brava, bravas, romesco, pizza, lasaña, lasagna, ratatouille, escalivada, chili con carne, ragú, ragu, salsa roja, fritada, shakshuka",
+  "pimiento, berenjena, patata");
+famDef("berenjena", "berenjena, aubergine, eggplant, melanzane, melanzana, auberginen, baba ganoush, babaganoush, moussaka, musaka",
+  "pisto, ratatouille, escalivada", "tomate, pimiento, patata");
+famDef("patata", "patata, papa, patatas fritas, ñoquis, gnocchi, fécula de patata, vichyssoise, tortilla de patata, tortilla española, ensaladilla, ensaladilla rusa, potato, pomme de terre, patate, kartoffel, bravas, rösti, rosti, hash brown, puré de patata",
+  "puré, fécula, almidón, croqueta, tortilla", "tomate, pimiento, berenjena");
+famDef("cebolla", "cebolla, cebolleta, cebollita, chalota, chalote, escalonia, escalona, encebollado, encebollada, onion, shallot, oignon, échalote, cipolla, scalogno, zwiebel",
+  [...X_SAZON, ...X_CALDO, ...famList("pisto, escalivada, estofado, guiso, albóndigas, bolonesa, boloñesa, bolognese, pico de gallo")], "ajo, puerro, cebollino");
+famDef("ajo", "ajo, ajillo, ajete, alioli, allioli, aioli, all i oli, ali oli, ajoblanco, ajo blanco, ajada, ajoarriero, pil pil, pilpil, mojo, chimichurri, gremolata, pesto, tzatziki, romesco, salsa verde, garlic, ail, aglio, knoblauch, ajo negro",
+  [...X_SAZON, ...X_CALDO, ...famList("chorizo, embutido, hummus, escabeche, marinada, marinado, albóndigas")], "cebolla, puerro, cebollino");
+famDef("puerro", "puerro, leek, poireau, porro, lauch, vichyssoise", [...X_CALDO, "sofrito"], "cebolla, ajo, cebollino");
+famDef("cebollino", "cebollino, chives, ciboulette, erba cipollina, schnittlauch", "", "cebolla, ajo, puerro");
+famDef("calabacin", "calabacín, zucchini, courgette, zucchine", "pisto, ratatouille, menestra, verduras, crema de verduras, sopa de verduras", "calabaza, pepino, melon, sandia");
+famDef("calabaza", "calabaza, pumpkin, citrouille, zucca, kürbis, pipas de calabaza", "menestra, verduras, crema de verduras, sopa de verduras", "calabacin, pepino, melon, sandia");
+famDef("pepino", "pepino, pepinillo, cucumber, concombre, cetriolo, gurke, tzatziki", "gazpacho", "calabacin, calabaza, melon, sandia");
+famDef("zanahoria", "zanahoria, carrot, carotte, carota, karotte", [...famList("menestra, verduras, crema de verduras, sopa de verduras, ensaladilla, cocido"), ...X_CALDO, "sofrito"], "perejil, hinojo, cilantro", { relA: ["APIO"] });
+famDef("espinaca", "espinaca, spinach, épinard, spinaci, spinat", "menestra, verduras, crema de verduras", "acelga, remolacha");
+famDef("acelga", "acelga, chard, bette, bietole, mangold", "menestra, verduras", "espinaca, remolacha");
+famDef("remolacha", "remolacha, beet, betterave, barbabietola, rote bete", "ensalada de remolacha", "espinaca, acelga");
+famDef("col", "col, repollo, lombarda, berza, kale, grelo, coles de bruselas, col rizada, cabbage, chou, cavolo, kohl", "menestra, verduras, cocido, kimchi", "brocoli, rabano", { relA: ["MOSTAZA"] });
+famDef("brocoli", "brócoli, brécol, coliflor, romanesco, broccoli, cauliflower, chou-fleur, cavolfiore, blumenkohl", "menestra, verduras, crema de verduras", "col, rabano", { relA: ["MOSTAZA"] });
+famDef("rabano", "rábano, nabo, wasabi, rábano picante, horseradish, raifort, rafano, meerrettich", "salsa picante", "col, brocoli, rucula", { relA: ["MOSTAZA"] });
+famDef("rucula", "rúcula, rucola, arugula, roquette, berro, watercress", "ensalada, ensalada verde, mezclum", "rabano, lechuga");
+famDef("lechuga", "lechuga, lettuce, laitue, lattuga, endibia, escarola, achicoria, radicchio, cogollo, canónigos, cesar, césar", "ensalada, ensalada verde, mezclum", "rucula, alcachofa");
+famDef("alcachofa", "alcachofa, artichoke, artichaut, carciofo, artischocke, cardo", "menestra, verduras", "lechuga");
+famDef("esparrago", "espárrago, espárragos trigueros, asparagus, asperge, asparago, spargel", "menestra, verduras", "cebolla, ajo");
+famDef("aceituna", "aceituna, olivas, olivas negras, tapenade, olive, olives", "", "aceite de oliva", { ex: ["olive oil", "olives oil"] });
+famDef("aceite de oliva", "aceite de oliva, aove, aceite virgen extra, olive oil, huile d'olive, olio d'oliva, olivenöl", "", "aceituna", { n: "aceite de oliva" });
+famDef("seta", "seta, champiñón, hongo, boletus, boleto, rebozuelo, níscalo, senderuela, trompeta de la muerte, girgola, gírgola, pleurotus, orellana, shiitake, portobello, enoki, shimeji, morilla, colmenilla, mushroom, funghi, pilze, champignon, cep, cèpe, girolle, porcini, pied de mouton, amanita, cantarela, cantarelo, seta de cardo, duxelles, hongos", "", "trufa", { n: "setas" });
+famDef("trufa", "trufa, truffle, truffe, tartufo, trüffel, aceite de trufa, criadilla de tierra", "", "seta", { ex: ["trufa de chocolate", "trufas de chocolate", "trufa al chocolate", "trufas al chocolate", "trufa de cacao", "trufas de cacao", "trufa de nata", "trufas de nata", "trufa de whisky", "trufas de whisky"] });
+
+// ---------- Frutas ----------
+famDef("manzana", "manzana, sidra, compota de manzana, tatin, strudel, calvados, apple, cider, pomme, mela, apfel, tarta de manzana", [...X_FRUTA, "pectina", "sangría", "sangria"], "pera, melocoton, membrillo");
+famDef("pera", "pera, pear, poire, birne", X_FRUTA, "manzana, membrillo, melocoton");
+famDef("membrillo", "membrillo, dulce de membrillo, quince, coing", "", "manzana, pera");
+famDef("melocoton", "melocotón, durazno, paraguayo, nectarina, peach, nectarine, pêche, pesca, pfirsich, melocotón en almíbar", [...X_FRUTA, "sangría", "sangria"], "albaricoque, ciruela, cereza, manzana, fresa", { relA: ["FRUTOS CON CÁSCARA"] });
+famDef("albaricoque", "albaricoque, damasco, apricot, abricot, albicocca, aprikose", X_FRUTA, "melocoton, ciruela, cereza");
+famDef("ciruela", "ciruela, ciruela pasa, prune, plum, prugna, pflaume", X_FRUTA, "melocoton, albaricoque, cereza");
+famDef("cereza", "cereza, guinda, picota, cherry, cerise, ciliegia, kirsche, kirsch", [...X_FRUTA, ...X_ROJOS], "melocoton, albaricoque, ciruela, fresa");
+famDef("fresa", "fresa, fresón, strawberry, fraise, fragola, erdbeere, mermelada de fresa", [...X_FRUTA, ...X_ROJOS], "frambuesa, mora, arandano, melocoton, kiwi");
+famDef("frambuesa", "frambuesa, raspberry, framboise, lampone, himbeere", [...X_FRUTA, ...X_ROJOS], "fresa, mora, arandano");
+famDef("mora", "mora, zarzamora, blackberry, mûre, brombeere", [...X_FRUTA, ...X_ROJOS], "fresa, frambuesa, arandano");
+famDef("arandano", "arándano, arándano rojo, blueberry, cranberry, myrtille, mirtillo, heidelbeere", [...X_FRUTA, ...X_ROJOS], "fresa, frambuesa, mora");
+famDef("grosella", "grosella, groseilla, currant, cassis, ribes, johannisbeere", [...X_FRUTA, ...X_ROJOS], "fresa, frambuesa, mora");
+famDef("kiwi", "kiwi, actinidia", X_FRUTA, "aguacate, platano, fresa", { relA: ["FRUTOS CON CÁSCARA"] });
+famDef("platano", "plátano, banana, banano, plantain, bananen, banane", [...X_FRUTA, "batido tropical"], "aguacate, kiwi, mango");
+famDef("aguacate", "aguacate, guacamole, palta, avocado, avocat", "", "platano, kiwi, mango");
+famDef("mango", "mango, mangos", [...X_FRUTA, "chutney"], "papaya, pina, platano, aguacate", { relA: ["FRUTOS CON CÁSCARA"] });
+famDef("papaya", "papaya, mamón, lechosa", X_FRUTA, "mango, pina, maracuya");
+famDef("pina", "piña, ananás, ananas, pineapple, piña colada", X_FRUTA, "mango, papaya");
+famDef("maracuya", "maracuyá, fruta de la pasión, passion fruit, parchita", X_FRUTA, "mango, papaya, kiwi");
+famDef("coco", "coco, leche de coco, coconut, noix de coco, cocco, kokos, coco rallado", "", "");
+famDef("higo", "higo, higos secos, fig, figue, fico, feige", X_FRUTA, "kiwi, mora");
+famDef("granada", "granada, pomegranate, grenade, melograno, granatapfel, granadina", X_FRUTA, "");
+famDef("uva", "uva, pasa, pasas, grape, raisin, raisins, passas, mosto", [...X_FRUTA, ...famList("vino, cava, champán, champagne, sangría, sangria, tinto de verano, vermut, vinagre de vino")], "melocoton, manzana");
+famDef("datil", "dátil, dátiles, date, datte, dattero, dattel", X_FRUTA, "higo");
+famDef("caqui", "caqui, persimmon, kaki, sharon", X_FRUTA, "kiwi, melocoton");
+famDef("melon", "melón, cantaloupe, canteloup", [...X_FRUTA, "gazpacho"], "sandia, pepino, calabacin");
+famDef("sandia", "sandía, watermelon, pastèque, anguria, wassermelone", X_FRUTA, "melon, pepino, calabacin");
+famDef("limon", "limón, limonada, limoncello, lemon, citron, limone, zitrone, zumo de limón", "", "naranja, lima, pomelo, mandarina, citricos");
+famDef("naranja", "naranja, naranjada, zumo de naranja, orange, arancia, orangensaft, curaçao, curacao, cointreau, grand marnier, mermelada de naranja", X_FRUTA, "limon, mandarina, lima, pomelo, citricos");
+famDef("mandarina", "mandarina, clementina, satsuma, tangerina, tangerine, mandarin", X_FRUTA, "naranja, limon, lima, pomelo, citricos");
+famDef("lima", "lima, lime, citron vert, limetta", "", "limon, naranja, pomelo, citricos");
+famDef("pomelo", "pomelo, toronja, grapefruit, pamplemousse, pompelmo", X_FRUTA, "naranja, limon, lima, citricos");
+famDef("citricos", "cítricos, cítrico, citrus, agrios, agrumes, agrumi", X_FRUTA, "", { n: "cítricos", incl: ["limon", "naranja", "mandarina", "lima", "pomelo"] });
+
+// ---------- Frutos secos concretos, legumbres, semillas, cereales ----------
+famDef("almendra", "almendra, almendrado, marcona, mazapán, horchata de almendra, leche de almendra, almond, amande, mandorla, mandel, amaretto, amaretti, ajoblanco, marzipan, turrón de almendra", "turrón, polvorón, picada, romesco, praliné, granola, muesli, frutos secos", "avellana, nuez, pistacho, melocoton", { relA: ["FRUTOS CON CÁSCARA"] });
+famDef("avellana", "avellana, hazelnut, noisette, nocciola, haselnuss, nutella, praliné, gianduja, crema de avellanas", "turrón, picada, romesco, granola, muesli, frutos secos, chocolate", "almendra, nuez, pistacho", { relA: ["FRUTOS CON CÁSCARA"] });
+famDef("nuez", "nuez, nueces, walnut, noix, noce, walnuss, pecana, pecan, macadamia, nuez de macadamia", "turrón, picada, granola, muesli, frutos secos, pesto", "almendra, avellana, pistacho", { ex: ["nuez moscada"], relA: ["FRUTOS CON CÁSCARA"] });
+famDef("pistacho", "pistacho, pistachio, pistache, pistacchio, pistazie", "turrón, mortadela, granola, muesli, frutos secos", "anacardo, mango, almendra", { relA: ["FRUTOS CON CÁSCARA"] });
+famDef("anacardo", "anacardo, cashew, noix de cajou, anacardi, cajou", "granola, muesli, frutos secos, salsa thai", "pistacho, mango", { relA: ["FRUTOS CON CÁSCARA"] });
+famDef("castana", "castaña, chestnut, châtaigne, castagna, kastanie, marron glacé", "", "aguacate, platano, kiwi", { n: "castaña", relA: ["FRUTOS CON CÁSCARA"] });
+famDef("pinon", "piñón, piñones, pine nut, pignon, pinolo, pinoli, pesto", "salsa pesto, picada", "almendra, nuez", { n: "piñón", relA: ["FRUTOS CON CÁSCARA"] });
+famDef("cacahuete", "cacahuete, maní, peanut, arachide, cacahouète, erdnuss, crema de cacahuete, mantequilla de cacahuete, satay, aceite de cacahuete", "garrapiñado, garrapiñada, salsa thai, snacks, mix de frutos secos, frutos secos", "garbanzo, lenteja, guisante, judia", { relA: ["CACAHUETES", "SOJA"] });
+famDef("garbanzo", "garbanzo, hummus, humus, houmous, falafel, harina de garbanzo, chickpea, pois chiche, ceci, kichererbse, socca, panisse", "cocido, potaje, olla", "lenteja, guisante, judia, haba, cacahuete", { relA: ["SOJA", "CACAHUETES", "ALTRAMUCES"] });
+famDef("lenteja", "lenteja, lentil, lentille, lenticchie, linsen, dal, dhal, dahl", "cocido, potaje", "garbanzo, guisante, judia, haba", { relA: ["SOJA", "CACAHUETES", "ALTRAMUCES"] });
+famDef("guisante", "guisante, petit pois, tirabeque, chícharo, piselli, erbsen, green peas", "menestra, ensaladilla, verduras", "garbanzo, lenteja, judia, haba", { relA: ["SOJA", "CACAHUETES", "ALTRAMUCES"] });
+famDef("judia", "judía, alubia, frijol, frejol, fabes, fabada, habichuela, judión, judías verdes, bohnen, fagioli, haricot, beans, cassoulet", "cocido, potaje, menestra", "garbanzo, lenteja, guisante, haba", { n: "judía", relA: ["SOJA", "CACAHUETES", "ALTRAMUCES"] });
+famDef("haba", "haba, habas, fava, broad bean, fève, habones, habitas", "menestra", "judia, guisante, garbanzo");
+famDef("arroz", "arroz, rice, riz, riso, reis, paella, risotto, sushi, onigiri, maki, nigiri, harina de arroz, tortitas de arroz", "poke", "maiz, quinoa");
+famDef("quinoa", "quinoa, quinua", "", "arroz, maiz");
+famDef("alforfon", "alforfón, trigo sarraceno, buckwheat, sarrasin, grano saraceno, buchweizen", "soba", "");
+famDef("girasol", "girasol, pipas, pipas de girasol, semillas de girasol, aceite de girasol, sunflower, tournesol, girasole, sonnenblume", [...X_OIL, "margarina", "mayonesa"], "colza, lino");
+famDef("colza", "colza, canola, aceite de colza, rapeseed", [...X_OIL], "girasol", { relA: ["MOSTAZA"] });
+famDef("lino", "lino, linaza, semillas de lino, flax, flaxseed, lin, leinsamen", "", "chia, girasol");
+famDef("chia", "chía, chia", "", "lino");
+famDef("amapola", "amapola, semillas de amapola, poppy, pavot, papavero, mohn", "", "");
+famDef("canamo", "cáñamo, hemp, chanvre", "", "", { n: "cáñamo" });
+
+// ---------- El maíz y sus derivados escondidos ----------
+famDef("maiz", "maíz, palomitas, polenta, maicena, mazorca, choclo, elote, nachos, totopos, arepa, maize, corn, mais, harina de maíz, sémola de maíz, aceite de maíz, jarabe de maíz, cornflakes, corn flakes, cereales de maíz, tortilla de maíz, tamal, humita, cornstarch, almidón de maíz",
+  [...famList("fructosa, jarabe de glucosa, jarabe de fructosa, jarabe de glucosa-fructosa, sirope de glucosa, isoglucosa, glucosa, dextrosa, maltodextrina, almidón, almidón modificado, fécula, sorbitol, levadura química, polvo de hornear, azúcar glas, azúcar glass, goma xantana, colorante caramelo, gofio, taco, tacos, tortilla mexicana, enchilada, quesadilla"), ...X_OIL],
+  "arroz, quinoa");
+
+// ---------- Hierbas, especias y aromas ----------
+famDef("perejil", "perejil, parsley, persil, prezzemolo, petersilie", [...famList("salsa verde, chimichurri, gremolata, persillade"), ...X_HIERBAS], "cilantro, zanahoria, hinojo", { relA: ["APIO"] });
+famDef("hinojo", "hinojo, fennel, fenouil, finocchio, fenchel", X_HIERBAS, "anis, perejil, zanahoria", { relA: ["APIO"] });
+famDef("anis", "anís, anise, aniseed, ouzo, sambuca, pastis, anisette", "", "hinojo", { n: "anís" });
+famDef("cilantro", "cilantro, coriandro, culantro, coriander, coriandre, coriandolo, koriander", [...famList("curry, garam masala"), ...X_HIERBAS], "perejil, comino");
+famDef("jengibre", "jengibre, gari, ginger, gingembre, zenzero, ingwer, pan de jengibre, gingerbread", [...famList("curry"), ...X_SAZON], "curcuma");
+famDef("curcuma", "cúrcuma, curcuma, turmeric, curcumin, e100", [...famList("curry, arroz amarillo"), ...X_SAZON], "jengibre", { n: "cúrcuma" });
+famDef("canela", "canela, cinnamon, cannelle, cannella, zimt", [...famList("pan de especias, speculoos, chai, garam masala, ras el hanout, arroz con leche, natillas"), ...X_SAZON], "clavo, vainilla");
+famDef("vainilla", "vainilla, vanilla, vanille, vaniglia, vainillina, vanillin", famList("helado, natillas, flan, crema pastelera, crema catalana, bizcocho, aroma, aromas"), "canela");
+famDef("clavo", "clavo, clavos de olor, clove, girofle, chiodi di garofano, nelke", X_SAZON, "canela, nuez moscada");
+famDef("nuez moscada", "nuez moscada, nutmeg, muscade, noce moscata, muskatnuss", [...famList("bechamel, besamel"), ...X_SAZON], "canela, clavo");
+famDef("comino", "comino, cumin, cumino, kreuzkümmel", [...famList("curry, garam masala, ras el hanout"), ...X_SAZON], "cilantro, hinojo", { relA: ["APIO"] });
+famDef("azafran", "azafrán, saffron, safran, zafferano, safran", [...famList("paella, arroz amarillo"), ...X_SAZON], "curcuma", { n: "azafrán" });
+famDef("pimienta", "pimienta, pimienta negra, pimienta blanca, pimienta verde, pimienta rosa, peppercorn, poivre, pepe nero, pfeffer", X_SAZON, "");
+famDef("laurel", "laurel, bay leaf, laurier, alloro, lorbeer", [...X_CALDO, ...X_HIERBAS], "");
+famDef("menta", "menta, hierbabuena, yerbabuena, mint, menthe, minze, mojito", X_HIERBAS, "albahaca, oregano, tomillo, romero, salvia");
+famDef("albahaca", "albahaca, basil, basilic, basilico, basilikum, pesto, ensalada caprese", X_HIERBAS, "menta, oregano, tomillo, romero, salvia");
+famDef("oregano", "orégano, oregano, origan, origano", [...famList("pizza"), ...X_HIERBAS], "menta, albahaca, tomillo, romero, salvia");
+famDef("tomillo", "tomillo, thyme, thym, timo, thymian", X_HIERBAS, "menta, albahaca, oregano, romero, salvia");
+famDef("romero", "romero, rosemary, romarin, rosmarino, rosmarin", X_HIERBAS, "menta, albahaca, oregano, tomillo, salvia");
+famDef("salvia", "salvia, sage, sauge, salbei", X_HIERBAS, "menta, albahaca, oregano, tomillo, romero");
+
+// ---------- Dulces, bebidas y aditivos ----------
+famDef("cacao", "cacao, chocolate, cocoa, cioccolato, schokolade, bombón, brownie, mousse de chocolate", famList("praliné, tiramisú, tiramisu, profiteroles, mole, turrón, nutella"), "cafeina");
+famDef("cafeina", "café, cafeína, espresso, expreso, cortado, capuchino, cappuccino, moka, mocca, latte, té verde, té negro, matcha, guaraná, bebida energética, coca cola, coca-cola, pepsi, refresco de cola, bebida de cola", famList("chocolate, cacao, tiramisú, tiramisu, descafeinado"), "cacao", { n: "cafeína" });
+famDef("miel", "miel, honey, hidromiel, polen, propóleo, jalea real", "", "");
+famDef("alcohol", "alcohol, cerveza, vino, cava, champán, champagne, licor, ron, whisky, ginebra, vodka, brandy, coñac, vermut, sidra, sangría, sangria, tinto de verano, mojito, cóctel, cocktail, aguardiente, orujo, pacharán, tequila, amaretto, kirsch, calvados", famList("flambeado, flambé, flambe, al vino, al whisky, al brandy, al jerez, al oporto, reducción de vino, reducción de vermut, borracho, borracha, tarta borracha"), "", { ex: ["cerveza sin alcohol", "cerveza 0 0", "cerveza 0,0", "cerveza 00", "vino sin alcohol", "cava sin alcohol", "sidra sin alcohol", "bebida sin alcohol"] });
+famDef("gelatina", "gelatina, gelatin, gelatine, grenetina, cola de pescado, colágeno", famList("gominola, gominolas, nubes, malvaviscos, mousse, panna cotta, tarta de queso, cheesecake, jelly, flan"), "");
+famDef("glutamato", "glutamato, glutamato monosódico, msg, e621, potenciador del sabor", [...X_CALDO, ...famList("sazonador, salsa de soja, ramen, snacks, aperitivos")], "");
+famDef("levadura", "levadura, yeast, levure, lievito, hefe, levadura de cerveza, levadura nutricional, extracto de levadura", famList("pan, masa, pizza, bollo, bollería, cerveza, vino, cava, fermentado"), "");
+
+// ---------- Carnes y caza ----------
+famDef("cerdo", "cerdo, puerco, marrano, cochino, jamón, jamon, chorizo, lomo embuchado, panceta, bacon, beicon, tocino, salchichón, mortadela, morcilla, butifarra, sobrasada, longaniza, cochinillo, lechón, presa ibérica, secreto ibérico, pluma ibérica, lacón, torrezno, oreja, manteca de cerdo, pork, porc, maiale, schwein, ham, prosciutto, speck, mortadella",
+  famList("manteca, gelatina, carrillada, solomillo, hamburguesa, albóndigas, salchicha, embutido, cocido, caldo de cocido, fabada, callos, cecina"), "ternera, cordero");
+famDef("ternera", "ternera, vaca, vacuno, buey, res, carne de res, añojo, cecina, rabo de toro, entrecot, chuletón, beef, boeuf, manzo, rind", famList("gelatina, carrillera, carrillada, solomillo, hamburguesa, albóndigas, carne picada, caldo de carne, cocido, salchicha, embutido, bolonesa, boloñesa, bolognese"), "cerdo, cordero", { ex: ["buey de mar"], relA: ["LÁCTEO"] });
+famDef("pollo", "pollo, gallina, capón, pularda, alitas, nuggets, chicken, poulet, hähnchen, pollastre", famList("pechuga, muslo, contramuslo, ave, aves, caldo de ave, kebab"), "pavo, pato", { relA: ["HUEVO"] });
+famDef("pavo", "pavo, turkey, dinde, tacchino, pute, fiambre de pavo", famList("pechuga, fiambre, embutido"), "pollo, pato");
+famDef("cordero", "cordero, lechal, borrego, lamb, agneau, agnello, lamm", famList("kebab, gelatina"), "ternera, cerdo");
+famDef("conejo", "conejo, rabbit, lapin, coniglio, kaninchen", "", "pollo");
+famDef("pato", "pato, magret, confit de pato, foie, foie gras, duck, canard, anatra, ente, oca, ganso", "", "pollo, pavo");
+famDef("caza", "caza, jabalí, venado, ciervo, corzo, perdiz, codorniz, faisán, liebre, paloma, wild boar", "", "conejo, pato");
+
+// ---------- Pescados y mariscos ----------
+famDef("atun", "atún, bonito, atún rojo, tuna, thon, tonno, thunfisch, ventresca, mojama, melva, tataki", famList("poke, sushi, ensaladilla, marmitako, pescado azul"), "salmon, sardina, anchoa, pescado azul", { n: "atún", relA: ["PESCADO"] });
+famDef("salmon", "salmón, salmon, lox, saumon, salmone, lachs", famList("poke, sushi, ahumado, pescado azul"), "atun, trucha, pescado azul", { n: "salmón", relA: ["PESCADO"] });
+famDef("bacalao", "bacalao, bacalhau, cod, morue, baccalà, kabeljau, skrei, brandada, tirabuques, abadejo", famList("pil pil, fumet, caldo de pescado, pescado blanco"), "merluza, pescado blanco", { relA: ["PESCADO"] });
+famDef("merluza", "merluza, pescadilla, hake, merlu, nasello, seehecht, merlán, colín", famList("fumet, caldo de pescado, pescado blanco"), "bacalao, pescado blanco", { relA: ["PESCADO"] });
+famDef("anchoa", "anchoa, boquerón, boqueron, anchovy, anchois, acciuga", famList("salsa worcestershire, salsa inglesa, salsa césar, salsa cesar, puttanesca, pasta de anchoas, pizza napolitana, nam pla, nuoc mam, fish sauce"), "sardina, atun, pescado azul", { relA: ["PESCADO"] });
+famDef("sardina", "sardina, sardinilla, sardinas en lata, pilchard, sardine, sardella", "pescado azul", "anchoa, atun, pescado azul", { relA: ["PESCADO"] });
+famDef("pescado azul", "pescado azul, caballa, jurel, arenque, mackerel, maquereau, herring, hareng, pez espada, emperador, bonito del norte", "", "atun, salmon, sardina, anchoa", { relA: ["PESCADO"], incl: ["atun", "salmon", "sardina", "anchoa"] });
+famDef("pescado blanco", "pescado blanco, lubina, dorada a la, dorada al, filete de dorada, lomo de dorada, rape, lenguado, rodaballo, corvina, eglefino, pangasius, panga, tilapia", "", "bacalao, merluza", { ex: ["pico de gallo"], relA: ["PESCADO"], incl: ["bacalao", "merluza"] });
+famDef("trucha", "trucha, trout, truite, trota, forelle", "", "salmon", { relA: ["PESCADO"] });
+famDef("marisco", "gamba, langostino, camarón, cigala, carabinero, langosta, bogavante, cangrejo, centollo, nécora, buey de mar, percebe, quisquilla, krill, crustáceo, shrimp, prawn, lobster, crab, crawfish, crevette, gambero, garnele",
+  famList("marisco, mariscos, mariscada, bisque, sopa de marisco, salsa americana, fumet, caldo de pescado, pasta de gambas, chips de gamba, paella mixta"), "bivalvo, cefalopodo", { n: "gamba", relA: ["CRUSTÁCEOS", "MOLUSCOS"] });
+famDef("cefalopodo", "pulpo, calamar, sepia, choco, chipirón, jibia, potera, pota, tinta de calamar, tinta de sepia, octopus, poulpe, polpo, squid, calamari, seiche", "arroz negro, fideuá, marisco, mariscada", "bivalvo, marisco", { n: "pulpo", relA: ["MOLUSCOS"] });
+famDef("bivalvo", "mejillón, almeja, berberecho, ostra, vieira, zamburiña, navaja, coquina, chirla, volandeira, bivalvo, caracol, bígaro, lapa, mussel, clam, oyster, scallop, moule, huître, cozza, vongola, auster, muschel, escargot", "marisco, mariscada, salsa de ostras", "cefalopodo, marisco", { n: "mejillón", relA: ["MOLUSCOS"] });
+
+// ---------- Motor ----------
+let FAM_BY_ID = null, FAM_INDEX = null, FAM_DISP = null;
+function famNorm(s) { return normText(s).trim().replace(/\s+/g, " "); }
+function famForms(k) {
+  const f = new Set([k]);
+  if (/ces$/.test(k) && k.length > 4) f.add(k.slice(0, -3) + "z");
+  else if (/[^aeiou]es$/.test(k) && k.length > 4) f.add(k.slice(0, -2));
+  if (/s$/.test(k) && k.length > 3) f.add(k.slice(0, -1));
+  return [...f];
+}
+function famInit() {
+  if (FAM_BY_ID) return;
+  FAM_BY_ID = {}; FAM_INDEX = new Map(); FAM_DISP = new Map();
+  const put = (name, id) => { famForms(name).forEach(f => { const a = FAM_INDEX.get(f) || []; if (!a.includes(id)) a.push(id); FAM_INDEX.set(f, a); }); };
+  // Una palabra que aparece en varias familias («pesto», «paella», «chorizo») NO sirve para saber a cuál
+  // se refiere quien la escribe: se busca tal cual. El nombre de cada familia sí se reconoce siempre.
+  const uses = new Map();
+  FOOD_FAMILIES.forEach(fam => new Set(fam.m.concat(fam.x).filter(r => !/^re:/.test(r)).map(famNorm)).forEach(k => uses.set(k, (uses.get(k) || 0) + 1)));
+  FOOD_FAMILIES.forEach(fam => {
+    FAM_BY_ID[fam.id] = fam;
+    put(famNorm(fam.id), fam.id);
+    put(famNorm(fam.n), fam.id);
+    fam.m.concat(fam.x).forEach(raw => { if (!/^re:/.test(raw)) { const k = famNorm(raw); if (!FAM_DISP.has(k)) FAM_DISP.set(k, raw); } });
+    fam.m.forEach(raw => { if (!/^re:/.test(raw)) { const k = famNorm(raw); if (uses.get(k) === 1) put(k, fam.id); } });
+  });
+}
+// ¿A qué familias pertenece lo que escribió el comensal? «boletus» → seta, «pimentón» → pimiento, «pimiento rojo» → pimiento
+function famResolve(term) {
+  famInit();
+  const k = famNorm(term);
+  if (!k) return [];
+  const ids = new Set();
+  famForms(k).forEach(f => (FAM_INDEX.get(f) || []).forEach(id => ids.add(id)));
+  if (!ids.size && k.indexOf(" ") > 0) {
+    let best = 0, found = [];
+    FAM_INDEX.forEach((list, name) => {
+      if (name.length < 3 || name.length < best) return;
+      if ((" " + k + " ").indexOf(" " + name + " ") >= 0) { if (name.length > best) { best = name.length; found = []; } found.push(...list); }
+    });
+    found.forEach(id => ids.add(id));
+  }
+  return [...ids].map(id => FAM_BY_ID[id]);
+}
+const famRulesCache = {};
+function famCap(list) { return list.length ? new RegExp("(?:^|[^a-z0-9])(" + kwSource(list) + ")(?:s|es)?(?=[^a-z0-9]|$)") : null; }
+function famRules(term) {
+  const k = famNorm(term);
+  if (famRulesCache[k]) return famRulesCache[k];
+  const fams = famResolve(k);
+  const sure = new Set(famForms(k)), maybe = new Set(), seen = new Set();
+  const add = fam => {
+    if (!fam || seen.has(fam.id)) return;
+    seen.add(fam.id);
+    fam.m.forEach(x => sure.add(x));
+    fam.x.forEach(x => maybe.add(x));
+    (fam.incl || []).forEach(i => add(FAM_BY_ID[i]));
+  };
+  fams.forEach(add);
+  const sureNorm = new Set([...sure].map(x => /^re:/.test(x) ? x : famNorm(x)));
+  const sureList = [...sureNorm], maybeList = [...maybe].filter(x => /^re:/.test(x) || !sureNorm.has(famNorm(x)));
+  const ex = [];
+  seen.forEach(id => (FAM_BY_ID[id].ex || []).forEach(e => ex.push(famNorm(e))));
+  // Si la palabra escrita es justo la que se excluye, no se excluye
+  const exRe = ex.filter(e => !sureNorm.has(e)).length ? new RegExp("(^|[^a-z0-9])(?:" + ex.filter(e => !sureNorm.has(e)).map(e => rxEscape(e).replace(/\s+/g, "\\s+")).join("|") + ")(?=[^a-z0-9]|$)", "g") : null;
+  return (famRulesCache[k] = { fams, ids: [...seen], sureList, maybeList, exRe, sureRe: famCap(sureList), maybeRe: famCap(maybeList) });
+}
+function famShow(norm) { famInit(); return FAM_DISP.get(norm) || FAM_DISP.get(famForms(norm)[1] || "") || norm; }
+// null | { kind: "sure"|"maybe", via: "pimentón" }
+function customHitInfo(text, term) {
+  const k = famNorm(term);
+  if (!k) return null;
+  const R = famRules(k);
+  let t = neutralizeOptional(" " + normText(text) + " ");
+  if (R.exRe) t = t.replace(R.exRe, "$1 ");
+  t = stripNegations(t);
+  let m = R.sureRe && R.sureRe.exec(t);
+  if (m) return { kind: "sure", via: famShow(m[1].replace(/\s+/g, " ")) };
+  m = R.maybeRe && R.maybeRe.exec(t);
+  if (m) return { kind: "maybe", via: famShow(m[1].replace(/\s+/g, " ")) };
+  return null;
+}
+function customHit(text, term) { return !!customHitInfo(text, term); }
+// Texto para el comensal: «lleva AJO en «alioli»», «puede llevar MAÍZ por «fructosa»»
+function customWhy(info, term) {
+  const T = String(term || "").toUpperCase();
+  if (info.kind === "maybe") return `puede llevar ${T} por «${info.via}»`;
+  const same = famForms(famNorm(term)).includes(famNorm(info.via)) || famForms(famNorm(info.via)).includes(famNorm(term));
+  return same ? `lleva ${T}` : `lleva ${T} en «${info.via}»`;
+}
+// Qué buscamos exactamente (para enseñárselo al comensal y a la cocina)
+function customSummary(term) {
+  const R = famRules(term);
+  const k = famNorm(term);
+  const own = new Set(famForms(k));
+  const names = R.sureList.filter(x => !/^re:/.test(x) && !own.has(x)).map(famShow);
+  const maybes = R.maybeList.filter(x => !/^re:/.test(x)).map(famShow);
+  return { known: R.fams.length > 0, names, maybes, fams: R.fams };
+}
+// Sugerencias de familias relacionadas que aún no ha añadido
+function customRelated(terms) {
+  famInit();
+  const have = new Set(), relCustom = [], relAl = [];
+  terms.forEach(t => famRules(t).ids.forEach(id => have.add(id)));
+  terms.forEach(t => famRules(t).fams.forEach(f => {
+    f.rel.forEach(id => { const g = FAM_BY_ID[id]; if (g && !have.has(g.id) && !relCustom.some(x => x.id === g.id)) relCustom.push(g); });
+    (f.relA || []).forEach(a => { if (!relAl.includes(a)) relAl.push(a); });
+  }));
+  return { custom: relCustom, allergens: relAl };
+}
+// Para la tarjeta del camarero y el pre-aviso: «PIMIENTO (y derivados: pimentón, paprika, guindilla…)»
+function customForCard(term, max) {
+  const T = String(term || "").toUpperCase();
+  const s = customSummary(term);
+  if (!s.known || !s.names.length) return T;
+  const n = max || 6;
+  return `${T} (y derivados: ${s.names.slice(0, n).join(", ")}${s.names.length > n ? "…" : ""})`;
+}
+
+// Solo para las pruebas
+function famAll() { return FOOD_FAMILIES; }
+
+// =====================================================================
+// WEB DE RESTAURANTES (restaurantes.html) · 3.11
+// Lista, mapa y ficha de cada restaurante para consultar desde el navegador, al estilo de las
+// webs de reservas. Es de SOLO LECTURA: no se publica nada (opinar, avisar, guardar o reclamar
+// se hace desde la app). Usa el mismo motor que la app (01_core, 02_detect y 02b_families), así
+// que un plato sale igual de compatible, adaptable o no apto en la web que en el móvil.
+// - El perfil de alergias es el mismo que el de la app (misma clave en el navegador): si usas las
+//   dos en el mismo navegador, comparten lo que marques.
+// - Para gastar pocas lecturas de Firebase, la lista se guarda en el navegador y solo se piden
+//   los cambios desde la última visita (la lista entera, una vez por semana).
+// =====================================================================
+const WEB_FB_VERSION = "10.12.2";           // la misma versión del SDK que la app (lo comprueba la compilación)
+const WEB_CACHE_KEY = "comeclaro_web_restaurantes_v1";
+const WEB_FULL_MS = 7 * DAY_MS, WEB_OVERLAP_MS = 60000, WEB_PAGE = 300, WEB_PLAN_MS = 10 * 60000;
+const MAP_OK = "tusalergias_mapa_ok";        // el mismo permiso del mapa que en la app
+const SITE = "https://comeclaro.es/";
+const W = {
+  list: [], plan: { b: 0 }, planAt: 0, loaded: false, noServer: false, netFail: false,
+  q: "", onlyVerified: false, sort: "rec", me: null,
+  rest: null, shownId: null, filter: "all", cat: "ALL", menuQ: ""
+};
+const detailCache = new Map();
+
+// ---------- Utilidades ----------
+function webTs(v) { return v && typeof v.toMillis === "function" ? v.toMillis() : 0; }
+function plural(n, one, many) { return `${n} ${n === 1 ? one : many}`; }
+function hasProfile() { return selectedAllergens.size > 0 || selectedDiets.size > 0 || customAvoidSet.size > 0; }
+function profileWords() {
+  return [...ALLERGENS.filter(a => selectedAllergens.has(a)),
+    ...DIETS.filter(d => selectedDiets.has(d.id)).map(d => d.label.replace(/^\S+\s/, "")),
+    ...[...customAvoidSet].map(t => "sin " + t)];
+}
+function routeId() {
+  const v = new URLSearchParams(location.search).get("r");
+  if (!v) return null;
+  if (v === "ejemplo") return "ejemplo";
+  const id = String(v).replace(/[^A-Za-z0-9_-]/g, "").slice(0, 60);
+  return id || null;
+}
+function appLink(r) { return r && !r.demo ? "app.html?r=" + encodeURIComponent(r.id) : "app.html"; }
+function distKm(a, b) {
+  const R = 6371, rad = x => x * Math.PI / 180;
+  const dLat = rad(b.lat - a.lat), dLng = rad(b.lng - a.lng);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function fmtKm(km) { return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(km < 10 ? 1 : 0).replace(".", ",")} km`; }
+function starsHtml(n) {
+  n = Math.max(0, Math.min(5, Math.round(n)));
+  return `<span class="stars" aria-hidden="true">${"★".repeat(n)}${"☆".repeat(5 - n)}</span><span class="sr">${n} de 5 estrellas</span>`;
+}
+
+// ---------- Firebase (solo lectura, sin cuenta) ----------
+function webCfg() {
+  const c = window.TUSALERGIAS_FIREBASE_CONFIG;
+  const ok = v => typeof v === "string" && v.trim() && !/^PEGA|^TU_/i.test(v.trim());
+  return c && ok(c.apiKey) && ok(c.projectId) && ok(c.appId) ? c : null;
+}
+let fbReady = null;
+function webFirebase() {
+  if (fbReady) return fbReady;
+  const cfg = webCfg();
+  if (!cfg) return (fbReady = Promise.resolve(null));
+  fbReady = (async () => {
+    const base = `https://www.gstatic.com/firebasejs/${WEB_FB_VERSION}/`;
+    const [appM, F] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-firestore.js")]);
+    const app = appM.initializeApp(cfg, "web");
+    return { F, db: F.getFirestore(app), pid: cfg.projectId };
+  })().catch(e => { console.warn("firebase:", e); fbReady = null; return null; });
+  return fbReady;
+}
+
+// ---------- Lista guardada en el navegador ----------
+function loadCache() {
+  try { const c = JSON.parse(localStorage.getItem(WEB_CACHE_KEY)); if (c && Array.isArray(c.list)) return c; } catch (e) {}
+  return null;
+}
+function saveCache(c) { try { localStorage.setItem(WEB_CACHE_KEY, JSON.stringify(c)); } catch (e) {} }
+function restFromDoc(id, x) {
+  x = x || {};
+  return {
+    id: safeId(id), name: str(x.name, 120) || "Restaurante", city: str(x.city, 200), phone: str(x.phone, 20).replace(/[^0-9+]/g, ""),
+    lat: Number(x.lat) || 0, lng: Number(x.lng) || 0, lastVerified: str(x.lastVerified, 40),
+    verified: x.verified === true, founder: !!x.founder, dishCount: Math.max(0, Math.min(300, parseInt(x.dishCount) || 0)),
+    paidUntil: webTs(x.paidUntil), createdAtMs: webTs(x.createdAt), up: webTs(x.updatedAt)
+  };
+}
+// ¿Se muestra este local al público ahora? (la misma regla que la app y que el servidor)
+function webPublicNow(r, now = Date.now()) {
+  const b = (W.plan && W.plan.b) || 0;
+  if (!b || now < b) return true;
+  if (now < b + PLAN.graceDays * DAY_MS) return true;
+  if (r.founder && now < b + (PLAN.founderFreeDays + PLAN.graceDays) * DAY_MS) return true;
+  return (r.paidUntil || 0) > now;
+}
+async function loadPlan(fb) {
+  if (Date.now() - W.planAt < WEB_PLAN_MS) return;
+  try {
+    const s = await fb.F.getDoc(fb.F.doc(fb.db, "meta", "plan"));
+    W.plan = { b: s.exists() ? webTs((s.data() || {}).billingStartsAt) : 0 };
+    W.planAt = Date.now();
+  } catch (e) { console.warn("plan:", e); }
+}
+async function syncRestaurants() {
+  const fb = await webFirebase();
+  if (!fb) { W.noServer = true; return; }
+  const { F, db, pid } = fb;
+  const now = Date.now();
+  let c = loadCache();
+  if (c && c.p !== pid) c = null;
+  try {
+    await loadPlan(fb);
+    const fresh = c && c.r && now - c.full < WEB_FULL_MS && now >= c.full;
+    if (fresh) {
+      const qs = await F.getDocs(F.query(F.collection(db, "restaurants"), F.where("updatedAt", ">", F.Timestamp.fromMillis(Math.max(0, c.r - WEB_OVERLAP_MS))), F.orderBy("updatedAt"), F.limit(WEB_PAGE)));
+      if (qs.docs.length < WEB_PAGE) {
+        const map = new Map(c.list.map(r => [r.id, r]));
+        let max = c.r;
+        qs.docs.forEach(d => {
+          const x = d.data() || {}, id = safeId(d.id);
+          if (x.published) map.set(id, restFromDoc(id, x)); else map.delete(id);
+          max = Math.max(max, webTs(x.updatedAt));
+        });
+        W.list = [...map.values()];
+        saveCache({ p: pid, full: c.full, r: max, list: W.list, plan: W.plan });
+        return;
+      }
+    }
+    const qs = await F.getDocs(F.query(F.collection(db, "restaurants"), F.where("published", "==", true), F.limit(500)));
+    let max = 0;
+    W.list = qs.docs.map(d => { const x = d.data() || {}; max = Math.max(max, webTs(x.updatedAt)); return restFromDoc(d.id, x); });
+    saveCache({ p: pid, full: now, r: max, list: W.list, plan: W.plan });
+  } catch (e) { console.warn("restaurantes:", e); W.netFail = true; }
+}
+function forgetRest(id) {
+  W.list = W.list.filter(r => r.id !== id);
+  const c = loadCache();
+  if (c) { c.list = c.list.filter(r => r.id !== id); saveCache(c); }
+}
+
+// ---------- Etiquetas comunes ----------
+function badgesHtml(r) {
+  if (r.demo) return `<span class="badge demo">🧪 Carta de ejemplo: no es un restaurante real</span>`;
+  return (r.verified ? `<span class="badge ver" title="Comeclaro ha comprobado con el local que quien publica la carta es el restaurante">✓ Verificado</span>` : `<span class="badge">Sin verificar</span>`)
+    + (r.founder ? ` <span class="badge fund">🏅 Fundador</span>` : "");
+}
+
+// ---------- Lista ----------
+function visibleList() {
+  let L = W.list.filter(r => webPublicNow(r));
+  if (W.onlyVerified) L = L.filter(r => r.verified);
+  const q = normText(W.q).trim();
+  if (q) L = L.filter(r => normText(r.name + " " + r.city).includes(q));
+  const byName = (a, b) => a.name.localeCompare(b.name, "es", { sensitivity: "base" });
+  if (W.sort === "near" && W.me) {
+    const d = r => (r.lat || r.lng) ? distKm(W.me, r) : 1e9;
+    L.sort((a, b) => d(a) - d(b) || byName(a, b));
+  } else if (W.sort === "az") L.sort(byName);
+  else L.sort((a, b) => (Number(b.verified) - Number(a.verified)) || (Number(b.founder) - Number(a.founder)) || byName(a, b));
+  return L;
+}
+function cardHtml(r) {
+  const km = W.me && (r.lat || r.lng) ? ` · a ${fmtKm(distKm(W.me, r))}` : "";
+  const dishes = r.demo ? "Pruébala con tus alergias" : (r.dishCount ? `${plural(r.dishCount, "plato", "platos")} con sus alérgenos` : "Carta con alérgenos");
+  const rev = r.lastVerified && !r.demo ? ` · revisada el ${esc(r.lastVerified)}` : "";
+  return `<a class="rcard" href="?r=${encodeURIComponent(r.id)}" data-r="${esc(r.id)}" id="card-${esc(r.id)}">
+    <div><h2>${esc(r.name)}</h2><div class="badges">${badgesHtml(r)}</div>
+    <p class="meta">📍 ${esc(r.city || "Región de Murcia")}${km}</p>
+    <p class="meta">🍽️ ${esc(dishes)}${rev}</p></div>
+    <span class="go" aria-hidden="true">Ver carta →</span></a>`;
+}
+function demoCard() { return cardHtml({ id: "ejemplo", demo: true, name: "Carta de ejemplo (12 platos)", city: "Prueba el filtro con tus alergias", lat: 0, lng: 0 }); }
+function renderList() {
+  const box = $("rlist");
+  if (!box) return;
+  const L = visibleList();
+  const total = W.list.filter(r => webPublicNow(r)).length;
+  const q = W.q.trim();
+  if (!W.loaded && !W.list.length) { $("count").textContent = "Cargando restaurantes…"; box.innerHTML = ""; return; }
+  $("count").textContent = W.noServer ? "Lista no disponible" : `${plural(L.length, "restaurante", "restaurantes")}${q ? ` para «${q}»` : ""}`;
+  let html = L.map(cardHtml).join("");
+  if (W.noServer || (W.netFail && !W.list.length)) {
+    html = `<div class="empty"><strong>No se ha podido cargar la lista de restaurantes.</strong><span>${W.noServer ? "Esta copia de la web no está conectada al servidor." : "Revisa tu conexión e inténtalo de nuevo."}</span>${W.noServer ? "" : `<button class="btn btn-navy" type="button" data-retry>Reintentar</button>`}</div>` + demoCard();
+  } else if (!total) {
+    html = `<div class="empty"><strong>Todavía no hay restaurantes publicados.</strong><span>Estamos empezando en la Región de Murcia. Mientras tanto, prueba cómo funciona con una carta de ejemplo.</span><a class="btn btn-navy" href="./#hosteleria">¿Tienes un restaurante? Publica tu carta</a></div>` + demoCard();
+  } else if (!L.length) {
+    html = `<div class="empty"><strong>Ningún restaurante coincide con tu búsqueda.</strong><button class="btn btn-line" type="button" data-clear-filters>Quitar filtros</button></div>`;
+  } else if (total < 5) html += demoCard();
+  box.innerHTML = html;
+  refreshMarkers(false);
+}
+function updateProfLine() {
+  const el = $("profLine");
+  if (!el) return;
+  const w = profileWords();
+  el.innerHTML = w.length
+    ? `Vigilando: ${w.slice(0, 8).map(x => `<span class="chipx">${esc(x)}</span>`).join("")}${w.length > 8 ? ` <span>y ${w.length - 8} más</span>` : ""}${strictTracesEnabled ? "" : " <span>(trazas permitidas)</span>"} <button type="button" data-open-profile>Cambiar</button>`
+    : `Aún no has marcado tus alergias. <button type="button" data-open-profile>Márcalas</button> y cada carta te dirá qué platos son para ti.`;
+}
+function setNotice(msg) { const c = $("count"); if (c) c.textContent = msg; }
+
+// ---------- Mapa (solo si la persona lo permite: lo dibuja OpenStreetMap) ----------
+let map = null, layer = null, miniMap = null;
+function mapOk() { try { return localStorage.getItem(MAP_OK) === "1"; } catch (e) { return false; } }
+function consentHtml(small) {
+  return `<div class="consent"><div class="ico" aria-hidden="true">🗺️</div><button class="btn btn-navy${small ? " btn-sm" : ""}" type="button" data-allow-map>Mostrar el mapa</button><div>El mapa lo dibuja OpenStreetMap: al mostrarlo, sus servidores reciben tu dirección IP.${small ? "" : " La lista funciona sin él."}</div></div>`;
+}
+function tileLayer() {
+  return L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' });
+}
+function withLeaflet(box, done) {
+  box.innerHTML = `<div class="consent"><div class="ico" aria-hidden="true">⏳</div>Cargando el mapa…</div>`;
+  ensureLib("leaflet").then(ok => {
+    if (!ok) { box.innerHTML = `<div class="consent"><div class="ico" aria-hidden="true">🗺️</div>${esc(libFailText("El mapa"))}<button class="btn btn-line btn-sm" type="button" data-allow-map>Reintentar</button></div>`; return; }
+    try { if (L.Icon && L.Icon.Default) L.Icon.Default.imagePath = libUrl(""); } catch (e) {}
+    done();
+  });
+}
+function ensureMap() {
+  const box = $("mapBox");
+  if (!box || $("listView").hidden) return;
+  if (!mapOk()) { if (!map) box.innerHTML = consentHtml(false); return; }
+  if (map) { try { map.invalidateSize(); } catch (e) {} refreshMarkers(false); return; }
+  withLeaflet(box, () => {
+    box.innerHTML = `<div id="map"></div>`;
+    map = L.map("map").setView([37.75, -1.3], 9);
+    tileLayer().addTo(map);
+    layer = L.layerGroup().addTo(map);
+    refreshMarkers(true);
+  });
+}
+function refreshMarkers(fit) {
+  if (!map || !layer) return;
+  layer.clearLayers();
+  const pts = [];
+  visibleList().forEach(r => {
+    if (!r.lat && !r.lng) return;
+    L.marker([r.lat, r.lng], { zIndexOffset: r.verified ? 1000 : 0, title: r.name }).addTo(layer)
+      .bindPopup(`<b>${esc(r.name)}</b>${r.city ? "<br>" + esc(r.city) : ""}${r.verified ? "<br>✓ Local verificado" : ""}<br><a class="btn btn-green btn-sm" href="?r=${encodeURIComponent(r.id)}" data-r="${esc(r.id)}">Ver carta</a>`);
+    pts.push([r.lat, r.lng]);
+  });
+  if (fit && pts.length && typeof map.fitBounds === "function") map.fitBounds(pts, { padding: [30, 30], maxZoom: 14 });
+}
+function ensureMiniMap(r) {
+  const box = $("miniMap");
+  if (!box) return;
+  if (!r.lat && !r.lng) { box.remove(); return; }
+  if (!mapOk()) { box.innerHTML = consentHtml(true); return; }
+  withLeaflet(box, () => {
+    box.innerHTML = `<div id="mini" style="width:100%;height:100%"></div>`;
+    if (miniMap) { try { miniMap.remove(); } catch (e) {} }
+    miniMap = L.map("mini", { scrollWheelZoom: false }).setView([r.lat, r.lng], 15);
+    tileLayer().addTo(miniMap);
+    L.marker([r.lat, r.lng], { title: r.name }).addTo(miniMap);
+  });
+}
+function allowMap() {
+  try { localStorage.setItem(MAP_OK, "1"); } catch (e) {}
+  if ($("listView").hidden) { if (W.rest) ensureMiniMap(W.rest); } else ensureMap();
+}
+
+// ---------- Ficha de un restaurante ----------
+function demoRest() {
+  const p = makePilotRest();
+  return {
+    id: "ejemplo", demo: true, name: "Carta de ejemplo (12 platos)", city: p.city, phone: "", lat: p.lat, lng: p.lng, lastVerified: "",
+    verified: false, founder: false, menu: sanitizeMenu(p.menu).filter(d => !d.draft), equip: sanitizeEquip(p.equip || []),
+    reviews: (p.reviews || []).map(rv => ({ id: String(rv.id), author: rv.author, stars: rv.stars, allergens: rv.allergens, comment: rv.comment, isAlert: false, ts: 0, date: "", reply: "", replyTs: 0, resolvedTs: 0, sample: true })),
+    denied: false, createdAtMs: 0
+  };
+}
+function reviewFrom(d) {
+  const x = d.data() || {};
+  const ms = webTs(x.createdAt) || Date.now();
+  return {
+    id: safeId(d.id, "rv_"), author: str(x.author, 60) || "Anónimo", stars: Math.min(5, Math.max(1, parseInt(x.stars) || 5)),
+    allergens: str(x.allergens, 200), comment: str(x.comment, 1000), isAlert: !!x.isAlert,
+    ts: ms, date: new Date(ms).toLocaleDateString("es-ES"), reply: str(x.reply, 500), replyTs: webTs(x.replyAt), resolvedTs: webTs(x.resolvedAt)
+  };
+}
+async function fetchRest(id) {
+  const fb = await webFirebase();
+  if (!fb) return { error: "server" };
+  const { F, db } = fb;
+  try {
+    let denied = false;
+    const [s, m, rv] = await Promise.all([
+      F.getDoc(F.doc(db, "restaurants", id)),
+      // Con el cobro activo, el servidor no entrega la carta de un local sin suscripción
+      F.getDoc(F.doc(db, "menus", id)).catch(e => { if (/permission/i.test(String(e && (e.code || e.message)))) { denied = true; return null; } throw e; }),
+      F.getDocs(F.query(F.collection(db, "restaurants", id, "reviews"), F.orderBy("createdAt", "desc"), F.limit(30))).catch(() => null),
+      loadPlan(fb)
+    ]);
+    if (!s.exists() || !(s.data() || {}).published) { forgetRest(id); return { gone: true }; }
+    const r = restFromDoc(id, s.data());
+    const md = m && m.exists() ? (m.data() || {}) : null;
+    r.menu = md ? sanitizeMenu(md.menu || []).filter(d => !d.draft) : [];
+    r.equip = md ? sanitizeEquip(md.equip || []) : [];
+    r.denied = denied || !webPublicNow(r);
+    if (r.denied) r.menu = [];
+    // Las opiniones anteriores a que el local se diera de alta en esta cuenta no son de este local
+    const since = r.createdAtMs;
+    r.reviews = rv ? rv.docs.map(reviewFrom).filter(x => !since || !x.ts || x.ts >= since - 10 * 60000) : [];
+    r.fetchedAt = Date.now();
+    detailCache.set(id, { r, at: Date.now() });
+    // La lista guardada se pone al día con lo que se acaba de leer
+    const i = W.list.findIndex(x => x.id === id);
+    if (i >= 0) { const { menu, equip, reviews, denied: dn, fetchedAt, ...sum } = r; W.list[i] = Object.assign(W.list[i], sum); }
+    return r;
+  } catch (e) { console.warn("restaurante:", e); return { error: "net" }; }
+}
+async function openDetail(id) {
+  const box = $("detail");
+  W.shownId = id;
+  box.innerHTML = `<a class="back" href="restaurantes.html" data-list>← Todos los restaurantes</a><div class="loading" role="status">Cargando la carta…</div>`;
+  window.scrollTo(0, 0);
+  let r;
+  if (id === "ejemplo") r = demoRest();
+  else {
+    const c = detailCache.get(id);
+    r = c && Date.now() - c.at < 5 * 60000 ? c.r : await fetchRest(id);
+  }
+  if (routeId() !== id) return;               // ya se ha ido a otra página
+  if (!r || r.gone || r.error) {
+    const msg = r && r.gone ? ["Este restaurante ya no está disponible.", "Puede que haya dejado de publicar su carta en Comeclaro."]
+      : r && r.error === "server" ? ["La carta no está disponible en esta copia de la web.", "Esta copia no está conectada al servidor."]
+      : ["No se ha podido cargar la carta.", "Revisa tu conexión e inténtalo de nuevo."];
+    box.innerHTML = `<a class="back" href="restaurantes.html" data-list>← Todos los restaurantes</a><div class="empty" style="margin-top:14px"><strong>${esc(msg[0])}</strong><span>${esc(msg[1])}</span>${r && r.error === "net" ? `<button class="btn btn-navy" type="button" data-retry-detail>Reintentar</button>` : ""}</div>`;
+    setMeta({ title: "Restaurante no disponible · Comeclaro", noindex: true });
+    setLd(null);
+    return;
+  }
+  W.rest = r;
+  W.filter = hasProfile() ? "aptos" : "all"; W.cat = "ALL"; W.menuQ = "";
+  renderDetail();
+  const name = r.demo ? "Carta de ejemplo" : r.name;
+  setMeta({
+    title: `${name}${r.city && !r.demo ? " (" + r.city + ")" : ""} · Carta con alérgenos · Comeclaro`,
+    desc: r.demo ? "Prueba con una carta de ejemplo cómo Comeclaro te dice qué platos son para ti." :
+      `Carta de ${r.name}${r.city ? " en " + r.city : ""} con los alérgenos de cada plato. Marca tus alergias y mira qué platos son compatibles, cuáles se pueden adaptar y cuáles no.`,
+    url: SITE + "restaurantes.html?r=" + encodeURIComponent(r.id), noindex: !!r.demo
+  });
+  setLd(r.demo ? null : r);
+  const h = $("rName"); if (h) h.focus({ preventScroll: true });
+}
+function renderDetail() {
+  const r = W.rest, box = $("detail");
+  const phone = r.phone ? `<a class="btn btn-line" href="tel:${esc(r.phone)}">📞 Llamar</a>` : "";
+  const route = (r.lat || r.lng) && !r.demo ? `<a class="btn btn-line" href="https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lng}" target="_blank" rel="noopener">🧭 Cómo llegar</a>` : "";
+  const fresh = r.demo ? `<p class="fresh">Platos de muestra para probar el filtro.</p>`
+    : `<p class="fresh">✓ Carta consultada ahora${r.lastVerified ? ` · revisada por el local el ${esc(r.lastVerified)}` : ""}</p>`;
+  const nRev = r.reviews.filter(x => !x.isAlert).length;
+  box.innerHTML = `<a class="back" href="restaurantes.html" data-list>← Todos los restaurantes</a>
+  <div class="dgrid"><div class="dmain">
+    <section class="rhead" aria-labelledby="rName">
+      <h1 id="rName" tabindex="-1">${esc(r.name)}</h1>
+      <div class="badges">${badgesHtml(r)}</div>
+      ${r.city ? `<p class="meta">📍 ${esc(r.city)}${r.phone ? ` · 📞 ${esc(r.phone)}` : ""}</p>` : ""}
+      ${fresh}
+      <div class="ractions">${phone}${route}<a class="btn btn-green" href="${appLink(r)}">📱 Abrir en la app</a></div>
+    </section>
+    <nav class="secnav" aria-label="Secciones de la ficha"><a href="#carta">Carta</a><a href="#opiniones">Opiniones${nRev ? ` (${nRev})` : ""}</a><a href="#info">Información</a></nav>
+    <section class="sec" id="carta" aria-labelledby="cartaT"><h2 id="cartaT">Carta</h2><div id="menuTop"></div><div id="menuList" aria-live="polite"></div></section>
+    <section class="sec" id="opiniones" aria-labelledby="opT"><h2 id="opT">Opiniones</h2><div id="revBox"></div></section>
+    <section class="sec" id="info" aria-labelledby="infoT"><h2 id="infoT">Información</h2><div class="panel" id="infoBox"></div></section>
+  </div>
+  <aside class="aside" aria-label="Tus alergias y la app"><div class="panel" id="asideProf"></div>
+    <div class="panel"><h2>En el restaurante</h2><p>Desde la app tienes la tarjeta de alergias para el camarero en 4 idiomas, puedes guardar el local y dejar tu opinión.</p><a class="btn btn-green" href="${appLink(r)}">📱 Abrir en la app</a></div>
+  </aside></div>`;
+  renderMenu(); renderReviews(); renderInfo(); renderAside();
+}
+function renderAside() {
+  const el = $("asideProf");
+  if (!el) return;
+  const w = profileWords();
+  el.innerHTML = `<h2>Tus alergias</h2>${w.length ? `<p>Vigilando: <b>${esc(w.join(", "))}</b>${strictTracesEnabled ? "" : " (trazas permitidas)"}.</p>` : `<p>Marca tus alergias y te decimos qué platos de esta carta son para ti.</p>`}<button class="btn ${w.length ? "btn-line" : "btn-amber"}" type="button" data-open-profile>${w.length ? "Cambiar mis alergias" : "Marcar mis alergias"}</button>`;
+}
+function renderInfo() {
+  const r = W.rest, el = $("infoBox");
+  if (!el) return;
+  const li = (ico, html) => `<li><span aria-hidden="true">${ico}</span><span>${html}</span></li>`;
+  el.innerHTML = `<ul class="info-list">
+    ${r.city ? li("📍", esc(r.city)) : ""}
+    ${r.phone ? li("📞", `<a href="tel:${esc(r.phone)}">${esc(r.phone)}</a>`) : ""}
+    ${r.demo ? li("🧪", "Es una carta de ejemplo para probar el filtro: no es un restaurante real.")
+      : r.verified ? li("✓", "<b>Local verificado:</b> Comeclaro ha comprobado con el local que quien publica la carta es el restaurante. No significa que hayamos revisado la carta: de sus alérgenos responde el restaurante.")
+      : li("ℹ️", "<b>Local sin verificar:</b> todavía no hemos comprobado con el local que quien publica la carta es el restaurante.")}
+    ${r.founder ? li("🏅", "Restaurante fundador: de los primeros en publicar su carta en Comeclaro.") : ""}
+    ${r.lastVerified && !r.demo ? li("📅", `Carta revisada por el local el ${esc(r.lastVerified)}.`) : ""}
+  </ul>
+  ${(r.lat || r.lng) ? `<div class="minimap" id="miniMap"></div>` : ""}
+  ${r.demo ? "" : `<p class="rnote">¿Es tu restaurante? Gestiona tu carta desde <a href="app.html?accion=hosteleria">Acceso hostelería</a>.</p>`}`;
+  ensureMiniMap(r);
+}
+
+// Carta: la parte de arriba (perfil, filtros, buscador) se pinta una vez; la lista, cada vez que cambia algo
+function evalMenu() {
+  const r = W.rest;
+  const eqx = r.equip.length ? buildEquipIndex(r.equip, r.menu) : null;
+  return { eqx, items: r.menu.map(d => ({ d, res: evaluateDish(d, strictTracesEnabled, eqx) })) };
+}
+function renderMenu() {
+  const r = W.rest, top = $("menuTop");
+  if (!top) return;
+  if (r.denied) {
+    top.innerHTML = `<div class="panel lock"><b>🔒 Este restaurante no tiene la carta disponible en Comeclaro ahora mismo.</b><p class="muted">Pregunta directamente al personal por los alérgenos de cada plato.</p></div>`;
+    $("menuList").innerHTML = ""; return;
+  }
+  if (!r.menu.length) { top.innerHTML = `<div class="panel"><p class="muted">Este local aún no tiene platos publicados.</p></div>`; $("menuList").innerHTML = ""; return; }
+  const prof = hasProfile();
+  if (!prof) W.filter = "all";
+  const { items } = evalMenu();
+  const counts = { aptos: 0, mod: 0, proh: 0 };
+  items.forEach(x => counts[x.res.status]++);
+  const cats = [...new Set(r.menu.map(d => d.cat))];
+  if (W.cat !== "ALL" && !cats.includes(W.cat)) W.cat = "ALL";
+  const w = profileWords();
+  const seg = prof ? `<div class="seg" role="group" aria-label="Qué platos ver">${[["all", "Todos", items.length], ["aptos", "Compatibles", counts.aptos], ["mod", "Adaptables", counts.mod], ["proh", "No aptos", counts.proh]]
+    .map(([k, t, n]) => `<button type="button" class="s-${k}" data-filter="${k}" aria-pressed="${W.filter === k}">${t} (${n})</button>`).join("")}</div>` : "";
+  top.innerHTML = `<p class="legal-note">⚖️ La carta la publica el restaurante. El resultado es orientativo: confirma siempre tus alergias con el personal antes de pedir.</p>
+    <div class="profbar">${prof ? `<span>🛡️ Vigilando: <b>${esc(w.join(", "))}</b>${strictTracesEnabled ? "" : " (trazas permitidas)"}</span><button class="btn btn-line btn-sm" type="button" data-open-profile>Cambiar</button>`
+      : `<span>🛡️ Marca tus alergias y te decimos qué platos son para ti.</span><button class="btn btn-amber btn-sm" type="button" data-open-profile>Mis alergias</button>`}</div>
+    ${seg}
+    <div class="menu-tools">
+      <label class="search-field" for="menuQ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sr">Buscar en la carta</span><input id="menuQ" type="search" placeholder="Buscar un plato o ingrediente" value="${esc(W.menuQ)}" autocomplete="off"></label>
+      ${cats.length > 1 ? `<label class="sr" for="catSel">Sección de la carta</label><select id="catSel"><option value="ALL">Todas las secciones (${r.menu.length})</option>${cats.map(c => `<option value="${esc(c)}"${W.cat === c ? " selected" : ""}>${esc(c)}</option>`).join("")}</select>` : ""}
+    </div>`;
+  renderMenuList();
+}
+function renderMenuList() {
+  const r = W.rest, box = $("menuList");
+  if (!box || r.denied || !r.menu.length) return;
+  const prof = hasProfile();
+  const { eqx, items } = evalMenu();
+  const q = normText(W.menuQ).trim();
+  const shown = items.filter(({ d, res }) => (W.filter === "all" || res.status === W.filter) && (W.cat === "ALL" || d.cat === W.cat)
+    && (!q || normText(d.name + " " + d.ings.map(i => i.n + " " + i.sub).join(" ")).includes(q)));
+  document.querySelectorAll("#menuTop [data-filter]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.filter === W.filter)));
+  let html = "";
+  if (prof && W.filter === "aptos" && shown.length) html += `<p class="aptos-note">✅ Estos platos no llevan lo que tienes en tu perfil <b>según los datos del local</b>. Compatible no significa seguro: confírmalo con el camarero.</p>`;
+  const groups = new Map();
+  shown.forEach(x => { if (!groups.has(x.d.cat)) groups.set(x.d.cat, []); groups.get(x.d.cat).push(x); });
+  groups.forEach((list, cat) => {
+    html += `<h3 class="cathead">${esc(cat)}</h3><div class="dishes">${list.map(({ d, res }) => dishHtml(d, res, prof, eqx)).join("")}</div>`;
+  });
+  if (!shown.length) {
+    const why = q || W.cat !== "ALL" ? "Ningún plato coincide con tu búsqueda."
+      : { aptos: "Ningún plato es compatible tal cual. Mira los adaptables.", mod: "No hay platos que necesiten adaptación.", proh: "Ningún plato queda descartado.", all: "No hay platos." }[W.filter];
+    html += `<p class="muted" style="text-align:center;padding:18px 0">${esc(why)}</p>`;
+  }
+  box.innerHTML = html;
+}
+const ST_LABEL = { aptos: "COMPATIBLE", mod: "ADAPTABLE", proh: "NO APTO" };
+function dishHtml(d, res, prof, eqx) {
+  let body = "";
+  if (prof) {
+    if (res.status === "mod") body += `<p class="why mod">🔄 <b>Adaptable:</b> ${res.rem.join(" · ")}</p>`;
+    if (res.status === "proh") body += `<p class="why proh">⛔ <b>No apto:</b> ${res.blk.join(" · ")}</p>`;
+    if (res.tr.length && res.status !== "proh") body += `<p class="why tr">ℹ️ Trazas en cocina: ${esc(res.tr.join(", "))}</p>`;
+  } else {
+    // Sin perfil: los alérgenos del plato tal como los indica el local y, aparte, los que se deducen de su descripción
+    const real = d.ings.filter(i => !isPlaceholderIng(i));
+    const declared = ALLERGENS.filter(a => d.ings.some(i => (i.a || []).includes(a)));
+    const guessed = ALLERGENS.filter(a => !declared.includes(a) && d.ings.some(i => ingAllergenList(i).includes(a)));
+    body += `<p class="dal">${declared.length ? `<b>Alérgenos:</b> ${esc(declared.join(", "))}` : (real.length ? "El local no indica alérgenos en sus componentes." : "No detalla sus ingredientes: pregunta al camarero.")}${guessed.length ? ` <span class="maybe">· Por su descripción, también podría llevar: ${esc(guessed.join(", "))}</span>` : ""}</p>`;
+    if (d.traces.length) body += `<p class="why tr">ℹ️ Puede contener trazas de: ${esc(d.traces.join(", "))}</p>`;
+  }
+  if (d.protocol) body += `<p class="why pro">👩‍🍳 ${esc(d.protocol)}</p>`;
+  dishEquipLines(d, eqx).forEach(l => { body += `<p class="why eq">${esc(l)}</p>`; });
+  const comps = d.ings.map(i => {
+    const fromEq = ingEquipAllergens(i, eqx).filter(x => x.al.length).map(x => `${(EQUIP_KINDS[x.E.k] || EQUIP_KINDS.freidora).icon} ${x.al.join(", ")}`);
+    return `<li><b>${esc(i.n)}</b>${i.a && i.a.length ? ` <span class="al">${esc(i.a.join(", "))}</span>` : ""}${fromEq.length ? ` <span class="ale">${esc(fromEq.join(" · "))}</span>` : ""}${i.mod ? ` <span class="rm">· se puede quitar</span>` : ""}</li>`;
+  }).join("");
+  return `<article class="dish ${prof ? res.status : ""}"><header><h4>${esc(d.name)}</h4>${prof ? `<span class="st ${res.status}">${ST_LABEL[res.status]}</span>` : ""}</header>${body}${comps ? `<ul class="comps" aria-label="Componentes">${comps}</ul>` : ""}</article>`;
+}
+
+// Opiniones: solo para leer (se escriben desde la app)
+function reviewOverlapWeb(rv) {
+  const txt = " " + normText(rv.allergens) + " ";
+  return [...selectedAllergens].filter(a => txt.includes(normText(a))).length;
+}
+function renderReviews() {
+  const r = W.rest, box = $("revBox");
+  if (!box) return;
+  const list = r.reviews.map(rv => ({ rv, ov: reviewOverlapWeb(rv) }));
+  const rank = rv => rv.isAlert ? (rv.resolvedTs ? 1 : 2) : 0;
+  list.sort((a, b) => (rank(b.rv) - rank(a.rv)) || (b.ov - a.ov) || ((b.rv.ts || 0) - (a.rv.ts || 0)));
+  const fmt = ms => new Date(ms).toLocaleDateString("es-ES");
+  const normal = r.reviews.filter(x => !x.isAlert);
+  const avg = normal.length ? normal.reduce((s, x) => s + x.stars, 0) / normal.length : 0;
+  let html = normal.length ? `<div class="rsum"><span class="big">${avg.toFixed(1).replace(".", ",")}</span>${starsHtml(avg)}<span class="muted">· ${plural(normal.length, "opinión", "opiniones")}</span></div>` : "";
+  html += `<div class="reviews">` + list.map(({ rv, ov }) => {
+    const reply = rv.reply ? `<div class="reply"><b>💬 Respuesta del local</b>${rv.replyTs ? " · " + esc(fmt(rv.replyTs)) : ""}<div>${esc(rv.reply)}</div></div>` : "";
+    if (rv.isAlert) return `<article class="review alert${rv.resolvedTs ? " done" : ""}"><div class="rh"><b>⚠️ Aviso de un cliente sobre la carta</b><span>${esc(rv.date)}</span></div><p>${esc(rv.comment)}</p>${rv.resolvedTs ? `<div class="resolved">✓ Corregido por el local el ${esc(fmt(rv.resolvedTs))}</div>` : ""}${reply}</article>`;
+    return `<article class="review"><div class="rh"><b>${esc(rv.author)}${rv.sample ? " · opinión de ejemplo" : ""}</b><span>${starsHtml(rv.stars)} ${esc(rv.date)}</span></div>
+      ${ov ? `<div class="twin">🤝 Comparte ${plural(ov, "alergia", "alergias")} contigo</div>` : ""}
+      ${rv.allergens ? `<div class="alls">🛡️ Sus alergias: ${esc(rv.allergens)}</div>` : ""}
+      <p>«${esc(rv.comment)}»</p>${reply}</article>`;
+  }).join("") + `</div>`;
+  if (!list.length) html = `<div class="panel"><p class="muted">${r.demo ? "Esta carta de ejemplo no tiene opiniones." : "Aún no hay opiniones de este local."}</p></div>`;
+  html += r.demo ? "" : `<p class="rnote">Comeclaro no comprueba que quien opina haya comido en el local: permite una opinión por persona y revisa las que se denuncian. Para opinar, avisar de un error en la carta o denunciar una opinión, <a href="${appLink(r)}">abre este local en la app</a>.</p>`;
+  box.innerHTML = html;
+}
+
+// ---------- Datos para buscadores ----------
+function setMeta({ title, desc, url, noindex }) {
+  document.title = title || "Restaurantes con carta de alérgenos · Comeclaro";
+  const set = (sel, attr, v) => { const el = document.querySelector(sel); if (el && v) el.setAttribute(attr, v); };
+  const d = desc || "Restaurantes de la Región de Murcia con su carta de alérgenos. Marca tus alergias y mira qué platos son compatibles, cuáles se pueden adaptar y cuáles no.";
+  const u = url || SITE + "restaurantes.html";
+  set('meta[name="description"]', "content", d);
+  set("#canonical", "href", u); set("#ogUrl", "content", u); set("#ogTitle", "content", document.title); set("#ogDesc", "content", d);
+  let rb = document.querySelector('meta[name="robots"]');
+  if (noindex) { if (!rb) { rb = document.createElement("meta"); rb.name = "robots"; document.head.appendChild(rb); } rb.content = "noindex"; }
+  else if (rb) rb.remove();
+}
+function setLd(r) {
+  const old = $("ldjson");
+  if (old) old.remove();
+  if (!r) return;
+  const ld = { "@context": "https://schema.org", "@type": "Restaurant", name: r.name, url: SITE + "restaurantes.html?r=" + encodeURIComponent(r.id) };
+  if (r.city) ld.address = { "@type": "PostalAddress", addressLocality: r.city, addressCountry: "ES" };
+  if (r.phone) ld.telephone = r.phone;
+  if (r.lat || r.lng) ld.geo = { "@type": "GeoCoordinates", latitude: r.lat, longitude: r.lng };
+  const s = document.createElement("script");
+  s.type = "application/ld+json"; s.id = "ldjson";
+  s.textContent = JSON.stringify(ld).replace(/</g, "\\u003c");
+  document.head.appendChild(s);
+}
+
+// ---------- Panel «Mis alergias» ----------
+let profReturn = null;
+function openProfile() {
+  profReturn = document.activeElement;
+  renderProfile();
+  $("profOvl").classList.add("open");
+  document.body.style.overflow = "hidden";
+  $("profOvl").querySelector(".xbtn").focus();
+}
+function closeProfile() {
+  if (!$("profOvl").classList.contains("open")) return;
+  $("profOvl").classList.remove("open");
+  document.body.style.overflow = "";
+  if (profReturn && document.contains(profReturn)) profReturn.focus();
+}
+let sugg = { custom: [], allergens: [] };
+function renderProfile() {
+  $("pAl").innerHTML = ALLERGENS.map((a, i) => `<button type="button" class="chip" data-al="${i}" aria-pressed="${selectedAllergens.has(a)}">${esc(a)}</button>`).join("");
+  $("pDi").innerHTML = DIETS.map((d, i) => `<button type="button" class="chip diet" data-di="${i}" aria-pressed="${selectedDiets.has(d.id)}">${esc(d.label)}</button>`).join("");
+  $("pQuick").innerHTML = QUICK_CUSTOM_INGS.map((q, i) => `<button type="button" class="chip cus" data-qc="${i}" aria-pressed="${customAvoidSet.has(q.toLowerCase())}">Sin ${esc(q.toLowerCase())}</button>`).join("");
+  const quick = new Set(QUICK_CUSTOM_INGS.map(q => q.toLowerCase()));
+  const terms = [...customAvoidSet];
+  $("pTags").innerHTML = terms.map((t, i) => quick.has(t) ? "" : `<button type="button" class="tag-x" data-rmc="${i}" aria-label="Quitar ${esc(t)}">Sin ${esc(t)} ✕</button>`).join("");
+  $("pStrict").checked = strictTracesEnabled;
+  let info = "";
+  if (terms.length) {
+    info = terms.map(t => {
+      const T = esc(t.toUpperCase()), sm = customSummary(t);
+      if (!sm.known) return `<details><summary>🔎 «${T}»: solo buscamos esta palabra</summary><div>No conocemos otros alimentos de su familia. Si te sientan mal otros parecidos, añádelos tú también.</div></details>`;
+      const names = sm.names.slice(0, 14), maybes = sm.maybes.slice(0, 12);
+      return `<details><summary>🔎 ${T}: qué buscamos</summary><div>${names.length ? `<b>También buscamos:</b> ${esc(names.join(", "))}${sm.names.length > names.length ? "…" : ""}.` : "Buscamos esa palabra."}${maybes.length ? `<br><b>Avisamos como sospechoso:</b> ${esc(maybes.join(", "))}${sm.maybes.length > maybes.length ? "…" : ""}.` : ""}</div></details>`;
+    }).join("");
+    const rel = customRelated(terms);
+    sugg = { custom: rel.custom.slice(0, 8).map(f => f.n), allergens: rel.allergens.filter(a => !selectedAllergens.has(a) && ALLERGENS.includes(a)) };
+    if (sugg.custom.length || sugg.allergens.length) info += `<div class="sug"><span>👪 <b>¿Te sientan mal también?</b> Alimentos de la misma familia o que a veces dan reacción cruzada:</span>`
+      + sugg.custom.map((n, i) => `<button type="button" class="chip" data-sugc="${i}">+ ${esc(n)}</button>`).join("")
+      + sugg.allergens.map((a, i) => `<button type="button" class="chip" data-suga="${i}">+ alérgeno: ${esc(a)}</button>`).join("") + `</div>`;
+  } else sugg = { custom: [], allergens: [] };
+  $("pInfo").innerHTML = info;
+}
+function onProfileChange() {
+  saveProfile();
+  renderProfile();
+  afterProfile();
+}
+function afterProfile() {
+  updateProfLine();
+  if (W.rest && !$("detailView").hidden) {
+    if (hasProfile() && W.filter === "all" && !W.touchedFilter) W.filter = "aptos";
+    renderMenu(); renderReviews(); renderAside();
+  }
+}
+function trapFocus(e) {
+  if (e.key !== "Tab" || !$("profOvl").classList.contains("open")) return;
+  const f = [...$("profOvl").querySelectorAll("button, input, a[href], summary")].filter(x => x.offsetParent !== null);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+
+// ---------- Navegación entre la lista y las fichas ----------
+function go(id) {
+  const url = id ? "?r=" + encodeURIComponent(id) : location.pathname;
+  history.pushState({ r: id || null }, "", url);
+  render();
+}
+function render() {
+  const id = routeId();
+  $("listView").hidden = !!id;
+  $("detailView").hidden = !id;
+  document.body.classList.remove("show-map");
+  if (id) { if (W.shownId !== id || !W.rest || W.rest.id !== id) openDetail(id); return; }
+  W.shownId = null; W.rest = null;
+  setMeta({}); setLd(null);
+  renderList();
+  ensureMap();
+}
+
+// ---------- Arranque ----------
+function bindEvents() {
+  document.addEventListener("click", e => {
+    const t = e.target;
+    const link = t.closest("a[data-r], a[data-list]");
+    if (link && !e.defaultPrevented && e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
+      e.preventDefault();
+      go(link.hasAttribute("data-r") ? link.getAttribute("data-r") : null);
+      return;
+    }
+    if (t.closest("[data-open-profile]")) { openProfile(); return; }
+    if (t.closest("[data-close-profile]") || t === $("profOvl")) { closeProfile(); return; }
+    if (t.closest("[data-allow-map]")) { allowMap(); return; }
+    if (t.closest("[data-retry]")) { W.netFail = false; W.loaded = false; renderList(); syncRestaurants().then(() => { W.loaded = true; renderList(); }); return; }
+    if (t.closest("[data-retry-detail]")) { const id = routeId(); if (id) { W.shownId = null; openDetail(id); } return; }
+    if (t.closest("[data-clear-filters]")) { W.q = ""; $("q").value = ""; W.onlyVerified = false; $("fVerified").setAttribute("aria-pressed", "false"); renderList(); return; }
+    const fb = t.closest("[data-filter]");
+    if (fb) { W.filter = fb.dataset.filter; W.touchedFilter = true; renderMenuList(); return; }
+    // Panel de alergias
+    let b;
+    if ((b = t.closest("[data-al]"))) { const a = ALLERGENS[+b.dataset.al]; selectedAllergens.has(a) ? selectedAllergens.delete(a) : selectedAllergens.add(a); onProfileChange(); return; }
+    if ((b = t.closest("[data-di]"))) { const d = DIETS[+b.dataset.di].id; selectedDiets.has(d) ? selectedDiets.delete(d) : selectedDiets.add(d); onProfileChange(); return; }
+    if ((b = t.closest("[data-qc]"))) { const q = QUICK_CUSTOM_INGS[+b.dataset.qc].toLowerCase(); customAvoidSet.has(q) ? customAvoidSet.delete(q) : customAvoidSet.add(q); onProfileChange(); return; }
+    if ((b = t.closest("[data-rmc]"))) { const q = [...customAvoidSet][+b.dataset.rmc]; if (q !== undefined) customAvoidSet.delete(q); onProfileChange(); return; }
+    if ((b = t.closest("[data-sugc]"))) { const n = sugg.custom[+b.dataset.sugc]; if (n) customAvoidSet.add(String(n).toLowerCase()); onProfileChange(); return; }
+    if ((b = t.closest("[data-suga]"))) { const a = sugg.allergens[+b.dataset.suga]; if (a) selectedAllergens.add(a); onProfileChange(); return; }
+  });
+  $("pAddForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const v = str($("pCustom").value, 60).trim().toLowerCase();
+    if (v) { customAvoidSet.add(v); $("pCustom").value = ""; onProfileChange(); }
+    $("pCustom").focus();
+  });
+  $("pStrict").addEventListener("change", e => { strictTracesEnabled = !!e.target.checked; onProfileChange(); });
+  $("pClear").addEventListener("click", () => { selectedAllergens.clear(); selectedDiets.clear(); customAvoidSet.clear(); W.touchedFilter = false; onProfileChange(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeProfile(); trapFocus(e); });
+  // Buscador de la lista y filtros
+  $("q").addEventListener("input", e => { W.q = e.target.value; renderList(); });
+  $("fVerified").addEventListener("click", e => { W.onlyVerified = !W.onlyVerified; e.currentTarget.setAttribute("aria-pressed", String(W.onlyVerified)); renderList(); });
+  $("sortSel").addEventListener("change", e => { W.sort = e.target.value; if (W.sort === "near" && !W.me) locateMe(); else renderList(); });
+  $("fNear").addEventListener("click", () => { if (W.me) { W.me = null; W.sort = "rec"; $("sortSel").value = "rec"; $("fNear").setAttribute("aria-pressed", "false"); renderList(); } else locateMe(); });
+  $("mapToggle").addEventListener("click", e => {
+    const on = document.body.classList.toggle("show-map");
+    e.currentTarget.setAttribute("aria-pressed", String(on));
+    e.currentTarget.textContent = on ? "☰ Ver lista" : "🗺️ Ver mapa";
+    if (on) ensureMap();
+  });
+  // Buscador y secciones dentro de una carta
+  document.addEventListener("input", e => { if (e.target.id === "menuQ") { W.menuQ = e.target.value; renderMenuList(); } });
+  document.addEventListener("change", e => { if (e.target.id === "catSel") { W.cat = e.target.value; renderMenuList(); } });
+  window.addEventListener("popstate", render);
+  // Si cambias tu perfil en la app (otra pestaña del mismo navegador), la web se pone al día
+  window.addEventListener("storage", e => {
+    if (e.key !== PROFILE_KEY) return;
+    selectedAllergens.clear(); selectedDiets.clear(); customAvoidSet.clear(); strictTracesEnabled = true;
+    try { applyProfile(JSON.parse(e.newValue)); } catch (x) {}
+    if ($("profOvl").classList.contains("open")) renderProfile();
+    afterProfile();
+  });
+}
+function locateMe() {
+  if (!navigator.geolocation) { setNotice("Este navegador no permite saber dónde estás."); return; }
+  setNotice("Buscando tu ubicación…");
+  navigator.geolocation.getCurrentPosition(p => {
+    W.me = { lat: p.coords.latitude, lng: p.coords.longitude };
+    W.sort = "near"; $("sortSel").value = "near"; $("fNear").setAttribute("aria-pressed", "true");
+    renderList();
+  }, () => {
+    W.sort = W.sort === "near" ? "rec" : W.sort; $("sortSel").value = W.sort;
+    renderList();
+    setNotice("No hemos podido saber dónde estás. Revisa el permiso de ubicación del navegador.");
+  }, { timeout: 10000, maximumAge: 300000 });
+}
+async function startWeb() {
+  bindEvents();
+  updateProfLine();
+  const c = loadCache();
+  if (c) { W.list = c.list; if (c.plan) W.plan = c.plan; }
+  render();
+  await syncRestaurants();
+  W.loaded = true;
+  if (!routeId()) { renderList(); ensureMap(); }
+}
+startWeb();
+
+</script>
+</body>
+</html>
