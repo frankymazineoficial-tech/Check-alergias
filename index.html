@@ -7,7 +7,10 @@
 (function () {
   var q = location.search.replace(/^\?/, "").split("&").filter(function (p) { return p && !/^(utm_[a-z]+|fbclid|gclid)(=|$)/i.test(p); });
   var h = location.hash && !/^#(contenido|casa|hosteleria|titulo|casa-t|extras-t|pro-t)?$/.test(location.hash);
-  if (q.length || h) location.replace("app.html" + location.search + location.hash);
+  // La app instalada (icono del móvil, pantalla completa o Google Play) abre siempre la app, no la presentación
+  var inst = false;
+  try { inst = !!(window.matchMedia && (matchMedia("(display-mode: standalone)").matches || matchMedia("(display-mode: fullscreen)").matches || matchMedia("(display-mode: minimal-ui)").matches)) || navigator.standalone === true || /[?&]source=(pwa|twa)\b/.test(location.search); } catch (e) {}
+  if (q.length || h || inst) location.replace("app.html" + location.search + location.hash);
 })();
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
