@@ -2,6 +2,11 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<!--seguridad-3.12-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.gstatic.com https://apis.google.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.org https://www.gstatic.com https://www.google.com; font-src 'self' data:; connect-src 'self' data: blob: https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://content-firebaseappcheck.googleapis.com https://firebaseinstallations.googleapis.com https://*.cloudfunctions.net https://*.firebaseapp.com https://www.google.com https://www.recaptcha.net https://world.openfoodfacts.org https://es.openfoodfacts.org https://nominatim.openstreetmap.org; frame-src 'self' https://*.firebaseapp.com https://apis.google.com https://www.google.com https://recaptcha.google.com https://www.recaptcha.net; worker-src 'self' blob:; media-src 'self' data: blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<style id="antiClickjack">html{display:none!important}</style><script>(function(){var ok=false;try{ok=window.top===window.self||window.top.location.origin===location.origin;}catch(e){}if(ok){var s=document.getElementById("antiClickjack");if(s)s.parentNode.removeChild(s);return;}try{window.top.location=location.href;}catch(e){}})();</script>
+<!--/seguridad-3.12-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b132b">
 <link rel="manifest" href="manifest.json">
@@ -864,6 +869,12 @@
 </ul>
 <p>Ninguno de estos servicios recibe tu perfil de alergias.</p>
 
+<h3>Protección contra abusos</h3>
+<ul>
+  <li><b>Límites diarios:</b> para evitar el spam, guardamos cuántas opiniones, avisos de carta, sugerencias de locales y denuncias publica cada usuario en 24 horas: un contador con la hora de inicio y la última publicación, sin tu nombre ni tu email. Se reinicia solo cada 24 horas y no se usa para nada más. Al borrar tus datos o tu cuenta se borra también (si publicaste algo en las últimas 24 horas, queda solo ese contador, que ya no te identifica). Base legal: nuestro interés legítimo en mantener el servicio libre de abusos.</li>
+  <li><b>Google reCAPTCHA (Firebase App Check):</b> cuando la app o la web se conectan a nuestro servidor, reCAPTCHA, de Google Ireland Ltd., analiza señales técnicas del navegador y del dispositivo (como la dirección IP, los datos del navegador y una cookie técnica de seguridad de Google) para comprobar que la petición la hace la app de Comeclaro y no un programa automático. No recibe tu perfil de alergias. Base legal: nuestro interés legítimo en la seguridad del servicio. Más información en la política de privacidad de Google: <a href="https://policies.google.com/privacy?hl=es" rel="noopener">policies.google.com/privacy</a>.</li>
+</ul>
+
 <h3>Qué guarda la app en tu móvil</h3>
 <ul>
   <li>Tu perfil de alergias, tus platos caseros, tus rutas y tus preferencias (por ejemplo, si quieres ver el mapa), y una copia de las cartas para poder usarlas sin conexión. Son necesarios para que funcione lo que pides.</li>
@@ -872,7 +883,7 @@
   <li>Si tienes cuenta de restaurante y creas el <b>PIN de gestión</b>: un resumen cifrado del PIN (no el PIN), los intentos fallidos y el tiempo de bloqueo. Se quedan en ese móvil y no nos llegan. Sirven para que solo quien conoce el PIN pueda cambiar la carta desde ese móvil.</li>
   <li>Solo si lo permites, el identificador anónimo de las estadísticas de uso.</li>
 </ul>
-<p>La app no usa cookies de publicidad ni herramientas de analítica de terceros.</p>
+<p>La app no usa cookies de publicidad ni herramientas de analítica de terceros. La única cookie de terceros es la técnica de seguridad de Google reCAPTCHA (ver «Protección contra abusos»).</p>
 
 <h3>Cuánto tiempo los guardamos</h3>
 <p>Mientras exista tu cuenta o hasta que borres tu opinión. Al eliminar una cuenta de restaurante borramos sus locales, cartas, las opiniones de esos locales, sus estadísticas, sus denuncias y sus reclamaciones. Las denuncias y reclamaciones ya resueltas, y el registro de locales borrados, se guardan como máximo 12 meses. Si tuviste una suscripción de pago, conservaremos las facturas y los datos fiscales asociados durante 4 años para cumplir las obligaciones tributarias y hasta 6 años conforme al Código de Comercio.</p>
@@ -1429,7 +1440,7 @@
 </div>
 
 <script>
-const APP_VERSION = "3.11.0";
+const APP_VERSION = "3.12.0";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
@@ -1485,6 +1496,24 @@ function uid(prefix) { return prefix + Date.now().toString(36) + Math.random().t
 // Los identificadores viajan en atributos onclick: solo letras, números, "_" y "-"
 function safeId(x, prefix = "r_") { const s = String(x == null ? "" : x).replace(/[^A-Za-z0-9_-]/g, "").slice(0, 60); return s || uid(prefix); }
 function str(x, max = 400) { return String(x == null ? "" : x).slice(0, max); }
+// 3.12 · App Check (se activa poniendo la clave de reCAPTCHA en firebase-config.js): Firebase solo
+// atiende a la app y la web de Comeclaro, no a programas automáticos que publiquen spam o gasten lecturas.
+function appCheckConfig() {
+  const k = typeof window !== "undefined" ? window.COMECLARO_APPCHECK_KEY : null;
+  if (typeof k !== "string" || !/^[A-Za-z0-9_-]{20,100}$/.test(k.trim())) return null;
+  return { key: k.trim(), v3: String(window.COMECLARO_APPCHECK_TIPO || "").trim().toLowerCase() === "v3" };
+}
+// Se arranca justo después de initializeApp y antes de usar la base de datos o el servidor
+async function startAppCheck(app, base) {
+  const ac = appCheckConfig();
+  if (!ac) return false;
+  try {
+    const M = await import(base + "firebase-app-check.js");
+    const Provider = ac.v3 ? M.ReCaptchaV3Provider : M.ReCaptchaEnterpriseProvider;
+    M.initializeAppCheck(app, { provider: new Provider(ac.key), isTokenAutoRefreshEnabled: true });
+    return true;
+  } catch (e) { console.warn("App Check:", e); return false; }
+}
 function today() { return new Date().toLocaleDateString("es-ES"); }
 
 // ---------- Diálogos propios (Chrome puede bloquear alert/prompt y quedan feos en la app) ----------
@@ -1540,7 +1569,8 @@ const LIBS = {
   ocr: { test: () => typeof Tesseract !== "undefined", js: [LIB_DIR + "tesseract.min.js"] }
 };
 // Opciones del lector de etiquetas: su programa, su núcleo y el idioma español, también desde la propia web
-function ocrOptions() { return { workerPath: libUrl("tesseract-worker.min.js"), corePath: libUrl(""), langPath: libUrl("").replace(/\/$/, "") }; }
+// 3.12: el lector arranca desde su archivo (no desde un blob:) para que la política de seguridad de la página no lo bloquee
+function ocrOptions() { return { workerPath: libUrl("tesseract-worker.min.js"), corePath: libUrl(""), langPath: libUrl("").replace(/\/$/, ""), workerBlobURL: false }; }
 const libLoading = {};
 function loadScript(src, timeout = 15000) {
   return new Promise((resolve, reject) => {
@@ -3259,7 +3289,7 @@ function setAuthTab(t) {
   $("termsRow").style.display = t === "signup" ? "block" : "none";
   $("authSubmitBtn").innerText = t === "signup" ? "🚀 Crear cuenta gratis" : "🔑 Entrar";
   $("forgotLink").style.display = (t === "login" && isCloudMode()) ? "inline-block" : "none";
-  $("authPassInput").placeholder = isCloudMode() ? "Mínimo 6 caracteres" : "Mínimo 4 caracteres";
+  $("authPassInput").placeholder = !isCloudMode() ? "Mínimo 4 caracteres" : t === "signup" ? "Mínimo 8, con letras y números" : "Tu contraseña";
   $("authPassInput").autocomplete = t === "signup" ? "new-password" : "current-password";
 }
 function launchSummaryHtml() {
@@ -3305,13 +3335,26 @@ function renderOwnerSessionView() {
   if (isCloudMode() && cloudOwner()) loadOwnerItems().then(() => { if (currentView === "owner") renderOwnerItemsBox(); });
 }
 function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+// 3.12 · Contraseña de las cuentas de restaurante: 8 caracteres o más, con letras y números,
+// que no sea de las más usadas ni contenga el propio email
+const COMMON_PASSWORDS = ["12345678", "123456789", "1234567890", "password1", "contraseña1", "contrasena1", "qwerty123", "abc12345", "a1234567", "12345678a", "restaurante1", "comeclaro1", "iloveyou1", "11111111a"];
+function cloudPasswordProblem(pass, email) {
+  const p = String(pass || "");
+  if (p.length < 8) return "La contraseña debe tener al menos 8 caracteres.";
+  if (!/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/.test(p) || !/\d/.test(p)) return "La contraseña debe llevar letras y números.";
+  const low = p.toLowerCase(), user = String(email || "").toLowerCase().split("@")[0];
+  if (COMMON_PASSWORDS.includes(low) || /^(.)\1+$/.test(p)) return "Esa contraseña es de las más usadas. Elige otra más difícil de adivinar.";
+  if (user.length >= 4 && low.includes(user)) return "La contraseña no puede contener tu email.";
+  return "";
+}
 async function submitOwnerAuth() {
   if (!isCloudMode()) { loginWithEmail(); return; }
   const email = $("authEmailInput").value.trim().toLowerCase();
   const pass = $("authPassInput").value;
   if (!validEmail(email)) { toast("Escribe un email válido.", "err"); return; }
   if (authTab === "signup") {
-    if (pass.length < 6) { toast("La contraseña debe tener al menos 6 caracteres.", "err"); return; }
+    const weak = cloudPasswordProblem(pass, email);
+    if (weak) { toast(weak, "err"); return; }
     if (!$("authTermsCheck").checked) { toast("Para crear la cuenta acepta las condiciones y la política de privacidad.", "err"); return; }
   } else if (!pass) { toast("Escribe tu contraseña.", "err"); return; }
   const btn = $("authSubmitBtn");
@@ -5565,6 +5608,7 @@ function initCloud() {
       const base = `https://www.gstatic.com/firebasejs/${FB_VERSION}/`;
       const [appM, A, F] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js")]);
       const app = appM.initializeApp(cfg);
+      await startAppCheck(app, base);          // 3.12: antes de la primera petición a la base de datos
       let db;
       try { db = F.initializeFirestore(app, { localCache: F.persistentLocalCache({ tabManager: F.persistentMultipleTabManager() }) }); }
       catch (e) { db = F.getFirestore(app); }
@@ -6160,10 +6204,71 @@ function myPreviousReviewIds(id, isAlert) {
   }
   return out;
 }
+// ---------- 3.12 · Límites diarios por cuenta: opiniones, sugerencias y denuncias ----------
+// Las reglas exigen sumar 1 en quotas/{uid} en la misma operación que cada publicación (así un
+// programa automático no puede llenar el mapa de spam con una sola cuenta).
+const QUOTA_MAX = { rev: 20, sug: 5, rep: 20 };
+const QUOTA_TXT = {
+  rev: "Has llegado al máximo de 20 opiniones y avisos al día. Podrás publicar más mañana.",
+  sug: "Has llegado al máximo de 5 locales sugeridos al día. Podrás sugerir más mañana.",
+  rep: "Has llegado al máximo de 20 denuncias al día. Podrás enviar más mañana."
+};
+// Lee el contador (1 lectura) y devuelve la función que guarda la publicación junto con la suma
+async function quotaRead(qRef) {
+  const { F } = cloud;
+  try { const s = await F.getDocFromServer(qRef); return { q: s.exists() ? s.data() : null, fresh: true }; }
+  catch (e) {
+    // Sin conexión: la copia del móvil (con la hora estimada si la última suma aún no ha llegado al servidor)
+    try { const s = await F.getDoc(qRef); return { q: s.exists() ? s.data({ serverTimestamps: "estimate" }) : null, fresh: false }; }
+    catch (x) { return { q: null, fresh: false }; }
+  }
+}
+async function quotaPrepare(u, kind, ref) {
+  const { F, db } = cloud;
+  const qRef = F.doc(db, "quotas", u.uid);
+  const plan = q => {
+    const winMs = q && q.win && typeof q.win.toMillis === "function" ? q.win.toMillis() : 0;
+    return { q, winMs, reset: !winMs || Date.now() >= winMs + DAY_MS };
+  };
+  let st = plan((await quotaRead(qRef)).q);
+  if (!st.reset && (Number(st.q[kind]) || 0) >= QUOTA_MAX[kind]) throw new Error(QUOTA_TXT[kind]);
+  const attempt = (s, asReset, fill) => {
+    const b = F.writeBatch(db);
+    fill(b);
+    const c = asReset ? { win: F.serverTimestamp(), rev: 0, sug: 0, rep: 0 }
+      : { win: s.q.win, rev: Number(s.q.rev) || 0, sug: Number(s.q.sug) || 0, rep: Number(s.q.rep) || 0 };
+    c[kind] += 1;
+    b.set(qRef, { ...c, at: F.serverTimestamp(), ref: str(ref, 200) });
+    return b.commit();
+  };
+  const denied = e => /permission/i.test(cloudErr(e));
+  return async fill => {
+    try { return await attempt(st, st.reset, fill); }
+    catch (e) {
+      if (!denied(e)) throw e;
+      // Otro móvil o pestaña ha publicado a la vez, o la lectura era antigua: se vuelve a leer y se rehace una vez
+      const again = await quotaRead(qRef);
+      if (!again.fresh) throw e;
+      st = plan(again.q);
+      if (!st.reset && (Number(st.q[kind]) || 0) >= QUOTA_MAX[kind]) throw new Error(QUOTA_TXT[kind]);
+      try { return await attempt(st, st.reset, fill); }
+      catch (e2) {
+        // Justo al cumplirse las 24 horas, el reloj del móvil y el del servidor pueden no coincidir: la otra opción
+        if (denied(e2) && st.winMs) return attempt(st, !st.reset, fill);
+        throw e2;
+      }
+    }
+  };
+}
+
 async function cloudAddReview(id, rv) {
   const u = await ensureCloudUser();
   const { F, db } = cloud;
   const revId = myReviewIdFor(u.uid, rv.isAlert);
+  // Si ya tiene una opinión (o aviso) en este local con este usuario, se sustituye: no cuenta como nueva
+  let exists = false;
+  try { exists = (await F.getDocFromServer(F.doc(db, "restaurants", id, "reviews", revId))).exists(); } catch (e) { exists = false; }
+  const commitWithQuota = exists ? (fill => { const b = F.writeBatch(db); fill(b); return b.commit(); }) : await quotaPrepare(u, "rev", id + "/" + revId);
   // Las anteriores de este móvil con otro usuario (p. ej., antes de entrar o salir de Hostelería)
   // se borran cuando la nueva ya está publicada
   const prevs = myPreviousReviewIds(id, rv.isAlert).filter(x => x !== revId);
@@ -6174,7 +6279,7 @@ async function cloudAddReview(id, rv) {
   appState.myReviews.push(id + "/" + revId + (key ? "|" + key : ""));
   const data = { author: rv.author, stars: rv.stars, allergens: rv.allergens, comment: rv.comment, isAlert: !!rv.isAlert, authorUid: u.uid, createdAt: F.serverTimestamp() };
   if (delHash) data.delHash = delHash;
-  const done = F.setDoc(ref, data).then(async () => {
+  const done = commitWithQuota(b => b.set(ref, data)).then(async () => {
     for (const p of prevs) { try { await cloudDeleteReview(id, p); } catch (e) { console.warn("opinión anterior:", e); } }
   });
   return { id: revId, uid: u.uid, replaced: prevs, done };
@@ -6219,9 +6324,11 @@ function isMyRid(id) { return !!(cloudOwner() && new RegExp("^" + cloudUser.uid 
 async function cloudReportReview(id, revId, reason, text) {
   const u = await ensureCloudUser();
   const { F, db } = cloud;
-  await F.setDoc(F.doc(db, "reports", id + "__" + revId + "__" + u.uid), {
+  const repId = id + "__" + revId + "__" + u.uid;
+  const commitWithQuota = await quotaPrepare(u, "rep", repId);
+  await commitWithQuota(b => b.set(F.doc(db, "reports", repId), {
     rid: id, revId, uid: u.uid, byOwner: isMyRid(id), reason, text: str(text, 1000), createdAt: F.serverTimestamp(), status: "pendiente"
-  });
+  }));
 }
 async function cloudMyDocs(col) {
   const { F, db } = cloud;
@@ -6240,10 +6347,12 @@ async function cloudSuggest(d) {
   const u = await ensureCloudUser();
   const { F, db } = cloud;
   const sRef = F.doc(F.collection(db, "suggestions"));
-  const b = F.writeBatch(db);
-  b.set(sRef, { name: str(d.name, 120), city: str(d.city, 200), lat: Number(d.lat) || 0, lng: Number(d.lng) || 0, createdBy: u.uid, requests: 1, claimed: false, createdAt: F.serverTimestamp() });
-  b.set(F.doc(db, "suggestions", sRef.id, "votes", u.uid), { at: F.serverTimestamp() });
-  await b.commit();
+  const commitWithQuota = await quotaPrepare(u, "sug", sRef.id);
+  const lat = Math.max(-90, Math.min(90, Number(d.lat) || 0)), lng = Math.max(-180, Math.min(180, Number(d.lng) || 0));
+  await commitWithQuota(b => {
+    b.set(sRef, { name: str(d.name, 120), city: str(d.city, 200), lat, lng, createdBy: u.uid, requests: 1, claimed: false, createdAt: F.serverTimestamp() });
+    b.set(F.doc(db, "suggestions", sRef.id, "votes", u.uid), { at: F.serverTimestamp() });
+  });
   return upsertCloudSuggestion(sRef.id, { name: d.name, city: d.city, lat: d.lat, lng: d.lng, createdBy: u.uid, requests: 1 });
 }
 async function cloudVote(sid) {
@@ -6260,7 +6369,7 @@ function authErrorText(e) {
   const c = e && e.code || "";
   if (/invalid-credential|wrong-password|user-not-found|invalid-login/.test(c)) return "Email o contraseña incorrectos.";
   if (/email-already-in-use/.test(c)) return "Ya existe una cuenta con ese email. Usa «Entrar».";
-  if (/weak-password/.test(c)) return "La contraseña debe tener al menos 6 caracteres.";
+  if (/weak-password|password-does-not-meet-requirements/.test(c)) return "La contraseña es demasiado débil: usa al menos 8 caracteres, con letras y números.";
   if (/invalid-email/.test(c)) return "El email no es válido.";
   if (/popup-blocked/.test(c)) return "El navegador bloqueó la ventana de Google. Permite las ventanas emergentes o entra con tu email.";
   if (/popup-closed|cancelled-popup/.test(c)) return "Se cerró la ventana de Google antes de terminar.";
@@ -6432,6 +6541,7 @@ async function cloudDeleteAccount() {
     try { for (const x of await cloudMyDocs(col)) await F.deleteDoc(F.doc(db, col, x.id)); }
     catch (e) { console.warn("borrar " + col + ":", e); }
   }
+  await cloudDeleteQuota();
   await F.deleteDoc(F.doc(db, "owners", user.uid));
   const uidGone = user.uid;
   await cloud.A.deleteUser(user);
@@ -6942,6 +7052,18 @@ async function pingUsage() {
 async function cloudDeleteUsage() {
   if (!cloud || !cloud.auth.currentUser) return;
   try { await cloud.F.deleteDoc(cloud.F.doc(cloud.db, "users", cloud.auth.currentUser.uid)); } catch (e) {}
+  await cloudDeleteQuota();
+}
+// 3.12: el contador de publicaciones del día (las reglas solo dejan borrarlo pasadas 24 horas desde que empezó)
+async function cloudDeleteQuota() {
+  if (!cloud || !cloud.auth.currentUser) return;
+  try {
+    const ref = cloud.F.doc(cloud.db, "quotas", cloud.auth.currentUser.uid);
+    const s = await cloud.F.getDoc(ref);
+    const win = s.exists() && s.data().win && typeof s.data().win.toMillis === "function" ? s.data().win.toMillis() : 0;
+    // Con la ventana aún abierta no se puede (ni hace falta: el contador ya no identifica a nadie sin la cuenta)
+    if (s.exists() && Date.now() >= win + DAY_MS + 60000) await cloud.F.deleteDoc(ref);
+  } catch (e) {}
 }
 function renderUsageToggle() {
   const el = $("usageToggle");
@@ -7059,6 +7181,11 @@ function menuAiErrorText(e) {
 async function readMenuWithAi() {
   if (!maiFiles.length) return;
   if (!menuAiAllowed()) { closeMenuAiModal(true); openMenuAiModal(); return; }
+  // 3.12: cada lectura cuesta dinero; el servidor solo la hace para cuentas con el email verificado
+  if (isCloudMode() && cloudOwner() && !cloudUser.emailVerified && !await cloudEmailVerifiedNow()) {
+    if (await uiConfirm("📧 Para usar «Subir carta con foto», verifica antes tu email: pulsa el enlace que te enviamos al registrarte (mira también en «Correo no deseado») y vuelve a intentarlo.\n\nSi entras con Google, tu email ya está verificado.", { okText: "📧 Reenviar el email", cancelText: "Ahora no" })) resendVerification();
+    return;
+  }
   const run = ++maiRun;
   maiStep("busy");
   try {

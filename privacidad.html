@@ -2,6 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<!--seguridad-3.12-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.gstatic.com https://apis.google.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.org https://www.gstatic.com https://www.google.com; font-src 'self' data:; connect-src 'self' data: blob: https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://content-firebaseappcheck.googleapis.com https://firebaseinstallations.googleapis.com https://*.cloudfunctions.net https://*.firebaseapp.com https://www.google.com https://www.recaptcha.net https://world.openfoodfacts.org https://es.openfoodfacts.org https://nominatim.openstreetmap.org; frame-src 'self' https://*.firebaseapp.com https://apis.google.com https://www.google.com https://recaptcha.google.com https://www.recaptcha.net; worker-src 'self' blob:; media-src 'self' data: blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<!--/seguridad-3.12-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b132b">
 <link rel="icon" type="image/png" href="favicon-32.png">
@@ -80,6 +84,12 @@
 </ul>
 <p>Ninguno de estos servicios recibe tu perfil de alergias.</p>
 
+<h3>Protección contra abusos</h3>
+<ul>
+  <li><b>Límites diarios:</b> para evitar el spam, guardamos cuántas opiniones, avisos de carta, sugerencias de locales y denuncias publica cada usuario en 24 horas: un contador con la hora de inicio y la última publicación, sin tu nombre ni tu email. Se reinicia solo cada 24 horas y no se usa para nada más. Al borrar tus datos o tu cuenta se borra también (si publicaste algo en las últimas 24 horas, queda solo ese contador, que ya no te identifica). Base legal: nuestro interés legítimo en mantener el servicio libre de abusos.</li>
+  <li><b>Google reCAPTCHA (Firebase App Check):</b> cuando la app o la web se conectan a nuestro servidor, reCAPTCHA, de Google Ireland Ltd., analiza señales técnicas del navegador y del dispositivo (como la dirección IP, los datos del navegador y una cookie técnica de seguridad de Google) para comprobar que la petición la hace la app de Comeclaro y no un programa automático. No recibe tu perfil de alergias. Base legal: nuestro interés legítimo en la seguridad del servicio. Más información en la política de privacidad de Google: <a href="https://policies.google.com/privacy?hl=es" rel="noopener">policies.google.com/privacy</a>.</li>
+</ul>
+
 <h3>Qué guarda la app en tu móvil</h3>
 <ul>
   <li>Tu perfil de alergias, tus platos caseros, tus rutas y tus preferencias (por ejemplo, si quieres ver el mapa), y una copia de las cartas para poder usarlas sin conexión. Son necesarios para que funcione lo que pides.</li>
@@ -88,7 +98,7 @@
   <li>Si tienes cuenta de restaurante y creas el <b>PIN de gestión</b>: un resumen cifrado del PIN (no el PIN), los intentos fallidos y el tiempo de bloqueo. Se quedan en ese móvil y no nos llegan. Sirven para que solo quien conoce el PIN pueda cambiar la carta desde ese móvil.</li>
   <li>Solo si lo permites, el identificador anónimo de las estadísticas de uso.</li>
 </ul>
-<p>La app no usa cookies de publicidad ni herramientas de analítica de terceros.</p>
+<p>La app no usa cookies de publicidad ni herramientas de analítica de terceros. La única cookie de terceros es la técnica de seguridad de Google reCAPTCHA (ver «Protección contra abusos»).</p>
 
 <h3>Cuánto tiempo los guardamos</h3>
 <p>Mientras exista tu cuenta o hasta que borres tu opinión. Al eliminar una cuenta de restaurante borramos sus locales, cartas, las opiniones de esos locales, sus estadísticas, sus denuncias y sus reclamaciones. Las denuncias y reclamaciones ya resueltas, y el registro de locales borrados, se guardan como máximo 12 meses. Si tuviste una suscripción de pago, conservaremos las facturas y los datos fiscales asociados durante 4 años para cumplir las obligaciones tributarias y hasta 6 años conforme al Código de Comercio.</p>

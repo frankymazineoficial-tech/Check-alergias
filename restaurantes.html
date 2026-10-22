@@ -2,6 +2,11 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<!--seguridad-3.12-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.gstatic.com https://apis.google.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.org https://www.gstatic.com https://www.google.com; font-src 'self' data:; connect-src 'self' data: blob: https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://content-firebaseappcheck.googleapis.com https://firebaseinstallations.googleapis.com https://*.cloudfunctions.net https://*.firebaseapp.com https://www.google.com https://www.recaptcha.net https://world.openfoodfacts.org https://es.openfoodfacts.org https://nominatim.openstreetmap.org; frame-src 'self' https://*.firebaseapp.com https://apis.google.com https://www.google.com https://recaptcha.google.com https://www.recaptcha.net; worker-src 'self' blob:; media-src 'self' data: blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<style id="antiClickjack">html{display:none!important}</style><script>(function(){var ok=false;try{ok=window.top===window.self||window.top.location.origin===location.origin;}catch(e){}if(ok){var s=document.getElementById("antiClickjack");if(s)s.parentNode.removeChild(s);return;}try{window.top.location=location.href;}catch(e){}})();</script>
+<!--/seguridad-3.12-->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Restaurantes con carta de alérgenos · Comeclaro</title>
 <meta name="description" content="Restaurantes de la Región de Murcia con su carta de alérgenos. Marca tus alergias y mira qué platos son compatibles, cuáles se pueden adaptar y cuáles no.">
@@ -355,7 +360,7 @@ footer a:hover { color: #7dd3fc; }
 </footer>
 
 <script>
-const APP_VERSION = "3.11.0";
+const APP_VERSION = "3.12.0";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
@@ -411,6 +416,24 @@ function uid(prefix) { return prefix + Date.now().toString(36) + Math.random().t
 // Los identificadores viajan en atributos onclick: solo letras, números, "_" y "-"
 function safeId(x, prefix = "r_") { const s = String(x == null ? "" : x).replace(/[^A-Za-z0-9_-]/g, "").slice(0, 60); return s || uid(prefix); }
 function str(x, max = 400) { return String(x == null ? "" : x).slice(0, max); }
+// 3.12 · App Check (se activa poniendo la clave de reCAPTCHA en firebase-config.js): Firebase solo
+// atiende a la app y la web de Comeclaro, no a programas automáticos que publiquen spam o gasten lecturas.
+function appCheckConfig() {
+  const k = typeof window !== "undefined" ? window.COMECLARO_APPCHECK_KEY : null;
+  if (typeof k !== "string" || !/^[A-Za-z0-9_-]{20,100}$/.test(k.trim())) return null;
+  return { key: k.trim(), v3: String(window.COMECLARO_APPCHECK_TIPO || "").trim().toLowerCase() === "v3" };
+}
+// Se arranca justo después de initializeApp y antes de usar la base de datos o el servidor
+async function startAppCheck(app, base) {
+  const ac = appCheckConfig();
+  if (!ac) return false;
+  try {
+    const M = await import(base + "firebase-app-check.js");
+    const Provider = ac.v3 ? M.ReCaptchaV3Provider : M.ReCaptchaEnterpriseProvider;
+    M.initializeAppCheck(app, { provider: new Provider(ac.key), isTokenAutoRefreshEnabled: true });
+    return true;
+  } catch (e) { console.warn("App Check:", e); return false; }
+}
 function today() { return new Date().toLocaleDateString("es-ES"); }
 
 // ---------- Diálogos propios (Chrome puede bloquear alert/prompt y quedan feos en la app) ----------
@@ -466,7 +489,8 @@ const LIBS = {
   ocr: { test: () => typeof Tesseract !== "undefined", js: [LIB_DIR + "tesseract.min.js"] }
 };
 // Opciones del lector de etiquetas: su programa, su núcleo y el idioma español, también desde la propia web
-function ocrOptions() { return { workerPath: libUrl("tesseract-worker.min.js"), corePath: libUrl(""), langPath: libUrl("").replace(/\/$/, "") }; }
+// 3.12: el lector arranca desde su archivo (no desde un blob:) para que la política de seguridad de la página no lo bloquee
+function ocrOptions() { return { workerPath: libUrl("tesseract-worker.min.js"), corePath: libUrl(""), langPath: libUrl("").replace(/\/$/, ""), workerBlobURL: false }; }
 const libLoading = {};
 function loadScript(src, timeout = 15000) {
   return new Promise((resolve, reject) => {
@@ -1839,6 +1863,7 @@ function webFirebase() {
     const base = `https://www.gstatic.com/firebasejs/${WEB_FB_VERSION}/`;
     const [appM, F] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-firestore.js")]);
     const app = appM.initializeApp(cfg, "web");
+    await startAppCheck(app, base);          // 3.12: antes de la primera lectura
     return { F, db: F.getFirestore(app), pid: cfg.projectId };
   })().catch(e => { console.warn("firebase:", e); fbReady = null; return null; });
   return fbReady;

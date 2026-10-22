@@ -2,6 +2,11 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<!--seguridad-3.12-->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.gstatic.com https://apis.google.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.org https://www.gstatic.com https://www.google.com; font-src 'self' data:; connect-src 'self' data: blob: https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://content-firebaseappcheck.googleapis.com https://firebaseinstallations.googleapis.com https://*.cloudfunctions.net https://*.firebaseapp.com https://www.google.com https://www.recaptcha.net https://world.openfoodfacts.org https://es.openfoodfacts.org https://nominatim.openstreetmap.org; frame-src 'self' https://*.firebaseapp.com https://apis.google.com https://www.google.com https://recaptcha.google.com https://www.recaptcha.net; worker-src 'self' blob:; media-src 'self' data: blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin">
+<style id="antiClickjack">html{display:none!important}</style><script>(function(){var ok=false;try{ok=window.top===window.self||window.top.location.origin===location.origin;}catch(e){}if(ok){var s=document.getElementById("antiClickjack");if(s)s.parentNode.removeChild(s);return;}try{window.top.location=location.href;}catch(e){}})();</script>
+<!--/seguridad-3.12-->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Comeclaro · Administración</title>
@@ -57,15 +62,17 @@
 
   <section class="card" id="loginCard" hidden>
     <h2>Entrar</h2>
-    <p class="muted">Usa el email de administración que pusiste en las reglas de Firestore. Si es la primera vez, pulsa «Crear cuenta».</p>
-    <label for="email">Email</label><input type="email" id="email" autocomplete="username">
-    <label for="pass">Contraseña</label><input type="password" id="pass" autocomplete="current-password">
+    <p class="muted">Entra con la cuenta de Google del email de administración (el de las reglas de Firestore). Por seguridad, el panel solo funciona entrando con Google: así lo protege la verificación en dos pasos de tu cuenta de Google.</p>
     <div class="row" style="margin-top:12px;">
-      <button class="btn btn-primary" id="btnLogin">Entrar</button>
-      <button class="btn btn-outline" id="btnSignup">Crear cuenta</button>
-      <button class="btn btn-outline" id="btnGoogle">Continuar con Google</button>
+      <button class="btn btn-primary" id="btnGoogle">Entrar con Google</button>
     </div>
     <div class="msg" id="loginMsg"></div>
+  </section>
+
+  <section class="card" id="googleOnly" hidden>
+    <h2>Entra con Google</h2>
+    <p class="muted">Has entrado con email y contraseña. Por seguridad, la administración solo funciona entrando con Google (con la verificación en dos pasos de tu cuenta de Google). Sal y pulsa «Entrar con Google» con la misma cuenta.</p>
+    <button class="btn btn-outline" data-logout>Salir</button>
   </section>
 
   <section class="card" id="verifyCard" hidden>
@@ -188,6 +195,17 @@
 
 <script type="module">
 const FB_VERSION = "10.12.2";
+// 3.12 · App Check (igual que en la app): solo si firebase-config.js tiene la clave de reCAPTCHA
+async function startAppCheck(app, base) {
+  const k = window.COMECLARO_APPCHECK_KEY;
+  if (typeof k !== "string" || !/^[A-Za-z0-9_-]{20,100}$/.test(k.trim())) return false;
+  try {
+    const M = await import(base + "firebase-app-check.js");
+    const v3 = String(window.COMECLARO_APPCHECK_TIPO || "").trim().toLowerCase() === "v3";
+    M.initializeAppCheck(app, { provider: new (v3 ? M.ReCaptchaV3Provider : M.ReCaptchaEnterpriseProvider)(k.trim()), isTokenAutoRefreshEnabled: true });
+    return true;
+  } catch (e) { console.warn("App Check:", e); return false; }
+}
 const PRICES = { monthly: "19,99 €", yearly: "199,99 €", founderMonthly: "9,99 €", founderYearly: "99,99 €" };
 const DAY = 86400000;
 const $ = id => document.getElementById(id);
@@ -202,7 +220,6 @@ function errText(e) {
   if (/permission-denied/.test(c)) return "Permiso denegado por las reglas.";
   if (/invalid-credential|wrong-password|user-not-found/.test(c)) return "Email o contraseña incorrectos.";
   if (/email-already-in-use/.test(c)) return "Ya existe una cuenta con ese email: pulsa «Entrar».";
-  if (/weak-password/.test(c)) return "La contraseña debe tener al menos 6 caracteres.";
   if (/too-many-requests/.test(c)) return "Demasiados intentos. Espera unos minutos.";
   if (/network/.test(c)) return "Sin conexión a internet.";
   return "Error: " + (c || (e && e.message) || e);
@@ -215,33 +232,44 @@ if (!cfg || !okVal(cfg.apiKey) || !okVal(cfg.projectId) || !okVal(cfg.appId)) {
 } else {
   const base = `https://www.gstatic.com/firebasejs/${FB_VERSION}/`;
   const [appM, A, F] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js")]);
-  const app = appM.initializeApp(cfg);
-  const auth = A.getAuth(app);
+  // 3.12: una «app» de Firebase propia del panel. Su sesión no se comparte con la app de Comeclaro abierta en el
+  // mismo navegador y vive solo en esta pestaña: al cerrarla, hay que volver a entrar con Google.
+  const app = appM.initializeApp(cfg, "admin");
+  await startAppCheck(app, base);          // 3.12: App Check, si está configurado en firebase-config.js
+  const auth = A.initializeAuth(app, { persistence: A.browserSessionPersistence, popupRedirectResolver: A.browserPopupRedirectResolver });
+  // Con qué método se ha entrado en esta sesión (las reglas exigen Google para administrar)
+  const signInProvider = async u => {
+    try { const r = await u.getIdTokenResult(); if (r && r.signInProvider) return r.signInProvider; } catch (e) {}
+    return ((u.providerData || [])[0] || {}).providerId || "";
+  };
   try { auth.languageCode = "es"; } catch (e) {}
   const db = F.getFirestore(app);
   let planDoc = null, owners = [];
 
   const route = async () => {
     const u = auth.currentUser;
-    ["loginCard", "verifyCard", "notAdmin", "dash"].forEach(id => show(id, false));
+    ["loginCard", "verifyCard", "googleOnly", "notAdmin", "dash"].forEach(id => show(id, false));
     $("whoami").textContent = u ? "Conectado como " + (u.email || "") : "Panel privado";
     if (!u || u.isAnonymous) { show("loginCard"); return; }
     if (!u.emailVerified) { show("verifyCard"); return; }
+    if (await signInProvider(u) !== "google.com") { show("googleOnly"); return; }
     try { await F.getCountFromServer(F.collection(db, "owners")); }
     catch (e) { $("naEmail").textContent = u.email || ""; show("notAdmin"); return; }
     show("dash");
     loadSummary(); loadPlan();
   };
   A.onAuthStateChanged(auth, () => { route(); });
+  // 3.12: si el panel se queda abierto sin usarlo 30 minutos, se cierra la sesión (por si te dejas el móvil o el ordenador)
+  let lastActive = Date.now();
+  ["pointerdown", "keydown", "scroll", "touchstart"].forEach(ev => addEventListener(ev, () => { lastActive = Date.now(); }, { passive: true }));
+  const idleCheck = async () => {
+    if (!auth.currentUser || Date.now() - lastActive < 30 * 60000) return;
+    await A.signOut(auth); await route();
+    msg("loginMsg", "Por seguridad, la sesión se ha cerrado tras 30 minutos sin usar el panel.");
+  };
+  setInterval(idleCheck, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) idleCheck(); });
 
-  $("btnLogin").onclick = async () => {
-    try { await A.signInWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value); $("pass").value = ""; await route(); }
-    catch (e) { msg("loginMsg", errText(e), "err"); }
-  };
-  $("btnSignup").onclick = async () => {
-    try { await A.createUserWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value); $("pass").value = ""; await route(); }
-    catch (e) { msg("loginMsg", errText(e), "err"); }
-  };
   $("btnGoogle").onclick = async () => {
     try { await A.signInWithPopup(auth, new A.GoogleAuthProvider()); await route(); }
     catch (e) { msg("loginMsg", errText(e), "err"); }
