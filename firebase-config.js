@@ -12,6 +12,6 @@ window.TUSALERGIAS_FIREBASE_CONFIG = {
 window.TUSALERGIAS_PUBLIC_URL = "https://comeclaro.es/";
 
 // Protección contra programas automáticos (Firebase App Check con reCAPTCHA).
-// Déjala en "PEGA_AQUI" hasta activarla con la guía de seguridad: la app funciona igual.
-window.COMECLARO_APPCHECK_KEY = "PEGA_AQUI";
+// Clave de sitio de Fraud Defense (reCAPTCHA Enterprise), proyecto tus-alergias. Es pública.
+window.COMECLARO_APPCHECK_KEY = "6LcjK_wtAAAAAFBoKNvsg1QBoWWTHR9UfY8zlEzt";
 window.COMECLARO_APPCHECK_TIPO = "enterprise";
