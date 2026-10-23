@@ -361,7 +361,7 @@ footer a:hover { color: #7dd3fc; }
 </footer>
 
 <script>
-const APP_VERSION = "3.12.1";
+const APP_VERSION = "3.12.2";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
@@ -369,11 +369,11 @@ const PLAN = {
   founderMax: 30, founderFreeMonths: 12, maxRestaurants: 3, noticeDays: 30,
   founderFreeDays: 365,      // los 12 meses gratis de los Fundadores, contados desde el inicio del cobro
   graceDays: 7,              // días de margen tras el inicio del cobro (o tras el año gratis) antes de ocultar la carta
-  termsVersion: "2026-10-21"
+  termsVersion: "2026-10-23"
 };
 // Versión del aviso legal y condiciones de uso que acepta en la bienvenida quien consulta cartas.
 // Si cambia, la bienvenida vuelve a salir para que se acepten las nuevas.
-const LEGAL_VERSION = "2026-10-21";
+const LEGAL_VERSION = "2026-10-23";
 const DAY_MS = 86400000;
 const ALLERGENS = ["GLUTEN","CRUSTÁCEOS","HUEVO","PESCADO","CACAHUETES","SOJA","LÁCTEO","FRUTOS CON CÁSCARA","APIO","MOSTAZA","SÉSAMO","SULFITOS","ALTRAMUCES","MOLUSCOS"];
 const DIETS = [{id:"CRUDO_EMBARAZO",label:"🤰 Embarazada"},{id:"NO_VEGANO",label:"🌱 Vegano"},{id:"NO_VEGETARIANO",label:"🥚 Vegetariano"},{id:"CERDO",label:"🚫🐷 Sin Cerdo"},{id:"PICANTE",label:"🌶️ Sin Picante"}];
@@ -423,6 +423,22 @@ function appCheckConfig() {
   const k = typeof window !== "undefined" ? window.COMECLARO_APPCHECK_KEY : null;
   if (typeof k !== "string" || !/^[A-Za-z0-9_-]{20,100}$/.test(k.trim())) return null;
   return { key: k.trim(), v3: String(window.COMECLARO_APPCHECK_TIPO || "").trim().toLowerCase() === "v3" };
+}
+// 3.12.2: lee una colección pública entera de página en página (sin el antiguo tope de 500 locales).
+// Ordena por el identificador del documento, que Firestore sirve sin índices compuestos.
+const LIST_PAGE = 500, LIST_MAX_PAGES = 10;     // hasta 5.000 documentos; más allá habrá que cargar por zonas
+async function fetchAllWhere(F, db, col, field, value, page = LIST_PAGE) {
+  const all = [];
+  let last = null;
+  for (let i = 0; i < LIST_MAX_PAGES; i++) {
+    const cs = [F.where(field, "==", value), F.orderBy(F.documentId()), F.limit(page)];
+    if (last) cs.push(F.startAfter(last));
+    const qs = await F.getDocs(F.query(F.collection(db, col), ...cs));
+    all.push(...qs.docs);
+    if (qs.docs.length < page) break;
+    last = qs.docs[qs.docs.length - 1];
+  }
+  return all;
 }
 // Se arranca justo después de initializeApp y antes de usar la base de datos o el servidor
 async function startAppCheck(app, base) {
@@ -544,7 +560,75 @@ window.addEventListener("error", e => {
     b.onclick = () => b.remove(); document.body.appendChild(b);
   }
   b.textContent = "⚠️ Error: " + e.message + " (toca para cerrar)";
+  reportClientError(e.message, errSource(e.filename, e.lineno, e.colno) || errStackSource(e.error && e.error.stack) || (e.lineno ? `script:${e.lineno}:${e.colno || 0}` : ""));
 });
+window.addEventListener("unhandledrejection", e => {
+  const r = e && e.reason;
+  reportClientError(r && (r.message || r.code) || String(r), errStackSource(r && r.stack));
+});
+
+// ---------- 3.12.2 · Informes de errores técnicos (sin datos personales) ----------
+// Se guarda un informe por error distinto y día (clientErrors/{día}_{resumen}); si se repite, sube su contador.
+// Sin emails, números largos ni direcciones web, sin identificador del móvil. Lo ve solo la administración y se
+// borra solo a los 90 días (campo «exp», con la política TTL de Firestore). Como mucho 5 errores por sesión.
+const ERR_MAX_PER_SESSION = 5;
+let errorSender = null;                 // lo pone la parte que se conecta al servidor (app o web de restaurantes)
+const errQueue = [], errSeen = new Set();
+function errScrub(s, max) {
+  return String(s == null ? "" : s).replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, "[email]").replace(/https?:\/\/[^\s)'"]+/g, "[url]")
+    .replace(/\d{6,}/g, "[n]").replace(/\s+/g, " ").trim().slice(0, max);
+}
+function errSource(file, line, col) {
+  const f = String(file || "").split(/[?#]/)[0].split("/").pop();
+  return f ? `${f}:${line || 0}:${col || 0}` : "";
+}
+function errStackSource(stack) {
+  const m = String(stack || "").match(/([^\/\s()@?#]+\.(?:js|html))(?:[?#][^:\s)]*)?:(\d+):(\d+)/);
+  return m ? `${m[1]}:${m[2]}:${m[3]}` : "";
+}
+function errPlatform() {
+  const ua = navigator.userAgent || "";
+  return /android/i.test(ua) ? "android" : (/iphone|ipad|ipod/i.test(ua) || (/macintosh/i.test(ua) && navigator.maxTouchPoints > 1)) ? "ios" : "otro";
+}
+function reportClientError(msg, src) {
+  try {
+    const m = errScrub(msg, 200), s = errScrub(src, 120);
+    if (!m || /^Script error\.?$|ResizeObserver loop/i.test(m)) return;
+    const key = m + "|" + s;
+    if (errSeen.has(key) || errSeen.size >= ERR_MAX_PER_SESSION) return;
+    errSeen.add(key);
+    errQueue.push({ msg: m, src: s });
+    flushClientErrors();
+  } catch (e) {}
+}
+async function flushClientErrors() {
+  if (!errorSender) return;
+  while (errQueue.length) { const e = errQueue.shift(); try { await errorSender(e); } catch (x) { console.warn("informe de error:", x); } }
+}
+async function errHash(text) {
+  try {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+  } catch (e) {          // sin crypto.subtle (página sin https): resumen sencillo, suficiente para agrupar
+    let h1 = 0x811c9dc5, h2 = 0x01000193;
+    for (let i = 0; i < text.length; i++) { h1 = Math.imul(h1 ^ text.charCodeAt(i), 16777619) >>> 0; h2 = Math.imul(h2 + text.charCodeAt(i), 2246822519) >>> 0; }
+    return (h1.toString(16).padStart(8, "0") + h2.toString(16).padStart(8, "0")).repeat(4);
+  }
+}
+// ctx: "app" o "web". El primer informe del día crea el documento; los siguientes solo suman 1.
+function makeErrorSender(F, db, ctx) {
+  return async e => {
+    const day = new Date().toISOString().slice(0, 10);
+    const id = day + "_" + (await errHash(APP_VERSION + "|" + ctx + "|" + e.msg + "|" + e.src)).slice(0, 16);
+    const ref = F.doc(db, "clientErrors", id);
+    try {
+      await F.setDoc(ref, { v: APP_VERSION, ctx, msg: e.msg, src: e.src, plat: errPlatform(), count: 1, day,
+        first: F.serverTimestamp(), last: F.serverTimestamp(), exp: F.Timestamp.fromMillis(Date.now() + 90 * DAY_MS) });
+    } catch (x) {
+      await F.updateDoc(ref, { count: F.increment(1), last: F.serverTimestamp() });
+    }
+  };
+}
 
 // ---------- Estado guardado en el móvil ----------
 const STATE_KEY = "tusalergias_v15_final", PROFILE_KEY = "tusalergias_profile_v1";
@@ -1865,7 +1949,9 @@ function webFirebase() {
     const [appM, F] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-firestore.js")]);
     const app = appM.initializeApp(cfg, "web");
     await startAppCheck(app, base);          // 3.12: antes de la primera lectura
-    return { F, db: F.getFirestore(app), pid: cfg.projectId };
+    const db = F.getFirestore(app);
+    errorSender = makeErrorSender(F, db, "web"); flushClientErrors();   // 3.12.2: informes de errores
+    return { F, db, pid: cfg.projectId };
   })().catch(e => { console.warn("firebase:", e); fbReady = null; return null; });
   return fbReady;
 }
@@ -1926,9 +2012,9 @@ async function syncRestaurants() {
         return;
       }
     }
-    const qs = await F.getDocs(F.query(F.collection(db, "restaurants"), F.where("published", "==", true), F.limit(500)));
+    const docs = await fetchAllWhere(F, db, "restaurants", "published", true);
     let max = 0;
-    W.list = qs.docs.map(d => { const x = d.data() || {}; max = Math.max(max, webTs(x.updatedAt)); return restFromDoc(d.id, x); });
+    W.list = docs.map(d => { const x = d.data() || {}; max = Math.max(max, webTs(x.updatedAt)); return restFromDoc(d.id, x); });
     saveCache({ p: pid, full: now, r: max, list: W.list, plan: W.plan });
   } catch (e) { console.warn("restaurantes:", e); W.netFail = true; }
 }
