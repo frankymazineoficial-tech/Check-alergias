@@ -1,4 +1,4 @@
-// Pruebas de las reglas de seguridad de Comeclaro (3.12) contra el EMULADOR OFICIAL de Firestore.
+// Pruebas de las reglas de seguridad de Comeclaro (3.12.2) contra el EMULADOR OFICIAL de Firestore.
 // Cada «debe FALLAR» va acompañado de un «debe FUNCIONAR» parecido, para que un fallo de la
 // propia prueba no pase por seguridad.
 const fs = require('fs');
@@ -298,6 +298,26 @@ const R = (db_, p) => db_.doc(p);
   await t('NO reclamar una sugerencia apuntándola a un local que ya existía', seedS9, () => assertFails(R(db.owner('own1'), 'suggestions/s9').update({ claimed: true, claimedBy: 'own1', claimedRid: 'own1_1' })));
   await t('NO dar de alta un local «desde una sugerencia» sin reclamarla', seedS9, () => assertFails(R(db.owner('own1'), 'restaurants/own1_2').set(restNew('own1', { fromSuggestion: 's9' }))));
   await t('alta del local + reclamar su sugerencia a la vez, SÍ', seedS9, () => { const d = db.owner('own1'), b = d.batch(); b.set(d.doc('restaurants/own1_2'), restNew('own1', { fromSuggestion: 's9' })); b.update(d.doc('suggestions/s9'), { claimed: true, claimedBy: 'own1', claimedRid: 'own1_2' }); return assertSucceeds(b.commit()); });
+
+  sec('13) 3.12.2 · Informes de errores técnicos (clientErrors)');
+  const day = new Date().toISOString().slice(0, 10);
+  const eid = day + '_0123456789abcdef';
+  const errDoc = (extra = {}) => ({ v: '3.12.2', ctx: 'app', msg: 'TypeError: x is undefined', src: 'app.html:10:5', plat: 'android', count: 1, day, first: ST(), last: ST(), exp: inDays(90), ...extra });
+  const seedErr = (count = 1) => seed(d => d.doc('clientErrors/' + eid).set({ ...errDoc(), count, first: TS.now(), last: TS.now() }));
+  await t('un informe de error SÍ, incluso sin sesión', null, () => assertSucceeds(R(db.anon(), 'clientErrors/' + eid).set(errDoc())));
+  await t('NO leer los informes sin ser administración', seedErr, () => assertFails(R(db.guest('c1'), 'clientErrors/' + eid).get()));
+  await t('la administración SÍ los lee', seedErr, () => assertSucceeds(R(db.admin(), 'clientErrors/' + eid).get()));
+  await t('NO campos extra (por ejemplo, un email)', null, () => assertFails(R(db.anon(), 'clientErrors/' + eid).set(errDoc({ email: 'a@b.es' }))));
+  await t('NO un mensaje de más de 200 caracteres', null, () => assertFails(R(db.anon(), 'clientErrors/' + eid).set(errDoc({ msg: 'x'.repeat(201) }))));
+  await t('NO un identificador que no sea {día}_{resumen}', null, () => assertFails(R(db.anon(), 'clientErrors/' + day + '_cualquiercosa').set(errDoc())));
+  await t('NO un día que no coincide con el identificador', null, () => assertFails(R(db.anon(), 'clientErrors/2020-01-01_0123456789abcdef').set(errDoc())));
+  await t('NO empezar el contador en 50', null, () => assertFails(R(db.anon(), 'clientErrors/' + eid).set(errDoc({ count: 50 }))));
+  await t('NO guardarlo más de 95 días', null, () => assertFails(R(db.anon(), 'clientErrors/' + eid).set(errDoc({ exp: inDays(400) }))));
+  await t('repetido: SÍ sumar 1', seedErr, () => assertSucceeds(R(db.anon(), 'clientErrors/' + eid).update({ count: FV.increment(1), last: ST() })));
+  await t('NO sumar 5 de golpe', seedErr, () => assertFails(R(db.anon(), 'clientErrors/' + eid).update({ count: FV.increment(5), last: ST() })));
+  await t('NO cambiar el mensaje de un informe', seedErr, () => assertFails(R(db.anon(), 'clientErrors/' + eid).update({ count: FV.increment(1), last: ST(), msg: 'otro' })));
+  await t('NO pasar del tope de 10.000 repeticiones', () => seedErr(10000), () => assertFails(R(db.anon(), 'clientErrors/' + eid).update({ count: FV.increment(1), last: ST() })));
+  await t('NO borrarlos sin ser administración', seedErr, () => assertFails(R(db.guest('c1'), 'clientErrors/' + eid).delete()));
 
   await env.cleanup();
   console.log(`\n==== ${pass} correctas, ${fail} fallos ====`);

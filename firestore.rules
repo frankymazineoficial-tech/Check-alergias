@@ -1,7 +1,7 @@
 rules_version = '2';
 
 // =====================================================================
-// REGLAS DE SEGURIDAD DE COMECLARO (versión 3.12)
+// REGLAS DE SEGURIDAD DE COMECLARO (versión 3.12.2)
 // Pégalas en: Consola de Firebase → Firestore Database → Reglas → Publicar.
 //
 // Antes de publicarlas, revisa la línea marcada con «ADMINISTRACIÓN»:
@@ -34,6 +34,8 @@ rules_version = '2';
 // - 3.12 · La administración solo entra con Google (así la protege la verificación en
 //   dos pasos de tu cuenta de Google). Cada cuenta puede publicar como mucho 20
 //   opiniones, 5 sugerencias de locales y 20 denuncias cada 24 horas (quotas/).
+// - 3.12.2 · Informes de errores técnicos de la app (clientErrors/): sin datos personales,
+//   uno por error y día; solo los lee la administración y se borran solos a los 90 días.
 // =====================================================================
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -551,6 +553,30 @@ service cloud.firestore {
         && qCountOk('rev', 20) && qCountOk('sug', 5) && qCountOk('rep', 20);
       // Al borrar sus datos, cada cuenta puede borrar el suyo, pero solo con la ventana ya cerrada (así no sirve para saltarse el límite)
       allow delete: if (signedIn() && request.auth.uid == uid && request.time >= resource.data.win + duration.value(1, 'd')) || isAdmin();
+    }
+
+    // ---------- Informes de errores técnicos de la app (3.12.2) ----------
+    // Sin datos personales: mensaje del programa, dónde ocurrió, versión y tipo de móvil. Uno por error y día
+    // ({día}_{resumen}); si se repite, solo sube el contador. «exp» (a 90 días) lo usa la política TTL para borrarlos.
+    match /clientErrors/{id} {
+      allow read, delete: if isAdmin();
+      allow create: if request.resource.data.keys().hasOnly(['v', 'ctx', 'msg', 'src', 'plat', 'count', 'day', 'first', 'last', 'exp'])
+        && isStr(request.resource.data.v, 20)
+        && request.resource.data.ctx in ['app', 'web']
+        && request.resource.data.msg is string && request.resource.data.msg.size() >= 1 && request.resource.data.msg.size() <= 200
+        && isStr(request.resource.data.src, 120)
+        && request.resource.data.plat in ['android', 'ios', 'otro']
+        && request.resource.data.count == 1
+        && request.resource.data.day is string && request.resource.data.day.matches('20[0-9]{2}-[01][0-9]-[0-3][0-9]')
+        && id.matches(request.resource.data.day + '_[0-9a-f]{16}')
+        && request.resource.data.first == request.time && request.resource.data.last == request.time
+        && request.resource.data.exp is timestamp
+        && request.resource.data.exp > request.time + duration.value(85, 'd')
+        && request.resource.data.exp < request.time + duration.value(95, 'd');
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['count', 'last'])
+        && resource.data.count < 10000
+        && request.resource.data.count == resource.data.count + 1
+        && request.resource.data.last == request.time;
     }
 
     // ---------- Lecturas de cartas con IA (las escribe solo el servidor; la administración las ve) ----------
