@@ -11,6 +11,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Comeclaro · Administración</title>
 <link rel="icon" type="image/png" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <style>
   :root { --bg:#0b132b; --card:#1c2541; --card-alt:#060b19; --text:#f8fafc; --muted:#94a3b8; --green:#10b981; --amber:#f59e0b; --red:#ef4444; --accent:#38bdf8; --border:#2d3a5d; }
   * { box-sizing:border-box; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
@@ -544,7 +545,7 @@ El equipo de Comeclaro`;
   // ---------- Email con los motivos ----------
   // Cuando se retira o limita algo de un restaurante (su local, su respuesta, su verificación o su plaza de
   // Fundador), la ley de servicios digitales (Reglamento UE 2022/2065, art. 17) obliga a explicarle por qué
-  // si tenemos su email. El panel prepara el email: tú lo envías desde tu correo (mejor tusalergiasapp@gmail.com).
+  // si tenemos su email. El panel prepara el email: tú lo envías desde tu correo (mejor contacto@comeclaro.es).
   const termsUrl = () => new URL("condiciones.html", location.href).href;
   function askReason(what, def) {
     const r = prompt(`Motivo (se incluirá en el email al restaurante):\n${what}`, def || "");
@@ -557,7 +558,7 @@ El equipo de Comeclaro`;
       `En qué nos basamos: ${clause} de las condiciones de uso (${termsUrl()}).`,
       "La decisión la ha tomado una persona del equipo de Comeclaro, sin medios automatizados.", "",
       "Si no estás de acuerdo, responde a este email explicando por qué y lo revisaremos. También puedes acudir a los tribunales.", "",
-      "Comeclaro · tusalergiasapp@gmail.com"];
+      "Comeclaro · contacto@comeclaro.es"];
   }
   function mailLink(parent, to, subject, lines, label) {
     if (!to || /cuenta borrada/.test(to)) { parent.appendChild(el("div", "⚠️ No consta el email de esa cuenta: si puedes, avísale por otra vía.", "msg")); return null; }
@@ -663,7 +664,7 @@ El equipo de Comeclaro`;
     mailLink(ask, c.email, `Comeclaro: tu reclamación de «${r ? r.name : "un local"}»`, ["Hola:", "",
       `Hemos recibido tu reclamación del local «${r ? r.name : ""}» en Comeclaro.`, "",
       "Para comprobar que lo gestionas, responde a este email adjuntando un documento que acredite tu relación con el local (por ejemplo, la cabecera de una factura a nombre del local o su licencia de apertura) o escríbenos desde el email del propio local.",
-      "Solo lo usaremos para resolver la reclamación y lo borraremos después.", "", "Comeclaro · tusalergiasapp@gmail.com"], "📧 Pedir el documento");
+      "Solo lo usaremos para resolver la reclamación y lo borraremos después.", "", "Comeclaro · contacto@comeclaro.es"], "📧 Pedir el documento");
     const row = el("div", null, "row"); row.style.marginTop = "8px";
     if (r) button(row, "Aprobar y traspasar el local", "btn-green", async () => {
       const oldEmail = await emailOf(r.ownerUid);
@@ -675,7 +676,7 @@ El equipo de Comeclaro`;
         card.replaceChildren(el("div", "✅ Local traspasado y verificado. Sus QR impresos siguen funcionando.", "msg ok"));
         mailLink(card, oldEmail, `Comeclaro: «${r.name}» ha pasado a otra cuenta`, reasonLines(r.name, "traspasar el local, con su carta, opiniones y estadísticas, a la cuenta de quien lo ha reclamado. Tu cuenta ya no lo gestiona.", why, "el punto C8 (Verificación y reclamación de locales)"), "📧 Avisar con los motivos a la cuenta anterior");
         card.appendChild(el("div"));
-        mailLink(card, c.email, `Comeclaro: reclamación aprobada`, ["Hola:", "", `Hemos aprobado tu reclamación: «${r.name}» ya está en tu cuenta de Comeclaro, verificado. Lo verás en la pestaña Hostelería.`, "", "Comeclaro · tusalergiasapp@gmail.com"], "📧 Avisar a quien reclama");
+        mailLink(card, c.email, `Comeclaro: reclamación aprobada`, ["Hola:", "", `Hemos aprobado tu reclamación: «${r.name}» ya está en tu cuenta de Comeclaro, verificado. Lo verás en la pestaña Hostelería.`, "", "Comeclaro · contacto@comeclaro.es"], "📧 Avisar a quien reclama");
       }
       catch (e) { alert(e && e.message && !e.code ? e.message : errText(e)); }
     });
@@ -686,7 +687,7 @@ El equipo de Comeclaro`;
       try {
         await F.updateDoc(c.ref, { status: "rechazada", resolvedAt: F.serverTimestamp() });
         card.replaceChildren(el("div", "Reclamación rechazada.", "msg"));
-        mailLink(card, c.email, "Comeclaro: tu reclamación", ["Hola:", "", `Hemos revisado tu reclamación del local «${r ? r.name : ""}» y no la hemos aprobado.`, "Motivo: " + why, "", "Si crees que es un error, responde a este email con la información que lo acredite y lo revisaremos.", "", "Comeclaro · tusalergiasapp@gmail.com"], "📧 Avisar a quien reclama");
+        mailLink(card, c.email, "Comeclaro: tu reclamación", ["Hola:", "", `Hemos revisado tu reclamación del local «${r ? r.name : ""}» y no la hemos aprobado.`, "Motivo: " + why, "", "Si crees que es un error, responde a este email con la información que lo acredite y lo revisaremos.", "", "Comeclaro · contacto@comeclaro.es"], "📧 Avisar a quien reclama");
       }
       catch (e) { alert(errText(e)); }
     });
