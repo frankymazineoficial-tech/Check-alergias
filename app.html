@@ -289,6 +289,98 @@
   body { padding-bottom:98px; }
   .staff-bar .btn, .staff-bar { gap:8px; }
   @media (min-width: 1100px) { body { padding-bottom:28px; } }
+  /* 3.14.0 · FASE 2: cabecera única, barra de 4 huecos y pantalla «Yo» */
+  header { background:var(--card-alt); display:flex; align-items:center; gap:10px; }
+  .profile-pill { flex:0 1 52%; min-width:0; background:var(--card); border:1.5px solid var(--border); border-radius:22px; padding:0; position:static; }
+  .profile-pill.empty { border-color:var(--accent); }
+  .profile-pill .profile-bar-info { padding:9px 13px; min-height:40px; font-size:0.8rem; color:var(--text); cursor:pointer; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .profile-pill .profile-bar-info b { color:#fca5a5; font-weight:700; overflow:hidden; text-overflow:ellipsis; }
+  .profile-pill.empty .profile-bar-info b { color:var(--accent); }
+  .pp-edit { color:var(--accent); flex-shrink:0; }
+  .pp-dim { color:var(--muted); font-size:0.72rem; }
+  .header-sub:empty { display:none; }
+  #headerMainTitle { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bottom-nav { grid-template-columns:repeat(4,1fr); }
+  .fab-scan { transform:none; width:auto; height:48px; margin:auto 6px; padding:0 8px; border:0; border-radius:14px; flex-direction:row; gap:6px; font-size:0.78rem; font-weight:800; letter-spacing:0; box-shadow:none; }
+  .fab-scan span { font-size:1.2rem; }
+  .view-title { margin:0 0 12px; font-size:1.3rem; }
+  .row-sub { font-size:0.82rem; color:var(--muted); font-weight:400; }
+  .me-card { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; margin-bottom:12px; }
+  .me-label { font-size:0.8rem; color:var(--muted); font-weight:700; text-transform:uppercase; }
+  .me-value { font-size:1.15rem; font-weight:700; margin:6px 0 14px; color:#fca5a5; line-height:1.35; }
+  .btn-block { width:100%; }
+  @media (min-width: 1100px) {
+    header { margin-left:-232px; }
+    .bottom-nav { display:flex; }
+    .fab-scan { height:48px; margin:10px 0 0; width:auto; border-radius:12px; padding:0 14px; justify-content:flex-start; }
+  }
+  /* 3.14.0 · FASE 3: la carta */
+  .diner-actions { display:flex; gap:8px; flex-wrap:wrap; }
+  .diner-actions .btn { flex:1 1 auto; }
+  #btnWaiterCard { flex:1 1 100%; min-height:48px; font-size:0.95rem; }
+  .controls-bar { margin:4px 0 8px; }
+  .search-input { border-radius:12px; }
+  .cat-chips { display:flex; gap:8px; overflow-x:auto; padding:2px 0 10px; scrollbar-width:none; }
+  .cat-chips::-webkit-scrollbar { display:none; }
+  .cat-chip { flex:0 0 auto; padding:9px 15px; border-radius:20px; border:1.5px solid var(--border); background:var(--card); color:var(--text); font-weight:700; font-size:0.85rem; cursor:pointer; min-height:40px; }
+  .cat-chip.on { background:var(--accent); border-color:var(--accent); color:#04121f; }
+  .legal-line { font-size:0.78rem; color:var(--muted); line-height:1.4; margin:0 0 10px; }
+  .summary-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:12px; }
+  .summary-strip .tab { display:flex; flex-direction:column; align-items:center; gap:2px; padding:10px 2px; border-radius:12px; background:var(--card); border:2px solid transparent; color:var(--muted); cursor:pointer; font-family:inherit; }
+  .summary-strip .tab b { font-size:1.35rem; line-height:1; }
+  .summary-strip .tab span { font-size:0.7rem; font-weight:700; }
+  .summary-strip .tab.aptos b { color:var(--green); }
+  .summary-strip .tab.mod b { color:var(--amber); }
+  .summary-strip .tab.ask b { color:#fb923c; }
+  .summary-strip .tab.proh b { color:var(--red); }
+  .summary-strip .tab.active { border-color:var(--accent); background:rgba(56,189,248,0.1); color:var(--text); }
+  .dish-row { display:grid; grid-template-columns:1fr auto; grid-template-areas:"st chev" "dn chev" "why chev"; gap:2px 8px; align-items:center; width:100%; text-align:left; background:var(--card); border:1px solid var(--border); border-left:5px solid #475569; border-radius:14px; padding:12px 14px; margin-bottom:8px; color:var(--text); font-family:inherit; cursor:pointer; }
+  .dish-row.aptos { border-left-color:var(--green); } .dish-row.mod { border-left-color:var(--amber); } .dish-row.ask { border-left-color:#fb923c; } .dish-row.proh { border-left-color:var(--red); }
+  .dish-row .st { grid-area:st; font-size:0.74rem; font-weight:800; letter-spacing:0.03em; text-transform:uppercase; display:flex; align-items:center; gap:6px; }
+  .dish-row .st i { font-style:normal; display:inline-flex; width:20px; height:20px; border-radius:50%; align-items:center; justify-content:center; color:#04121f; font-size:0.78rem; }
+  .dish-row.aptos .st { color:#6ee7b7; } .dish-row.aptos .st i { background:var(--green); }
+  .dish-row.mod .st { color:#fcd34d; } .dish-row.mod .st i { background:var(--amber); }
+  .dish-row.ask .st { color:#fdba74; } .dish-row.ask .st i { background:#fb923c; }
+  .dish-row.proh .st { color:#fca5a5; } .dish-row.proh .st i { background:var(--red); color:#fff; }
+  .dish-row .dn { grid-area:dn; font-size:1.06rem; font-weight:700; line-height:1.3; }
+  .dish-row .why { grid-area:why; font-size:0.85rem; color:#cbd5e1; line-height:1.35; }
+  .dish-row .chev { grid-area:chev; font-size:1.6rem; color:var(--muted); }
+  .proh-fold { margin-top:6px; }
+  .proh-fold > summary { cursor:pointer; padding:12px 4px; color:var(--muted); font-weight:700; font-size:0.9rem; list-style:none; }
+  .proh-fold > summary::-webkit-details-marker { display:none; }
+  .proh-fold > summary::before { content:"▸ "; }
+  .proh-fold[open] > summary::before { content:"▾ "; }
+  .proh-fold .dish-row { opacity:0.92; }
+  .reviews-fold { margin-top:22px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:4px 14px 12px; }
+  .reviews-fold > summary { cursor:pointer; padding:12px 0; font-weight:800; font-size:0.95rem; color:var(--text); }
+  .empty-note { text-align:center; color:var(--muted); font-size:0.9rem; padding:8px 0; }
+  .gap-banner { background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.4); color:#fde68a; border-radius:12px; padding:10px 12px; margin-bottom:10px; font-size:0.85rem; line-height:1.4; }
+  .modal-content.sheet { max-width:620px; margin:auto; position:fixed; left:0; right:0; bottom:0; border-radius:22px 22px 0 0; max-height:88vh; overflow-y:auto; padding:18px 16px 20px; }
+  @media (min-width: 700px) { .modal-content.sheet { position:relative; margin:40px auto; border-radius:18px; max-height:none; } }
+  #dishList .dish-card { margin-bottom:10px; }
+  #dishDetailBody .dish-card { margin-bottom:0; }
+  @media (min-width: 1100px) { #dishList { display:block; } }
+  /* 3.14.0 · FASE 4: Comer fuera */
+  .btn-xl { width:100%; min-height:56px; font-size:1.02rem; border-radius:16px; }
+  .seg2 { display:grid; grid-template-columns:1fr 1fr; background:var(--card); border-radius:14px; padding:4px; gap:4px; margin-bottom:12px; }
+  .seg2 button { border:0; background:transparent; color:var(--muted); font-weight:800; font-size:0.9rem; padding:11px 6px; border-radius:11px; cursor:pointer; font-family:inherit; min-height:44px; }
+  .seg2 button.on { background:var(--accent); color:#04121f; }
+  .geo-card { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:14px; margin-bottom:12px; }
+  .rest-row { display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; text-align:left; background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; margin-bottom:8px; color:var(--text); cursor:pointer; font-family:inherit; }
+  .rr-main { display:flex; flex-direction:column; gap:3px; min-width:0; }
+  .rr-name { font-size:1.06rem; font-weight:800; line-height:1.25; }
+  .rr-sub { font-size:0.84rem; color:var(--muted); }
+  .rr-hook { font-size:0.9rem; color:#6ee7b7; font-weight:600; }
+  .rr-hook b { font-size:1rem; }
+  .rr-side { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+  .rr-side .chev, .dish-row .chev { color:var(--muted); font-size:1.6rem; }
+  .list-tools { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 12px; }
+  .danger-text { color:#fca5a5; border-color:rgba(239,68,68,0.5); }
+  .map-more { margin-top:18px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:4px 14px 12px; }
+  .map-more > summary { cursor:pointer; padding:12px 0; font-weight:800; font-size:0.95rem; color:var(--text); }
+  .suggest-line { text-align:center; color:var(--muted); font-size:0.85rem; margin:16px 0 0; }
+  .suggest-line a { color:var(--muted); }
+  .diner-actions .btn:not(#btnWaiterCard) { flex:1 1 0; padding:8px 6px; font-size:0.78rem; }
 </style>
 </head>
 <body>
@@ -306,47 +398,48 @@
   </symbol>
 </svg>
 
-<!-- CABECERA GLOBAL -->
+<!-- CABECERA GLOBAL: la marca y una sola píldora con lo que evitas -->
 <header>
   <div class="brand-header" onclick="showView('discover')">
     <svg class="app-logo-svg"><use href="#tusalergias-logo"></use></svg>
-    <div><h1 id="headerMainTitle">Comeclaro</h1><span class="header-sub" id="headerSubTitle">Cartas según tus alergias</span></div>
+    <div><h1 id="headerMainTitle">Comeclaro</h1><span class="header-sub" id="headerSubTitle"></span></div>
   </div>
-  <div style="display:flex; gap:6px;">
-    <button class="btn btn-purple" id="btnWaiterCard" onclick="openWaiterCardModal()">🗣️ Camarero</button>
-    <div id="headerRightActions"></div>
+  <div class="profile-pill" id="topAllergenBar">
+    <div class="profile-bar-info" id="activeProfileSummary" onclick="openAllergyProfileModal()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAllergyProfileModal();}"></div>
   </div>
+  <div id="headerRightActions"></div>
 </header>
 
-<!-- BARRA SUPERIOR PERMANENTE DE PERFIL ALÉRGICO -->
-<div class="profile-bar" id="topAllergenBar">
-  <div class="profile-bar-info" id="activeProfileSummary" onclick="openAllergyProfileModal()" style="cursor:pointer;">
-    🛡️ <b>Sin alergias marcadas</b> (Toca para configurar tu perfil)
-  </div>
-  <button class="btn btn-amber" style="padding:5px 9px; font-size:0.7rem;" onclick="openAllergyProfileModal()">⚙️ Mis Alergias</button>
-</div>
-
-<!-- PESTAÑA 1: DESCUBRIR (RESTAURANTES + MAPA + RUTAS) -->
+<!-- PESTAÑA 1: COMER FUERA (ESCANEAR LA MESA, RESTAURANTES CERCA Y GUARDADOS) -->
 <div id="discoverView" class="container">
-  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-    <h2 style="margin:0; font-size:1.02rem; color:var(--green);">🗺️ Mapa de restaurantes</h2>
-    <div style="display:flex; gap:6px;">
-      <button class="btn btn-amber" onclick="openSuggestRestModal()">💡 Sugerir Local</button>
-      <button class="btn btn-green" onclick="locateUserOnMap()">📍 Mi GPS</button>
-    </div>
+  <button class="btn btn-primary btn-xl" onclick="openUniversalScanner()">📷 Escanear el QR de la mesa</button>
+  <input type="search" id="discoverSearch" class="search-input" style="width:100%; margin:12px 0 10px;" placeholder="Busca un restaurante o una localidad" oninput="nearShown=15; renderDinerView()" aria-label="Buscar restaurante o localidad">
+  <div class="seg2" role="tablist">
+    <button type="button" class="on" id="seg-near" role="tab" onclick="setDiscoverSeg('near')">Cerca de ti</button>
+    <button type="button" id="seg-saved" role="tab" onclick="setDiscoverSeg('saved')">Guardados</button>
   </div>
-  <div id="mapContainer"></div>
 
-  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin:12px 0 8px;">
-    <span class="section-title" style="margin:0;">🎒 Mis Rutas, Favoritos y Sugeridos:</span>
-    <div style="display:flex; gap:5px;">
-      <button class="btn btn-outline" onclick="createNewRouteFolder()">+ Nueva Ruta</button>
-      <button class="btn btn-outline" id="btnRenameFolder" style="display:none;" onclick="renameActiveFolder()">✏️</button>
-      <button class="btn btn-danger" id="btnDeleteFolder" style="display:none;" onclick="deleteActiveFolder()">🗑️</button>
-    </div>
+  <div id="nearBox">
+    <div id="nearGeoPrompt" class="geo-prompt"></div>
+    <div id="nearList"></div>
   </div>
-  <div class="folder-bar" id="routeFoldersBar"></div>
-  <div id="myRestaurantsList"></div>
+
+  <div id="savedBox" style="display:none;">
+    <div class="folder-bar" id="routeFoldersBar"></div>
+    <div class="list-tools">
+      <button class="btn btn-outline" onclick="createNewRouteFolder()">+ Nueva lista</button>
+      <button class="btn btn-outline" id="btnRenameFolder" style="display:none;" onclick="renameActiveFolder()">Renombrar</button>
+      <button class="btn btn-outline danger-text" id="btnDeleteFolder" style="display:none;" onclick="deleteActiveFolder()">Borrar lista</button>
+    </div>
+    <div id="myRestaurantsList"></div>
+  </div>
+
+  <details class="map-more" id="mapMore" ontoggle="toggleMapOpen(this.open)">
+    <summary>Ver en el mapa</summary>
+    <div style="display:flex; justify-content:flex-end; margin:8px 0;"><button class="btn btn-outline" onclick="locateUserOnMap()">Centrar el mapa en mí</button></div>
+    <div id="mapContainer"></div>
+  </details>
+  <p class="suggest-line">¿Falta un restaurante? <a href="#" onclick="openSuggestRestModal(); return false;">Sugiérelo</a></p>
 </div>
 
 <!-- PESTAÑA 2: EN CASA (DESPENSA Y PLATOS CASEROS) -->
@@ -421,45 +514,52 @@
   </div>
 </div>
 
-<!-- PESTAÑA 4: MI PERFIL, BACKUP Y LEGAL -->
+<!-- PESTAÑA 4: YO (PERFIL, AYUDA, LEGAL Y MODO RESTAURANTE) -->
 <div id="profileView" class="container" style="display:none;">
-  <h2 style="margin:0 0 12px; font-size:1.05rem;">👤 Mi Perfil y Herramientas</h2>
-  <div class="rest-list-card">
-    <div><b>📖 Instrucciones de uso</b><br><span style="font-size:0.74rem; color:var(--muted);">Cómo funciona cada parte de la app, paso a paso</span></div>
-    <button class="btn btn-primary" id="btnHelp" onclick="openHelpModal()">Ver</button>
+  <h2 class="view-title">Yo</h2>
+  <div class="me-card">
+    <div class="me-label">Lo que evitas</div>
+    <div class="me-value" id="meAvoidSummary">Todavía no has marcado nada</div>
+    <button class="btn btn-primary btn-block" onclick="openAllergyProfileModal()">Editar lo que evito</button>
   </div>
   <div class="rest-list-card">
-    <div><b>🛡️ Configurar Mis Alergias, Dietas y Trazas</b><br><span style="font-size:0.74rem; color:var(--muted);">Personaliza qué ingredientes vigila la app en restaurantes y en casa</span></div>
-    <button class="btn btn-amber" onclick="openAllergyProfileModal()">⚙️ Editar Perfil</button>
+    <div><b>Tarjeta para el camarero</b><br><span class="row-sub">En español, inglés, francés e italiano</span></div>
+    <button class="btn btn-outline" onclick="openWaiterCardModal()">Abrir</button>
   </div>
   <div class="rest-list-card">
-    <div><b>🗣️ Tarjeta Multi-idioma para el Camarero</b><br><span style="font-size:0.74rem; color:var(--muted);">Español, Inglés, Francés e Italiano lista para mostrar en mesa</span></div>
-    <button class="btn btn-purple" onclick="openWaiterCardModal()">Abrir Tarjeta</button>
+    <div><b>Cómo se usa Comeclaro</b><br><span class="row-sub">Paso a paso</span></div>
+    <button class="btn btn-outline" id="btnHelp" onclick="openHelpModal()">Ver</button>
   </div>
+  <div class="rest-list-card pro-entry">
+    <div><b>Tengo un restaurante</b><br><span class="row-sub">Sube tu carta y saca tu QR de mesa</span></div>
+    <button class="btn btn-outline" id="btnOwnerEntry" onclick="showView('owner')">Entrar</button>
+  </div>
+  <div class="section-title">Mis datos</div>
   <div class="rest-list-card">
-    <div><b>💾 Copia de Seguridad (.JSON)</b><br><span style="font-size:0.74rem; color:var(--muted);">Guarda o restaura tus cartas, platos caseros y rutas en tu teléfono</span></div>
+    <div><b>Copia de seguridad</b><br><span class="row-sub">Guarda o recupera tus platos y listas</span></div>
     <div style="display:flex; gap:6px;">
-      <button class="btn btn-primary" onclick="exportBackupJson()">📤 Exportar</button>
-      <label class="btn btn-outline" style="cursor:pointer; margin:0;">📥 Importar<input type="file" accept=".json" style="display:none;" onchange="importBackupJson(event)"></label>
+      <button class="btn btn-outline" onclick="exportBackupJson()">Exportar</button>
+      <label class="btn btn-outline" style="cursor:pointer; margin:0;">Importar<input type="file" accept=".json" style="display:none;" onchange="importBackupJson(event)"></label>
     </div>
   </div>
   <div class="rest-list-card">
-    <div><b>📊 Estadísticas de uso</b><br><span style="font-size:0.74rem; color:var(--muted);">Cuenta que este móvil usa la app (solo el día y el tipo de móvil, nunca tus alergias), para conseguir apoyos para Comeclaro</span></div>
-    <label style="display:flex; align-items:center; gap:6px; font-size:0.78rem; font-weight:700; cursor:pointer;"><input type="checkbox" id="usageToggle" onchange="toggleUsage(this.checked)"> Permitir</label>
+    <div><b>Estadísticas de uso</b><br><span class="row-sub">Solo el día y el tipo de móvil, nunca tus alergias. Nos ayuda a conseguir apoyos para Comeclaro</span></div>
+    <label style="display:flex; align-items:center; gap:6px; font-size:0.9rem; font-weight:700; cursor:pointer;"><input type="checkbox" id="usageToggle" onchange="toggleUsage(this.checked)"> Permitir</label>
+  </div>
+  <div class="section-title">Legal</div>
+  <div class="rest-list-card">
+    <div><b>Aviso legal y normativa sanitaria</b><br><span class="row-sub">Reglamento UE 1169/2011 y exención de responsabilidad</span></div>
+    <button class="btn btn-outline" onclick="openModal('legalModal')">Ver</button>
   </div>
   <div class="rest-list-card">
-    <div><b>⚖️ Normativa Sanitaria (Reglamento UE 1169/2011)</b><br><span style="font-size:0.74rem; color:var(--muted);">Condiciones legales de uso y exención de responsabilidad</span></div>
-    <button class="btn btn-outline" onclick="openModal('legalModal')">Ver Aviso</button>
-  </div>
-  <div class="rest-list-card">
-    <div><b>🔒 Privacidad</b><br><span style="font-size:0.74rem; color:var(--muted);">Qué datos guarda la app y dónde: tu perfil de alergias se queda en tu móvil</span></div>
-    <button class="btn btn-outline" onclick="openPrivacyModal()">Ver política</button>
+    <div><b>Privacidad</b><br><span class="row-sub">Tu perfil de alergias se queda en tu móvil</span></div>
+    <button class="btn btn-outline" onclick="openPrivacyModal()">Ver</button>
   </div>
   <div class="rest-list-card" style="border-color:rgba(239,68,68,0.5);">
-    <div><b>🗑️ Borrar todos mis datos</b><br><span style="font-size:0.74rem; color:var(--muted);">Elimina de este móvil tu perfil, platos, rutas, reseñas y la cuenta de hostelería</span></div>
-    <button class="btn btn-danger" onclick="deleteAllMyData()">Borrar datos</button>
+    <div><b>Borrar todos mis datos</b><br><span class="row-sub">Elimina de este móvil tu perfil, platos, listas, reseñas y cuenta de restaurante</span></div>
+    <button class="btn btn-danger" onclick="deleteAllMyData()">Borrar</button>
   </div>
-  <p class="app-copyright">© 2026 Francisco José Ureña Castillo. Comeclaro, su diseño y su código son de su titular. <a href="LICENCIAS-LIBRERIAS.txt" target="_blank" rel="noopener">Licencias de las librerías</a></p>
+  <p class="app-copyright">Comeclaro <span id="aboutVersion"></span> · © 2026 Francisco José Ureña Castillo. Comeclaro, su diseño y su código son de su titular. <a href="LICENCIAS-LIBRERIAS.txt" target="_blank" rel="noopener">Licencias de las librerías</a></p>
 </div>
 
 <!-- VISTA INTERNA: CARTA DEL RESTAURANTE -->
@@ -507,9 +607,11 @@
           <span id="activeRestLastVerified" style="font-size:0.7rem; color:var(--green); margin-left:6px; font-weight:700;"></span>
           <div id="activeRestCity" style="font-size:0.76rem; color:var(--muted); margin-top:3px;"></div>
         </div>
-        <div id="dinerHeaderActions" style="display:flex; gap:6px; flex-wrap:wrap;">
-          <button class="btn btn-outline" id="btnToggleFav" onclick="openSaveToRouteModal(activeRestId)">⭐ Guardar en Ruta</button>
-          <button class="btn btn-green" id="btnBookingAction" onclick="openBookingModal()">📅 Pre-aviso Reserva</button>
+        <div id="dinerHeaderActions" class="diner-actions">
+          <button class="btn btn-primary" id="btnWaiterCard" onclick="openWaiterCardModal()">Mostrar al camarero</button>
+          <button class="btn btn-outline" id="btnToggleFav" onclick="openSaveToRouteModal(activeRestId)">♡ Guardar</button>
+          <button class="btn btn-outline" id="btnBookingAction" onclick="openBookingModal()">Avisar al restaurante</button>
+          <button class="btn btn-outline" id="btnShareMenu" onclick="shareWhatsApp()">Compartir</button>
         </div>
       </div>
 
@@ -526,49 +628,55 @@
 
     <div id="menuInteractiveZone">
       <div class="controls-bar">
-        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar plato o ingrediente..." oninput="renderDishes()">
-        <select id="catFilter" class="cat-filter" onchange="renderDishes()" aria-label="Filtrar la carta por sección"></select>
-        <button class="btn btn-green" id="btnShareMenu" onclick="shareWhatsApp()">📲 Compartir</button>
+        <input type="search" id="searchInput" class="search-input" placeholder="Buscar un plato o ingrediente" oninput="renderDishes()">
+        <select id="catFilter" class="cat-filter" onchange="renderDishes()" aria-label="Filtrar la carta por sección" style="display:none;"></select>
       </div>
-      <div class="legal-banner" id="menuLegalBanner">
-        ⚠️ <b>Seguridad Alimentaria:</b> Filtro orientativo según los datos del local y <b>solo según lo que has añadido a tu perfil</b>. <b>Confirma siempre tus alergias con el camarero</b> antes de pedir.
-      </div>
-      <div class="tabs tabs-4">
-        <div class="tab aptos active" id="tab-aptos" onclick="setTab('aptos')">COMPATIBLES (0)</div>
-        <div class="tab mod" id="tab-mod" onclick="setTab('mod')">ADAPTABLES (0)</div>
-        <div class="tab ask" id="tab-ask" onclick="setTab('ask')">PREGUNTA (0)</div>
-        <div class="tab proh" id="tab-proh" onclick="setTab('proh')">NO APTOS (0)</div>
+      <div class="cat-chips" id="catChips"></div>
+      <div class="legal-line" id="menuLegalBanner">Según los datos del local · confírmalo con el camarero antes de pedir.</div>
+      <div class="summary-strip" role="group" aria-label="Filtrar por resultado">
+        <button type="button" class="tab aptos" id="tab-aptos" onclick="setTab('aptos')"></button>
+        <button type="button" class="tab mod" id="tab-mod" onclick="setTab('mod')"></button>
+        <button type="button" class="tab ask" id="tab-ask" onclick="setTab('ask')"></button>
+        <button type="button" class="tab proh" id="tab-proh" onclick="setTab('proh')"></button>
       </div>
       <div id="dishList"></div>
     </div>
 
-    <div id="reviewsSection">
-    <hr style="border-color:var(--border); margin:20px 0 12px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
+    <details id="reviewsSection" class="reviews-fold">
+    <summary>Opiniones de otras personas con alergias</summary>
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin:10px 0;">
       <div>
-        <h3 style="margin:0; font-size:0.95rem;">💬 Experiencias de la Comunidad Alérgica</h3>
+        <h3 style="margin:0; font-size:0.95rem;">Experiencias de la comunidad alérgica</h3>
         <span style="font-size:0.7rem; color:var(--muted);">Priorizadas según tus alergias activas</span>
         <div id="reviewsNotice" style="font-size:0.66rem; color:var(--muted); margin-top:3px; line-height:1.35;">Comeclaro no comprueba que quien opina haya comido en el local: permite una opinión por persona y revisa las que se denuncian.</div>
       </div>
       <div style="display:flex; gap:6px;">
-        <button class="btn btn-green" id="btnValorar" onclick="openReviewModal()">✍️ Valorar</button>
-        <button class="btn btn-outline" id="btnReportDiscrepancy" style="color:#fca5a5; border-color:#ef4444;" onclick="reportMenuDiscrepancy()">⚠️ Aviso Carta</button>
+        <button class="btn btn-primary" id="btnValorar" onclick="openReviewModal()">Escribir opinión</button>
+        <button class="btn btn-outline" id="btnReportDiscrepancy" onclick="reportMenuDiscrepancy()">Avisar de un error en la carta</button>
       </div>
     </div>
     <div id="reviewsListContainer"></div>
-    </div>
+    </details>
     <div id="claimLocalBox" style="display:none; text-align:center; margin-top:14px;"><a href="#" id="claimLocalLink" onclick="openClaimModal(); return false;" style="font-size:0.74rem; color:var(--muted);">🔑 ¿Es tu local? Reclámalo</a></div>
   </div>
 </div>
 
 <!-- BARRA DE NAVEGACIÓN INFERIOR FIJA -->
 <nav class="bottom-nav">
-  <div class="nav-item active" id="nav-discover" onclick="showView('discover')"><span class="ico">🍽️</span><span>Restaurantes</span></div>
-  <div class="nav-item" id="nav-home" onclick="showView('home')"><span class="ico">🏠</span><span>En Casa</span></div>
+  <div class="nav-item active" id="nav-discover" onclick="showView('discover')"><span class="ico">🍽️</span><span>Comer fuera</span></div>
   <div class="fab-scan" onclick="openUniversalScanner()"><span>📷</span>Escanear</div>
-  <div class="nav-item" id="nav-owner" onclick="showView('owner')"><span class="ico">👨‍🍳</span><span>Hostelería</span></div>
-  <div class="nav-item" id="nav-profile" onclick="showView('profile')"><span class="ico">👤</span><span>Mi Perfil</span></div>
+  <div class="nav-item" id="nav-home" onclick="showView('home')"><span class="ico">🏠</span><span>En casa</span></div>
+  <div class="nav-item" id="nav-profile" onclick="showView('profile')"><span class="ico">👤</span><span>Yo</span></div>
 </nav>
+
+<!-- DETALLE DE UN PLATO -->
+<div class="modal" id="dishDetailModal" role="dialog" aria-modal="true" aria-label="Detalle del plato" onclick="if(event.target===this) closeModal('dishDetailModal')">
+  <div class="modal-content sheet">
+    <div id="dishDetailBody"></div>
+    <p class="legal-line" style="margin-top:12px;"><b>Seguridad alimentaria:</b> filtro orientativo según los datos del local y <b>solo según lo que has añadido a tu perfil</b>. <b>Confirma siempre tus alergias con el camarero</b> antes de pedir.</p>
+    <button class="btn btn-primary btn-block" style="margin-top:8px;" onclick="closeModal('dishDetailModal')">Cerrar</button>
+  </div>
+</div>
 
 <!-- MODAL 1: CONFIGURADOR UNIFICADO DE MIS ALERGIAS, DIETAS Y TRAZAS -->
 <div class="modal" id="allergyProfileModal" role="dialog" aria-modal="true" aria-labelledby="allergyProfileModalTitle">
@@ -1935,7 +2043,7 @@ let pinOpen = false;          // hostelería: herramientas abiertas con el PIN (
 let currentView = "discover", currentWaiterLang = "es";
 let leafletMap = null, markersLayer = null, userMarker = null, lastGeoPlaces = [], lastSupermarketProducts = [];
 let selectedAllergens = new Set(), selectedDiets = new Set(), customAvoidSet = new Set(), strictTracesEnabled = true;
-let currentTab = "aptos", currentHomeTab = "aptos";
+let currentTab = "all", currentHomeTab = "aptos";   // «all»: toda la carta, ordenada por resultado
 let tempHomeDishIngs = [];
 let pendingUnsafeProduct = null, lastUniversalProduct = null;
 let html5QrScanner = null;
@@ -3578,14 +3686,14 @@ function showView(v, fromBack) {
     if (el) el.style.display = (id === v + "View") ? "block" : "none";
   });
   document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
-  const nav = $("nav-" + (v === "app" ? (isStaffUnlocked ? "owner" : "discover") : v));
+  const nav = $("nav-" + (v === "app" ? (isStaffUnlocked ? "profile" : "discover") : (v === "owner" ? "profile" : v)));
   if (nav) nav.classList.add("active");
   if (v !== "app") {
     $("headerMainTitle").innerText = "Comeclaro";
-    $("headerSubTitle").innerText = `Cartas según tus alergias · v${APP_VERSION}`;
+    $("headerSubTitle").innerText = "";
     $("topAllergenBar").style.display = "flex";
   }
-  if (v === "discover") { renderDinerView(); setTimeout(initOrRefreshMap, 100); }
+  if (v === "discover") { renderDinerView(); if (cloud) cloudPullPublic(); autoLocateIfGranted(); }
   if (v === "home") renderHomeView();
   if (v === "owner") renderOwnerSessionView();
   if (v === "app") renderRestaurantApp();
@@ -3610,9 +3718,13 @@ function profileLabels() {
 }
 function updateProfileBarSummary() {
   const total = profileLabels();
+  const pill = $("topAllergenBar");
+  if (pill) pill.classList.toggle("empty", !total.length);
   $("activeProfileSummary").innerHTML = total.length
-    ? `🛡️ <b>Vigilando:</b> <span style="color:#f87171;">${esc(total.join(", "))}</span>${strictTracesEnabled ? "" : " <span style='color:var(--muted);'>(trazas permitidas)</span>"}`
-    : `🛡️ <b>Sin alergias marcadas</b> (Toca para configurar tu perfil)`;
+    ? `Evitas: <b>${esc(total.join(", "))}</b>${strictTracesEnabled ? "" : " <span class='pp-dim'>(trazas permitidas)</span>"} <span class="pp-edit">✎</span>`
+    : `<b>Marca tus alergias</b> <span class="pp-edit">✎</span>`;
+  const me = $("meAvoidSummary");
+  if (me) me.innerHTML = total.length ? esc(total.join(", ")) + (strictTracesEnabled ? "" : " <span class='pp-dim'>(trazas permitidas)</span>") : "Todavía no has marcado nada";
 }
 function initFilterButtons() {
   $("allergenGrid").innerHTML = ALLERGENS.map((a, i) => `<div class="chip ${selectedAllergens.has(a) ? "active" : ""}" onclick="toggleAl(${i})">${esc(a)}</div>`).join("");
@@ -4401,7 +4513,76 @@ async function deleteActiveHomeList() {
 // ============================================================
 // RESTAURANTES: LISTA, RUTAS, MAPA, ALTA/EDICIÓN Y CARTA
 // ============================================================
+// ---------- Comer fuera: cerca de ti ----------
+let userPos = null, geoBusy = false, geoDenied = false, nearShown = 15, discoverSeg = "near", mapOpen = false;
+function setDiscoverSeg(seg) {
+  discoverSeg = seg;
+  $("seg-near").classList.toggle("on", seg === "near");
+  $("seg-saved").classList.toggle("on", seg === "saved");
+  $("nearBox").style.display = seg === "near" ? "block" : "none";
+  $("savedBox").style.display = seg === "saved" ? "block" : "none";
+}
+function distKm(a, b) {
+  const R = 6371, rad = x => x * Math.PI / 180;
+  const dLat = rad(b.lat - a.lat), dLng = rad(b.lng - a.lng);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function fmtDist(km) { return km < 1 ? `${Math.max(10, Math.round(km * 100) * 10)} m` : `${km.toFixed(km < 10 ? 1 : 0).replace(".", ",")} km`; }
+async function locateForList() {
+  if (geoBusy) return;
+  geoBusy = true; geoDenied = false; renderNearList();
+  try {
+    const p = await getPosition();
+    userPos = { lat: p.coords.latitude, lng: p.coords.longitude };
+  } catch (e) { geoDenied = true; toast("📍 " + e.message, "info"); }
+  geoBusy = false; renderNearList();
+}
+// Si el móvil ya dio permiso a esta web, se ordena sola; si no, se pide con un botón
+async function autoLocateIfGranted() {
+  if (userPos || geoBusy || !navigator.permissions || !navigator.permissions.query) return;
+  try { const st = await navigator.permissions.query({ name: "geolocation" }); if (st.state === "granted") locateForList(); } catch (e) {}
+}
+function dishesForYou(r) {
+  const menu = publicMenu(r);
+  if (!menu.length) return null;
+  const S = activeSets();
+  if (!S.al.size && !S.di.size && !S.cu.size) return { total: menu.length, mine: null };
+  const eqx = (r.equip || []).length ? buildEquipIndex(r.equip, menu) : null;
+  let ok = 0;
+  menu.forEach(d => { if (evaluateDish(d, strictTracesEnabled, eqx).status === "aptos") ok++; });
+  return { total: menu.length, mine: ok };
+}
+function renderNearList() {
+  const box = $("nearList"), prompt = $("nearGeoPrompt");
+  if (!box) return;
+  prompt.innerHTML = userPos ? "" : geoBusy
+    ? `<div class="geo-card"><b>Buscando tu ubicación…</b></div>`
+    : `<div class="geo-card"><div><b>Ordena los restaurantes por cercanía</b><div class="row-sub">Usamos tu ubicación solo para ordenar esta lista. No se guarda ni se envía.</div></div><button class="btn btn-primary" onclick="locateForList()">📍 Usar mi ubicación</button></div>`;
+  const q = normalizeStr(($("discoverSearch") || {}).value || "");
+  let list = appState.restaurants.filter(r => {
+    if (r.demo && isCloudMode()) return false;
+    if (!restaurantPublicNow(r) && !ownsRestaurant(r)) return false;
+    if (q && !normalizeStr(`${r.name} ${r.city || ""}`).includes(q)) return false;
+    return true;
+  });
+  list.forEach(r => { r._km = userPos && isFinite(r.lat) && isFinite(r.lng) ? distKm(userPos, r) : null; });
+  list.sort((a, b) => userPos && a._km != null && b._km != null ? a._km - b._km
+    : (Number(!!b.verified) - Number(!!a.verified)) || String(a.name).localeCompare(String(b.name), "es"));
+  if (!list.length) { box.innerHTML = `<p class="empty-note">${q ? "No hay ningún restaurante con ese nombre." : "Todavía no hay restaurantes en esta zona."} Prueba otra búsqueda o sugiere el tuyo abajo.</p>`; return; }
+  const shown = list.slice(0, nearShown);
+  box.innerHTML = shown.map(r => {
+    const dd = dishesForYou(r);
+    const hook = r.unclaimed ? "Aún sin carta" : dd ? (dd.mine != null ? `<b>${dd.mine}</b> plato${dd.mine === 1 ? "" : "s"} para ti` : `${dd.total} platos en la carta`) : (r.dishCount ? `${r.dishCount} platos en la carta` : "Ver la carta");
+    const sub = [r._km != null ? fmtDist(r._km) : "", r.city || ""].filter(Boolean).join(" · ");
+    return `<button type="button" class="rest-row" onclick="openRestaurantForDiner('${r.id}')">
+      <span class="rr-main"><span class="rr-name">${esc(r.name)}</span>${sub ? `<span class="rr-sub">${esc(sub)}</span>` : ""}<span class="rr-hook">${hook}</span></span>
+      <span class="rr-side">${restListBadge(r)}<span class="chev" aria-hidden="true">›</span></span></button>`;
+  }).join("") + (list.length > shown.length ? `<button class="btn btn-outline btn-block" style="margin-top:8px;" onclick="nearShown += 15; renderNearList()">Ver más (${list.length - shown.length})</button>` : "");
+}
+
 function renderDinerView() {
+  renderNearList();
   const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId) || appState.routeFolders[0];
   appState.activeFolderId = folder.id;
   const isSec = folder.id !== "f_fav";
@@ -4413,7 +4594,7 @@ function renderDinerView() {
   // Los locales verificados por la administración, primero
   const list = appState.restaurants.filter(r => (folder.restIds || []).includes(r.id)).sort((a, b) => Number(!!b.verified) - Number(!!a.verified));
   if (!list.length) {
-    $("myRestaurantsList").innerHTML = `<div style="text-align:center; padding:18px; color:var(--muted); font-size:0.8rem;">Carpeta vacía. Abre un local del mapa y pulsa «⭐ Guardar en Ruta», o sugiere uno nuevo.</div>`;
+    $("myRestaurantsList").innerHTML = `<div style="text-align:center; padding:18px; color:var(--muted); font-size:0.8rem;">Esta lista está vacía. Abre un restaurante y pulsa «♡ Guardar».</div>`;
     return;
   }
   $("myRestaurantsList").innerHTML = list.map(r => `
@@ -4425,8 +4606,8 @@ function renderDinerView() {
         </div>
       </div>
       <div style="display:flex; gap:5px;">
-        <button class="btn btn-green" onclick="openRestaurantForDiner('${r.id}')">🍽️ Abrir</button>
-        <button class="btn btn-outline" onclick="openSaveToRouteModal('${r.id}')" aria-label="Guardar en ruta">🎒</button>
+        <button class="btn btn-primary" onclick="openRestaurantForDiner('${r.id}')">Abrir</button>
+        <button class="btn btn-outline" onclick="openSaveToRouteModal('${r.id}')" aria-label="Cambiar de lista">Lista</button>
         ${canDeleteSuggestion(r) ? `<button class="btn btn-danger" onclick="deleteRestaurant('${r.id}', true)" aria-label="Borrar sugerencia">🗑️</button>` : ""}
       </div>
     </div>`).join("");
@@ -4443,7 +4624,7 @@ function verifiedLabel(r) { return r.cloud && !r.suggestion && !r.demo ? (r.veri
 function selectRouteFolder(id) { appState.activeFolderId = id; saveAppState(); renderDinerView(); }
 
 async function createNewRouteFolder(fromModal = false) {
-  const n = await uiPrompt("✈️ Nombre de tu nueva carpeta o ruta:", "", { placeholder: "Ej. Vacaciones en Cádiz" });
+  const n = await uiPrompt("Nombre de tu nueva lista:", "", { placeholder: "Ej. Vacaciones en Cádiz" });
   if (!n || !n.trim()) return;
   const id = uid("f_");
   appState.routeFolders.push({ id, name: "📍 " + str(n.trim(), 60), restIds: fromModal ? [activeRestId] : [] });
@@ -4454,7 +4635,7 @@ async function createNewRouteFolder(fromModal = false) {
 async function renameActiveFolder() {
   const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId);
   if (!folder || folder.id === "f_fav") return;
-  const n = await uiPrompt("Nuevo nombre de la ruta:", folder.name.replace(/^📍 /u, ""));
+  const n = await uiPrompt("Nuevo nombre de la lista:", folder.name.replace(/^📍 /u, ""));
   if (n && n.trim()) { folder.name = "📍 " + str(n.trim(), 60); saveAppState(); renderDinerView(); }
 }
 async function deleteActiveFolder() {
@@ -4499,7 +4680,12 @@ function allowMap() {
   $("mapContainer").innerHTML = "";
   initOrRefreshMap();
 }
+function toggleMapOpen(open) {
+  mapOpen = !!open;
+  if (mapOpen) initOrRefreshMap();
+}
 function initOrRefreshMap() {
+  if (!mapOpen) return;
   renderDinerView();
   if (cloud) cloudPullPublic();
   if (!leafletMap && !mapAllowed()) {
@@ -4541,6 +4727,7 @@ function getPosition() {
   });
 }
 async function locateUserOnMap() {
+  if (!mapOpen) { const m = $("mapMore"); if (m) m.open = true; }
   if (!leafletMap && !mapAllowed()) { toast("🗺️ Pulsa primero «Mostrar el mapa».", "info"); return; }
   toast("📍 Buscando tu ubicación...", "info");
   try {
@@ -4859,15 +5046,18 @@ function renderRoiMetrics(r) {
   $("ownerRoiMetrics").innerHTML = [["👁️", s.views, "Visitas"], ["⭐", s.saves, "Guardados"], ["📅", s.bookings, "Pre-avisos"], ["⚠️", alerts, "Avisos carta"]]
     .map(([ico, n, label]) => `<div class="roi-box"><span class="roi-num">${ico} ${Number(n) || 0}</span><span class="roi-label">${label}</span></div>`).join("");
 }
+let lastRenderedRestId = null;
 function renderRestaurantApp() {
   const r = getActiveRest();
+  if (lastRenderedRestId !== r.id) { lastRenderedRestId = r.id; currentTab = "all"; document.querySelectorAll("#appView .tab").forEach(x => x.classList.remove("active")); }
   $("headerMainTitle").innerText = r.name;
   const waiter = isStaffUnlocked && !pinOpen;            // vista del camarero: solo alergias de la mesa y carta
   $("headerSubTitle").innerText = isStaffUnlocked ? (pinOpen ? "Modo propietario" : "Vista del camarero") : (r.city || "Carta de alérgenos");
   $("restInfoCard").style.display = waiter ? "none" : "block";
-  $("menuLegalBanner").style.display = waiter ? "none" : "block";
+  $("menuLegalBanner").style.display = (waiter || isStaffUnlocked) ? "none" : "block";
   $("btnShareMenu").style.display = isStaffUnlocked ? "none" : "inline-flex";
   $("reviewsSection").style.display = waiter ? "none" : "block";
+  $("dinerHeaderActions").style.display = isStaffUnlocked ? "none" : "flex";
   $("btnWaiterCard").style.display = isStaffUnlocked ? "none" : "inline-flex";
   $("activeRestCity").innerText = r.city ? `📍 ${r.city}` : "";
   $("activeRestBadge").className = r.unclaimed ? "community-badge" : "verified-badge";
@@ -4895,6 +5085,7 @@ function renderRestaurantApp() {
   const prevCat = $("catFilter").value;
   $("catFilter").innerHTML = `<option value="ALL">Todas (${shownMenu.length})</option>` + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
   if (cats.includes(prevCat)) $("catFilter").value = prevCat;
+  renderCatChips();
   renderDishes(); renderReviews();
 }
 
@@ -4916,6 +5107,12 @@ function renderDishes() {
   const counts = { aptos: 0, mod: 0, ask: 0, proh: 0 };
   const staffEdit = isStaffUnlocked && pinOpen;           // con las herramientas abiertas se edita; el camarero solo mira
   let html = staffEdit ? draftsBarHtml(r) : "";
+  if (staffEdit) {
+    const gapN = menu.filter(d => { const g = dishGaps(d); return !d.draft && (g.none || g.names.length); }).length;
+    if (gapN) html += `<div class="gap-banner">⚠️ <b>${gapN} plato${gapN === 1 ? "" : "s"}</b> no detalla${gapN === 1 ? "" : "n"} todos sus ingredientes: tus clientes ${gapN === 1 ? "lo verán" : "los verán"} en PREGUNTA hasta que lo completes.</div>`;
+  }
+  const rows = { aptos: [], mod: [], ask: [], proh: [] };
+  dishDetailHtml.clear();
   // Freidoras y planchas: lo que se cocina en cada una sale de la carta publicada
   const eqx = (r.equip || []).length ? buildEquipIndex(r.equip, publicMenu(r)) : null;
   menu.forEach(d => {
@@ -4923,7 +5120,7 @@ function renderDishes() {
     if (q && !normalizeStr(d.name + " " + (d.ings || []).map(i => i.n + " " + i.sub).join(" ")).includes(q)) return;
     const res = evaluateDish(d, isStaffUnlocked ? true : strictTracesEnabled, eqx);
     counts[res.status]++;
-    if (res.status !== currentTab) return;
+    if (currentTab !== "all" && res.status !== currentTab) return;
     let badge = "";
     if (res.status === "mod") badge = `<div class="mod-box warn">🔄 ADAPTABLE: ${res.rem.join(" · ")}</div>`;
     // 3.13.0: PREGUNTA = el local no detalla algo que puede llevar lo que evitas. No es compatible hasta que lo confirme el personal
@@ -4945,28 +5142,58 @@ function renderDishes() {
     }).join("");
     const staffBtns = staffEdit ? `<button class="btn ${d.draft ? "btn-green" : "btn-outline"} dish-pub-btn" style="padding:2px 6px;font-size:0.65rem;" onclick="toggleDishDraft(${d.id})">${d.draft ? "📢 Publicar" : "📝 A borrador"}</button><button class="btn btn-outline" style="padding:2px 6px;font-size:0.65rem;" onclick="openDishModal(${d.id})" aria-label="Editar plato">✏️</button><button class="btn btn-danger" style="padding:2px 6px;font-size:0.65rem;" onclick="deleteDishById(${d.id})" aria-label="Borrar plato">🗑️</button>` : "";
     const draftBadge = d.draft ? `<div class="draft-badge">📝 BORRADOR · solo lo ves tú</div>` : "";
-    html += `<div class="dish-card ${res.status}${d.draft ? " is-draft" : ""}">${draftBadge}<div class="dish-header"><h3 class="dish-name">${esc(d.name)}</h3><div style="display:flex;gap:4px;align-items:center;">${staffBtns}<span class="dish-cat">${esc(d.cat)}</span></div></div>${badge}<div class="ing-pills">${pills}</div></div>`;
+    const card = `<div class="dish-card ${res.status}${d.draft ? " is-draft" : ""}">${draftBadge}<div class="dish-header"><h3 class="dish-name">${esc(d.name)}</h3><div style="display:flex;gap:4px;align-items:center;">${staffBtns}<span class="dish-cat">${esc(d.cat)}</span></div></div>${badge}<div class="ing-pills">${pills}</div></div>`;
+    if (isStaffUnlocked) { html += card; return; }          // el restaurante ve y edita la ficha completa
+    // El cliente ve una fila: resultado, nombre y un motivo corto. La ficha completa se abre al tocar
+    const why = res.status === "mod" ? "Pídelo así: " + res.rem[0] : res.status === "ask" ? res.ask[0] : res.status === "proh" ? "Lleva: " + res.blk.map(x => x.replace(/\s*\(.*$/, "")).join(", ") : "";
+    const full = (res.status === "aptos" ? `<div class="aptos-note">Compatible no significa seguro: confírmalo con el camarero.</div>` : "") + card;
+    dishDetailHtml.set(String(d.id), full);
+    const lab = { aptos: ["✓", "Compatible"], mod: ["~", "Adaptable"], ask: ["?", "Pregunta"], proh: ["✕", "No apto"] }[res.status];
+    rows[res.status].push(`<button type="button" class="dish-row ${res.status}" onclick="openDishDetail(${d.id})"><span class="st"><i>${lab[0]}</i>${lab[1]}</span><span class="dn">${esc(d.name)}</span>${why ? `<span class="why">${why}</span>` : ""}<span class="chev" aria-hidden="true">›</span></button>`);
   });
+  if (!isStaffUnlocked) {
+    html += rows.aptos.join("") + rows.mod.join("") + rows.ask.join("");
+    // Con toda la carta a la vista, los que no son para ti quedan plegados: a un toque, sin ensuciar
+    if (rows.proh.length) html += currentTab === "all"
+      ? `<details class="proh-fold"><summary>Ver los ${rows.proh.length} plato${rows.proh.length === 1 ? "" : "s"} que no ${rows.proh.length === 1 ? "es" : "son"} para ti</summary>${rows.proh.join("")}</details>`
+      : rows.proh.join("");
+  }
   setDishTabs(counts);
-  const emptyMsg = { aptos: "Ningún plato es compatible tal cual. Mira las pestañas ADAPTABLES y PREGUNTA.", mod: "No hay platos que necesiten adaptación.", ask: "No hay platos pendientes de preguntar al camarero.", proh: "Ningún plato queda descartado." }[currentTab];
-  if (currentTab === "aptos" && counts.aptos && !isStaffUnlocked) html = `<div class="aptos-note">✅ Estos platos no llevan lo que tienes en tu perfil <b>según los datos del local</b>. Compatible no significa seguro: confírmalo con el camarero.</div>` + html;
-  $("dishList").innerHTML = html + (counts[currentTab] ? "" : `<p style="text-align:center;color:var(--muted);font-size:0.8rem;">${emptyMsg}</p>`);
+  const emptyMsg = { all: "No hay platos que mostrar.", aptos: "Ningún plato es compatible tal cual. Mira las pestañas ADAPTABLES y PREGUNTA.", mod: "No hay platos que necesiten adaptación.", ask: "No hay platos pendientes de preguntar al camarero.", proh: "Ningún plato queda descartado." }[currentTab];
+  const shown = currentTab === "all" ? counts.aptos + counts.mod + counts.ask + counts.proh : counts[currentTab];
+  if (currentTab === "all" && !isStaffUnlocked && !counts.aptos && !counts.mod && !counts.ask && counts.proh) html = `<p class="empty-note">Ningún plato es compatible tal cual con lo que evitas. Abajo puedes ver los que no son para ti.</p>` + html;
+  $("dishList").innerHTML = html + (shown ? "" : `<p class="empty-note">${emptyMsg}</p>`);
 }
 function setDishTabs(c) {
-  $("tab-aptos").innerText = `COMPATIBLES (${c.aptos})`;
-  $("tab-mod").innerText = `ADAPTABLES (${c.mod})`;
-  $("tab-ask").innerText = `PREGUNTA (${c.ask})`;
-  $("tab-proh").innerText = `NO APTOS (${c.proh})`;
+  $("tab-aptos").innerHTML = `<b>${c.aptos}</b><span>Compatibles</span>`;
+  $("tab-mod").innerHTML = `<b>${c.mod}</b><span>Adaptables</span>`;
+  $("tab-ask").innerHTML = `<b>${c.ask}</b><span>Pregunta</span>`;
+  $("tab-proh").innerHTML = `<b>${c.proh}</b><span>No aptos</span>`;
 }
 function fmtDay(iso) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ""));
   return m ? `${m[3]}/${m[2]}/${m[1]}` : String(iso || "");
 }
 function setTab(t) {
-  currentTab = t;
+  currentTab = currentTab === t ? "all" : t;      // tocar el mismo número otra vez vuelve a mostrar toda la carta
   document.querySelectorAll("#appView .tab").forEach(x => x.classList.remove("active"));
-  $("tab-" + t).classList.add("active");
+  if (currentTab !== "all") $("tab-" + currentTab).classList.add("active");
   renderDishes();
+}
+function renderCatChips() {
+  const sel = $("catFilter"), box = $("catChips");
+  if (!sel || !box) return;
+  const opts = [...sel.options];
+  box.style.display = opts.length > 2 ? "flex" : "none";
+  box.innerHTML = opts.map(o => `<button type="button" class="cat-chip${sel.value === o.value || (!sel.value && o.value === "ALL") ? " on" : ""}" data-c="${esc(o.value)}" onclick="pickCat(this.dataset.c)">${o.value === "ALL" ? "Todo" : esc(o.textContent)}</button>`).join("");
+}
+function pickCat(c) { $("catFilter").value = c; renderCatChips(); renderDishes(); }
+const dishDetailHtml = new Map();
+function openDishDetail(id) {
+  const h = dishDetailHtml.get(String(id));
+  if (!h) return;
+  $("dishDetailBody").innerHTML = h;
+  openModal("dishDetailModal");
 }
 
 // Tocar un ingrediente en modo propietario: Fijo 🔒 <-> Adaptable 🔄
@@ -6169,6 +6396,7 @@ function upsertCloudRest(id, d, menu, stats, equip) {
   else Object.assign(r, { cloud: true, ownerUid: clean.ownerUid, name: clean.name, city: clean.city, phone: clean.phone, lat: clean.lat, lng: clean.lng, lastVerified: clean.lastVerified, unclaimed: false, imported: false, demo: false, suggestion: false });
   r.founder = !!d.founder;
   r.verified = d.verified === true;
+  r.dishCount = Math.min(Math.max(+d.dishCount || 0, 0), 300);
   if (tsMs(d.createdAt)) r.createdAtMs = tsMs(d.createdAt);
   r.paidUntil = tsMs(d.paidUntil);
   if (menu !== undefined) r.menu = sanitizeMenu(menu);
@@ -8512,7 +8740,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   $("uiDialogOk").addEventListener("click", () => closeUiDialog(true));
   $("uiDialogCancel").addEventListener("click", () => closeUiDialog(false));
   $("uiDialogInput").addEventListener("keydown", e => { if (e.key === "Enter") closeUiDialog(true); });
-  $("headerSubTitle").innerText = `Cartas según tus alergias · v${APP_VERSION}`;
+  $("headerSubTitle").innerText = "";
+  const av = $("aboutVersion"); if (av) av.innerText = "v" + APP_VERSION;
   initFilterButtons();
   if (!legalUpToDate()) openLegalModal();
   if (inPreview()) setTimeout(() => {
