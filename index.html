@@ -19,10 +19,13 @@
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Comeclaro · Cartas de restaurantes según tus alergias</title>
-<meta name="description" content="Marca tus alergias y la carta de cada restaurante se ordena sola: platos compatibles, adaptables y no aptos, con el motivo. Para restaurantes, gratis durante el lanzamiento.">
+<meta name="description" content="Comeclaro es una aplicación gratuita para personas con alergias e intolerancias alimentarias: marca lo que evitas y la carta de cada restaurante se ordena sola en platos compatibles, adaptables y no aptos, con el motivo.">
+<meta name="application-name" content="Comeclaro">
+<meta name="apple-mobile-web-app-title" content="Comeclaro">
 <meta name="theme-color" content="#0b132b">
-<link rel="icon" type="image/png" href="favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/icon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
 <link rel="canonical" href="https://comeclaro.es/">
@@ -33,6 +36,7 @@
 <meta property="og:site_name" content="Comeclaro">
 <meta property="og:image" content="https://comeclaro.es/icon-512.png">
 <meta property="og:locale" content="es_ES">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Organization", "@id": "https://comeclaro.es/#org", "name": "Comeclaro", "alternateName": ["Comeclaro.es", "Comeclaro app de alergias"], "url": "https://comeclaro.es/", "logo": {"@type": "ImageObject", "url": "https://comeclaro.es/icon-512.png", "width": 512, "height": 512}, "email": "contacto@comeclaro.es", "founder": {"@type": "Person", "name": "Francisco José Ureña Castillo"}, "address": {"@type": "PostalAddress", "addressLocality": "Lorca", "addressRegion": "Región de Murcia", "addressCountry": "ES"}}, {"@type": "WebSite", "@id": "https://comeclaro.es/#web", "url": "https://comeclaro.es/", "name": "Comeclaro", "alternateName": "Comeclaro · Cartas de restaurantes según tus alergias", "inLanguage": "es", "publisher": {"@id": "https://comeclaro.es/#org"}}, {"@type": "WebApplication", "@id": "https://comeclaro.es/#app", "name": "Comeclaro", "url": "https://comeclaro.es/app.html", "applicationCategory": "HealthApplication", "operatingSystem": "Web, Android, iOS", "description": "Aplicación gratuita para personas con alergias e intolerancias alimentarias. Ordena la carta de cada restaurante según tu perfil (los 14 alérgenos de declaración obligatoria, dietas y otros alimentos), lee productos del supermercado y muestra una tarjeta para el camarero. Es una ayuda orientativa, no un producto sanitario.", "inLanguage": "es", "featureList": ["Carta de restaurantes ordenada por tus alergias", "Escáner de productos del supermercado", "Tarjeta de alergias para el camarero", "Los 14 alérgenos del Reglamento (UE) 1169/2011", "Dietas vegana, vegetariana, sin cerdo y de embarazo"], "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "publisher": {"@id": "https://comeclaro.es/#org"}}]}</script>
 <style>
 /* Letra Inter (licencia SIL OFL 1.1), servida desde esta misma web: ningún servidor externo recibe la IP de quien la visita */
 @font-face { font-family: "Inter TA"; src: url("fuente-inter-400.woff") format("woff"); font-weight: 400 500; font-display: swap; }
@@ -147,6 +151,13 @@ footer a:hover { color: #7dd3fc; }
   .steps { padding-top: 64px; padding-bottom: 64px; }
   .pro .wrap, .home .wrap, .extras .wrap { padding-top: 64px; padding-bottom: 64px; }
 }
+.shots { border-top: 1px solid var(--line); background: var(--mist); }
+.shots .wrap { padding-top: 80px; padding-bottom: 80px; display: flex; flex-direction: column; gap: 36px; }
+.shot-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 28px; align-items: start; }
+.shot { margin: 0; text-align: center; }
+.shot img { width: 100%; max-width: 270px; height: auto; border-radius: 26px; border: 6px solid var(--navy); box-shadow: 0 18px 40px rgba(11, 19, 43, 0.25); background: var(--navy); }
+.shot figcaption { margin-top: 14px; font-weight: 700; color: var(--ink); }
+.shot figcaption small { display: block; font-weight: 400; color: var(--soft); margin-top: 2px; }
 </style>
 </head>
 <body>
@@ -167,7 +178,7 @@ footer a:hover { color: #7dd3fc; }
 <div class="hero-copy">
 <span class="pill">Región de Murcia · Fase de lanzamiento</span>
 <h1 id="titulo">Come fuera sabiendo qué platos son para ti</h1>
-<p class="lead">Marca tus alergias y la carta de cada restaurante se ordena sola: compatibles, adaptables y no aptos, con el motivo.</p>
+<p class="lead"><strong>Comeclaro</strong> es la aplicación para personas con alergias e intolerancias alimentarias: marca lo que evitas y la carta de cada restaurante se ordena sola en compatibles, adaptables y no aptos, con el motivo.</p>
 <div class="ctas">
 <a class="btn btn-green" href="restaurantes.html">Ver restaurantes y cartas</a>
 <a class="btn btn-ghost" href="#hosteleria">Tengo un restaurante</a>
@@ -187,6 +198,20 @@ footer a:hover { color: #7dd3fc; }
 <div class="step"><span class="num" aria-hidden="true">03</span><h2>Plato a plato</h2><p>Ingredientes, trazas, freidoras y planchas compartidas, y lo que dice el nombre del plato. Todo cuenta.</p></div>
 </section>
 
+<section class="shots" aria-labelledby="shots-t">
+<div class="wrap">
+<div>
+<p class="eyebrow">La app</p>
+<h2 id="shots-t">Así se ve en tu móvil</h2>
+</div>
+<div class="shot-row">
+<figure class="shot"><img src="captura-3.jpg" width="540" height="960" loading="lazy" alt="Pantalla de inicio de Comeclaro con las alergias Gluten y Lácteo arriba y el restaurante de la zona en una tarjeta con su foto"><figcaption>Tus alergias, siempre arriba<small>Solo ves los restaurantes de tu zona, con los platos que son para ti.</small></figcaption></figure>
+<figure class="shot"><img src="captura-1.jpg" width="540" height="960" loading="lazy" alt="Carta de un restaurante con el recuento de platos compatibles, adaptables, con duda y no aptos para quien evita gluten y lácteos"><figcaption>La carta, ordenada por ti<small>Compatibles, adaptables, con duda y no aptos, y el motivo de cada uno.</small></figcaption></figure>
+<figure class="shot"><img src="captura-2.jpg" width="540" height="960" loading="lazy" alt="Resultado del escáner de un producto: no es para ti, lleva gluten y lácteo"><figcaption>El súper, escaneado<small>Código de barras o foto de la etiqueta, con el aviso claro.</small></figcaption></figure>
+</div>
+</div>
+</section>
+
 <section class="extras" aria-labelledby="extras-t">
 <div class="wrap">
 <h2 id="extras-t">Lo que una lista de alérgenos no te dice</h2>
@@ -204,7 +229,7 @@ footer a:hover { color: #7dd3fc; }
 <div class="feature">
 <svg viewBox="0 0 44 44" aria-hidden="true" fill="none" stroke="#0e7490" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="42" height="42" rx="12" fill="#e0f2fe" stroke="none"/><path d="M14 22l5 5 11-11"/></svg>
 <h3>Más que los 14 alérgenos</h3>
-<p>Dieta vegana, vegetariana, sin cerdo o para el embarazo, y cualquier alimento que añadas, con su familia: pimiento, pimentón, guindilla…</p>
+<p>Dieta vegana, vegetariana, sin cerdo o para el embarazo, y cualquier alimento que añadas, con su familia: pimiento, pimentón, guindilla, lactosa, sal, níquel…</p>
 </div>
 </div>
 </div>
