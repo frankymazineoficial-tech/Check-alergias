@@ -556,6 +556,16 @@
   .icon-act.on svg { fill:#f87171; }
   .rest-info-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; margin-top:18px; }
   .rest-info-card .btn { width:100%; }
+  /* 3.17.0 · Corazón en cada foto y «Mis favoritos» sin listas */
+  .rc-heart { position:absolute; top:10px; right:10px; z-index:2; width:36px; height:36px; border-radius:50%; border:0; padding:0; display:inline-flex; align-items:center; justify-content:center; background:rgba(7,12,28,0.7); color:#fff; cursor:pointer; backdrop-filter:blur(4px); }
+  .rc-heart.on { color:#f87171; }
+  .rc-heart.on svg { fill:#f87171; }
+  .fav-row { display:flex; align-items:center; gap:10px; background:var(--card-alt); border:1px solid var(--border); border-radius:14px; padding:12px 12px 12px 14px; margin-bottom:8px; cursor:pointer; }
+  .fr-main { flex:1; min-width:0; }
+  .fr-main b { display:block; font-size:1.02rem; line-height:1.25; }
+  .fr-main span { display:block; font-size:0.84rem; color:var(--muted); margin-top:2px; }
+  .fr-badge { flex-shrink:0; }
+  .fav-row .icon-act { flex-shrink:0; }
 </style>
 </head>
 <body>
@@ -611,8 +621,8 @@
   <div id="nearBox"><div id="nearList"></div></div>
 
   <p class="scan-line">¿Estás ya en un restaurante? <a href="#" onclick="openUniversalScanner(); return false;">Escanea el QR de la mesa</a></p>
-  <p class="scan-line">¿Quieres volver a uno que guardaste? <a href="#" onclick="openSavedSheet(); return false;">Tus guardados<span id="savedCount"></span></a></p>
-  <p class="scan-line">¿Falta un restaurante? <a href="#" onclick="openSuggestRestModal(); return false;">Sugiérelo</a></p>
+  <p class="scan-line"><a href="#" onclick="openSavedSheet(); return false;">♥ Mis favoritos<span id="savedCount"></span></a></p>
+  <p class="scan-line"><a href="#" onclick="openSuggestRestModal(); return false;">Sugerir restaurante en Comeclaro App</a></p>
 </div>
 
 <!-- PESTAÑA 2: EN CASA (MIS PLATOS Y PRODUCTOS) -->
@@ -765,7 +775,7 @@
     <div class="rest-title-row" id="restTitleRow">
       <h2 class="rest-title" id="restTitle"></h2>
       <div class="rt-actions">
-        <button type="button" class="icon-act" id="btnToggleFav" onclick="toggleFavorite()" aria-pressed="false" aria-label="Guardar este restaurante"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5.2 5.2 0 0 0-7.4 0L12 7l-1.4-1.4a5.2 5.2 0 0 0-7.4 7.4L12 21.6l8.8-8.6a5.2 5.2 0 0 0 0-7.4z"/></svg></button>
+        <button type="button" class="icon-act" id="btnToggleFav" data-fav="" onclick="toggleFavorite()" aria-pressed="false" aria-label="Añadir a mis favoritos"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5.2 5.2 0 0 0-7.4 0L12 7l-1.4-1.4a5.2 5.2 0 0 0-7.4 7.4L12 21.6l8.8-8.6a5.2 5.2 0 0 0 0-7.4z"/></svg></button>
         <button type="button" class="icon-act" id="btnShareMenu" onclick="shareWhatsApp()" aria-label="Compartir este restaurante"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
       </div>
     </div>
@@ -851,7 +861,7 @@
     <div class="set-group">
       <div class="set-row"><span class="sr-t"><b>Mi perfil de alergias</b><small>Alérgenos, dietas y alimentos a evitar</small></span><button class="btn btn-outline danger-text" onclick="clearMyProfileData()">Borrar</button></div>
       <div class="set-row"><span class="sr-t"><b>Mis platos de casa</b><small>Los platos y productos de «En casa»</small></span><button class="btn btn-outline danger-text" onclick="clearMyHomeData()">Borrar</button></div>
-      <div class="set-row"><span class="sr-t"><b>Mis guardados</b><small>Las listas de restaurantes guardados</small></span><button class="btn btn-outline danger-text" onclick="clearMySavedData()">Borrar</button></div>
+      <div class="set-row"><span class="sr-t"><b>Mis favoritos</b><small>Los restaurantes que marcaste con el corazón</small></span><button class="btn btn-outline danger-text" onclick="clearMySavedData()">Borrar</button></div>
     </div>
     <div class="set-title">Eliminar mi cuenta y mis datos</div>
     <p class="row-sub" style="margin:0 0 8px;">Borra todo lo anterior y también lo que publicaste (opiniones y denuncias). Si tienes cuenta de restaurante, elimina la cuenta con sus locales, cartas y estadísticas. No se puede deshacer.</p>
@@ -860,17 +870,11 @@
   </div>
 </div>
 
-<!-- RESTAURANTES GUARDADOS -->
+<!-- MIS FAVORITOS -->
 <div class="modal" id="savedModal" role="dialog" aria-modal="true" aria-labelledby="savedModalTitle" onclick="if(event.target===this) closeModal('savedModal')">
   <div class="modal-content sheet">
-    <div class="scan-head"><h2 id="savedModalTitle">Tus guardados</h2><button class="btn btn-outline" onclick="closeModal('savedModal')">Cerrar</button></div>
-    <div class="folder-bar" id="routeFoldersBar" style="margin-top:10px;"></div>
-    <div class="list-tools">
-      <button class="btn btn-outline" onclick="createNewRouteFolder()">+ Nueva lista</button>
-      <button class="btn btn-outline" id="btnRenameFolder" style="display:none;" onclick="renameActiveFolder()">Renombrar</button>
-      <button class="btn btn-outline danger-text" id="btnDeleteFolder" style="display:none;" onclick="deleteActiveFolder()">Borrar lista</button>
-    </div>
-    <div id="myRestaurantsList"></div>
+    <div class="scan-head"><h2 id="savedModalTitle">Mis favoritos</h2><button class="btn btn-outline" onclick="closeModal('savedModal')">Cerrar</button></div>
+    <div id="myRestaurantsList" style="margin-top:12px;"></div>
   </div>
 </div>
 
@@ -1122,17 +1126,6 @@
 </div>
 
 <!-- MODALES AUXILIARES: RUTAS, CAMARERO, RESERVA, RESEÑA, QR Y AVISO LEGAL OBLIGATORIO -->
-<div class="modal" id="saveRouteModal" role="dialog" aria-modal="true" aria-labelledby="saveRouteModalTitle">
-  <div class="modal-content">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="margin:0; font-size:1rem;" id="saveRouteModalTitle">🎒 Guardar en Mis Rutas</h2>
-      <button class="btn btn-outline" onclick="closeModal('saveRouteModal')">✕</button>
-    </div>
-    <div id="routeFolderSelectorList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;"></div>
-    <button class="btn btn-outline" style="width:100%;" onclick="createNewRouteFolder(true)">+ Nueva Carpeta de Ruta</button>
-  </div>
-</div>
-
 <div class="modal" id="waiterCardModal" role="dialog" aria-modal="true" aria-labelledby="waiterCardModalTitle">
   <div class="modal-content" style="border:2px solid var(--purple);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -1457,7 +1450,7 @@
       <div class="help-body">
         <ul>
           <li><b>«Avisar al restaurante»</b>: escribe tu nombre, cuántos sois, el día y la hora. Se abre WhatsApp con un mensaje al restaurante que incluye tus alergias y dietas, y tú decides si lo envías. Solo aparece si el local tiene WhatsApp.</li>
-          <li><b>El corazón ♡</b> junto al nombre del restaurante lo guarda (púlsalo otra vez para quitarlo). Tus guardados están en «🍽️ Comer fuera», abajo, en «Tus guardados»: ahí, con «Lista», lo pasas a otra lista (por ejemplo «Vacaciones»); con «Renombrar» cambias el nombre de una lista y con «Borrar lista» la borras.</li>
+          <li><b>El corazón ♡</b> (en la foto de cada restaurante y junto a su nombre) lo añade a tus favoritos; púlsalo otra vez para quitarlo. Tus favoritos están en «🍽️ Comer fuera», abajo, en «♥ Mis favoritos».</li>
           <li><b>«📲 Compartir»</b>: envía el enlace de la carta por WhatsApp.</li>
         </ul>
       </div>
@@ -1533,7 +1526,7 @@
           <li>Tu perfil, tus platos caseros y tus rutas se guardan <b>solo en este móvil</b>. Si cambias de móvil o borras la app, se pierden, salvo que hagas una copia.</li>
           <li><b>«Mis datos»</b> (en «👤 Yo»): «Exportar copia» descarga un archivo con todo. En el móvil nuevo, pulsa «Importar copia» y elige ese archivo. Ojo: sustituye lo que haya en ese móvil.</li>
           <li><b>«📊 Estadísticas de uso»</b>: solo si lo permites, cuenta que este móvil usa la app, sin tu nombre ni tus alergias. Si lo desactivas, se borra lo apuntado.</li>
-          <li><b>Borrar</b>: en «Mis datos» puedes borrar por partes (tu perfil de alergias, tus platos de casa o tus guardados) o eliminar tu cuenta y todos tus datos. Lee el aviso antes de confirmar.</li>
+          <li><b>Borrar</b>: en «Mis datos» puedes borrar por partes (tu perfil de alergias, tus platos de casa o tus favoritos) o eliminar tu cuenta y todos tus datos. Lee el aviso antes de confirmar.</li>
           <li><b>Botón «atrás» del móvil</b>: cierra la ventana abierta o vuelve a la pantalla anterior. En la pantalla de inicio, púlsalo dos veces para salir.</li>
           <li><b>Sin internet</b>, la app se abre con lo último que guardó. Para buscar productos, ver el mapa o publicar cambios hace falta conexión.</li>
         </ul>
@@ -1847,7 +1840,7 @@
 </div>
 
 <script>
-const APP_VERSION = "3.16.2";
+const APP_VERSION = "3.17.0";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
@@ -4765,7 +4758,7 @@ async function deleteActiveHomeList() {
 // ============================================================
 // ---------- Comer fuera: un restaurante a la vez ----------
 let userPos = null, geoBusy = false, nearShown = 40, mapOpen = false, locMode = "all", locCity = "";
-function openSavedSheet() { renderDinerView(); openModal("savedModal"); }
+function openSavedSheet() { renderFavorites(); openModal("savedModal"); }
 function toggleDiscoverSearch() {
   const inp = $("discoverSearch");
   const open = inp.style.display === "none";
@@ -4958,7 +4951,7 @@ function renderNearList() {
       const where = [r.city].filter(Boolean).join("");
       return `<article class="rc-card" role="listitem" tabindex="0" onclick="openRestaurantForDiner('${r.id}')" onkeydown="if(event.key==='Enter'){openRestaurantForDiner('${r.id}')}" aria-label="${esc(r.name)}">
         <div class="rc-photo" style="background-image:${coverFallback(r.name)};"><span class="rc-init" aria-hidden="true">${esc(String(r.name || "?").trim().charAt(0).toUpperCase())}</span>
-          <span class="rc-badge">${restListBadge(r)}</span>${r._km != null ? `<span class="rc-dist">${fmtDist(r._km)}</span>` : ""}</div>
+          <span class="rc-badge">${restListBadge(r)}</span><button type="button" class="rc-heart${isSavedAnywhere(r.id) ? " on" : ""}" data-fav="${r.id}" onclick="event.stopPropagation(); toggleFavorite('${r.id}')" aria-pressed="${isSavedAnywhere(r.id)}" aria-label="${isSavedAnywhere(r.id) ? "Quitar de mis favoritos" : "Añadir a mis favoritos"}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5.2 5.2 0 0 0-7.4 0L12 7l-1.4-1.4a5.2 5.2 0 0 0-7.4 7.4L12 21.6l8.8-8.6a5.2 5.2 0 0 0 0-7.4z"/></svg></button>${r._km != null ? `<span class="rc-dist">${fmtDist(r._km)}</span>` : ""}</div>
         <div class="rc-body"><div class="rc-name">${esc(r.name)}</div>${where ? `<div class="rc-sub">${esc(where)}</div>` : ""}<div class="rc-hook">${hook}</div></div>
       </article>`;
     }).join("")}</div>
@@ -4986,38 +4979,30 @@ function rcGo(d) {
   if (t && c) t.scrollBy({ left: d * (c.offsetWidth + 12), behavior: "smooth" });
 }
 
+// Favoritos: los restaurantes con el corazón puesto (internamente siguen en las listas de siempre, que ya no se ven)
+function favIds() { return new Set(appState.routeFolders.flatMap(f => f.restIds || [])); }
+function favRestaurants() {
+  const ids = favIds();
+  return appState.restaurants.filter(r => ids.has(r.id) && !(r.demo && isCloudMode()))
+    .sort((a, b) => Number(!!b.verified) - Number(!!a.verified) || String(a.name).localeCompare(String(b.name), "es"));
+}
 function renderDinerView() {
   renderNearList();
+  renderFavorites();
+}
+function renderFavorites() {
+  const list = favRestaurants();
   const sc = $("savedCount");
-  if (sc) { const n = new Set(appState.routeFolders.flatMap(f => f.restIds || [])).size; sc.innerText = n ? ` (${n})` : ""; }
-  const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId) || appState.routeFolders[0];
-  appState.activeFolderId = folder.id;
-  const isSec = folder.id !== "f_fav";
-  $("btnRenameFolder").style.display = isSec ? "inline-flex" : "none";
-  $("btnDeleteFolder").style.display = isSec ? "inline-flex" : "none";
-  $("routeFoldersBar").innerHTML = appState.routeFolders.map(f =>
-    `<div class="folder-pill ${f.id === folder.id ? "active" : ""}" onclick="selectRouteFolder('${f.id}')">${esc(f.name)} (${(f.restIds || []).length})</div>`
-  ).join("");
-  // Los locales verificados por la administración, primero
-  const list = appState.restaurants.filter(r => (folder.restIds || []).includes(r.id)).sort((a, b) => Number(!!b.verified) - Number(!!a.verified));
-  if (!list.length) {
-    $("myRestaurantsList").innerHTML = `<div style="text-align:center; padding:18px; color:var(--muted); font-size:0.8rem;">Esta lista está vacía. Abre un restaurante y pulsa «♡ Guardar».</div>`;
-    return;
-  }
-  $("myRestaurantsList").innerHTML = list.map(r => `
-    <div class="rest-list-card">
-      <div class="rest-info" onclick="openRestaurantForDiner('${r.id}')">
-        <div>
-          <b>${esc(r.name)}</b> ${restListBadge(r)}${r.founder ? ' <span class="community-badge">🏅 Fundador</span>' : ""}<br>
-          <span style="font-size:0.73rem; color:var(--muted);">📍 ${esc(r.city || "En el mapa")}</span>
-        </div>
-      </div>
-      <div style="display:flex; gap:5px;">
-        <button class="btn btn-primary" onclick="openRestaurantForDiner('${r.id}')">Abrir</button>
-        <button class="btn btn-outline" onclick="openSaveToRouteModal('${r.id}')" aria-label="Cambiar de lista">Lista</button>
-        ${canDeleteSuggestion(r) ? `<button class="btn btn-danger" onclick="deleteRestaurant('${r.id}', true)" aria-label="Borrar sugerencia">🗑️</button>` : ""}
-      </div>
-    </div>`).join("");
+  if (sc) sc.innerText = list.length ? ` (${list.length})` : "";
+  const box = $("myRestaurantsList");
+  if (!box) return;
+  box.innerHTML = list.length ? list.map(r => `
+    <div class="fav-row" onclick="openRestaurantForDiner('${r.id}')">
+      <div class="fr-main"><b>${esc(r.name)}</b>${r.city ? `<span>${esc(r.city)}</span>` : ""}</div>
+      <span class="fr-badge">${restListBadge(r)}</span>
+      <button type="button" class="icon-act on" data-fav="${r.id}" onclick="event.stopPropagation(); toggleFavorite('${r.id}')" aria-pressed="true" aria-label="Quitar de mis favoritos"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5.2 5.2 0 0 0-7.4 0L12 7l-1.4-1.4a5.2 5.2 0 0 0-7.4 7.4L12 21.6l8.8-8.6a5.2 5.2 0 0 0 0-7.4z"/></svg></button>
+    </div>`).join("")
+    : `<p class="empty-note">Todavía no tienes favoritos. Toca el corazón de un restaurante para añadirlo.</p>`;
 }
 function canDeleteSuggestion(r) { return !!r.unclaimed && (!r.cloud || !!(cloud && cloudUser && r.createdBy === cloudUser.uid)); }
 // «Verificado» solo si la administración comprobó con el local que la cuenta es suya
@@ -5028,79 +5013,41 @@ function restListBadge(r) {
   return '<span class="verified-badge">🛡️ Oficial</span>';
 }
 function verifiedLabel(r) { return r.cloud && !r.suggestion && !r.demo ? (r.verified ? " · ✓ Local verificado" : " · Local sin verificar") : ""; }
-function selectRouteFolder(id) { appState.activeFolderId = id; saveAppState(); renderDinerView(); }
-
-async function createNewRouteFolder(fromModal = false) {
-  const n = await uiPrompt("Nombre de tu nueva lista:", "", { placeholder: "Ej. Vacaciones en Cádiz" });
-  if (!n || !n.trim()) return;
-  const id = uid("f_");
-  appState.routeFolders.push({ id, name: "📍 " + str(n.trim(), 60), restIds: fromModal ? [activeRestId] : [] });
-  appState.activeFolderId = id;
-  saveAppState();
-  if (fromModal) openSaveToRouteModal(activeRestId); else renderDinerView();
+// El corazón (en la foto de cada restaurante, junto al nombre en la carta y en «Mis favoritos»):
+// un toque lo añade a favoritos y otro lo quita
+function isSavedAnywhere(id) { return favIds().has(id); }
+function syncHearts() {
+  const ids = favIds();
+  document.querySelectorAll("[data-fav]").forEach(b => {
+    const on = ids.has(b.dataset.fav);
+    b.classList.toggle("on", on);
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+    b.setAttribute("aria-label", on ? "Quitar de mis favoritos" : "Añadir a mis favoritos");
+  });
+  const sc = $("savedCount"), n = favRestaurants().length;
+  if (sc) sc.innerText = n ? ` (${n})` : "";
 }
-async function renameActiveFolder() {
-  const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId);
-  if (!folder || folder.id === "f_fav") return;
-  const n = await uiPrompt("Nuevo nombre de la lista:", folder.name.replace(/^📍 /u, ""));
-  if (n && n.trim()) { folder.name = "📍 " + str(n.trim(), 60); saveAppState(); renderDinerView(); }
-}
-async function deleteActiveFolder() {
-  const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId);
-  if (!folder || folder.id === "f_fav") return;
-  if (!await uiConfirm(`¿Eliminar la carpeta "${folder.name}"? Los restaurantes no se borran.`, { okText: "Eliminar", danger: true })) return;
-  appState.routeFolders = appState.routeFolders.filter(f => f.id !== folder.id);
-  appState.activeFolderId = "f_fav";
-  saveAppState(); renderDinerView();
-}
-function openSaveToRouteModal(restId) {
-  const targetId = restId || activeRestId;
-  $("routeFolderSelectorList").innerHTML = appState.routeFolders.map(f => {
-    const has = (f.restIds || []).includes(targetId);
-    return `<button class="btn ${has ? "btn-green" : "btn-outline"}" style="width:100%; justify-content:space-between; padding:10px;" onclick="toggleRestInFolder('${f.id}','${targetId}')"><span>${esc(f.name)}</span><span>${has ? "✅ En carpeta (Quitar)" : "+ Añadir"}</span></button>`;
-  }).join("");
-  openModal("saveRouteModal");
-}
-// El corazón de la carta: un toque guarda el local (en «Favoritos») y otro lo quita de tus guardados
-function isSavedAnywhere(id) { return appState.routeFolders.some(f => (f.restIds || []).includes(id)); }
 function updateFavButton() {
   const b = $("btnToggleFav");
   if (!b) return;
-  const on = isSavedAnywhere(activeRestId);
-  b.classList.toggle("on", on);
-  b.setAttribute("aria-pressed", on ? "true" : "false");
-  b.setAttribute("aria-label", on ? "Quitar de mis guardados" : "Guardar este restaurante");
+  b.dataset.fav = activeRestId || "";
+  syncHearts();
 }
-function toggleFavorite() {
-  const id = activeRestId;
+function toggleFavorite(id) {
+  id = id || activeRestId;
   if (!id) return;
   if (isSavedAnywhere(id)) {
     appState.routeFolders.forEach(f => { f.restIds = (f.restIds || []).filter(x => x !== id); });
-    toast("Quitado de tus guardados.", "info");
+    toast("Quitado de tus favoritos.", "info");
   } else {
     const f = appState.routeFolders.find(x => x.id === "f_fav") || appState.routeFolders[0];
     f.restIds.push(id);
     const r = appState.restaurants.find(x => x.id === id);
     if (r && r.cloud) cloudInc(id, "saves");
     else if (r && !ownsRestaurant(r)) r.stats.saves = (r.stats.saves || 0) + 1;
-    toast("♥ Guardado en tus guardados.");
+    toast("♥ Añadido a tus favoritos.");
   }
-  saveAppState(); updateFavButton(); renderDinerView();
-}
-function toggleRestInFolder(folderId, restId) {
-  const f = appState.routeFolders.find(x => x.id === folderId);
-  if (!f) return;
-  const idx = f.restIds.indexOf(restId);
-  if (idx > -1) f.restIds.splice(idx, 1);
-  else {
-    f.restIds.push(restId);
-    const r = appState.restaurants.find(x => x.id === restId);
-    if (r && r.cloud) cloudInc(restId, "saves");
-    else if (r && !ownsRestaurant(r)) r.stats.saves = (r.stats.saves || 0) + 1;
-  }
-  saveAppState();
-  openSaveToRouteModal(restId);
-  if (currentView === "discover") renderDinerView();
+  saveAppState(); syncHearts();           // los corazones cambian en su sitio: la lista no se mueve ni salta
 }
 
 // ---------- Mapa y GPS ----------
@@ -9167,9 +9114,9 @@ async function clearMyHomeData() {
   saveAppState(); if (currentView === "home") renderHomeView(); toast("Platos de casa borrados.");
 }
 async function clearMySavedData() {
-  if (!await uiConfirm("¿Vaciar todas tus listas de restaurantes guardados? Los restaurantes no se borran.", { okText: "Vaciar", danger: true })) return;
+  if (!await uiConfirm("¿Quitar todos tus restaurantes favoritos? Los restaurantes no se borran.", { okText: "Vaciar", danger: true })) return;
   appState.routeFolders.forEach(f => { f.restIds = []; });
-  saveAppState(); renderDinerView(); toast("Guardados vaciados.");
+  saveAppState(); renderDinerView(); toast("Favoritos vaciados.");
 }
 async function deleteAllMyData() {
   if (isCloudMode() && !cloud) await initCloud();      // así se sabe bien si hay cuenta de hostelería
