@@ -4,7 +4,7 @@
 // - Las librerías del propio sitio (mapa, escáner, lector de etiquetas) y el programa de Firebase
 //   tienen versión fija: se guardan la primera vez que se usan y después se sirven desde el móvil.
 // - Los datos en vivo (cartas en la nube, productos, mapas, direcciones) nunca se sirven desde aquí.
-const CACHE = "comeclaro-v3.22.0";
+const CACHE = "comeclaro-v3.23.0";
 // 3.10: la app está en app.html; la portada (index.html) es la página de presentación.
 const SHELL = ["./app.html", "./index.html", "./manifest.json", "./firebase-config.js", "./icon-192.png", "./icon-512.png", "./privacidad.html", "./condiciones.html"];
 
