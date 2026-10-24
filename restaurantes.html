@@ -2494,7 +2494,7 @@ famDef("romero", "romero, rosemary, romarin, rosmarino, rosmarin", X_HIERBAS, "m
 famDef("salvia", "salvia, sage, sauge, salbei", X_HIERBAS, "menta, albahaca, oregano, tomillo, romero");
 
 // ---------- Dulces, bebidas y aditivos ----------
-famDef("cacao", "cacao, chocolate, cocoa, cioccolato, schokolade, bombón, brownie, mousse de chocolate", famList("praliné, tiramisú, tiramisu, profiteroles, mole, turrón, nutella"), "cafeina");
+famDef("cacao", "cacao, chocolate, cocoa, cioccolato, schokolade, bombón, brownie, mousse de chocolate", famList("praliné, tiramisú, tiramisu, profiteroles, mole, turrón, nutella"), "cafeina", { alias: ["chocolate", "chocolates", "choco"] });
 famDef("cafeina", "café, cafeína, espresso, expreso, cortado, capuchino, cappuccino, moka, mocca, latte, té verde, té negro, matcha, guaraná, bebida energética, coca cola, coca-cola, pepsi, refresco de cola, bebida de cola", famList("chocolate, cacao, tiramisú, tiramisu, descafeinado"), "cacao", { n: "cafeína" });
 famDef("miel", "miel, honey, hidromiel, polen, propóleo, jalea real", "", "");
 famDef("alcohol", "alcohol, cerveza, vino, cava, champán, champagne, licor, ron, whisky, ginebra, vodka, brandy, coñac, vermut, sidra, sangría, sangria, tinto de verano, mojito, cóctel, cocktail, aguardiente, orujo, pacharán, tequila, amaretto, kirsch, calvados", famList("flambeado, flambé, flambe, al vino, al whisky, al brandy, al jerez, al oporto, reducción de vino, reducción de vermut, borracho, borracha, tarta borracha"), "", { ex: ["cerveza sin alcohol", "cerveza 0 0", "cerveza 0,0", "cerveza 00", "vino sin alcohol", "cava sin alcohol", "sidra sin alcohol", "bebida sin alcohol"] });
@@ -2649,6 +2649,16 @@ famDef("yodo", "yodo, iodo, yoduro, yoduro de potasio, yodato, yodato de potasio
   "algas, alga, alga nori, nori, wakame, kombu, kelp, espirulina, agar agar, agar-agar, ensalada de algas, sushi, maki, onigiri, dashi, caldo dashi, miso con wakame, sopa de miso, pescado, pescado blanco, pescado azul, bacalao, merluza, lubina, dorada a la, dorada al, filete de dorada, lomo de dorada, dorada a la sal, atun, salmon, sardinas, anchoas, marisco, mariscos, gambas, langostinos, mejillones, almejas, ostras, vieiras, calamares, pulpo, surimi, palitos de cangrejo, huevo, huevos, yema de huevo, leche, yogur, queso, nata, mantequilla, lacteos, pan con sal yodada, sal marina, carragenanos, carragenato, e407, alginato, e401, e400",
   "", { broad: true, ex: famList("sin yodo, bajo en yodo, sal sin yodar, sal sin yodo, yoga, yodado, re:(?:leche|bebida|nata|queso|yogur|mantequilla|helado)\\s+(?:de\\s+)?(?:soja|avena|coco|almendras?|arroz|anacardos?|vegetal(?:es)?|vegan[oa]s?)") });
 
+// 3.18 · Lo que la gente escribe tal cual: «queso», «fruta», «carne»
+famDef("queso", "queso, quesos, quesito, quesitos, cheese, fromage, formaggio, kase, queijo, formatge, gazta, manchego, brie, camembert, parmesano, parmigiano, pecorino, grana padano, gorgonzola, roquefort, cabrales, idiazabal, mozzarella, burrata, feta, halloumi, cheddar, gouda, emmental, gruyere, mascarpone, ricotta, requeson, mato, provolone, scamorza, stracciatella, tetilla, torta del casar, queso de cabra, rulo de cabra, philadelphia, queso crema, queso fresco, queso de burgos, tranchetes, queso rallado, paneer, labneh, cottage, quark, raclette, fondue de queso, tiropita, saganaki, cuatro quesos, 4 quesos, a la parmesana, parmigiana, gratinado con queso, tabla de quesos, queso azul, stilton, comte, reblochon, taleggio, edam, havarti, mahon, zamorano, payoyo, afuega'l pitu, san simon, arzua, tetilla gallega, queso de oveja, queso de vaca, queso curado, queso semicurado, queso tierno",
+  "pizza, pizzas, lasana, lasagna, canelones, gratinado, gratinada, gratinados, gratinadas, croque monsieur, quesadilla, quesadillas, nachos, tequenos, cheesecake, tarta de queso, sandwich mixto, bikini, bocadillo mixto, hamburguesa completa, cheeseburger, mac and cheese, risotto, carbonara, alfredo, pasta cuatro quesos, ensalada cesar, ensalada caprese, ensalada griega, moussaka, pastitsio, enchiladas, chilaquiles, arepa rellena, empanada de queso, croquetas de queso, bechamel, salsa de queso, fondue, raclette",
+  "lactosa", { relA: ["LÁCTEO"], ex: famList("queso vegano, queso vegetal, queso de anacardos, queso de almendras, queso de soja, queso de tofu, queso de cerdo, quesillo") });
+famDef("fruta", "fruta, frutas, fruit, fruits, frutta, obst, fruita, pieza de fruta, fruta del tiempo, fruta de temporada, fruta fresca, macedonia, ensalada de frutas, brocheta de fruta, zumo de frutas, smoothie, smoothie de frutas, mermelada, confitura, compota, fruta deshidratada, fruta desecada, frutas secas, fruta confitada, fruta escarchada, fruta en almibar",
+  "tarta de frutas, tarta de fruta, sorbete, sorbetes, helado de fruta, nectar, zumo, zumos, batido de frutas, coulis, gelatina de frutas, yogur de frutas, yogur con frutas",
+  "", { broad: true, incl: ["manzana", "pera", "membrillo", "melocoton", "albaricoque", "ciruela", "cereza", "fresa", "frambuesa", "mora", "arandano", "grosella", "kiwi", "platano", "aguacate", "mango", "papaya", "pina", "maracuya", "higo", "granada", "uva", "datil", "caqui", "melon", "sandia", "citricos"], ex: famList("fruta de la pasion, frutos secos, fruto seco, frutos de cascara, pan de frutas, frutas del mar, frutos del mar, fruta de hueso") });
+famDef("carne", "carne, carnes, meat, viande, fleisch, carni, carne picada, carne roja, carnes rojas, carne blanca, carnes blancas, pate, pates",
+  "", "", { broad: true, incl: ["carne roja", "ave", "conejo"], ex: famList("carne de membrillo, carne de pimiento choricero, carne de coco, carne vegetal, carne de soja, carne vegana, pate vegetal, pate vegano, pate de aceitunas, pate de berenjena, pate de setas, re:(?:albondigas?|hamburguesas?|salchichas?|nuggets|filetes?|escalopes?|milanesas?|chorizos?|bacon|jamon)\\s+(?:de\\s+)?(?:garbanzos?|lentejas|tofu|soja|seitan|quinoa|verduras|setas|berenjena|vegan[oa]s?|vegetal(?:es)?|veggie)") });
+
 // ---------- Motor ----------
 let FAM_BY_ID = null, FAM_INDEX = null, FAM_DISP = null;
 function famNorm(s) { return normText(s).trim().replace(/\s+/g, " "); }
@@ -2666,6 +2676,7 @@ function famInit() {
   // Una palabra que aparece en varias familias («pesto», «paella», «chorizo») NO sirve para saber a cuál
   // se refiere quien la escribe: se busca tal cual. El nombre de cada familia sí se reconoce siempre.
   const uses = new Map();
+  const names = new Set(FOOD_FAMILIES.flatMap(f => [famNorm(f.id), famNorm(f.n)]));  // «carne roja» es otra familia, no un nombre de «carne»
   // 3.18: las familias «amplias» (grupos como «legumbres» o sustancias como «lactosa») no compiten por las palabras:
   // «gazpacho» sigue siendo tomate aunque también lo vigile quien evita el vinagre.
   FOOD_FAMILIES.forEach(fam => !fam.broad && new Set(fam.m.concat(fam.x).filter(r => !/^re:/.test(r)).map(famNorm)).forEach(k => uses.set(k, (uses.get(k) || 0) + 1)));
@@ -2675,6 +2686,10 @@ function famInit() {
     put(famNorm(fam.n), fam.id);
     fam.m.concat(fam.x).forEach(raw => { if (!/^re:/.test(raw)) { const k = famNorm(raw); if (!FAM_DISP.has(k)) FAM_DISP.set(k, raw); } });
     if (!fam.broad) fam.m.forEach(raw => { if (!/^re:/.test(raw)) { const k = famNorm(raw); if (uses.get(k) === 1) put(k, fam.id); } });
+    // 3.18: una familia amplia reconoce sus nombres si ninguna otra familia los usa («leche» → lactosa); y los alias se
+    // reconocen siempre («chocolate» → cacao aunque la avellana y la cafeína también lo vigilen)
+    else fam.m.forEach(raw => { if (!/^re:/.test(raw)) { const k = famNorm(raw); if (!uses.has(k) && !names.has(k)) put(k, fam.id); } });
+    (fam.alias || []).forEach(a => put(famNorm(a), fam.id));
   });
 }
 // ¿A qué familias pertenece lo que escribió el comensal? «boletus» → seta, «pimentón» → pimiento, «pimiento rojo» → pimiento
