@@ -1,7 +1,7 @@
 rules_version = '2';
 
 // =====================================================================
-// REGLAS DE SEGURIDAD DE COMECLARO (versión 3.12.2)
+// REGLAS DE SEGURIDAD DE COMECLARO (versión 3.15.0)
 // Pégalas en: Consola de Firebase → Firestore Database → Reglas → Publicar.
 //
 // Antes de publicarlas, revisa la línea marcada con «ADMINISTRACIÓN»:
@@ -36,6 +36,8 @@ rules_version = '2';
 //   opiniones, 5 sugerencias de locales y 20 denuncias cada 24 horas (quotas/).
 // - 3.12.2 · Informes de errores técnicos de la app (clientErrors/): sin datos personales,
 //   uno por error y día; solo los lee la administración y se borran solos a los 90 días.
+// - 3.15 · Foto de portada de cada local (covers/): pública para leer; solo la sube o la quita su dueño
+//   (JPEG reducido, máximo ~170.000 caracteres) y la administración puede retirarla.
 // =====================================================================
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -407,6 +409,20 @@ service cloud.firestore {
         && request.resource.data.resolvedAt == request.time;
       // Quien reclama puede retirar su reclamación; la administración, borrarla
       allow delete: if isAdmin() || (isOwnerUser() && resource.data.uid == request.auth.uid);
+    }
+
+    // ---------- Fotos de portada de los locales (3.15) ----------
+    // Una por local: una imagen JPEG ya reducida por la app (unos 100 KB) dentro del propio documento.
+    // La leen todos; solo la sube o la quita el dueño del local, y la administración puede retirarla.
+    match /covers/{rid} {
+      allow read: if true;
+      allow create, update: if ownsRid(rid)
+        && request.resource.data.keys().hasOnly(['img', 'updatedAt'])
+        && request.resource.data.img is string
+        && request.resource.data.img.size() <= 170000
+        && request.resource.data.img[0:23] == 'data:image/jpeg;base64,'
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if ownsRid(rid) || isAdmin();
     }
 
     // ---------- Cartas (una por local) ----------

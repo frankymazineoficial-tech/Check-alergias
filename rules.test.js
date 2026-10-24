@@ -1,4 +1,4 @@
-// Pruebas de las reglas de seguridad de Comeclaro (3.12.2) contra el EMULADOR OFICIAL de Firestore.
+// Pruebas de las reglas de seguridad de Comeclaro (3.15.0) contra el EMULADOR OFICIAL de Firestore.
 // Cada «debe FALLAR» va acompañado de un «debe FUNCIONAR» parecido, para que un fallo de la
 // propia prueba no pase por seguridad.
 const fs = require('fs');
@@ -318,6 +318,27 @@ const R = (db_, p) => db_.doc(p);
   await t('NO cambiar el mensaje de un informe', seedErr, () => assertFails(R(db.anon(), 'clientErrors/' + eid).update({ count: FV.increment(1), last: ST(), msg: 'otro' })));
   await t('NO pasar del tope de 10.000 repeticiones', () => seedErr(10000), () => assertFails(R(db.anon(), 'clientErrors/' + eid).update({ count: FV.increment(1), last: ST() })));
   await t('NO borrarlos sin ser administración', seedErr, () => assertFails(R(db.guest('c1'), 'clientErrors/' + eid).delete()));
+
+  sec('14) 3.15 · Fotos de portada de los locales (covers)');
+  const JPG = n => 'data:image/jpeg;base64,' + 'A'.repeat(n);
+  const cov = (extra = {}) => ({ img: JPG(1000), updatedAt: ST(), ...extra });
+  const seedCov = () => seed(d => d.doc('covers/own1_1').set({ img: JPG(1000), updatedAt: TS.now() }));
+  await t('cualquiera SÍ lee una portada, incluso sin sesión', seedCov, () => assertSucceeds(R(db.anon(), 'covers/own1_1').get()));
+  await t('el dueño SÍ sube la portada de su local', null, () => assertSucceeds(R(db.owner('own1'), 'covers/own1_1').set(cov())));
+  await t('el dueño SÍ cambia su portada', seedCov, () => assertSucceeds(R(db.owner('own1'), 'covers/own1_1').set(cov({ img: JPG(2000) }))));
+  await t('NO subir la portada de un local de otra cuenta', null, () => assertFails(R(db.owner('own2'), 'covers/own1_1').set(cov())));
+  await t('NO subir una portada sin sesión', null, () => assertFails(R(db.anon(), 'covers/own1_1').set(cov())));
+  await t('NO subir una portada como cliente anónimo', null, () => assertFails(R(db.guest('c1'), 'covers/own1_1').set(cov())));
+  await t('NO un documento que no sea de los 3 locales de la cuenta', null, () => assertFails(R(db.owner('own1'), 'covers/own1_4').set(cov())));
+  await t('NO una imagen de más de 170.000 caracteres', null, () => assertFails(R(db.owner('own1'), 'covers/own1_1').set(cov({ img: JPG(170000) }))));
+  await t('una imagen de tamaño máximo SÍ', null, () => assertSucceeds(R(db.owner('own1'), 'covers/own1_1').set(cov({ img: JPG(170000 - 23) }))));
+  await t('NO algo que no sea un JPEG (por ejemplo, un script)', null, () => assertFails(R(db.owner('own1'), 'covers/own1_1').set(cov({ img: 'data:text/html;base64,PHNjcmlwdD4=' }))));
+  await t('NO campos extra', null, () => assertFails(R(db.owner('own1'), 'covers/own1_1').set(cov({ nota: 'x' }))));
+  await t('NO una fecha inventada', null, () => assertFails(R(db.owner('own1'), 'covers/own1_1').set(cov({ updatedAt: TS.now() }))));
+  await t('el dueño SÍ quita su portada', seedCov, () => assertSucceeds(R(db.owner('own1'), 'covers/own1_1').delete()));
+  await t('la administración SÍ retira una portada', seedCov, () => assertSucceeds(R(db.admin(), 'covers/own1_1').delete()));
+  await t('NO borrar la portada de otra cuenta', seedCov, () => assertFails(R(db.owner('own2'), 'covers/own1_1').delete()));
+  await t('NO borrar una portada sin sesión', seedCov, () => assertFails(R(db.anon(), 'covers/own1_1').delete()));
 
   await env.cleanup();
   console.log(`\n==== ${pass} correctas, ${fail} fallos ====`);

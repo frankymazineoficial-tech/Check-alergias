@@ -434,9 +434,99 @@
   div:has(> #staffCustomInput) { flex-wrap:wrap; }
   #staffCustomInput { min-width:0; flex:1 1 140px !important; }
   @media (min-width: 1100px) { .fab-scan, .nav-item { flex:none; } }
+  /* 3.15.0 · Alergias arriba, pestañita de zona, carrusel de portadas y animación de bienvenida */
+  header { flex-wrap:wrap; row-gap:8px; padding:8px 14px 10px; }
+  .brand-header { flex:1 1 auto; min-width:0; }
+  .profile-pill { order:3; flex:1 1 100%; display:flex; align-items:center; gap:10px; background:rgba(239,68,68,0.12); border:1.5px solid rgba(239,68,68,0.55); border-radius:14px; padding:5px 8px 5px 12px; min-height:46px; }
+  .profile-pill.empty { background:rgba(56,189,248,0.12); border-color:var(--accent); }
+  .pp-label { font-size:0.68rem; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; color:#fca5a5; flex-shrink:0; }
+  .profile-pill.empty .pp-label { display:none; }
+  .profile-pill .profile-bar-info { flex:1; min-width:0; padding:0; min-height:0; display:flex; align-items:center; gap:8px; overflow:hidden; cursor:pointer; font-size:0.95rem; white-space:normal; color:var(--text); }
+  .profile-pill.empty .profile-bar-info b { color:var(--accent); font-size:1rem; flex:1; }
+  .pp-chips { display:flex; flex-wrap:wrap; gap:6px; flex:1; min-width:0; max-height:84px; overflow-y:auto; scrollbar-width:none; }
+  .pp-chips::-webkit-scrollbar { display:none; }
+  .pp-chip { flex:0 0 auto; background:rgba(239,68,68,0.26); color:#fff; font-weight:700; font-size:0.84rem; padding:5px 10px; border-radius:20px; border:1px solid rgba(252,165,165,0.55); white-space:nowrap; }
+  .pp-edit { flex-shrink:0; width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; background:rgba(255,255,255,0.1); color:#fff; }
+  .disc-bar { display:flex; justify-content:space-between; align-items:center; margin:0 0 10px; }
+  .loc-tab { display:inline-flex; align-items:center; gap:6px; background:var(--card); border:1px solid var(--border); color:var(--muted); border-radius:20px; padding:0 13px; min-height:38px; font-size:0.85rem; font-weight:700; cursor:pointer; font-family:inherit; max-width:75%; }
+  .loc-tab > span:nth-child(2) { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .loc-tab.set { color:var(--text); border-color:rgba(56,189,248,0.6); }
+  .lt-caret { font-size:0.7rem; }
+  .icon-btn { width:38px; height:38px; border-radius:50%; border:1px solid var(--border); background:var(--card); color:var(--text); font-size:1rem; cursor:pointer; }
+  .sheet-title { margin:0 0 12px; font-size:1.2rem; }
+  .loc-opt { display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:var(--card-alt); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; margin-bottom:10px; color:var(--text); cursor:pointer; font-family:inherit; font-size:1rem; }
+  .loc-opt small { display:block; font-size:0.82rem; color:var(--muted); font-weight:400; margin-top:2px; }
+  .lo-ico { font-size:1.4rem; flex-shrink:0; }
+  .loc-opt-box { background:var(--card-alt); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; margin-bottom:10px; }
+  .lo-head { display:flex; align-items:center; gap:12px; margin-bottom:10px; font-size:1rem; }
+  .city-chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .map-sheet #mapContainer { height:58vh; min-height:280px; margin:0; }
+  .rc-wrap { position:relative; }
+  .rc-track { display:flex; gap:12px; overflow-x:auto; scroll-snap-type:x mandatory; scroll-padding:0 16px; -webkit-overflow-scrolling:touch; padding:2px 16px 8px; margin:0 -16px; scrollbar-width:none; }
+  .rc-track::-webkit-scrollbar { display:none; }
+  .rc-card { flex:0 0 calc(100% - 48px); scroll-snap-align:start; background:var(--card); border:1px solid var(--border); border-radius:20px; overflow:hidden; cursor:pointer; display:flex; flex-direction:column; }
+  .rc-card:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .rc-photo { position:relative; aspect-ratio:4 / 3; background-size:cover; background-position:center; display:flex; align-items:center; justify-content:center; }
+  .rc-init { font-size:4.2rem; font-weight:800; color:rgba(255,255,255,0.28); }
+  .rc-photo.has-img .rc-init { display:none; }
+  .rc-photo::after { content:""; position:absolute; inset:auto 0 0 0; height:38%; background:linear-gradient(transparent, rgba(0,0,0,0.55)); pointer-events:none; }
+  .rc-badge { position:absolute; top:10px; left:10px; z-index:1; }
+  .rc-badge .verified-badge, .rc-badge .community-badge { background:rgba(11,19,43,0.82); backdrop-filter:blur(4px); }
+  .rc-dist { position:absolute; right:10px; bottom:10px; z-index:1; background:rgba(11,19,43,0.85); color:#fff; font-weight:800; font-size:0.82rem; padding:5px 10px; border-radius:20px; }
+  .rc-body { padding:13px 15px 15px; }
+  .rc-name { font-size:1.25rem; font-weight:800; line-height:1.25; }
+  .rc-sub { font-size:0.88rem; color:var(--muted); margin-top:3px; }
+  .rc-hook { font-size:0.98rem; color:#6ee7b7; font-weight:600; margin-top:8px; }
+  .rc-count { text-align:center; font-size:0.85rem; color:var(--muted); margin:4px 0 6px; }
+  .rc-arrow { display:none; position:absolute; top:34%; width:42px; height:42px; border-radius:50%; border:0; background:rgba(11,19,43,0.85); color:#fff; font-size:1.6rem; cursor:pointer; z-index:2; align-items:center; justify-content:center; }
+  .rc-prev { left:4px; } .rc-next { right:4px; }
+  @media (hover:hover) and (pointer:fine) { .rc-arrow { display:flex; } .rc-card { flex-basis:420px; } }
+  .scan-line, .suggest-line { text-align:center; color:var(--muted); font-size:0.88rem; margin:14px 0 0; }
+  .scan-line a { color:var(--accent); font-weight:700; }
+  .cover-edit { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .cover-preview { width:132px; aspect-ratio:4 / 3; border-radius:12px; background:var(--card-alt) center / cover no-repeat; border:1.5px dashed var(--border); flex-shrink:0; }
+  .cover-preview.has-img { border-style:solid; }
+  .cover-btns { display:flex; gap:8px; flex-wrap:wrap; }
+  /* Animación de bienvenida con el logo */
+  #splash { position:fixed; inset:0; z-index:9999; background:radial-gradient(circle at 50% 42%, #13204a 0%, #0b132b 62%); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; transition:opacity .4s ease, visibility .4s; }
+  #splash.out { opacity:0; visibility:hidden; }
+  .no-splash #splash { display:none; }
+  .sp-logo { width:132px; height:132px; overflow:visible; filter:drop-shadow(0 12px 30px rgba(56,189,248,0.25)); }
+  .sp-logo * { transform-box:fill-box; transform-origin:center; }
+  .sp-bg { opacity:0; animation:spPop .6s cubic-bezier(.2,1.4,.4,1) .1s forwards; }
+  .sp-sh { opacity:0; animation:spPop .55s cubic-bezier(.2,1.3,.4,1) .45s forwards; }
+  .sp-sh2 { opacity:0; animation:spPop .55s cubic-bezier(.2,1.3,.4,1) .6s forwards; }
+  .sp-fork { opacity:0; animation:spRise .55s ease-out 1s forwards; }
+  .sp-dot { transform:scale(0); animation:spDot .5s cubic-bezier(.2,1.7,.4,1) 1.4s forwards; }
+  .sp-check { stroke-dasharray:14; stroke-dashoffset:14; animation:spDraw .4s ease-out 1.8s forwards; }
+  .sp-word { font-size:1.9rem; font-weight:800; color:#fff; letter-spacing:.34em; margin-right:-.34em; opacity:0; animation:spWord .9s ease-out 1.25s forwards; }
+  @keyframes spPop { from { opacity:0; transform:scale(.4); } to { opacity:1; transform:scale(1); } }
+  @keyframes spRise { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes spDot { from { transform:scale(0); } to { transform:scale(1); } }
+  @keyframes spDraw { to { stroke-dashoffset:0; } }
+  @keyframes spWord { from { opacity:0; transform:translateY(10px); letter-spacing:.5em; } to { opacity:1; transform:translateY(0); letter-spacing:.08em; } }
+  @media (prefers-reduced-motion: reduce) { #splash { display:none; } }
+  .form-group label.btn { color:#04121f; margin:0; font-size:0.85rem; font-weight:700; }
+  .pp-chips { max-height:76px; }
+  body.v-app .pp-chips { flex-wrap:nowrap; overflow-x:auto; max-height:none; }
+  body.v-app .profile-pill { min-height:42px; padding-top:3px; padding-bottom:3px; }
+  @media (min-width: 1100px) { .bottom-nav { padding-top:132px; } .rc-track { margin:0; padding-left:0; padding-right:0; } .rc-card { flex-basis:420px; } }
 </style>
 </head>
 <body>
+<script>try{var q=location.search+location.hash;if(sessionStorage.getItem("cc_splash")||/[?&#](r|c|carta|restId|accion|pago)=/.test(q)||(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))document.documentElement.classList.add("no-splash");else sessionStorage.setItem("cc_splash","1");}catch(e){}</script>
+<div id="splash" aria-hidden="true">
+  <svg class="sp-logo" viewBox="0 0 100 100" focusable="false">
+    <rect class="sp-bg" width="100" height="100" rx="22" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+    <path class="sp-sh" d="M50 14 L80 25 V48 C80 68 66 82 50 88 C34 82 20 68 20 48 V25 L50 14 Z" fill="#10b981" fill-opacity="0.9"/>
+    <path class="sp-sh2" d="M50 20 L74 29 V48 C74 64 63 76 50 82 C37 76 26 64 26 48 V29 L50 20 Z" fill="#0b132b"/>
+    <path class="sp-fork" d="M43 33 V46 C43 50 46 52 47 54 V70 H51 V54 C52 52 55 50 55 46 V33 H52 V43 H50 V33 H48 V43 H46 V33 H43 Z" fill="#f8fafc"/>
+    <circle class="sp-dot" cx="63" cy="36" r="8" fill="#10b981"/>
+    <path class="sp-check" d="M59 36 L62 39 L67 33" stroke="#0b132b" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <div class="sp-word">Comeclaro</div>
+</div>
+<script>(function(){var s=document.getElementById("splash");if(!s)return;setTimeout(function(){s.classList.add("out");setTimeout(function(){if(s.parentNode)s.parentNode.removeChild(s);},450);},2300);})();</script>
 
 <div id="hiddenBarcodeFileReader" style="display:none;"></div>
 
@@ -451,31 +541,32 @@
   </symbol>
 </svg>
 
-<!-- CABECERA GLOBAL: la marca y una sola píldora con lo que evitas -->
+<!-- CABECERA GLOBAL: la marca y, justo debajo, lo que evitas (siempre visible) -->
 <header>
   <div class="brand-header" onclick="showView('discover')">
     <svg class="app-logo-svg"><use href="#tusalergias-logo"></use></svg>
     <div><h1 id="headerMainTitle">Comeclaro</h1><span class="header-sub" id="headerSubTitle"></span></div>
   </div>
-  <div class="profile-pill" id="topAllergenBar">
-    <div class="profile-bar-info" id="activeProfileSummary" onclick="openAllergyProfileModal()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAllergyProfileModal();}"></div>
-  </div>
   <div id="headerRightActions"></div>
+  <div class="profile-pill" id="topAllergenBar">
+    <span class="pp-label">Evitas</span>
+    <div class="profile-bar-info" id="activeProfileSummary" onclick="openAllergyProfileModal()" role="button" tabindex="0" aria-label="Lo que evitas. Toca para cambiarlo" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAllergyProfileModal();}"></div>
+  </div>
 </header>
 
-<!-- PESTAÑA 1: COMER FUERA (ESCANEAR LA MESA, RESTAURANTES CERCA Y GUARDADOS) -->
+<!-- PESTAÑA 1: COMER FUERA (UN RESTAURANTE A LA VEZ, DESLIZANDO) -->
 <div id="discoverView" class="container">
-  <button class="btn btn-primary btn-xl" onclick="openUniversalScanner()">📷 Escanear el QR de la mesa</button>
-  <input type="search" id="discoverSearch" class="search-input" style="width:100%; margin:12px 0 10px;" placeholder="Busca un restaurante o una localidad" oninput="nearShown=15; renderDinerView()" aria-label="Buscar restaurante o localidad">
+  <div class="disc-bar">
+    <button type="button" class="loc-tab" id="locTab" onclick="openLocSheet()" aria-haspopup="dialog"><span aria-hidden="true">📍</span><span id="locTabLabel">Elegir zona</span><span class="lt-caret" aria-hidden="true">▾</span></button>
+    <button type="button" class="icon-btn" id="btnSearchToggle" onclick="toggleDiscoverSearch()" aria-label="Buscar un restaurante por su nombre">🔍</button>
+  </div>
+  <input type="search" id="discoverSearch" class="search-input" style="display:none; width:100%; margin:0 0 10px;" placeholder="Nombre del restaurante o localidad" oninput="renderDinerView()" aria-label="Buscar restaurante o localidad">
   <div class="seg2" role="tablist">
-    <button type="button" class="on" id="seg-near" role="tab" onclick="setDiscoverSeg('near')">Cerca de ti</button>
+    <button type="button" class="on" id="seg-near" role="tab" onclick="setDiscoverSeg('near')">Restaurantes</button>
     <button type="button" id="seg-saved" role="tab" onclick="setDiscoverSeg('saved')">Guardados</button>
   </div>
 
-  <div id="nearBox">
-    <div id="nearGeoPrompt" class="geo-prompt"></div>
-    <div id="nearList"></div>
-  </div>
+  <div id="nearBox"><div id="nearList"></div></div>
 
   <div id="savedBox" style="display:none;">
     <div class="folder-bar" id="routeFoldersBar"></div>
@@ -487,11 +578,7 @@
     <div id="myRestaurantsList"></div>
   </div>
 
-  <details class="map-more" id="mapMore" ontoggle="toggleMapOpen(this.open)">
-    <summary>Ver en el mapa</summary>
-    <div style="display:flex; justify-content:flex-end; margin:8px 0;"><button class="btn btn-outline" onclick="locateUserOnMap()">Centrar el mapa en mí</button></div>
-    <div id="mapContainer"></div>
-  </details>
+  <p class="scan-line">¿Estás ya en un restaurante? <a href="#" onclick="openUniversalScanner(); return false;">Escanea el QR de la mesa</a></p>
   <p class="suggest-line">¿Falta un restaurante? <a href="#" onclick="openSuggestRestModal(); return false;">Sugiérelo</a></p>
 </div>
 
@@ -727,6 +814,30 @@
   </div>
 </nav>
 
+<!-- ELEGIR ZONA: mi ubicación, ciudad o mapa -->
+<div class="modal" id="locModal" role="dialog" aria-modal="true" aria-labelledby="locModalTitle" onclick="if(event.target===this) closeModal('locModal')">
+  <div class="modal-content sheet">
+    <h2 class="sheet-title" id="locModalTitle">¿Dónde quieres comer?</h2>
+    <button type="button" class="loc-opt" onclick="pickLocNear()"><span class="lo-ico" aria-hidden="true">📍</span><span><b>Mi ubicación</b><small>Ordena los restaurantes por cercanía. No se guarda ni se envía.</small></span></button>
+    <div class="loc-opt-box">
+      <div class="lo-head"><span class="lo-ico" aria-hidden="true">🏙️</span><b>Elegir ciudad o zona</b></div>
+      <input type="search" id="locCityInput" class="search-input" style="width:100%;" placeholder="Escribe una ciudad (Lorca, Mazarrón…)" oninput="renderCityChips()" onkeydown="if(event.key==='Enter'){event.preventDefault();pickCity(this.value);}">
+      <div class="city-chips" id="locCityChips"></div>
+    </div>
+    <button type="button" class="loc-opt" onclick="pickLocMap()"><span class="lo-ico" aria-hidden="true">🗺️</span><span><b>Ver en el mapa</b><small>Los restaurantes sobre un mapa de OpenStreetMap.</small></span></button>
+    <button type="button" class="btn btn-outline btn-block" style="margin-top:6px;" onclick="pickLocAll()">Ver todas las zonas</button>
+  </div>
+</div>
+
+<!-- MAPA -->
+<div class="modal" id="mapModal" role="dialog" aria-modal="true" aria-labelledby="mapModalTitle">
+  <div class="modal-content sheet map-sheet">
+    <div class="scan-head"><h2 id="mapModalTitle">Mapa</h2><button class="btn btn-outline" onclick="closeMapSheet()">Cerrar</button></div>
+    <div style="display:flex; justify-content:flex-end; margin:6px 0 10px;"><button class="btn btn-outline" onclick="locateUserOnMap()">Centrar el mapa en mí</button></div>
+    <div id="mapContainer"></div>
+  </div>
+</div>
+
 <!-- DETALLE DE UN PLATO -->
 <div class="modal" id="dishDetailModal" role="dialog" aria-modal="true" aria-label="Detalle del plato" onclick="if(event.target===this) closeModal('dishDetailModal')">
   <div class="modal-content sheet">
@@ -916,6 +1027,17 @@
     </div>
     <input type="hidden" id="restEditId"><input type="hidden" id="restIsSuggest"><input type="hidden" id="restFromSuggestion">
     <div class="form-group"><label style="color:#fff;">1. Nombre Comercial del Restaurante:</label><input type="text" id="restNameInput" placeholder="Ej. Restaurante El Puerto"></div>
+    <div class="form-group" id="coverGroup">
+      <label>Foto de portada <span style="font-weight:400;">(se ve en la lista de restaurantes)</span>:</label>
+      <div class="cover-edit">
+        <div id="coverPreview" class="cover-preview" role="img" aria-label="Vista previa de la portada"></div>
+        <div class="cover-btns">
+          <label class="btn btn-primary" style="cursor:pointer; margin:0;">Elegir foto<input type="file" accept="image/*" id="coverFile" style="display:none;" onchange="onCoverPicked(event)"></label>
+          <button type="button" class="btn btn-outline danger-text" id="coverRemove" style="display:none;" onclick="removeCoverDraft()">Quitar</button>
+        </div>
+      </div>
+      <div class="row-sub" style="margin-top:6px;">Se recorta y se reduce sola. <b>La foto será pública</b>: pon una de tu local o de tus platos, sin personas reconocibles.</div>
+    </div>
     <div class="form-group" style="background:var(--bg); padding:10px; border-radius:10px; border:1px solid var(--accent);">
       <label style="color:var(--accent);">2. 🔍 Buscar calle o localidad en España:</label>
       <div style="display:flex; gap:6px;">
@@ -1254,7 +1376,7 @@
     <details class="help-sec" id="help-carta">
       <summary>🍽️ 2. Mira la carta de un restaurante</summary>
       <div class="help-body">
-        <p><b>Para abrirla</b>, escanea el código QR de la mesa con «📷 Escanear». También puedes ir a «🍽️ Comer fuera» y tocar el local en «Cerca de ti» (para ordenarlos por distancia, pulsa «Usar mi ubicación»: no se guarda ni se envía) o buscarlo por su nombre. Si prefieres verlos en el mapa, abre «Ver en el mapa»; la primera vez se muestra al pulsar «Mostrar el mapa» (lo dibuja OpenStreetMap, que recibe tu dirección IP) y «Centrar el mapa en mí» lo centra donde estás.</p>
+        <p><b>Para abrirla</b>, escanea el código QR de la mesa con «📷 Escanear». También puedes ir a «🍽️ Comer fuera» y desliza los restaurantes hacia la derecha para ver el siguiente; toca uno para abrir su carta. Para cambiar de zona, toca la pestañita de arriba («📍 Elegir zona»): ahí puedes usar tu ubicación (no se guarda ni se envía), elegir una ciudad o ver el mapa. El mapa lo dibuja OpenStreetMap, que recibe tu dirección IP: por eso se muestra solo cuando lo pides. Con la lupa buscas por nombre.</p>
         <p><b>Los platos se ordenan según tu perfil</b> (primero los compatibles) y arriba tienes cuatro contadores; tócalos para ver solo esos platos. Los que no son para ti quedan plegados al final. Toca un plato para ver todos sus detalles:</p>
         <ul>
           <li><span class="help-ok">COMPATIBLES</span>: según los datos del local, no llevan nada de lo que evitas. Compatible no significa seguro: confírmalo siempre con el camarero.</li>
@@ -1664,7 +1786,7 @@
 </div>
 
 <script>
-const APP_VERSION = "3.14.0";
+const APP_VERSION = "3.15.0";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
@@ -1708,7 +1830,7 @@ function makePilotRest() {
   };
 }
 function makeDefaultHomeLists() {
-  return [{ id: "hl_default", name: "🍲 Mis Platos en Casa", dishes: [] }, { id: "hl_tuppers", name: "🍱 Cenas y Tuppers", dishes: [] }];
+  return [{ id: "hl_default", name: "🍲 Mis Platos en Casa", dishes: [] }];
 }
 
 // ---------- Utilidades ----------
@@ -2011,6 +2133,7 @@ function sanitizeRest(r) {
   return {
     id: safeId(r.id), name: str(r.name, 120) || "Restaurante", city: str(r.city, 200), phone: str(r.phone, 30).replace(/[^\d+]/g, ""),
     pass: str(r.pass, 80) || "2026", lat: Number.isFinite(lat) ? lat : 37.563, lng: Number.isFinite(lng) ? lng : -1.309,
+    cover: validCover(r.cover) ? r.cover : undefined,
     unclaimed: !!r.unclaimed, demo: !!r.demo || r.id === "pilot_1", imported: !!r.imported, ownerEmail: r.ownerEmail ? str(r.ownerEmail, 120) : null,
     lastVerified: str(r.lastVerified, 40),
     cloud: !!r.cloud, ownerUid: r.ownerUid ? safeId(r.ownerUid, "u_") : null, suggestion: !!r.suggestion, founder: !!r.founder,
@@ -2066,6 +2189,12 @@ function normalizeState(s) {
     }))
   }));
   if (!homeLists.some(l => l.id === "hl_default")) homeLists = [...makeDefaultHomeLists().filter(l => !homeLists.some(x => x.id === l.id)), ...homeLists];
+  // 3.15: desaparece la lista «Cenas y Tuppers»; si tenía platos, pasan a «Mis platos en casa»
+  const tupI = homeLists.findIndex(l => l.id === "hl_tuppers");
+  if (tupI > -1) {
+    const tup = homeLists.splice(tupI, 1)[0], def = homeLists.find(l => l.id === "hl_default");
+    if (def) def.dishes = def.dishes.concat(tup.dishes);
+  }
   const cu = s.currentUser && s.currentUser.email ? { name: str(s.currentUser.name, 80), email: str(s.currentUser.email, 120), uid: s.currentUser.uid ? safeId(s.currentUser.uid, "u_") : null } : null;
   return {
     restaurants, routeFolders, homeLists,
@@ -3735,6 +3864,7 @@ function showView(v, fromBack) {
   currentView = v;
   document.body.classList.toggle("local-mode", v === "owner" || (v === "app" && isStaffUnlocked));
   document.body.classList.toggle("local-app", v === "app" && isStaffUnlocked);
+  document.body.classList.toggle("v-app", v === "app");
   ["discoverView","homeView","ownerView","profileView","appView"].forEach(id => {
     const el = $(id);
     if (el) el.style.display = (id === v + "View") ? "block" : "none";
@@ -3770,15 +3900,19 @@ function syncAddressBar() {
 function profileLabels() {
   return [...selectedAllergens, ...[...selectedDiets].map(d => (DIETS.find(x => x.id === d) || {}).label || d), ...[...customAvoidSet].map(c => "Sin " + c)];
 }
+function capWords(t) { t = String(t || "").toLowerCase(); return t.charAt(0).toUpperCase() + t.slice(1); }
 function updateProfileBarSummary() {
-  const total = profileLabels();
+  const al = [...selectedAllergens], di = [...selectedDiets].map(d => (DIETS.find(x => x.id === d) || {}).label || d), cu = [...customAvoidSet];
+  const total = al.length + di.length + cu.length;
   const pill = $("topAllergenBar");
-  if (pill) pill.classList.toggle("empty", !total.length);
-  $("activeProfileSummary").innerHTML = total.length
-    ? `Evitas: <b>${esc(total.join(", "))}</b>${strictTracesEnabled ? "" : " <span class='pp-dim'>(trazas permitidas)</span>"} <span class="pp-edit">✎</span>`
-    : `<b>Marca tus alergias</b> <span class="pp-edit">✎</span>`;
+  if (pill) pill.classList.toggle("empty", !total);
+  const chips = [...al.map(a => `<span class="pp-chip">${AL_ICONS[a] || ""} ${esc(capWords(a))}</span>`), ...di.map(d => `<span class="pp-chip">${esc(d)}</span>`), ...cu.map(c => `<span class="pp-chip">Sin ${esc(c)}</span>`)];
+  $("activeProfileSummary").innerHTML = total
+    ? `<span class="pp-chips">${chips.join("")}</span>${strictTracesEnabled ? "" : "<span class='pp-dim'>trazas ok</span>"}<span class="pp-edit">✎</span>`
+    : `<b>Marca tus alergias</b><span class="pp-edit">✎</span>`;
   const me = $("meAvoidSummary");
-  if (me) me.innerHTML = total.length ? esc(total.join(", ")) + (strictTracesEnabled ? "" : " <span class='pp-dim'>(trazas permitidas)</span>") : "Todavía no has marcado nada";
+  const labels = profileLabels();
+  if (me) me.innerHTML = labels.length ? esc(labels.join(", ")) + (strictTracesEnabled ? "" : " <span class='pp-dim'>(trazas permitidas)</span>") : "Todavía no has marcado nada";
 }
 const AL_ICONS = { "GLUTEN":"🌾","CRUSTÁCEOS":"🦐","HUEVO":"🥚","PESCADO":"🐟","CACAHUETES":"🥜","SOJA":"🫘","LÁCTEO":"🥛","FRUTOS CON CÁSCARA":"🌰","APIO":"🥬","MOSTAZA":"🟡","SÉSAMO":"⚪","SULFITOS":"🍷","ALTRAMUCES":"🌼","MOLUSCOS":"🐚" };
 function initFilterButtons() {
@@ -4505,6 +4639,7 @@ function renderHomeView() {
   const isSec = list.id !== "hl_default";
   $("btnRenameHomeList").style.display = isSec ? "inline-flex" : "none";
   $("btnDeleteHomeList").style.display = isSec ? "inline-flex" : "none";
+  $("homeListsBar").style.display = appState.homeLists.length > 1 ? "flex" : "none";     // con una sola lista no hace falta la barra
   $("homeListsBar").innerHTML = appState.homeLists.map(l =>
     `<div class="folder-pill ${l.id === list.id ? "active" : ""}" onclick="selectHomeList('${l.id}')">${esc(l.name)} (${(l.dishes || []).length})</div>`
   ).join("");
@@ -4569,14 +4704,20 @@ async function deleteActiveHomeList() {
 // ============================================================
 // RESTAURANTES: LISTA, RUTAS, MAPA, ALTA/EDICIÓN Y CARTA
 // ============================================================
-// ---------- Comer fuera: cerca de ti ----------
-let userPos = null, geoBusy = false, geoDenied = false, nearShown = 15, discoverSeg = "near", mapOpen = false;
+// ---------- Comer fuera: un restaurante a la vez ----------
+let userPos = null, geoBusy = false, nearShown = 40, discoverSeg = "near", mapOpen = false, locMode = "all", locCity = "";
 function setDiscoverSeg(seg) {
   discoverSeg = seg;
   $("seg-near").classList.toggle("on", seg === "near");
   $("seg-saved").classList.toggle("on", seg === "saved");
   $("nearBox").style.display = seg === "near" ? "block" : "none";
   $("savedBox").style.display = seg === "saved" ? "block" : "none";
+}
+function toggleDiscoverSearch() {
+  const inp = $("discoverSearch");
+  const open = inp.style.display === "none";
+  inp.style.display = open ? "block" : "none";
+  if (open) inp.focus(); else { inp.value = ""; renderDinerView(); }
 }
 function distKm(a, b) {
   const R = 6371, rad = x => x * Math.PI / 180;
@@ -4587,17 +4728,48 @@ function distKm(a, b) {
 function fmtDist(km) { return km < 1 ? `${Math.max(10, Math.round(km * 100) * 10)} m` : `${km.toFixed(km < 10 ? 1 : 0).replace(".", ",")} km`; }
 async function locateForList() {
   if (geoBusy) return;
-  geoBusy = true; geoDenied = false; renderNearList();
+  geoBusy = true; renderNearList();
   try {
     const p = await getPosition();
     userPos = { lat: p.coords.latitude, lng: p.coords.longitude };
-  } catch (e) { geoDenied = true; toast("📍 " + e.message, "info"); }
+    locMode = "near"; locCity = "";
+  } catch (e) { toast("📍 " + e.message, "info"); if (locMode === "near") locMode = "all"; }
   geoBusy = false; renderNearList();
 }
-// Si el móvil ya dio permiso a esta web, se ordena sola; si no, se pide con un botón
+// Si el móvil ya dio permiso a esta web, se ordena solo por cercanía; si no, se pide desde la pestañita de zona
 async function autoLocateIfGranted() {
-  if (userPos || geoBusy || !navigator.permissions || !navigator.permissions.query) return;
+  if (userPos || geoBusy || locMode !== "all" || !navigator.permissions || !navigator.permissions.query) return;
   try { const st = await navigator.permissions.query({ name: "geolocation" }); if (st.state === "granted") locateForList(); } catch (e) {}
+}
+function updateLocTab() {
+  const l = $("locTabLabel"), t = $("locTab");
+  if (!l || !t) return;
+  l.innerText = geoBusy ? "Buscando…" : locMode === "near" ? "Cerca de ti" : locMode === "city" ? locCity : "Elegir zona";
+  t.classList.toggle("set", locMode !== "all");
+}
+function openLocSheet() { $("locCityInput").value = ""; renderCityChips(); openModal("locModal"); }
+function pickLocNear() { closeModal("locModal"); locMode = "near"; locCity = ""; if (userPos) renderNearList(); else locateForList(); }
+function pickLocAll() { closeModal("locModal"); locMode = "all"; locCity = ""; renderNearList(); }
+function pickLocMap() { closeModal("locModal"); openMapSheet(); }
+function pickCity(c) {
+  c = str(String(c || "").trim(), 80);
+  if (!c) return;
+  closeModal("locModal"); locMode = "city"; locCity = c; renderNearList();
+}
+const STREET_RE = /^(c\/|calle|cl\.|avda|avenida|paseo|plaza|pza|carretera|camino|ronda|travesia|travesía|urbanizacion|urbanización|poligono|polígono|glorieta|via |vía )/;
+function cityOptions(q) {
+  const counts = new Map();
+  appState.restaurants.forEach(r => {
+    if (r.unclaimed && !r.name) return;
+    String(r.city || "").split(",").map(x => x.trim()).filter(x => x && x.length <= 40 && !/\d/.test(x) && !STREET_RE.test(normalizeStr(x))).forEach(x => counts.set(x, (counts.get(x) || 0) + 1));
+  });
+  return [...counts.entries()].filter(([x]) => !q || normalizeStr(x).includes(q)).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "es")).slice(0, 14).map(x => x[0]);
+}
+function renderCityChips() {
+  const raw = ($("locCityInput").value || "").trim(), q = normalizeStr(raw);
+  const opts = cityOptions(q);
+  $("locCityChips").innerHTML = opts.map(c => `<button type="button" class="cat-chip" data-c="${esc(c)}" onclick="pickCity(this.dataset.c)">${esc(c)}</button>`).join("")
+    + (raw && !opts.some(c => normalizeStr(c) === q) ? `<button type="button" class="cat-chip on" data-c="${esc(raw)}" onclick="pickCity(this.dataset.c)">Buscar «${esc(raw)}»</button>` : "");
 }
 function dishesForYou(r) {
   const menu = publicMenu(r);
@@ -4609,32 +4781,154 @@ function dishesForYou(r) {
   menu.forEach(d => { if (evaluateDish(d, strictTracesEnabled, eqx).status === "aptos") ok++; });
   return { total: menu.length, mine: ok };
 }
+
+// ---------- Foto de portada ----------
+// Una imagen JPEG reducida por restaurante. En la nube vive en covers/<local> y se descarga solo la del
+// restaurante que se está viendo (y la siguiente); en un móvil sin servidor se guarda con el propio local.
+function validCover(x) { return typeof x === "string" && x.length <= 170000 && x.startsWith("data:image/jpeg;base64,") && /^[A-Za-z0-9+\/=]+$/.test(x.slice(23)); }
+const coverCache = new Map();           // id -> imagen, o "" si el local no tiene portada
+async function getCoverUrl(r) {
+  if (!r) return "";
+  if (validCover(r.cover)) return r.cover;
+  if (!r.cloud || r.suggestion || r.unclaimed) return "";
+  if (coverCache.has(r.id)) return coverCache.get(r.id);
+  let img = "";
+  try {
+    if (!cloud && isCloudMode()) await initCloud();
+    if (!cloud) return "";
+    const sn = await cloud.F.getDoc(cloud.F.doc(cloud.db, "covers", r.id));
+    if (sn.exists() && validCover(sn.data().img)) img = sn.data().img;
+  } catch (e) { return ""; }            // sin conexión o sin permiso: no se recuerda, se reintenta luego
+  coverCache.set(r.id, img);
+  return img;
+}
+async function paintCover(el, r) {
+  if (!el || el.dataset.cv) return;
+  el.dataset.cv = "1";
+  const u = await getCoverUrl(r);
+  if (u) { el.style.backgroundImage = `url("${u}")`; el.classList.add("has-img"); }
+}
+function coverFallback(name) {
+  let h = 0; String(name || "").split("").forEach(c => { h = (h * 31 + c.charCodeAt(0)) % 360; });
+  return `linear-gradient(135deg, hsl(${h} 38% 27%), hsl(${(h + 50) % 360} 42% 14%))`;
+}
+// Recorta al centro en 4:3 y reduce hasta que ocupe poco (unos 100 KB)
+function fileToCover(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const im = new Image();
+    im.onload = () => {
+      URL.revokeObjectURL(url);
+      try {
+        const sw = im.naturalWidth, sh = im.naturalHeight;
+        if (!sw || !sh) throw new Error("x");
+        let cw = sw, ch = sw * 3 / 4;
+        if (ch > sh) { ch = sh; cw = sh * 4 / 3; }
+        const sx = (sw - cw) / 2, sy = (sh - ch) / 2;
+        let out = "";
+        for (const [w, h, q] of [[800, 600, 0.74], [800, 600, 0.6], [640, 480, 0.55], [480, 360, 0.5]]) {
+          const c = document.createElement("canvas"); c.width = w; c.height = h;
+          const g = c.getContext("2d"); g.fillStyle = "#0b132b"; g.fillRect(0, 0, w, h); g.drawImage(im, sx, sy, cw, ch, 0, 0, w, h);
+          out = c.toDataURL("image/jpeg", q);
+          if (out.length <= 130000) break;
+        }
+        if (!validCover(out) || out.length > 150000) throw new Error("x");
+        resolve(out);
+      } catch (e) { reject(new Error("No se pudo preparar la foto. Prueba con otra.")); }
+    };
+    im.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Ese archivo no es una imagen que se pueda abrir.")); };
+    im.src = url;
+  });
+}
+let coverDraft;                        // undefined: sin cambios · null: quitar · «data:image/jpeg…»: nueva
+function renderCoverPreview(u) {
+  const el = $("coverPreview");
+  el.style.backgroundImage = u ? `url("${u}")` : "";
+  el.classList.toggle("has-img", !!u);
+  $("coverRemove").style.display = u ? "inline-flex" : "none";
+}
+async function onCoverPicked(ev) {
+  const f = ev.target.files && ev.target.files[0];
+  ev.target.value = "";
+  if (!f) return;
+  try { coverDraft = await fileToCover(f); renderCoverPreview(coverDraft); }
+  catch (e) { toast("⚠️ " + e.message, "err"); }
+}
+function removeCoverDraft() { coverDraft = null; renderCoverPreview(""); }
+async function applyCoverDraft(r) {
+  if (coverDraft === undefined || !r) return true;
+  const d = coverDraft; coverDraft = undefined;
+  if (!r.cloud) { if (d) r.cover = d; else delete r.cover; saveAppState(); return true; }
+  try {
+    if (!cloud && !await initCloud()) throw new Error("sin conexión con el servidor");
+    const { F, db } = cloud;
+    if (d) await F.setDoc(F.doc(db, "covers", r.id), { img: d, updatedAt: F.serverTimestamp() });
+    else await F.deleteDoc(F.doc(db, "covers", r.id));
+    coverCache.set(r.id, d || "");
+    return true;
+  } catch (e) {
+    toast("⚠️ No se pudo guardar la foto de portada: " + cloudErr(e) + (/permission/i.test(cloudErr(e)) ? " (hay que publicar las reglas nuevas de Firestore, versión 3.15)" : ""), "err");
+    return false;
+  }
+}
+
+// ---------- Carrusel ----------
+let rcObserver = null;
 function renderNearList() {
-  const box = $("nearList"), prompt = $("nearGeoPrompt");
+  const box = $("nearList");
   if (!box) return;
-  prompt.innerHTML = userPos ? "" : geoBusy
-    ? `<div class="geo-card"><b>Buscando tu ubicación…</b></div>`
-    : `<div class="geo-card"><div><b>Ordena los restaurantes por cercanía</b><div class="row-sub">Usamos tu ubicación solo para ordenar esta lista. No se guarda ni se envía.</div></div><button class="btn btn-primary" onclick="locateForList()">📍 Usar mi ubicación</button></div>`;
+  updateLocTab();
   const q = normalizeStr(($("discoverSearch") || {}).value || "");
+  const cq = locMode === "city" ? normalizeStr(locCity) : "";
   let list = appState.restaurants.filter(r => {
     if (r.demo && isCloudMode()) return false;
     if (!restaurantPublicNow(r) && !ownsRestaurant(r)) return false;
     if (q && !normalizeStr(`${r.name} ${r.city || ""}`).includes(q)) return false;
+    if (cq && !normalizeStr(r.city || "").includes(cq)) return false;
     return true;
   });
   list.forEach(r => { r._km = userPos && isFinite(r.lat) && isFinite(r.lng) ? distKm(userPos, r) : null; });
-  list.sort((a, b) => userPos && a._km != null && b._km != null ? a._km - b._km
+  list.sort((a, b) => locMode === "near" && a._km != null && b._km != null ? a._km - b._km
     : (Number(!!b.verified) - Number(!!a.verified)) || String(a.name).localeCompare(String(b.name), "es"));
-  if (!list.length) { box.innerHTML = `<p class="empty-note">${q ? "No hay ningún restaurante con ese nombre." : "Todavía no hay restaurantes en esta zona."} Prueba otra búsqueda o sugiere el tuyo abajo.</p>`; return; }
-  const shown = list.slice(0, nearShown);
-  box.innerHTML = shown.map(r => {
-    const dd = dishesForYou(r);
-    const hook = r.unclaimed ? "Aún sin carta" : dd ? (dd.mine != null ? `<b>${dd.mine}</b> plato${dd.mine === 1 ? "" : "s"} para ti` : `${dd.total} platos en la carta`) : (r.dishCount ? `${r.dishCount} platos en la carta` : "Ver la carta");
-    const sub = [r._km != null ? fmtDist(r._km) : "", r.city || ""].filter(Boolean).join(" · ");
-    return `<button type="button" class="rest-row" onclick="openRestaurantForDiner('${r.id}')">
-      <span class="rr-main"><span class="rr-name">${esc(r.name)}</span>${sub ? `<span class="rr-sub">${esc(sub)}</span>` : ""}<span class="rr-hook">${hook}</span></span>
-      <span class="rr-side">${restListBadge(r)}<span class="chev" aria-hidden="true">›</span></span></button>`;
-  }).join("") + (list.length > shown.length ? `<button class="btn btn-outline btn-block" style="margin-top:8px;" onclick="nearShown += 15; renderNearList()">Ver más (${list.length - shown.length})</button>` : "");
+  if (!list.length) {
+    box.innerHTML = `<p class="empty-note">${q || cq ? "No hay restaurantes con esa búsqueda." : "Todavía no hay restaurantes en esta zona."} Prueba otra zona o sugiere el tuyo abajo.</p>`;
+    return;
+  }
+  list = list.slice(0, nearShown);
+  box.innerHTML = (geoBusy ? `<p class="empty-note">Buscando tu ubicación…</p>` : "") + `<div class="rc-wrap">
+    <button type="button" class="rc-arrow rc-prev" onclick="rcGo(-1)" aria-label="Restaurante anterior">‹</button>
+    <div class="rc-track" id="rcTrack" role="list">${list.map((r, i) => {
+      const dd = dishesForYou(r);
+      const hook = r.unclaimed ? "Aún sin carta" : dd ? (dd.mine != null ? `<b>${dd.mine}</b> plato${dd.mine === 1 ? "" : "s"} para ti` : `${dd.total} platos en la carta`) : (r.dishCount ? `${r.dishCount} platos en la carta` : "Ver la carta");
+      const where = [r.city].filter(Boolean).join("");
+      return `<article class="rc-card" role="listitem" tabindex="0" onclick="openRestaurantForDiner('${r.id}')" onkeydown="if(event.key==='Enter'){openRestaurantForDiner('${r.id}')}" aria-label="${esc(r.name)}">
+        <div class="rc-photo" style="background-image:${coverFallback(r.name)};"><span class="rc-init" aria-hidden="true">${esc(String(r.name || "?").trim().charAt(0).toUpperCase())}</span>
+          <span class="rc-badge">${restListBadge(r)}</span>${r._km != null ? `<span class="rc-dist">${fmtDist(r._km)}</span>` : ""}</div>
+        <div class="rc-body"><div class="rc-name">${esc(r.name)}</div>${where ? `<div class="rc-sub">${esc(where)}</div>` : ""}<div class="rc-hook">${hook}</div></div>
+      </article>`;
+    }).join("")}</div>
+    <button type="button" class="rc-arrow rc-next" onclick="rcGo(1)" aria-label="Siguiente restaurante">›</button>
+  </div><div class="rc-count" id="rcCount" aria-live="polite"></div>`;
+  setupCarousel(list);
+}
+function setupCarousel(list) {
+  const track = $("rcTrack");
+  if (!track) return;
+  const cards = [...track.querySelectorAll(".rc-card")];
+  const show = i => {
+    $("rcCount").innerText = `${i + 1} de ${cards.length}`;
+    [i, i + 1].forEach(k => { if (cards[k]) paintCover(cards[k].querySelector(".rc-photo"), list[k]); });
+  };
+  show(0);
+  if (rcObserver) rcObserver.disconnect();
+  if ("IntersectionObserver" in window) {
+    rcObserver = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) show(cards.indexOf(e.target)); }), { root: track, threshold: 0.6 });
+    cards.forEach(c => rcObserver.observe(c));
+  } else cards.slice(0, 4).forEach((c, k) => paintCover(c.querySelector(".rc-photo"), list[k]));
+}
+function rcGo(d) {
+  const t = $("rcTrack"), c = t && t.querySelector(".rc-card");
+  if (t && c) t.scrollBy({ left: d * (c.offsetWidth + 12), behavior: "smooth" });
 }
 
 function renderDinerView() {
@@ -4736,10 +5030,8 @@ function allowMap() {
   $("mapContainer").innerHTML = "";
   initOrRefreshMap();
 }
-function toggleMapOpen(open) {
-  mapOpen = !!open;
-  if (mapOpen) initOrRefreshMap();
-}
+function openMapSheet() { openModal("mapModal"); mapOpen = true; setTimeout(initOrRefreshMap, 60); }
+function closeMapSheet() { mapOpen = false; closeModal("mapModal"); }
 function initOrRefreshMap() {
   if (!mapOpen) return;
   renderDinerView();
@@ -4783,7 +5075,7 @@ function getPosition() {
   });
 }
 async function locateUserOnMap() {
-  if (!mapOpen) { const m = $("mapMore"); if (m) m.open = true; }
+  if (!mapOpen) openMapSheet();
   if (!leafletMap && !mapAllowed()) { toast("🗺️ Pulsa primero «Mostrar el mapa».", "info"); return; }
   toast("📍 Buscando tu ubicación...", "info");
   try {
@@ -4806,6 +5098,7 @@ async function fillGpsForModal() {
 
 // ---------- Alta, sugerencia y edición de locales ----------
 function openNewRestaurantModal() {
+  coverDraft = undefined; renderCoverPreview(""); $("coverGroup").style.display = "block";
   $("restModalTitle").innerText = "➕ Alta de Restaurante Oficial";
   ["restEditId", "restIsSuggest", "restFromSuggestion", "restNameInput", "geoSearchInput", "restCityInput", "restPhoneInput", "restPassInput"].forEach(id => { $(id).value = ""; });
   $("restLatInput").value = "37.5630"; $("restLngInput").value = "-1.3090";
@@ -4818,6 +5111,7 @@ function openSuggestRestModal() {
   openNewRestaurantModal();
   $("restModalTitle").innerText = "💡 Sugerir Local Seguro";
   $("restIsSuggest").value = "1";
+  $("coverGroup").style.display = "none";
   $("passGroup").style.display = "none";
   $("phoneGroup").style.display = "none";
 }
@@ -4833,6 +5127,7 @@ function openEditRestModal(id) {
   $("passGroup").style.display = r.cloud ? "none" : "block";
   $("restLatInput").value = r.lat;
   $("restLngInput").value = r.lng;
+  getCoverUrl(r).then(u => { if ($("restEditId").value === r.id && coverDraft === undefined) renderCoverPreview(u); });
 }
 async function searchPlaceCoords() {
   const q = $("geoSearchInput").value.trim();
@@ -4875,7 +5170,9 @@ async function saveRestaurantMeta() {
       && !await uiConfirm("✓ Este local está verificado.\n\nSi cambias el nombre o la localidad, perderá la verificación hasta que la administración de Comeclaro lo compruebe de nuevo con el local. ¿Guardar el cambio?", { okText: "Guardar" })) return;
     Object.assign(r, { name, city, phone, lat, lng });
     if (!r.cloud) r.pass = pass;
-    saveAppState(); closeModal("restModal"); renderRestaurantApp();
+    saveAppState();
+    await applyCoverDraft(r);
+    closeModal("restModal"); renderRestaurantApp();
     toast("💾 Datos guardados.");
     return;
   }
@@ -4896,6 +5193,7 @@ async function saveRestaurantMeta() {
       }
       const r = await cloudCreateRestaurant({ name, city, phone, lat, lng, fromSuggestion });
       if (!r) return;
+      await applyCoverDraft(r);
       if (!appState.routeFolders[0].restIds.includes(r.id)) appState.routeFolders[0].restIds.push(r.id);
       activeRestId = r.id;
       saveAppState(); closeModal("restModal");
@@ -4915,7 +5213,9 @@ async function saveRestaurantMeta() {
     }));
     appState.routeFolders[0].restIds.push(newId);
     activeRestId = newId;
-    saveAppState(); closeModal("restModal");
+    saveAppState();
+    if (!isSug) await applyCoverDraft(appState.restaurants.find(x => x.id === newId));
+    closeModal("restModal");
     if (isSug) { showView("discover"); toast("💡 Local sugerido. ¡Gracias!"); }
     else { isStaffUnlocked = true; resetStaffGuest(); showView("app"); toast("✅ Restaurante creado. Añade tus platos."); }
   } finally { if (btn) btn.disabled = false; }
@@ -5068,6 +5368,7 @@ async function deleteRestaurant(id, isSuggested) {
 
 function openRestaurantForDiner(id) {
   if (!appState.restaurants.some(r => r.id === id)) return;
+  closeMapSheet();
   activeRestId = id; isStaffUnlocked = false; resetStaffGuest();
   const r = getActiveRest();
   if (r.cloud) cloudInc(id, "views");
@@ -6903,6 +7204,7 @@ async function cloudDeleteRestaurantDocs(id) {
     b.delete(F.doc(db, "stats", id));
     b.delete(ref);
     await b.commit();
+    try { await F.deleteDoc(F.doc(db, "covers", id)); } catch (e) {}
   }
   delete draftsInCloud[id];
   delete pushedSnapshot[id];
