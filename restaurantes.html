@@ -1095,7 +1095,8 @@ DENIABLE.SULFITOS = AL_RULES.SULFITOS.strong.filter(w => !SULFITE_LITERAL.has(w)
 // weak = lo suele llevar, PREGUNTA en el nombre de un plato; excl = falsos amigos que se quitan antes).
 // «like» son diminutivos y erratas acotadas («huevito», «huebo», «mallonesa»): cada uno se apunta a la
 // misma lista que su palabra base (y, si la base se puede desmentir con «sin …», también se desmiente).
-// Nunca se usa búsqueda aproximada general: así no se cuelan palabras parecidas.
+// 3.20: además existe una búsqueda aproximada ACOTADA (fuzzyText, más abajo) que solo toca palabras que ningún
+// diccionario conoce, con una sola edición y la misma letra inicial; lo que está aquí sigue mandando.
 // ============================================================
 const AL_MORE = {
   "HUEVO": {
@@ -1584,6 +1585,298 @@ function splitTraces(t) {
   return { main: " " + main.join(" . ") + " ", trace: " " + tr0.join(" . ") + " " };
 }
 
+// ============================================================
+// 3.20 · TOLERANCIA A ERRATAS (búsqueda aproximada ACOTADA)
+// Las cartas se escriben a mano: «almndra», «langostnios», «vinagretta», «krema». El motor busca palabras completas,
+// así que una errata lo dejaba ciego: el componente pasaba por ingrediente simple y seguro. fuzzyText() corrige SOLO
+// las palabras que ningún diccionario conoce, antes de buscar, con estas protecciones:
+//   1. Nunca toca una palabra conocida: cualquier término de AL_RULES, de los compuestos, de las familias o de la lista
+//      de parada FUZZY_STOP (palabras corrientes). «callos», «caldo», «apenas», «lecho», «carta» se quedan como están.
+//   2. Solo palabras de 5+ letras: por igualdad fonética (b/v, c/z/s/k/q, g/j, ll/y/i, h muda, letras dobles: «mayoneza»,
+//      «krema», «appio») o a UNA edición VEROSÍMIL a partir de la cuarta letra (fuzzyPlausible: dos letras invertidas, una
+//      letra cambiada por otra que se confunde con ella, una letra doble o una h de más o de menos, o una palabra
+//      impronunciable: «almndra», «langostnios», «huevoss», «cangrego»). Nunca dos ediciones, nunca en las tres primeras letras.
+//   3. La primera letra (fonética) tiene que coincidir: «gamon» no es «jamon», «nuevo» no es «huevo», «carta» no es «tarta».
+//   4. El candidato tiene que ser ÚNICO (salvo su plural): «pesta» (¿pesto?, ¿pasta?) no se corrige.
+//   5. Una variante de la misma palabra no es una errata: «cocida» no pasa a «cocido», «amarilla» no pasa a «amarillo».
+//   6. Sin cifras; los plurales se corrigen por su singular («mayonezas» → «mayonesas»).
+// La palabra corregida sigue el camino de las demás (negaciones, exclusiones, strong/weak, «sin …»): «sin mayoneza»
+// sigue siendo una negación y «leche de almendrras» sigue sin ser lácteo. Lo que corrige se ve con fuzzyText(t, log).
+// ============================================================
+const FUZZY_STOP = new Set(normText(`
+  a al algo alguna algunas alguno algunos ante antes aqui asi aun aunque bajo bien cada casi como con contra cual cuales cuando
+  cuanto cuanta cuantos cuantas de del desde donde dos tres cuatro cinco seis siete ocho nueve diez once doce quince veinte
+  treinta cien mil el ella ellas ello ellos en entre era eran es esa esas ese eso esos esta estas este esto estos fue fueron
+  ha han hasta hay la las le les lo los mas menos mi mis mientras mucho mucha muchos muchas muy nada ni no nos nosotros nuestra
+  nuestras nuestro nuestros nunca o otra otras otro otros para pero poco poca pocos pocas por porque que quien quienes se segun
+  ser si siempre sin sobre solo son su sus tal tambien tan tanto tanta tantos tantas te tiene tienen toda todas todo todos
+  tras tu tus un una unas uno unos usted ustedes ya yo
+  abierto abierta acompanado acompanada acompanados acompanadas ahora alto alta amplio amplia antiguo antigua autentico autentica
+  autenticos autenticas bueno buena buenos buenas caliente calientes calor casa casas casero casera caseros caseras clasico
+  clasica clasicos clasicas claro cocina cocinado cocinada cocinados cocinadas color colores combinacion completo completa comer
+  comida comidas corte cortes corto corta cualquier cuenta deliciosa delicioso dia dias diario diaria diferente diferentes
+  directo directa doble economico economica elaboracion elaborado elaborada elegante entero entera especialidad especialidades
+  estilo exquisito exquisita famoso famosa favorito favorita fino fina frescos frescas fresco fresca frio fria frios frias
+  fuerte fuertes gran grande grandes gratis gusto gustos hecho hecha hechos hechas hoy ideal igual incluido incluida incluye
+  individual interior jugoso jugosa junto junta largo larga ligero ligera listo lista local locales lugar manera mano mediano
+  mediana medio media mejor mejores menor menu menus mesa mezclado mezclada minimo minutos mismo misma mismos mismas mitad modo
+  momento natural naturales nuevo nueva nuevos nuevas numero opcion original originales parte partes pedido persona personas
+  pequeno pequena pequenos pequenas perfecto perfecta pieza piezas plato platos precio precios primer primero primera principal
+  principales propio propia punto puntos racion raciones rapido rapida recien recomendado recomendada recomendamos rico rica
+  ricos ricas sabor sabores sabroso sabrosa salon seco seca secos secas segundo segunda semana sencillo sencilla servicio
+  servido servida servimos servir simple sitio suave suaves tamano tarde temporada terraza textura tierno tierna tipico tipica
+  tipo tipos toque total tradicion tradicional tradicionales trozo trozos ultimo ultima unico unica variedad verano invierno
+  primavera otono vez veces vista zona
+  acompanamiento aire bandeja barra bebida bebidas bocado bocados bodega bol bote botella brasa brasas cantidad capa capas carta
+  cazuela cazuelita cazuelitas cena cenas cesta cestas cocotte compra copa copas corteza cortezas cubierto cubiertos cucharada
+  cucharadita cuchillo dado dados desayuno desayunos docena emplatado ensaladera envase espuma fiesta fuente gota gotas gramo
+  gramos grill hervido hervida hielo hoja hojas horneado horneada horno jarra jarras kilo lamina laminas lata litro loncha
+  lonchas lote molde nube pack paquete pizca porcion porciones preparacion presentacion rama ramas ramita ramitas receta recetas
+  rollo sarten sal salado salada salados saladas taza tazas tiempo tostado unidad unidades vapor vaso vasos vuelta lecho
+  natal tanta pesta album aminos batuta blando blanda bolsa bolsas bulalo canita canitas chucho chuchos cuerpo cuerpos dover
+  escala escalfado escalfada escalfados escalfadas frien freir frie fries cuece cuecen cocer cocemos cocinamos hacemos preparamos
+  elaboramos utilizamos usamos llevamos ponemos anadimos servimos
+  lactasa rubio rubia rubios rubias santona tineo volle halfvolle magere tallo tallos perla perlas palmito palmitos graso grasos
+  grasa grasas potasico potasica sulfato sulfatos sulfate sulfates sulphate sulphates fosfato fosfatos phosphate tiger turco turca
+  turcos turcas trina tarka spiny serra schar seller papad papadum masia larios kasha grits grises gris gambo frolla cozido cozida
+  cozidos cozidas cocida cocidas chivas champu alloco raising solis vella mince pousses products frittura tempera tramo tramos
+  marineira vinilo patatus patada patadas patatin patatan manzanares fresno fresnos plata bandana bandanas ternura terneza
+  pollino pollinos frutal frutales carnet carnets vacio vacia vacios vacias melba baca bacas salta saltar saltan salto saltos gasta
+  gastar gasto gastos panca flash pilar
+  asada asadas asados cocinada cocinadas frita fritas guisada guisadas guisado guisados hervida hervidas hervidos horneada
+  horneadas horneados salteada salteadas salteados braseado braseada braseados braseadas confitada confitadas confitados
+  curado curada curados curadas desalado desalada deshuesado deshuesada fileteado fileteada troceado troceada troceados
+  troceadas laminado laminada laminados laminadas cortado cortada cortados cortadas pelado pelada pelados peladas estrellado
+  estrellada estrellados estrelladas congelado congelada congelados congeladas fermentado fermentada fermentados fermentadas
+  desecado desecada desecados desecadas prensado prensada prensados prensadas
+  castilla leon aragon navarra galicia asturias cantabria extremadura andalucia murcia valencia alicante castellon cataluna
+  catalunya mallorca menorca ibiza canarias tenerife madrid barcelona zaragoza bilbao donostia santander oviedo gijon salamanca
+  zamora palencia valladolid burgos soria segovia avila toledo cuenca guadalajara albacete ciudad real jaen cordoba sevilla cadiz
+  huelva malaga almeria granada lugo ourense orense pontevedra coruna vigo cambados guijuelo jabugo trevelez teruel huesca lleida
+  girona gerona tarragona denia javea calpe altea benidorm elche orihuela cartagena lorca aguilas mazarron caravaca cieza
+  ingredientes ingrediente detallar alergenos alergeno indicados indicada nombre
+  libre libres exento exenta exentos exentas apto apta aptos aptas alergicos alergicas alergico alergica intolerantes
+  intolerante intolerancia contiene contienen lleva llevan tiene tienen without free from does not contain contains sans ne
+  contient pas senza non ohne enthalt keine sem nao contem sense zonder bez nie zawiera trazas restos rastros presencia anadido
+  anadidos anadida anadidas proteinas proteina nor and et pueden puede tener posibles posible contaminacion cruzada contacto
+  cruzado cross manipulan manipula fabricado producido envasado obrador fabrica planta instalacion instalaciones linea lineas
+  utilizan usan elaboran procesan handles processes uses podria contener vestigios pode conter pot contenir may made factory
+  facility manufactured produced traces peut puo contenere tracce kann spuren von enthalten also egalement kan sporen moze
+  zawierac sladowe ilosci opciones opcional options optional disponible disponibles available posibilidad consultar consulta
+  consultanos consultenos preguntar pregunta preguntanos preguntenos peticion previa encargo demanda request demande hacer pedir
+  preparar servir elaborar adaptar cambiar hacerse pedirse prepararse servirse elaborarse adaptarse podemos tenemos disponemos
+  ofrecemos existe existen elegir elige suplemento ask version vegano vegana veganos veganas vegan plant based vegetariano
+  vegetariana vegetarianos vegetarianas vegetarian veggie salvo excepto exceptuando excepcion except apart ausser
+  the with our your for of to in on at by or an is are be as it its this that these those all any some more most very just only
+  yes new local style house home served side top topped over under choice choose own extra large small medium big little hot
+  cold warm sweet sour salty bitter rich light heavy soft tender juicy fried grilled roasted roast baked steamed boiled poached
+  seasonal daily chef chefs kitchen plate bowl cup glass bottle pint half full double single portion portions piece pieces slice
+  slices starter starters main mains drink drinks price prices includes including add organic
+  ou avec le les une des du au aux pour par sur sous dans notre nos votre vos leur frais fraiche grillee roti rotie poele poelee
+  frite cuit cuite cru crue chaud chaude froid froide petit petite grand grande accompagne accompagnee servi servie assiette plat
+  plats entree entrees boisson boissons prix jour saison region
+  ed il gli della dello dei degli delle allo alla agli alle dal dalla nel nella sul sulla di da freschi fresche fritto fritta
+  fritti fritte arrosto grigliato grigliata forno nostra nostro piatto piatti antipasto antipasti primo primi secondo secondi
+  dolci bevanda bevande prezzo giorno stagione tipica freddo fredda
+  und oder der die das ein eine einen einem einer den dem zu zum zur im auf aus bei vom fur uber unter nach vor frisch frische
+  frischer gebraten gegrillt gebacken gekocht gedampft heiss gross klein doppelt halb ganz dazu serviert vorspeise vorspeisen
+  hauptgericht hauptgerichte nachspeise nachtisch getrank getranke preis speisekarte tag
+  com os as um uma do da dos das na nas ao aos pelo pela amb els unes dels als pel pels plat plats entrant entrants beguda
+  begudes preu fresc fregit fregida rostit rostida planxa forn
+  euros euro iva pax
+`).split(/\s+/).filter(Boolean));
+let FUZZY = null;
+const fuzzyMemo = new Map();
+// Clave fonética aproximada del español: lo que suena igual se escribe igual («mayoneza» = «mallonesa» = «mayonesa»)
+function fuzzyKey(w) {
+  return w.replace(/ph/g, "f").replace(/ch/g, "C").replace(/sh/g, "s").replace(/ck/g, "k")
+    .replace(/qu(?=[ei])/g, "k").replace(/q/g, "k").replace(/c(?=[ei])/g, "s").replace(/c/g, "k").replace(/z/g, "s").replace(/x/g, "s")
+    .replace(/g(?=[ei])/g, "j").replace(/gu(?=[ei])/g, "g")
+    .replace(/h/g, "").replace(/[vw]/g, "b").replace(/ll/g, "y").replace(/y/g, "i").replace(/m(?=[pb])/g, "n")
+    .replace(/(.)\1+/g, "$1");
+}
+// Palabras sueltas de una lista de términos (no las regex «re:»)
+function fuzzyWordsOf(list, out) {
+  (list || []).forEach(k => {
+    if (typeof k !== "string" || /^re:/.test(k)) return;
+    normText(k).replace(/\*$/, "").split(/[^a-z0-9]+/).forEach(w => { if (w.length >= 3) out.add(w); });
+  });
+}
+// Palabras legibles dentro de las regex («re:leche\s+de\s+(?:coco|almendras?)» → leche, coco, almendras): se dan por conocidas
+function fuzzyRegexWords(list, out) {
+  (list || []).forEach(k => {
+    if (typeof k !== "string" || !/^re:/.test(k)) return;
+    k.slice(3).replace(/\\[a-zA-Z]/g, " ").split(/[^a-z]+/).forEach(w => { if (w.length >= 3) out.add(w); });
+  });
+}
+function fuzzyInit() {
+  if (FUZZY) return FUZZY;
+  const known = new Set(), targets = new Set();
+  const learn = (list, asTarget) => { fuzzyWordsOf(list, asTarget ? targets : known); fuzzyRegexWords(list, known); };
+  Object.keys(AL_RULES).forEach(al => { const r = AL_RULES[al]; learn(r.strong, true); learn(r.weak, true); learn(r.excl, false); });
+  Object.keys(FREE_WORDS).forEach(al => learn(FREE_WORDS[al], false));
+  Object.keys(DIET_RULES).forEach(id => { learn(DIET_RULES[id].kw, true); learn(DIET_RULES[id].excl, false); });
+  COMPOUND_TYPES.forEach(t => learn(t[0], true));
+  AL_MORE_7.forEach(t => learn(t[0], true));
+  // Las familias (02b_families.js) se leen con famAll(): en las pruebas de nodo cada archivo va en su propio eval y sus const no se ven
+  (typeof famAll === "function" ? famAll() : []).forEach(f => { learn(f.m, true); learn(f.x, true); learn(f.alias, true); learn(f.ex, false); learn(f.rawX, false); });
+  targets.forEach(w => known.add(w));
+  FUZZY_STOP.forEach(w => { known.add(w); targets.delete(w); });
+  // Índices: por clave fonética, y por letra inicial (fonética) y longitud para la búsqueda a una edición
+  const byKey = new Map(), byFirst = new Map();
+  targets.forEach(w => {
+    if (w.length < 4 || /\d/.test(w)) return;
+    const k = fuzzyKey(w);
+    if (!k) return;
+    if (!byKey.has(k)) byKey.set(k, []);
+    byKey.get(k).push(w);
+    if (!byFirst.has(k[0])) byFirst.set(k[0], new Map());
+    const byLen = byFirst.get(k[0]);
+    if (!byLen.has(w.length)) byLen.set(w.length, []);
+    byLen.get(w.length).push(w);
+  });
+  // Regex de los diccionarios que ya reaccionan a una palabra tal cual («like» de erratas, «weizen*», «re:…»): manda lo que
+  // está escrito a mano, así que esas palabras tampoco se tocan
+  const res = [];
+  Object.keys(AL_RULES).forEach(al => { res.push(AL_RULES[al].strongRe); if (AL_RULES[al].weakRe) res.push(AL_RULES[al].weakRe); });
+  COMPOUND_TYPES.forEach(t => { if (t[0].some(k => /^re:|\*$/.test(k))) res.push(t[2]); });
+  FUZZY = { known, targets, byKey, byFirst, res };
+  return FUZZY;
+}
+// ¿Palabra conocida (también en plural) o a la que ya reacciona algún diccionario? Las conocidas no se tocan nunca
+function fuzzyKnown(w) {
+  const F = fuzzyInit(), K = F.known;
+  // Plural de una conocida («almendras»); «huevoss» no lo es: la raíz que queda ya termina en s
+  if (K.has(w) || (/[^s]s$/.test(w) && K.has(w.slice(0, -1))) || (/[^s]es$/.test(w) && K.has(w.slice(0, -2))) || (/ces$/.test(w) && K.has(w.slice(0, -3) + "z"))) return true;
+  const s = " " + w + " ";
+  return F.res.some(re => re.test(s));
+}
+// ¿A una sola edición a partir de la CUARTA letra? (una letra de más, de menos, cambiada, o dos seguidas invertidas).
+// Las tres primeras tienen que coincidir: «castilla» no es «costilla», «cozido» no es «cocido», «dover» no es «doner».
+function fuzzyNear(a, b) {
+  if (a === b) return true;
+  const la = a.length, lb = b.length;
+  if (Math.abs(la - lb) > 1) return false;
+  let i = 0;
+  while (i < la && i < lb && a[i] === b[i]) i++;
+  if (i < 3) return false;
+  if (la === lb) return a.slice(i + 1) === b.slice(i + 1) || (a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2));
+  return la > lb ? a.slice(i + 1) === b.slice(i) : a.slice(i) === b.slice(i + 1);
+}
+// ¿Dos letras que suenan igual y se confunden al escribir? b/v, c/s/z, c/k/q, g/j, i/y, m/n, x/s. (Las teclas vecinas no cuentan:
+// «puerto» no es «puerro», «carga» no es «carpa».)
+const FUZZY_PAIRS = new Set(["bv","cs","cz","sz","ck","kq","gj","iy","mn","sx","jx","vw"]);
+function fuzzyConfusable(a, b) { return FUZZY_PAIRS.has(a + b) || FUZZY_PAIRS.has(b + a); }
+// ¿Palabra impronunciable en español? Tres consonantes seguidas que no acaban en r/l ni son «ns»/«bs»/«rs»/«xs» + consonante
+// («almndra», «anacrdo», «langostnios»), o terminación en dos consonantes que no existe («gluetn»). «ch», «ll», «rr», «qu»,
+// «gu» cuentan como una sola letra («ancha» se pronuncia perfectamente).
+function fuzzyUnpronounceable(w) {
+  const t = w.replace(/ch|ll|rr|qu|gu/g, "c");
+  if (/[^aeiou][^aeiounsrldz]$/.test(t)) return true;
+  return (t.match(/[^aeiou]{3,}/g) || []).some(run => run.length > 3 || !(/[rl]$/.test(run) || (run[1] === "s" && /[nbrx]/.test(run[0]))));
+}
+// ¿Es una errata VEROSÍMIL y no otra palabra? Letras invertidas, siempre («langostnios»). Letra cambiada, solo por una que
+// suena igual («cangrego», «jamom»). Letra de más o de menos, solo si es doble («vinagretta», «avelana»), una h muda, o la
+// palabra escrita es impronunciable («almndra», «anacrdo»; «ancha» no es «anchoa», «acepto» no es «aceto»).
+function fuzzyPlausible(w, c) {
+  const la = w.length, lb = c.length;
+  let i = 0;
+  while (i < la && i < lb && w[i] === c[i]) i++;
+  if (la === lb) return w.slice(i + 1) !== c.slice(i + 1) || fuzzyConfusable(w[i], c[i]);
+  const long = la > lb ? w : c, x = long[i];
+  if (x === "h" || long[i - 1] === x || long[i + 1] === x) return true;
+  return fuzzyUnpronounceable(w);
+}
+// «cocida»/«cocido», «criolla»/«criollos», «catalan»/«catalana», «genoves»/«genovesa»: variantes de una misma palabra, no
+// erratas. No se tocan. («huevoss»/«huevos» sí: la letra sobrante no es una terminación.)
+function fuzzySameStem(a, b) {
+  if (a === b) return true;
+  const [x, y] = a.length >= b.length ? [a, b] : [b, a];
+  if (x.length === y.length) {                                   // cocida/cocido, cocidas/cocidos
+    const px = x.replace(/s$/, ""), py = y.replace(/s$/, "");
+    return px.length === py.length && px.slice(0, -1) === py.slice(0, -1) && /[aeo]$/.test(px) && /[aeo]$/.test(py);
+  }
+  if (x.length - y.length !== 1 || x.slice(0, -1) !== y) return false;
+  return /[aeo]$/.test(x) || (/s$/.test(x) && !/s$/.test(y));    // catalan/catalana, aperitivo/aperitivos; «huevoss» no
+}
+// Distancia de edición completa, con transposición (solo para comparar palabras que ya suenan igual)
+function fuzzyDist(a, b) {
+  const la = a.length, lb = b.length;
+  let prev2 = null, prev = [];
+  for (let j = 0; j <= lb; j++) prev.push(j);
+  for (let i = 1; i <= la; i++) {
+    const cur = [i];
+    for (let j = 1; j <= lb; j++) {
+      let v = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) v = Math.min(v, prev2[j - 2] + 1);
+      cur.push(v);
+    }
+    prev2 = prev; prev = cur;
+  }
+  return prev[lb];
+}
+// Lo que una palabra conocida significa para el motor: alérgenos, dietas, familias y compuestos. Dos candidatos con el
+// mismo significado («pimiento» y «pimento», «almendra» y «almendras») no son una ambigüedad; «pesto» y «pasta» sí.
+const fuzzyMeaningMemo = new Map();
+function fuzzyMeaning(c) {
+  let m = fuzzyMeaningMemo.get(c);
+  if (m === undefined) {
+    const d = detectAllergens(c), r = compoundRisks(c);
+    const fams = typeof famResolve === "function" ? famResolve(c).map(f => f.id).sort() : [];
+    m = [d.a.join(","), d.tr.join(","), detectDiets(c, d.a).sort().join(","), fams.join(","), r === "*" ? "*" : r ? [...r].sort().join(",") : "", dishMaybe(c).join(",")].join("|");
+    fuzzyMeaningMemo.set(c, m);
+  }
+  return m;
+}
+// Corrige UNA palabra desconocida; null si no hay un candidato claro
+function fuzzyWord(w) {
+  const F = fuzzyInit();
+  if (w.length < 5 || /\d/.test(w) || fuzzyKnown(w)) return null;
+  const key = fuzzyKey(w);
+  if (!key) return null;
+  let cands = [];
+  // 1) suena igual (candidato de 4+ letras; sin alejarse más de dos letras, tres si son largas: «filadelfia» → «philadelphia»)
+  (F.byKey.get(key) || []).forEach(c => {
+    if (c.length < 4) return;
+    const d = fuzzyDist(w, c);
+    if (d <= 2 || (d === 3 && Math.min(w.length, c.length) >= 8)) cands.push([d, c]);
+  });
+  // 2) una sola edición VEROSÍMIL a partir de la cuarta letra, misma letra inicial fonética, candidato de 5+ letras
+  if (!cands.length) {
+    const byLen = F.byFirst.get(key[0]);
+    if (byLen) for (let L = w.length - 1; L <= w.length + 1; L++) (byLen.get(L) || []).forEach(c => { if (c.length >= 5 && fuzzyNear(w, c) && fuzzyPlausible(w, c)) cands.push([1, c]); });
+  }
+  cands = cands.filter(x => !fuzzySameStem(w, x[1]));
+  if (!cands.length) return null;
+  // Se queda el que menos cambia; si empatan palabras con distinto significado («pesta»: ¿pesto?, ¿pasta?) no se toca
+  const best = Math.min(...cands.map(x => x[0]));
+  const top = cands.filter(x => x[0] === best).map(x => x[1]);
+  if (top.length > 1 && new Set(top.map(fuzzyMeaning)).size !== 1) return null;
+  top.sort((a, b) => Math.abs(a.length - w.length) - Math.abs(b.length - w.length) || (a < b ? -1 : a > b ? 1 : 0));
+  return top[0];
+}
+// Con plural: «mayonezas» → «mayonesas», «langostinso» → «langostinos»
+function fuzzyFix(w) {
+  let r = fuzzyWord(w);
+  if (r) return r;
+  if (w.length >= 6 && /[a-z]s$/.test(w) && !fuzzyKnown(w)) { r = fuzzyWord(w.slice(0, -1)); if (r) return /s$/.test(r) ? r : r + "s"; }
+  if (w.length >= 7 && /es$/.test(w) && !fuzzyKnown(w)) { r = fuzzyWord(w.slice(0, -2)); if (r) return /s$/.test(r) ? r : r + "es"; }
+  return null;
+}
+// Corrige las palabras desconocidas de un texto ya normalizado (normText). log (opcional): recoge cada [antes, despues]
+function fuzzyText(t, log) {
+  if (!t || t.length < 4) return t;
+  if (!log && fuzzyMemo.has(t)) return fuzzyMemo.get(t);
+  const out = t.replace(/[a-z]{4,}/g, (w, i, s) => {
+    if (/[a-z0-9]/.test(s[i - 1] || "") || /[a-z0-9]/.test(s[i + w.length] || "")) return w;   // «e1105», «gluten2»: no es una palabra
+    const r = fuzzyFix(w);
+    if (r && log) log.push([w, r]);
+    return r || w;
+  });
+  if (!log) { if (fuzzyMemo.size > 4000) fuzzyMemo.clear(); fuzzyMemo.set(t, out); }
+  return out;
+}
+
 // Una excepción («sin gluten salvo el pan») cuenta con sus propias negaciones y sin la regla «sin X» general
 function hitException(al, r, exc, strongOnly) {
   const t = stripNegations(r.exclRe ? exc.replace(r.exclRe, "$1 ") : exc);
@@ -1603,8 +1896,8 @@ const VEGAN_FREE = new Set(["HUEVO", "LÁCTEO", "PESCADO", "CRUSTÁCEOS", "MOLUS
 const VEGETARIAN_RE = /(^|[^a-z0-9])(?!no\s)(?:(?:ovo|lacto|ovolacto)?[\s-]?vegetarian[oa]s?|veggie|vegetarian|vegetariens?|vegetarisch)(?=[^a-z0-9]|$)/;
 const NO_PICANTE_RE = /(?:^|[^a-z0-9])(?:sin\s+picante|no\s+picantes?|nada\s+picante|no\s+pica|sin\s+picar|not\s+spicy|no\s+spicy|non\s+spicy|mild|suave|sin\s+(?:guindilla|cayena|chile|aji)|libre\s+de\s+picante|0\s*%\s*picante|nicht\s+scharf|non\s+piccante|pas\s+(?:epice|piquant))(?=[^a-z0-9]|$)/;
 function detectAllergens(raw, ctx, strongOnly) {
-  const full = neutralizeOptional(" " + normText(raw) + " ");
-  const ctxFull = ctx ? neutralizeOptional(" " + normText(ctx) + " ") : "";
+  const full = neutralizeOptional(" " + fuzzyText(normText(raw)) + " ");
+  const ctxFull = ctx ? neutralizeOptional(" " + fuzzyText(normText(ctx)) + " ") : "";
   const base = splitTraces(stripNegations(full));
   const neg = negatedWords(full + ctxFull);
   const a = [], tr = [];
@@ -1775,7 +2068,7 @@ function inferDietsFromAllergens(allergens, set) {
 
 // Devuelve las etiquetas de dieta que incumple un texto
 function detectDiets(raw, allergens) {
-  const full = neutralizeOptional(" " + normText(raw) + " ");
+  const full = neutralizeOptional(" " + fuzzyText(normText(raw)) + " ");
   const t = stripNegations(full);
   const found = new Set();
   Object.keys(DIET_RULES).forEach(id => {
@@ -1916,9 +2209,68 @@ const PREP_TYPES = [
   // KB-AUTO-BEGIN-PREP (tools/learn_from_signals.js --aplicar añade aquí; no editar a mano)
   // KB-AUTO-END-PREP
 ];
+// 3.20 · VALIDACIÓN CRUZADA: compuestos de la cocina asiática y mediterránea cuyo nombre esconde un alérgeno concreto (la pasta de
+// curry lleva pasta de gambas, la salsa thai lleva salsa de pescado, el aceite del wok suele ser de sésamo o cacahuete).
+// Cada entrada: [nombres, { ALÉRGENO: "qué lo esconde" }]. Hacen tres cosas:
+//   1. Son preparaciones compuestas (entran en COMPOUND_TYPES y en dishMaybe): sin desglose ni «✔ comprobado», PREGUNTA.
+//   2. Un desglose PARCIAL no basta («Salsa thai: azúcar, lima, chile»): el alérgeno escondido sigue en PREGUNTA mientras el local
+//      no lo nombre, lo marque o lo niegue («sin salsa de pescado», «vegano»). Lo comprueba ingUnknown (validación cruzada
+//      entre el nombre y el desglose).
+//   3. El aviso dice el porqué: «pregunta si tiene PESCADO (salsa de pescado)».
+// Como todo lo nuevo, solo PREGUNTA: lo que es el alérgeno por definición (taramasalata = huevas) ya está en AL_RULES.
+const CROSS_TYPES = [
+  // Tailandia, Vietnam, Laos: pastas de curry y salsas de mesa
+  [["pasta de curry","pasta de curry rojo","pasta de curry verde","pasta de curry amarillo","curry paste","curry rojo","curry verde","curry amarillo","curry thai","curry tailandes","red curry","green curry","yellow curry","panang","massaman","khao soi"], { "CRUSTÁCEOS": "pasta de gambas", "PESCADO": "salsa de pescado" }],
+  [["salsa thai","salsa tailandesa","salsa oriental","salsa asiatica","nuoc cham","nuoc mam cham","nam prik","nam jim","salsa de tamarindo","salsa agridulce thai","estilo thai","al estilo thai","estilo tailandes","estilo oriental","estilo asiatico","toque asiatico","toque oriental","fusion asiatica","asian fusion","nikkei"], { "PESCADO": "salsa de pescado", "CRUSTÁCEOS": "pasta de gambas", "SOJA": "salsa de soja", "SÉSAMO": "aceite o semillas de sésamo" }],
+  [["goi cuon","summer roll","summer rolls","rollito vietnamita","rollitos vietnamitas","rollito de verano","rollitos de verano","bo bun","bun bo","larb","laab","som tam","som tum","papaya salad","ensalada de papaya","ensalada thai","ensalada tailandesa"], { "PESCADO": "salsa de pescado", "CRUSTÁCEOS": "gambas secas o pasta de gambas", "CACAHUETES": "cacahuete picado o salsa de cacahuete" }],
+  // Malasia e Indonesia
+  [["sambal","sambal belacan","sambal terasi","rendang","laksa","tom yum","tom yam","tom kha","nasi lemak","mee goreng","mie goreng","nasi goreng"], { "CRUSTÁCEOS": "pasta de gambas (belacan)", "PESCADO": "salsa de pescado o anchoa seca" }],
+  [["rendang","gado gado","gado-gado","pecel","satay"], { "FRUTOS CON CÁSCARA": "candlenut (kemiri) o anacardo", "CACAHUETES": "salsa de cacahuete" }],
+  // Japón y Corea: salsas de sazón y pasteles de pescado
+  [["mentsuyu","tsuyu","tare","salsa tare","yakitori tare","salsa yakitori","unagi tare","salsa de anguila","eel sauce","ponzu","salsa ponzu"], { "PESCADO": "dashi de bonito o anguila", "SOJA": "salsa de soja", "GLUTEN": "trigo de la salsa de soja" }],
+  [["tataki","tataki de atun","tataki de bonito","tataki de salmon","tataki de ternera","tataki de buey"], { "SOJA": "marinado de soja", "SÉSAMO": "costra de sésamo" }],
+  [["tteokbokki","tteok","odeng","eomuk","kimbap","gimbap"], { "PESCADO": "pastel de pescado (eomuk) o caldo de anchoa", "SOJA": "gochujang y salsa de soja", "GLUTEN": "trigo del gochujang" }],
+  // Wok, salteados y sus aceites
+  [["wok","al wok","salteado al wok","wok de verduras","wok de pollo","wok de ternera","wok de gambas","wok de fideos","wok de arroz","stir fry","stir-fry","aceite de wok","aceite para wok","wok oil","chow mein","yakisoba","yaki udon","pad see ew"], { "SÉSAMO": "aceite de sésamo", "CACAHUETES": "aceite de cacahuete", "SOJA": "salsa de soja", "PESCADO": "salsa de pescado", "MOLUSCOS": "salsa de ostras", "GLUTEN": "trigo de la salsa de soja" }],
+  // India: masas fritas y marinados
+  [["pakora","pakoras","bhaji","bhajis","onion bhaji","vada","medu vada"], { "GLUTEN": "harina de la masa (a veces trigo)", "HUEVO": "huevo de la masa" }],
+  // Mediterráneo oriental: dips con pan, frutos secos, yogur o tahini sin decirlo
+  [["skordalia","skordalia de patata"], { "GLUTEN": "pan remojado", "FRUTOS CON CÁSCARA": "nueces o almendras" }],
+  [["tarator","salsa tarator"], { "FRUTOS CON CÁSCARA": "nueces", "LÁCTEO": "yogur", "SÉSAMO": "tahini" }],
+  [["ajvar","ljutenica","kyopolou"], { "SULFITOS": "vinagre" }],
+  // 3.20 · Cocina global. Mexicana y latina
+  [["mole","mole poblano","mole negro","mole rojo","mole verde","mole coloradito","mole amarillo","pipian","pipian rojo","pipian verde","adobo mexicano"], { "CACAHUETES": "cacahuete", "FRUTOS CON CÁSCARA": "almendra o nuez", "SÉSAMO": "semillas de sésamo", "GLUTEN": "pan o tortilla tostada que espesa" }],
+  [["sikil pak","sikil p'ak","pate de pepitas","pepita molida"], { "SÉSAMO": "ajonjolí o semillas", "FRUTOS CON CÁSCARA": "otras semillas o frutos secos" }],
+  [["leche de tigre","tiradito","cebiche","ceviche"], { "APIO": "apio picado en la leche de tigre", "PESCADO": "pescado" }],
+  [["cebiche nikkei","ceviche nikkei","tiradito nikkei"], { "SOJA": "salsa de soja de la versión nikkei", "SÉSAMO": "aceite de sésamo" }],
+  // Italia, Francia y resto de Europa
+  [["vitello tonnato","vitel tone","vitel toné","salsa tonnata","tonnata"], { "PESCADO": "atún y anchoa de la salsa", "HUEVO": "mayonesa o yema de la salsa" }],
+  [["bagna cauda","bagna caoda","bagnet verd","bagnetto verde"], { "PESCADO": "anchoa", "LÁCTEO": "mantequilla o nata", "FRUTOS CON CÁSCARA": "nueces (según la receta)" }],
+  [["pesto","pesto genovese","pesto alla genovese","pesto rojo","pesto de tomate seco","pistou"], { "FRUTOS CON CÁSCARA": "piñones, nueces o anacardos", "LÁCTEO": "parmesano o pecorino" }],
+  [["romesco","salsa romesco","salvitxada","calcots","calcotada","calçots","salsa de calcots"], { "FRUTOS CON CÁSCARA": "almendra y avellana", "GLUTEN": "pan frito o picatoste", "SULFITOS": "vinagre" }],
+  [["worcestershire","salsa worcestershire","salsa worcester","salsa inglesa","lea & perrins","lea and perrins","perrins","salsa perrins","salsa cesar","salsa caesar","caesar dressing","ensalada cesar","ensalada caesar","caesar salad"], { "PESCADO": "anchoa", "HUEVO": "yema (cesar)", "LÁCTEO": "parmesano (cesar)", "MOSTAZA": "mostaza", "GLUTEN": "vinagre de malta o picatostes", "SOJA": "salsa de soja" }],
+  // Oriente Medio y Mediterráneo
+  [["muhammara","mhammara","muhamara","salsa de pimiento rojo y nuez"], { "FRUTOS CON CÁSCARA": "nuez", "GLUTEN": "pan rallado o migas", "SÉSAMO": "tahini" }],
+  [["baba ganoush","baba ganush","babaganoush","mutabal","moutabal","mutabbal","salata baba ghanouj"], { "SÉSAMO": "tahini", "LÁCTEO": "yogur (según la receta)" }],
+  [["dukkah","duqqa","zaatar","za'atar","zatar","zaatar","zahtar"], { "SÉSAMO": "semillas de sésamo", "FRUTOS CON CÁSCARA": "avellana, almendra o pistacho" }],
+];
+const CROSS_LETTER = {};
+Object.keys(AL_LETTER).forEach(ch => { CROSS_LETTER[AL_LETTER[ch]] = ch; });
+CROSS_TYPES.forEach(t => { t[3] = t[1]; t[1] = Object.keys(t[3]).map(al => CROSS_LETTER[al]).join(""); t[2] = kwTest(t[0]); });
 PREP_TYPES.forEach(t => { t[2] = kwTest(t[0]); });
-COMPOUND_TYPES.push(...PREP_TYPES);
+COMPOUND_TYPES.push(...PREP_TYPES, ...CROSS_TYPES);
 COMPOUND_TYPES.forEach(t => { t[2] = kwTest(t[0]); });
+// 3.20: alérgenos que esconde un compuesto de validación cruzada y por qué → Map(alérgeno → motivo) | null
+function crossRisks(name) {
+  const n = " " + fuzzyText(normText(name)) + " ";
+  let out = null;
+  CROSS_TYPES.forEach(t => {
+    if (!t[2].test(n)) return;
+    if (!out) out = new Map();
+    Object.keys(t[3]).forEach(al => { if (!out.has(al)) out.set(al, t[3][al]); });
+  });
+  return out;
+}
 
 // 3.19 · AL_MORE_7: NOMBRES PROPIOS DE PLATO que no dicen en el nombre lo que llevan («Puntillitas», «Bienmesabe», «Pollo en pepitoria»,
 // «Lentejas»). Cada entrada: [nombres, letras de alérgenos que «suele llevar»]. Se usan SOLO con el nombre del plato y solo dan PREGUNTA
@@ -2203,14 +2555,14 @@ const AL_MORE_7 = [
 ];
 AL_MORE_7.forEach(t => { t[2] = kwTest(t[0]); });
 function dishMaybe(name) {
-  const n = " " + normText(name) + " ", out = new Set();
-  AL_MORE_7.concat(PREP_TYPES).forEach(t => { if (t[2].test(n)) t[1].split("").forEach(ch => out.add(AL_LETTER[ch])); });
+  const n = " " + fuzzyText(normText(name)) + " ", out = new Set();
+  AL_MORE_7.concat(PREP_TYPES, CROSS_TYPES).forEach(t => { if (t[2].test(n)) t[1].split("").forEach(ch => out.add(AL_LETTER[ch])); });
   return ALLERGENS.filter(x => out.has(x));
 }
 // Alérgenos que puede esconder este nombre de componente. null = no es una preparación compuesta.
 // "*" en el resultado = cualquiera (nombre genérico), y entonces también se pregunta por dietas y «otros alimentos».
 function compoundRisks(name) {
-  const n = " " + normText(name) + " ";
+  const n = " " + fuzzyText(normText(name)) + " ";
   let out = null, any = false;
   COMPOUND_TYPES.forEach(t => {
     if (!t[2].test(n)) return;
@@ -2238,7 +2590,15 @@ function ingUnknown(ing) {
   if (sub && VAGUE_SUB_RE.test(sub)) return "*";
   const risks = compoundRisks(ing.n);
   if (!risks) return null;
-  return ingDetailed(ing) ? null : risks;
+  if (!ingDetailed(ing)) return risks;
+  // 3.20: validación cruzada. En los compuestos de CROSS_TYPES el desglose solo explica el alérgeno escondido si lo nombra
+  // («salsa de pescado»), el local lo marca (ing.a) o lo niega («sin salsa de pescado», «vegano»); si no, sigue sin saberse.
+  const cross = crossRisks(ing.n);
+  if (!cross) return null;
+  const txt = `${ing.n || ""} . ${ing.sub || ""}`;
+  const said = new Set([...(ing.a || []), ...memoDetect("a", txt).a]);
+  const left = ALLERGENS.filter(x => cross.has(x) && !said.has(x) && !textDenies(x, txt));
+  return left.length ? new Set(left) : null;
 }
 function ingGaps(ing) { return ingUnknown(ing) !== null; }
 // Alérgenos que un texto PODRÍA esconder sin decirlo (preparaciones compuestas que menciona): para medir y para avisar
@@ -2250,7 +2610,7 @@ function possibleAllergens(text) {
 function ingIsCompound(ing) { return !!compoundRisks(ing && ing.n); }
 // ¿El texto de este componente (y el contexto del plato) dice que NO lleva este alérgeno? («pan sin gluten», «vegano»)
 function textDenies(al, txt, ctx) {
-  const full = neutralizeOptional(" " + normText(txt) + " "), cf = ctx ? neutralizeOptional(" " + normText(ctx) + " ") : "";
+  const full = neutralizeOptional(" " + fuzzyText(normText(txt)) + " "), cf = ctx ? neutralizeOptional(" " + fuzzyText(normText(ctx)) + " ") : "";
   const r = AL_RULES[al];
   if (r.free && (r.free.test(full) || (cf && r.free.test(cf)))) return true;
   if (r.denyRe && (r.denyRe.test(full) || (cf && r.denyRe.test(cf)))) return true;
@@ -2367,7 +2727,9 @@ function evaluateDish(dish, strict, eqx) {
         // Solo la sección sirve de contexto («Platos sin gluten»): lo que digan OTROS componentes («pan sin gluten»)
         // no dice nada de lo que esconde este
         const ctxTxt = dish.cat || "";
-        const what = [...S.al].filter(x => (unk === "*" || unk.has(x)) && !textDenies(x, txt, ctxTxt));
+        // 3.20: en los compuestos de validación cruzada se dice qué lo esconde («PESCADO (salsa de pescado)»)
+        const cross = unk === "*" ? null : crossRisks(ing.n);
+        const what = [...S.al].filter(x => (unk === "*" || unk.has(x)) && !textDenies(x, txt, ctxTxt)).map(x => cross && cross.get(x) ? `${x} (${cross.get(x)})` : x);
         if (unk === "*") { S.cu.forEach(c => what.push(c.toUpperCase())); S.di.forEach(t => what.push(DIET_ASK[t] || t)); }
         if (what.length) {
           if (ing.mod) rem.push(`${esc(ing.note || ("Sin " + ing.n))} (no detalla qué lleva: ${esc(what.join(", "))})`);
@@ -3010,6 +3372,11 @@ function famResolve(term) {
   if (!k) return [];
   const ids = new Set();
   famForms(k).forEach(f => (FAM_INDEX.get(f) || []).forEach(id => ids.add(id)));
+  // 3.20: una palabra sola con una errata («zanahorria», «pimeinto») se busca por su forma corregida (fuzzyFix, 02_detect.js)
+  if (!ids.size && k.indexOf(" ") < 0 && typeof fuzzyFix === "function") {
+    const fx = fuzzyFix(k);
+    if (fx) famForms(fx).forEach(f => (FAM_INDEX.get(f) || []).forEach(id => ids.add(id)));
+  }
   if (!ids.size && k.indexOf(" ") > 0) {
     let best = 0, found = [];
     FAM_INDEX.forEach((list, name) => {
@@ -3051,7 +3418,7 @@ function customHitInfo(text, term) {
   const k = famNorm(term);
   if (!k) return null;
   const R = famRules(k);
-  let t = neutralizeOptional(" " + normText(text) + " ");
+  let t = neutralizeOptional(" " + fuzzyText(normText(text)) + " ");
   if (R.exRe) t = t.replace(R.exRe, "$1 ");
   const t0 = t;
   t = stripNegations(t);
