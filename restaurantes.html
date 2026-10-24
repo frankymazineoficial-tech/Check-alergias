@@ -1509,6 +1509,29 @@ const AL_MORE_8 = {
   "MOSTAZA": { weak: ["kewpie"] },
   "APIO": { weak: ["marmite","vegemite","viandox"] }
 };
+// 3.22: técnicas europeas de carta y falsos amigos de idioma. «burro» es mantequilla en italiano y un animal en español;
+// «noisette» es avellana en francés, pero el «beurre noisette» es mantequilla tostada, sin avellanas. Todo PREGUNTA salvo lo que
+// la técnica lleva siempre (beurre manié = harina y mantequilla).
+const AL_MORE_9 = {
+  "GLUTEN": {
+    strong: ["beurre manie","re:buerre\\s+manie"],
+    weak: ["orly","a la orly","molinera","a la molinera","wellington"]
+  },
+  "LÁCTEO": {
+    weak: ["molinera","a la molinera","wellington","mantecato","pan perdido"],
+    // «burro» animal: carne, embutido o guiso de burro; «burrito» ya no casa por ser otra palabra
+    excl: ["re:(?:carne|carnes|filete|filetes|embutido|embutidos|salchichon|salchichas?|chorizo|lomo|jamon|cecina|hamburguesa|chuleta|guiso|estofado|ragu|bresaola)\\s+(?:de\\s+|di\\s+)?burro","re:burro\\s+(?:de\\s+carga|enano|miniatura|asno|rebuzna\\w*)","re:(?:el|un|del|al)\\s+burro\\s+(?:de|del)\\s+(?:shrek|campo|granja)",
+      // «burro di arachidi» es crema de cacahuete, y la «crème de coco» es crema de coco: ninguna lleva leche
+      "re:burro\\s+di\\s+(?:arachidi|nocciole?|mandorle|anacardi|cacao|karite|cocco|sesamo|pistacchi|noci)","re:tiger[\\s-]?nut\\s+milk","re:creme\\s+de\\s+coco","re:cream\\s+of\\s+coconut"]
+  },
+  "HUEVO": { weak: ["wellington","pan perdido"] },
+  "MOSTAZA": { weak: ["wellington"] },
+  "SULFITOS": { weak: ["orly","a la orly","wellington"] },
+  "FRUTOS CON CÁSCARA": {
+    // la chufa (tiger nut, almendra de tierra) es un tubérculo, no un fruto de cáscara
+    excl: ["re:tiger[\\s-]?nuts?","re:almendras?\\s+de\\s+tierra","re:earth\\s+almonds?","re:yellow\\s+nutsedge","re:(?:beurre|mantequilla|manteca|butter|burro)\\s+(?:de\\s+)?noisette","re:noisette\\s+(?:butter|de\\s+mantequilla)","re:(?:brown|browned)\\s+butter\\s+noisette"]
+  }
+};
 const mergeMore = MORE => Object.keys(MORE).forEach(al => {
   const m = MORE[al], r = AL_RULES[al];
   if (m.strong) r.strong = r.strong.concat(m.strong);
@@ -1521,7 +1544,7 @@ const mergeMore = MORE => Object.keys(MORE).forEach(al => {
     if (DENIABLE[al] && has(DENIABLE[al], b)) DENIABLE[al].push(k);
   });
 });
-mergeMore(AL_MORE); mergeMore(AL_MORE_2); mergeMore(AL_MORE_3); mergeMore(AL_MORE_4); mergeMore(AL_MORE_5); mergeMore(AL_MORE_6); mergeMore(AL_MORE_8);
+mergeMore(AL_MORE); mergeMore(AL_MORE_2); mergeMore(AL_MORE_3); mergeMore(AL_MORE_4); mergeMore(AL_MORE_5); mergeMore(AL_MORE_6); mergeMore(AL_MORE_8); mergeMore(AL_MORE_9);
 Object.keys(AL_RULES).forEach(al => {
   const r = AL_RULES[al];
   r.strongRe = kwTest(r.strong);
