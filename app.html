@@ -515,6 +515,9 @@
   body.v-app .profile-pill { min-height:42px; padding-top:3px; padding-bottom:3px; }
   @media (min-width: 1100px) { .bottom-nav { padding-top:132px; } .rc-track { margin:0; padding-left:0; padding-right:0; } .rc-card { flex-basis:420px; } }
   /* 3.16.0 · Título discreto, guardados abajo, cabeceras de «Yo» y «En casa», ajustes */
+  .sec-row { display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+  .sec-row .sec-head:first-child { flex:1; min-width:0; }
+  a.sec-fav { white-space:nowrap; text-decoration:none; cursor:pointer; }
   .sec-head { margin:2px 2px 10px; font-size:0.92rem; font-weight:700; color:#94a3b8; letter-spacing:0.01em; }
   .scan-line a, .suggest-line a { color:var(--accent); font-weight:700; text-decoration:underline; text-underline-offset:3px; }
   .scan-line { margin:12px 0 0; }
@@ -619,13 +622,10 @@
     <button type="button" class="icon-btn" id="btnSearchToggle" onclick="toggleDiscoverSearch()" aria-label="Buscar un restaurante por su nombre">🔍</button>
   </div>
   <input type="search" id="discoverSearch" class="search-input" style="display:none; width:100%; margin:0 0 10px;" placeholder="Nombre del restaurante o localidad" oninput="renderDinerView()" aria-label="Buscar restaurante o localidad">
-  <h2 class="sec-head" id="discoverTitle">Restaurantes según tus alergias</h2>
+  <div class="sec-row"><h2 class="sec-head" id="discoverTitle">Restaurantes según tus alergias</h2><a href="#" class="sec-head sec-fav" onclick="openSavedSheet(); return false;">♥ Mis favoritos<span id="savedCount"></span></a></div>
 
   <div id="nearBox"><div id="nearList"></div></div>
 
-  <p class="scan-line">¿Estás ya en un restaurante? <a href="#" onclick="openUniversalScanner(); return false;">Escanea el QR de la mesa</a></p>
-  <p class="scan-line"><a href="#" onclick="openSavedSheet(); return false;">♥ Mis favoritos<span id="savedCount"></span></a></p>
-  <p class="scan-line"><a href="#" onclick="openSuggestRestModal(); return false;">Sugerir restaurante en Comeclaro App</a></p>
 </div>
 
 <!-- PESTAÑA 2: EN CASA (MIS PLATOS Y PRODUCTOS) -->
@@ -1483,20 +1483,8 @@
       </div>
     </details>
 
-    <details class="help-sec" id="help-sugerir">
-      <summary>💡 6. Locales sin carta: sugerir y pedir</summary>
-      <div class="help-body">
-        <ul>
-          <li><b>«¿Falta un restaurante? Sugiérelo»</b> (al final de «Comer fuera»): añade un sitio que aún no está. Saldrá en el mapa como «sugerido por la comunidad», todavía sin carta.</li>
-          <li>En un local sugerido, <b>«🔥 Solicitar que suba su carta»</b> suma tu petición (una por persona). Así el restaurante ve que hay clientes interesados.</li>
-          <li>Si eres el dueño, <b>«🔑 Soy el propietario: Reclamar»</b> te lleva a crear tu cuenta de hostelería.</li>
-          <li>Una sugerencia solo la puede borrar quien la hizo.</li>
-        </ul>
-      </div>
-    </details>
-
     <details class="help-sec" id="help-escaner">
-      <summary>📷 7. Escanea productos del súper</summary>
+      <summary>📷 6. Escanea productos del súper</summary>
       <div class="help-body">
         <p>Pulsa «📷 Escanear», el botón de abajo: se abre la cámara. Si no, elige una opción:</p>
         <ul>
@@ -1512,7 +1500,7 @@
     </details>
 
     <details class="help-sec" id="help-casa">
-      <summary>🏠 8. En casa: tus platos y recetas</summary>
+      <summary>🏠 7. En casa: tus platos y recetas</summary>
       <div class="help-body">
         <ol>
           <li>Ve a «🏠 En casa» → «+ Añadir plato» y escribe el nombre.</li>
@@ -1525,7 +1513,7 @@
     </details>
 
     <details class="help-sec" id="help-datos">
-      <summary>💾 9. Tus datos, copias y privacidad</summary>
+      <summary>💾 8. Tus datos, copias y privacidad</summary>
       <div class="help-body">
         <ul>
           <li>Tu perfil, tus platos caseros y tus rutas se guardan <b>solo en este móvil</b>. Si cambias de móvil o borras la app, se pierden, salvo que hagas una copia.</li>
@@ -1541,7 +1529,7 @@
     <div class="help-group">Para restaurantes</div>
 
     <details class="help-sec" id="help-alta">
-      <summary>👨‍🍳 10. Crea tu cuenta y da de alta el local</summary>
+      <summary>👨‍🍳 9. Crea tu cuenta y da de alta el local</summary>
       <div class="help-body">
         <ol>
           <li>Ve a «👤 Yo» → «Tengo un restaurante» → «Crear cuenta». Entra con Google, o con tu email y una contraseña de 6 caracteres o más, y acepta las condiciones. Si usas tu email, te enviaremos un enlace para <b>verificarlo</b>: hace falta para conseguir una plaza de Fundador (mira también en «Correo no deseado»). Con Google ya está verificado.</li>
@@ -1570,7 +1558,7 @@
     </details>
 
     <details class="help-sec" id="help-foto">
-      <summary>📸 11. Carga tu carta con una foto (lo más rápido)</summary>
+      <summary>📸 10. Carga tu carta con una foto (lo más rápido)</summary>
       <div class="help-body">
         <ol>
           <li>En tu carta, pulsa «📸 Subir carta con foto».</li>
@@ -1614,7 +1602,7 @@
     </details>
 
     <details class="help-sec" id="help-plato">
-      <summary>✏️ 12. Añade o edita un plato a mano</summary>
+      <summary>✏️ 11. Añade o edita un plato a mano</summary>
       <div class="help-body">
         <ol>
           <li>Pulsa «+ Añadir Plato (Con Escáner)» y escribe el nombre y la categoría (ENTRANTES, CARNES…).</li>
@@ -1634,7 +1622,7 @@
     </details>
 
     <details class="help-sec" id="help-fijo">
-      <summary>🔒 13. Ingrediente fijo o adaptable</summary>
+      <summary>🔒 12. Ingrediente fijo o adaptable</summary>
       <div class="help-body">
         <p>En tu carta, toca un ingrediente para cambiar entre:</p>
         <ul>
@@ -1647,7 +1635,7 @@
     </details>
 
     <details class="help-sec" id="help-aldia">
-      <summary>✅ 14. Borradores y carta al día</summary>
+      <summary>✅ 13. Borradores y carta al día</summary>
       <div class="help-body">
         <p><b>Borradores</b>: son platos que solo ves tú. Sirven para preparar platos nuevos, la carta de temporada o los que todavía tienes que revisar. Los clientes solo ven los platos publicados.</p>
         <ul>
@@ -1666,7 +1654,7 @@
     </details>
 
     <details class="help-sec" id="help-qr">
-      <summary>📱 15. Código QR para las mesas</summary>
+      <summary>📱 14. Código QR para las mesas</summary>
       <div class="help-body">
         <p>Pulsa «Código QR de mesa» → «🖨️ Cartel para la mesa» y se descarga un cartel listo para imprimir. También puedes «⬇️ Descargar QR», «📋 Copiar enlace» o enviarlo por «📲 WhatsApp».</p>
         <p>El QR abre siempre tu carta actualizada.</p>
@@ -1674,7 +1662,7 @@
     </details>
 
     <details class="help-sec" id="help-comensal">
-      <summary>🧑‍🤝‍🧑 16. Atiende a un cliente en la mesa</summary>
+      <summary>🧑‍🤝‍🧑 15. Atiende a un cliente en la mesa</summary>
       <div class="help-body">
         <p>En tu carta, en «Comprobar la carta para un comensal», toca las alergias y dietas del cliente. Si evita algo más, escríbelo y pulsa «Añadir». Los contadores y la lista te muestran al momento qué puede tomar.</p>
         <p>Pulsa <b>«📲 Enviar a cocina»</b>, escribe la mesa si quieres y elige el chat de cocina en WhatsApp. El mensaje lleva las alergias de la mesa y los platos compatibles, los adaptables (con qué hay que adaptar) y los no aptos (con el motivo).</p>
@@ -1683,7 +1671,7 @@
     </details>
 
     <details class="help-sec" id="help-local">
-      <summary>📊 17. Estadísticas y datos del local</summary>
+      <summary>📊 16. Estadísticas y datos del local</summary>
       <div class="help-body">
         <ul>
           <li>En «⚙️ Gestión del restaurante» (con el PIN) ves cuántas visitas ha tenido tu carta, cuántas veces la han guardado, los pre-avisos de reserva y los avisos de errores.</li>
@@ -1694,7 +1682,7 @@
     </details>
 
     <details class="help-sec" id="help-plan">
-      <summary>💳 18. Plan, pagos y baja</summary>
+      <summary>💳 17. Plan, pagos y baja</summary>
       <div class="help-body">
         <ul>
           <li>Durante el lanzamiento, la app es gratis. Las 30 primeras cuentas que verifiquen su email son Fundadoras y tienen ventajas (mira las condiciones).</li>
@@ -1706,7 +1694,7 @@
     </details>
 
     <details class="help-sec" id="help-opiniones-local">
-      <summary>💬 19. Opiniones de tu local, verificación y reclamaciones</summary>
+      <summary>💬 18. Opiniones de tu local, verificación y reclamaciones</summary>
       <div class="help-body">
         <p>Las opiniones son de los clientes: <b>no puedes borrarlas ni valorar tu propio local</b>. Así los clientes pueden fiarse de ellas. Lo que sí puedes hacer, desde «⚙️ Gestión del restaurante» (con el PIN):</p>
         <ul>
@@ -5589,6 +5577,7 @@ function renderNearList() {
   const cq = locMode === "city" ? normalizeStr(locCity) : "";
   let list = appState.restaurants.filter(r => {
     if (r.demo && isCloudMode()) return false;
+    if (r.suggestion || r.unclaimed) return false;   // los locales sugeridos ya no se muestran
     if (!restaurantPublicNow(r) && !ownsRestaurant(r)) return false;
     if (q && !normalizeStr(`${r.name} ${r.city || ""}`).includes(q)) return false;
     if (cq && !normalizeStr(r.city || "").includes(cq)) return false;
@@ -5598,7 +5587,7 @@ function renderNearList() {
   list.sort((a, b) => locMode === "near" && a._km != null && b._km != null ? a._km - b._km
     : (Number(!!b.verified) - Number(!!a.verified)) || String(a.name).localeCompare(String(b.name), "es"));
   if (!list.length) {
-    box.innerHTML = `<p class="empty-note">${q || cq ? "No hay restaurantes con esa búsqueda." : "Todavía no hay restaurantes en esta zona."} Prueba otra zona o sugiere el tuyo abajo.</p>`;
+    box.innerHTML = `<p class="empty-note">${q || cq ? "No hay restaurantes con esa búsqueda." : "Todavía no hay restaurantes en esta zona."} Prueba otra zona.</p>`;
     return;
   }
   list = list.slice(0, nearShown);
@@ -5747,6 +5736,7 @@ function initOrRefreshMap() {
   } else { leafletMap.invalidateSize(); markersLayer.clearLayers(); }
   appState.restaurants.forEach(r => {
     if (r.demo && isCloudMode()) return;       // el local de ejemplo no se pone en el mapa real
+    if (r.suggestion || r.unclaimed) return;   // ni los sugeridos
     if (!restaurantPublicNow(r) && !ownsRestaurant(r)) return;   // con el cobro activo, solo locales al día
     // Los verificados se dibujan encima de los demás
     L.marker([r.lat, r.lng], { zIndexOffset: r.verified ? 1000 : 0 }).addTo(markersLayer)
