@@ -557,6 +557,7 @@
   .rest-info-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; margin-top:18px; }
   .rest-info-card .btn { width:100%; }
   /* 3.17.0 · Corazón en cada foto y «Mis favoritos» sin listas */
+  /* 3.18.0 · Detector ampliado: 14 alérgenos y embarazo en 20 idiomas, diminutivos, erratas y preparaciones */
   .rc-heart { position:absolute; top:10px; right:10px; z-index:2; width:36px; height:36px; border-radius:50%; border:0; padding:0; display:inline-flex; align-items:center; justify-content:center; background:rgba(7,12,28,0.7); color:#fff; cursor:pointer; backdrop-filter:blur(4px); }
   .rc-heart.on { color:#f87171; }
   .rc-heart.on svg { fill:#f87171; }
@@ -1840,7 +1841,7 @@
 </div>
 
 <script>
-const APP_VERSION = "3.17.0";
+const APP_VERSION = "3.18.0";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
@@ -2345,11 +2346,11 @@ function kwTest(list) { return new RegExp("(?:^|[^a-z0-9])(?:" + kwSource(list) 
 // Igual, pero global y conservando el carácter previo para poder borrar la frase
 function kwStrip(list) { return new RegExp("(^|[^a-z0-9])(?:" + kwSource(list) + ")(?:s|es)?(?=[^a-z0-9]|$)", "g"); }
 
-const NEGATION_RE = /(^|[^a-z0-9])(?:sin|libre de|libres de|exento de|exenta de|exentos de|exentas de|no contiene|no contienen|no lleva|no llevan|no tiene|no tienen|without|free from|does not contain|doesn't contain|contains no|sans|ne contient pas de|senza|non contiene|ohne|enthalt keine?|sem|nao contem|sense|zonder|bez|nie zawiera)\s+(?:(?:trazas|restos|rastros|presencia) de\s+|anadid[oa]s? de\s+)?[a-z0-9]+(?:\s+(?:ni|nor)\s+[a-z0-9]+)*/g;
+const NEGATION_RE = /(^|[^a-z0-9])(?:sin|libre de|libres de|exento de|exenta de|exentos de|exentas de|apt[oa]s? para (?:alergic[oa]s?|intolerantes?|(?:la\s+)?intolerancia) a(?:l|\s+la|\s+los)?|0\s*%(?: de)?|no contiene|no contienen|no lleva|no llevan|no tiene|no tienen|without|free from|does not contain|doesn't contain|contains no|sans|ne contient pas de|senza|non contiene|ohne|enthalt keine?|sem|nao contem|sense|zonder|bez|nie zawiera)\s+(?:(?:trazas|restos|rastros|presencia) de\s+|anadid[oa]s? de\s+|salsas?\s+de\s+|(?:la\s+)?proteinas?\s+de\s+(?:la\s+)?)?[a-z0-9]+(?:\s+(?:ni|nor|y|and|et|e)\s+(?!(?:sin|no|without|sans|senza|ohne|sem|libre|free)(?![a-z0-9]))[a-z0-9]+)*/g;
 const FREE_SUFFIX_RE = /(^|[^a-z0-9])[a-z]+[\s-]free(?=[^a-z0-9]|$)/g;
 // 3.9.4: avisos de contaminación cruzada de cocina u obrador («se manipulan frutos secos», «posible contaminación
 // cruzada», «puede tener restos de») = trazas. La freidora o el aceite compartido NO: es contacto directo.
-const TRACE_MARK_RE = /(?:pueden? tener (?:restos|trazas)|posibles? (?:restos|trazas)|contaminacion cruzada|contacto cruzado|cross[\s-]contamina[a-z]*|cross[\s-]contact|se manipulan?|(?:elaborad|fabricad|producid|envasad)[oa] en (?:una |unas |un )?(?:cocina|obrador|fabrica|planta|instalacion(?:es)?|linea|lineas)|(?:cocina|obrador|fabrica|planta|instalaciones|lineas?|factory|facility|plant) (?:donde|que|en (?:la|el|las) que|that|which|where) (?:se |also |tambien )?(?:manipulan?|utilizan?|usan?|elaboran?|procesan?|handles?|processes|uses)|pueden? contener|podria contener|trazas|vestigios de|pode conter|pot contenir|may contain|made in a (?:factory|facility|plant)|manufactured (?:in|on|at)|produced in a (?:factory|facility)|traces|peut contenir|puo contenere|tracce|kann spuren|spuren von|enthalt spuren|kan sporen|sporen van|moze zawierac|sladowe ilosci)/;
+const TRACE_MARK_RE = /(?:pueden? tener (?:restos|trazas)|posibles? (?:restos|trazas)|contaminacion cruzada|contacto cruzado|cross[\s-]contamina[a-z]*|cross[\s-]contact|se manipulan?|(?:elaborad|fabricad|producid|envasad)[oa] en (?:una |unas |un )?(?:cocina|obrador|fabrica|planta|instalacion(?:es)?|linea|lineas)|(?:cocina|obrador|fabrica|planta|instalaciones|lineas?|factory|facility|plant) (?:donde|que|en (?:la|el|las) que|that|which|where) (?:se |also |tambien )?(?:manipulan?|utilizan?|usan?|elaboran?|procesan?|handles?|processes|uses)|pueden? contener|podria contener|trazas|vestigios de|pode conter|pot contenir|may contain|made in a (?:factory|facility|plant)|manufactured (?:in|on|at)|produced in a (?:factory|facility)|traces|peut contenir|puo contenere|tracce|kann spuren|spuren von|enthalt spuren|kann (?:[a-z]+ ){0,8}enthalten|may also contain|peut egalement contenir|kan sporen|sporen van|moze zawierac|sladowe ilosci)/;
 
 // 3.13.0: palabras de etiquetas en otros idiomas (productos de Open Food Facts y cartas en inglés, francés,
 // italiano, alemán, portugués, catalán, neerlandés y polaco). Solo las que SIEMPRE son el alérgeno.
@@ -2430,7 +2431,7 @@ const AL_RULES = {
            "mus","cordial","pan de calatrava","leche frita","tarta de la abuela",
            // 3.13.0
            "clara","remoulade","remolada","bearnesa","bearnaise","sour","gin fizz","salsa coctel","salsa cocktail","cesar","gabardina","en gabardina","grana padano","toblerone","nubes","marshmallow","marshmallows","malvavisco","barquillo","mejillones tigre","tigres","queso frito","cocido maragato","panellet","panellets","carquinyoli","carquinoli","quesadilla herrena","perrunilla","arroz a la cubana","filete ruso","pastela","elote","elotes","esquites","huancaina","reina pepiada","bandeja paisa","biscuit glace","rebozado","rebozada","empanado","empanada","empanadilla","villaroy","villeroy","cordon bleu","kiev","nugget","nuggets","fingers","aros de cebolla","onion rings","libritos","pavias","soldaditos de pavia","pollo kentucky","kentucky","kfc","bolitas de queso","palitos de queso","mozzarella sticks","hamburguesa","burger","cheeseburger","albondigon","pelotas","pastel de pescado","pastel de cabracho","pudin de pescado","pudin de cabracho","pastel de merluza","pudin de merluza","pastel de puerros","pastel de verduras","pastel de calabacin","pastel de salmon","pastel de atun","pastel de setas","terrina de pescado","budin","pudding","pudin","ensalada mixta","ensalada campera","ensalada de patata","ensalada de patatas","coleslaw","ensalada de col","sandwich vegetal","club sandwich","caesar","steak tartar","steak tartare","tartar de ternera","tartar de buey","tartar de vaca","tartar de carne","tartar de solomillo","piononos","pionono","brazo de gitano","ponche segoviano","tarta","tartaleta","pastel","pastelito","brownie","muffin","cupcake","madeleine","financier","macaron","clafoutis","cannoli","panettone","pandoro","sbrisolona","cantucci","biscotti","amaretti","savoiardi","soletilla","genovesa","genoise","plum cake","plumcake","pound cake","bundt","roscon","ensaimada","sobao","quesada","carbayon","frixuelo","filloa","casadiella","mantecada","hornazo","fardelejo","trenza de almudevar","pastel vasco","gateau basque","pantxineta","goxua","bienmesabe","quesillo","flao","crespell","tortell","xuixo","cremadet","bombas de patata","medialuna","factura","pao de queijo","coxinha","chipa","tres leches","pie de limon","curd","creme caramel","leche asada","pudim","bolo","queijada","bartolillos","miguelitos","flores fritas","flores de sarten","orejas de carnaval","orella","hojuela","frutas de sarten","arroz doce","crema de san jose","crema de sant josep","pastel ruso","tarta rusa","milhojas","mil hojas","mille feuille","millefeuille","paris brest","saint honore","san honorato","selva negra","black forest","sacher","sachertorte","red velvet","angel food","angel cake","chiffon","sponge","roulade","tronco de navidad","buche de noel","souffle","sufle","sopa castellana","sopa de picadillo","katsudon","okonomiyaki","takoyaki","bibimbap","kimbap","arroz tres delicias","arroz chino","arroz frito","arroz cantones","nasi goreng","mie goreng","pad thai","pad see ew","tagliatelle","fettuccine","pappardelle","tortellini","ravioli","lasana","lasagna","canelones","canelon","welsh rarebit","surimi","palitos de cangrejo","gulas","varitas de merluza","varitas de pescado","fish fingers","nuggets de pescado","albondigas de pescado","coctel de gambas","coctel de langostinos","cocktail de gambas","cocktail de langostinos","aguacate con gambas","cobb salad","nicoise","salade nicoise","ensalada nicoise","pastel de choclo","causa","causa limena","atascaburras","gazpachuelo","plato alpujarreno","panquemao","panquemado","turron","pa de pessic","greixonera","gato de almendra","gato mallorquin","bollo maimon","flores manchegas","rosquillas de san isidro","rosquillas tontas","rosquillas listas","tecula mecula","rosquetes","rosquete","principe alberto","escalope","escalopes","farton","fartons","cotoletta","katsu","kasespatzle","trifle","vitello tonnato","volcan de chocolate","volcan","fondant de chocolate","fondant","re:mille[\\s-]?feuille","re:paris[\\s-]?brest","sopa de ajo","sopas de ajo","semifreddo","semifrio","parfait","pavlova","suspiros","suspiro limeno","baked alaska","helado","sorbete","tarta helada","comtessa","contessa","viennetta","vienetta","charlota","charlotte","bavarois","bavaroise","crema diplomatica","crema de limon","crema de vainilla","mona de pascua","mona","tona","coca de llanda","coca boba","coca de sant joan","coca de san juan","pan dulce","lebkuchen","galletas danesas","gingerbread","zuppa inglese","sticky toffee","eton mess","banoffee","key lime pie","pecan pie","pumpkin pie","carrot cake","apple pie","yorkshire pudding","toad in the hole","kaiserschmarrn","knodel","spatzle","schnitzel","kottbullar","pierogi","pelmeni","blini","dorayaki","taiyaki","melonpan","galletas de la fortuna","fortune cookie","moussaka","musaka","pastitsio","spanakopita","tiropita","bougatsa","tequeno","sopaipilla","arancini","suppli","parmigiana","berenjenas a la parmesana","salsa alemana"],
-    free: /(^|[^a-z0-9])(?:sin huevos?|libre de huevos?|egg[\s-]free|sans oeufs?|senza uova|ohne eier?|sem ovos?)(?=[^a-z0-9]|$)/,
+    free: /(^|[^a-z0-9])(?:sin huevos?|libre de huevos?|egg[\s-]free|eggless|sans oeufs?|senza uova|ohne eier?|sem ovos?|apt[oa]s? para alergic[oa]s? al huevo|0\s*% (?:de )?huevos?|no (?:lleva|contiene) huevos?)(?=[^a-z0-9]|$)/,
     excl: ["re:(?:mayonesas?|mahonesas?|mayonnaise|alioli|allioli|aioli|all\\s+i\\s+oli|ali\\s+oli|ajoaceite|ajo\\s+aceite|merengues?|helados?)\\s+(?:vegan[oa]s?|vegetal(?:es)?|veggie|plant[\\s-]based|sin\\s+huevos?|de\\s+tofu|de\\s+agua|de\\s+soja)", "re:(?:mousse|flan(?:es)?|natillas?|tortillas?|bizcochos?|magdalenas?|galletas?|crepes?|gofres?|hamburguesas?|burgers?|albondigas?|croquetas?|rebozados?|empanad[oa]s?|empanadillas?|nuggets?|tartas?|brownies?|muffins?|cupcakes?|cookies?|bollos?|roscones?|panettones?|tiramisu|cheesecakes?|pasteles?|pastel|tortitas?|pancakes?|crema\\s+pastelera|quiches?|revueltos?|sorbetes?|ensaladillas?|tartar(?:es)?)\\s+(?:vegan[oa]s?|plant[\\s-]based|sin\\s+huevos?|de\\s+tofu|de\\s+agua|de\\s+soja)",
            "re:tortillas?\\s+(?:de\\s+)?(?:maiz|trigo|harina|mexicanas?|wraps?|fajitas?|nopal)", "re:(?:a\\s+la|salsa)\\s+marinera", "re:tortitas?\\s+de\\s+(?:arroz|maiz|patata|platano|yuca)",
            "re:(?:clara|claras)\\s+(?:de|con)\\s+(?:limon|cerveza|lima|naranja|gaseosa|casera|sprite)", "re:sour\\s+cream", "re:crema\\s+sour", "re:mousse\\s+de\\s+(?:pato|foie|ave|salmon|atun|cabracho|higado|aceitunas?|olivas?|setas|champinones|berenjenas?|pimientos?|tomates?|verduras?|garbanzos?|alcachofas?|queso|roquefort|cabrales|gorgonzola|bacalao|gambas|langostinos|marisco)",
@@ -2528,24 +2529,25 @@ const AL_RULES = {
 };
 // Las palabras de otros idiomas se suman a las que siempre son el alérgeno
 Object.keys(AL_LANG).forEach(al => { AL_RULES[al].strong = AL_RULES[al].strong.concat(AL_LANG[al]); });
+
 // 3.13.0: negación del alérgeno EN SÍ («sin huevo», «egg-free», «sin frutos secos», «apto para celíacos»).
 // No la de un derivado («sin mayonesa» no quita el huevo de una tortilla): esas van en FREE_WORDS y solo
 // afectan a lo que el plato SUELE llevar (weak).
 const DENY_RE = {
   "GLUTEN": AL_RULES.GLUTEN.free,
-  "HUEVO": /(^|[^a-z0-9])(?:sin huevos?|libre de huevos?|egg[\s-]free|eggless|sans oeufs?|senza uova|ohne eier?|sem ovos?)(?=[^a-z0-9]|$)/,
+  "HUEVO": /(^|[^a-z0-9])(?:sin huevos?|libre de huevos?|egg[\s-]free|eggless|sans oeufs?|senza uova|ohne eier?|sem ovos?|apt[oa]s? para alergic[oa]s? al huevo|0\s*% (?:de )?huevos?|no (?:lleva|contiene) huevos?)(?=[^a-z0-9]|$)/,
   "LÁCTEO": /(^|[^a-z0-9])(?:sin leche|sin lacteos?|libre de lacteos?|libre de leche|dairy[\s-]free|milk[\s-]free|sans lait|sans produits laitiers|senza latte|senza latticini|ohne milch|sem leite|sin proteinas? de leche)(?=[^a-z0-9]|$)/,
   "PESCADO": /(^|[^a-z0-9])(?:sin pescados?|libre de pescados?|fish[\s-]free|sans poisson|senza pesce|ohne fisch|sem peixe)(?=[^a-z0-9]|$)/,
   "CRUSTÁCEOS": /(^|[^a-z0-9])(?:sin mariscos?|sin crustaceos|libre de mariscos?|shellfish[\s-]free|sans crustaces|sans fruits de mer|senza crostacei|senza frutti di mare|ohne krebstiere|sem crustaceos|sem marisco)(?=[^a-z0-9]|$)/,
   "MOLUSCOS": /(^|[^a-z0-9])(?:sin mariscos?|sin moluscos|libre de mariscos?|shellfish[\s-]free|sans mollusques|sans fruits de mer|senza molluschi|senza frutti di mare|ohne weichtiere|sem moluscos|sem marisco)(?=[^a-z0-9]|$)/,
-  "FRUTOS CON CÁSCARA": /(^|[^a-z0-9])(?:sin frutos secos|sin frutos de cascara|sin frutos con cascara|libre de frutos secos|nut[\s-]free|tree[\s-]nut[\s-]free|sans fruits a coque|senza frutta a guscio|ohne nusse|ohne schalenfruchte|sem frutos de casca rija)(?=[^a-z0-9]|$)/,
-  "CACAHUETES": /(^|[^a-z0-9])(?:sin cacahuetes?|sin mani|peanut[\s-]free|sans (?:arachides?|cacahuetes?)|senza arachidi|ohne erdnusse|sem amendoim)(?=[^a-z0-9]|$)/,
-  "SOJA": /(^|[^a-z0-9])(?:sin soja|soya?[\s-]free|sans soja|senza soia|ohne soja|sem soja)(?=[^a-z0-9]|$)/,
-  "SÉSAMO": /(^|[^a-z0-9])(?:sin sesamo|sin ajonjoli|sin tahini|sin tahina|sesame[\s-]free|sans sesame|senza sesamo|ohne sesam|sem sesamo|sem gergelim)(?=[^a-z0-9]|$)/,
-  "MOSTAZA": /(^|[^a-z0-9])(?:sin mostaza|mustard[\s-]free|sans moutarde|senza senape|ohne senf|sem mostarda)(?=[^a-z0-9]|$)/,
-  "APIO": /(^|[^a-z0-9])(?:sin apio|celery[\s-]free|sans celeri|senza sedano|ohne sellerie|sem aipo)(?=[^a-z0-9]|$)/,
-  "SULFITOS": /(^|[^a-z0-9])(?:sin sulfitos|libre de sulfitos|exento de sulfitos|sulfites?[\s-]free|sulphites?[\s-]free|sans sulfites|senza solfiti|ohne sulfite|sem sulfitos)(?=[^a-z0-9]|$)/,
-  "ALTRAMUCES": /(^|[^a-z0-9])(?:sin altramuz|sin altramuces|lupin[\s-]free|sans lupin|senza lupini|ohne lupinen|sem tremoco)(?=[^a-z0-9]|$)/
+  "FRUTOS CON CÁSCARA": /(^|[^a-z0-9])(?:sin frutos secos|sin frutos de cascara|sin frutos con cascara|libre de frutos secos|nut[\s-]free|tree[\s-]nut[\s-]free|sans fruits a coque|senza frutta a guscio|ohne nusse|ohne schalenfruchte|sem frutos de casca rija|nussfrei|sin (?:almendras?|nueces|avellanas?|pistachos?|anacardos?|pinones)|libre de nueces)(?=[^a-z0-9]|$)/,
+  "CACAHUETES": /(^|[^a-z0-9])(?:sin cacahuetes?|sin mani|peanut[\s-]free|sans (?:arachides?|cacahuetes?)|senza arachidi|ohne erdnusse|sem amendoim|erdnussfrei|libre de cacahuetes?)(?=[^a-z0-9]|$)/,
+  "SOJA": /(^|[^a-z0-9])(?:sin soja|soya?[\s-]free|sans soja|senza soia|ohne soja|sem soja|sojafrei|libre de soja)(?=[^a-z0-9]|$)/,
+  "SÉSAMO": /(^|[^a-z0-9])(?:sin sesamo|sin ajonjoli|sin tahini|sin tahina|sesame[\s-]free|sans sesame|senza sesamo|ohne sesam|sem sesamo|sem gergelim|sesamfrei|libre de sesamo)(?=[^a-z0-9]|$)/,
+  "MOSTAZA": /(^|[^a-z0-9])(?:sin mostaza|mustard[\s-]free|sans moutarde|senza senape|ohne senf|sem mostarda|senffrei|libre de mostaza)(?=[^a-z0-9]|$)/,
+  "APIO": /(^|[^a-z0-9])(?:sin apio|celery[\s-]free|sans celeri|senza sedano|ohne sellerie|sem aipo|selleriefrei|libre de apio)(?=[^a-z0-9]|$)/,
+  "SULFITOS": /(^|[^a-z0-9])(?:sin sulfitos|libre de sulfitos|exento de sulfitos|sulfites?[\s-]free|sulphites?[\s-]free|sans sulfites|senza solfiti|ohne sulfite|sem sulfitos|sulfitfrei)(?=[^a-z0-9]|$)/,
+  "ALTRAMUCES": /(^|[^a-z0-9])(?:sin altramuz|sin altramuces|lupin[\s-]free|sans lupin|senza lupini|ohne lupinen|sem tremoco|lupinenfrei|libre de altramuces)(?=[^a-z0-9]|$)/
 };
 // 3.13.0: palabras «seguras» que son el NOMBRE de una preparación, no el ingrediente («tortilla», «alioli»,
 // «croque madame», «hummus», «Rioja»): el alérgeno está por receta, pero si el texto niega el alérgeno en sí
@@ -2569,6 +2571,394 @@ const DENIABLE = {
 // solo las palabras del propio aditivo no se desmienten.
 const SULFITE_LITERAL = new Set(["sulfito","sulfite","sulphite","solfito","solfiti","sulfit","dioxido de azufre","anhidrido sulfuroso","sulphur dioxide","sulfur dioxide","anhydride sulfureux","anidride solforosa","schwefeldioxid","metabisulfito","bisulfito","metabisulfite","bisulfite","sulfuroso"]);
 DENIABLE.SULFITOS = AL_RULES.SULFITOS.strong.filter(w => !SULFITE_LITERAL.has(w) && !/^re:/.test(w) && !/^e[\s-]?2\d\d/.test(w) && !/sulf|solf|siarcz|zwavel|schwef/.test(w));
+// ============================================================
+// AMPLIACIÓN 3.18 · Vocabulario que se escapaba (sondas de octubre de 2026)
+// Cada alérgeno suma términos técnicos, otros idiomas y preparaciones (strong = siempre lo lleva;
+// weak = lo suele llevar, PREGUNTA en el nombre de un plato; excl = falsos amigos que se quitan antes).
+// «like» son diminutivos y erratas acotadas («huevito», «huebo», «mallonesa»): cada uno se apunta a la
+// misma lista que su palabra base (y, si la base se puede desmentir con «sin …», también se desmiente).
+// Nunca se usa búsqueda aproximada general: así no se cuelan palabras parecidas.
+// ============================================================
+const AL_MORE = {
+  "HUEVO": {
+    strong: [
+      "ovoderivado","ovolecitina","conalbumina","vitelina","ovovitelina","lipovitelina","fosvitina","ovoglobulina","avidina","ovoflavoproteina","apovitelenina","ovomacroglobulina","ovoinhibidor",
+      "albumin","ovalbumin","ovomucoid","ovomucin","ovotransferrin","conalbumin","vitellin","livetin","phosvitin","ovoproduit","ovoprodotto","ovoprodotti","ovoproduto","ovoprodukt","egg solids","egg lecithin",
+      "pasado por agua","pasados por agua","re:salsa\\s+mayo","re:mayo\\s+(?:casera|de\\s+la\\s+casa|kewpie|japonesa|sauce|dressing|dip)","re:(?:con|with|and|&|y)\\s+mayo(?=[^a-z0-9]|$)","huevos benedictine","eggs benedictine",
+      "tuorli","gema","xema","ei","eiweiss","eipulver","volleipulver","trockenei","huhnerei","huhnereier","eidotter","dotter","eiprotein","eiprodukt","eiprodukte","flussigei","ruhrei","spiegelei","eierspeise","omelete","ovoprodutos",
+      "kippenei","eipoeder","eierpoeder","eiproduct","żółtka","masa jajowa","jajeczny","jajeczna","jajeczne","re:ou\\s+(?:dur|ferrat|bullit|poche|escalfat|sencer|batut|cru|de\\s+gallina|de\\s+guatlla)","re:truita\\s+(?:de\\s+patat|francesa|a\\s+la\\s+francesa|d'?espinacs|de\\s+carbass|de\\s+pernil|de\\s+formatge|de\\s+xampinyons|de\\s+ceba|d'?all|de\\s+gambes|paisana|espanyola)",
+      "yumurta","oua","ou de gaina","αυγο","αυγα","яйцо","яйца","яичный","яичная","яичное","卵","鸡蛋","雞蛋","蛋","玉子","たまご","계란","달걀","بيض","agg","aeg","muna","kananmuna","tojas","vejce","vajicko","arrautza","ביצה","trung","ไข่","अंडा",
+      "kewpie","isla flotante","islas flotantes","ile flottante","floating island","crema muselina","crema bavara","bavarois","bavaroise","chiboust","crema chiboust","sabajon","ajitama","changua","hollandaise","gribiche","salsa muselina","salsa choron","salsa foyot","salsa maltesa","clover club","huevos mimosa","pasta all'uovo","pasta alluovo"
+    ],
+    weak: [
+      "pan de leche","bolleria","bollo suizo","suizo","cruasan","croissant","challah","jala","hallah","pan de pascua","rosca de pascua","colomba","kulich","babka","stollen",
+      "spaetzle","spatzle","ramen","yakisoba","chow mein","lo mein","a la orly","orly","tonkatsu","bolas de queso","delicias de queso","albondiguillas","terrina","re:s[ou]+f+l+e",
+      "rosquillas","rosquilla","churros rellenos","petisu","petit choux","pasta choux","choux","sfogliatella","pasta frola","lemon pie","gelato","salsa ravigote","ravigote","white lady","amaretto sour"
+    ],
+    like: [
+      ["re:huev(?:it|ecit|ecill|ill|az)[oa]","huevo"],["re:huevin","huevo"],["re:yemit[a]","yema"],["re:tortillit[ao](?!s?\\s+de\\s+camaron)","tortilla"],["re:tortill(?:on|aza)","tortilla"],["re:revuelt(?:it|ill)[oa]","revuelto"],["re:merenguit[oa]","merengue"],["re:mayonesit[a]","mayonesa"],["natillitas","natillas"],["re:clarit[a]","clara"],["re:flan(?:c|ec)it[o]","flan"],
+      ["huebo","huevo"],["uevo","huevo"],["guevo","huevo"],["huvo","huevo"],["hevo","huevo"],["huveo","huevo"],["huevoo","huevo"],["hueebo","huevo"],["huevvo","huevo"],["hueuvo","huevo"],["huev0","huevo"],["huevp","huevo"],["hueov","huevo"],["yemma","yema"],["llema","yema"],
+      ["re:ma(?:y|ll|i|h|hi)on+(?:e|a|ai)[sz]+[ae]?","mayonesa"],["re:a(?:l|ll|i|j)+[iy]?[\\s-]?ol+[iy]o?","alioli"],["re:ajo[\\s-]+aceite","ajo aceite"],["re:mere?n?[gq]u?e+","merengue"],["re:torti?(?:ll|y|l|j|i)a","tortilla"],["re:re[bv]uelt[oa]","revuelto"],["ensaladiya","ensaladilla"],["natiyas","natillas"],["natilas","natillas"],["re:fr+it+at+a","frittata"],["re:om+e?l+e+t+e?","omelette"]
+    ],
+    excl: [
+      "re:(?:tomates?\\s+)?huevos?\\s+de\\s+toro","re:berenjenas?\\s+huevo","re:egg\\s+plant","re:yemas?\\s+de\\s+esparragos?","re:(?:una|dos|tres|cuatro|cana\\s+y|canas\\s+y)\\s+claras?(?!\\s+de\\s+huevo)",
+      "re:merengues?\\s+de\\s+aquafaba","re:(?:cebollas?|puerros?|verduras?|pimientos?|ajos?|chalotas?|calabacin(?:es)?|tomates?)\\s+pochad[oa]s?"
+    ]
+  },
+  "LÁCTEO": {
+    strong: [
+      "lactosuero","grasa butirica","manteca de vaca","lactoferrina","manjar blanco","manjar de leche","yoghourt","quattro formaggi","fonduta",
+      "butterfat","lactalbumin","lactoglobulin","babeurre","caseine","re:laitiere?s?","produits laitiers","formaggi","grana","stracchino","provola","caciocavallo","latticini",
+      "re:(?!kokos|soja|hafer|mandel|reis|pflanzen|nuss|cashew|dinkel|erbsen|lupinen|kokosnuss)[a-z]*milch(?!frei)[a-z]*","re:(?!soja|vegan|cashew|mandel)[a-z]*kase(?!frei)[a-z]*","re:[a-z]*molke[a-z]*","re:[a-z]*rahm","schlagsahne","butterreinfett","requeijao","soro","laticinios","quallada","lactis",
+      "re:(?!kokos|soja|haver|amandel|rijst|plantaardig|cashew|erwten)[a-z]*melk(?!vrij)[a-z]*","re:(?!vegan|soja|cashew|plantaardig)[a-z]*kaas[a-z]*","slagroom","kwark","zuivel","ser żółty","ser biały","twaróg","kazeina","maślanka","produkty mleczne","nabiał",
+      "mjolk","smor","gradde","ost","vassle","laktos","maelk","smør","fløde","maelkeprotein","maito","kerma","juusto","hera","laktoosi","jogurtti","tej","vaj","tejszin","sajt","tejsavo","laktoz","maslo","smetana","syr","syrovatka",
+      "молоко","сливки","сливочное масло","сыр","творог","сыворотка","казеин","лактоза","йогурт","γαλα","τυρι","βουτυρο","sut","tereyağı","peynir","牛奶","奶粉","牛乳","乳糖","乳清","酪蛋白","乳製品","乳制品","奶油","黄油","奶酪","芝士","チーズ","バター","ヨーグルト","우유","치즈","버터","حليب","جبن","زبدة","لبن","esne","gazta","gurina","esnekia"
+    ],
+    weak: [
+      "pure","con crema","mixto","pudin","budin","re:(?<!salsa\\s)(?<!pizza\\s)(?<!a\\sla\\s)napolitanas?","chocolatina","bombon","re:trufas?\\s+de\\s+chocolate","fudge","butterscotch","mocca","moca","colacao","cola cao","nesquik","vichisuas","huevos a la florentina","a la florentina","flamenquin","sorrentinos","varenyky","pollo kiev","kiev","chicken kiev","shepherd's pie","chowder","polenta"
+    ],
+    like: [
+      ["re:lech(?:it|ecit)[a]","leche"],["re:ques(?:it[oa]|in|az[oa]|et[oe])","queso"],["re:natit[a]","nata"],["re:mantequillit[a]","mantequilla"],["re:yogur(?:cit|in|it)[o]?","yogur"],
+      ["lehe","leche"],["lechee","leche"],["lche","leche"],["lecje","leche"],["re:mante?[kq]u?i(?:ll|y|l)+a","mantequilla"],["natta","nata"],["re:yo[gu]+h?[ou]+r+t?","yogur"],["re:kef+ir","kefir"],["re:[qk]u?h?es+o","queso"],["re:be(?:s|sc|ch|tch)h?amel+a?","bechamel"],["re:m[ou]z+ar+el+a","mozzarella"],["re:parmes+ano","parmesano"],["re:ched+ar","cheddar"],["re:gruyere?","gruyere"],["re:ri[ck]ot+a","ricotta"],["re:mas[ck]arpone","mascarpone"],["re:la[ck]to[sz]+a","lactosa"]
+    ],
+    excl: [
+      "re:mato\\s+(?:vegan[oa]|de\\s+almendras?|de\\s+soja|de\\s+anacardos?)","pescado mantequilla","leche de alpiste","re:(?:pure|cremas?)\\s+(?:vegan[oa]s?|sin\\s+(?:nata|leche|lacteos|mantequilla))"
+    ]
+  },
+  "GLUTEN": {
+    strong: [
+      "burgol","couscus","freekeh","frikeh","escanda","escana","hogaza","masa madre","piadina","pumpernickel","re:b?[rb]re[tz]+[sz]?els?","kataifi","kadaif","farfalle","orecchiette","gurullos","galets","sopa de galets","basbousa","baozi","mantou","pantumaca","re:pan?\\s*tumaca","ovomaltina","eko",
+      "wholewheat","wheatgerm","brewer's yeast","pastry","puff pastry","shortcrust","batter","battered","breaded","crumbed","toast","bun","buns","dough","sourdough",
+      "pate feuilletee","pate brisee","pate a pizza","pates fraiches","pates alimentaires","gateau","nouilles","boulgour","gaufre","viennoiseries","semolino","spelta","malto","estratto di malto","pangrattato","cornetto","proteine del grano","sfoglia",
+      "re:hartweizen[a-z]*","griess","gries","re:malz[a-z]*","re:brot(?!e)","brotchen","re:semmel[a-z]*","panade","paniert","panierte","nudeln","teigwaren","kuchen","geback","keks","kekse","glutenhaltig","re:vollkorn[a-z]*","backwaren","pfannkuchen","waffeln",
+      "malte","extrato de malte","pao de forma","pao ralado","massa","massas","macarrao","esparguete","bolacha","biscoito","bolo","cerveja","panado","pa amb tomaquet","pa de pessic","pa ratllat","pa torrat","galetes","cervesa","arrebossat",
+      "re:[a-z]*tarwe[a-z]*","re:[a-z]*rogge[a-z]*","re:[a-z]*gerst[a-z]*","re:[a-z]*mout(?!ard)[a-z]*","havermout","re:[a-z]*spelt[a-z]*","re:[a-z]*brood[a-z]*","paneermeel","noedels","koek","koekjes","re:volkoren[a-z]*","deeg","bladerdeeg","beschuit","gepaneerd","griesmeel","bloem",
+      "maka","re:maka\\s+(?:pszenna|zytnia|orkiszowa|jeczmienna|owsiana|tortowa|krupczatka)","re:orkisz[a-z]*","chleb","bułka","bułki","makaron","ciasto","ciastka","piwo","re:panierk[a-z]*","re:panierowan[a-z]*","kasza manna","kasza jęczmienna","kuskus",
+      "vete","vetemjol","mjol","havre","brod","strobrod","hvede","hvedemel","rug","byg","brød","øl","vehna","vehnajauho","ruis","ohra","kaura","leipa","korppujauho","olut","gluteeni","buza","buzaliszt","liszt","rozs","zab","kenyer","zsemlemorzsa","teszta","psenice","psenicna mouka","mouka","zito","jecmen","oves","strouhanka","testoviny","pivo","lepek",
+      "пшеница","пшеничная мука","мука","рожь","ржаная мука","ячмень","солод","овёс","овес","хлеб","панировочные сухари","макароны","пиво","глютен","клейковина","σιταρι","αλευρι","σικαλη","κριθαρι","βρωμη","ψωμι","μπυρα","γλουτενη","bugday","bugday unu","cavdar","yulaf","ekmek","galeta unu","makarna","bira",
+      "小麦","小麦粉","麵粉","面粉","面筋","麸质","大麦","黑麦","燕麦","面包","面条","啤酒","醤油","パン","うどん","ラーメン","밀","밀가루","보리","호밀","귀리","빵","맥주","글루텐","قمح","دقيق القمح","شعير","شوفان","خبز","جلوتين","garia","gari irina","ogia","garagardoa"
+    ],
+    weak: [
+      "cono de helado","pescado frito","calamares fritos","chipirones fritos","salsa brava","carbonara","bolonesa","bolognese","talarines","andrajos","relleno de cocido","escudella i carn d'olla","flauta","mixto","tortas de anis","suizo","petisu","petit choux","choux","pasteis de nata","gateau basque","maamoul","ebi furai","salsa de ostras","perrito","kvas","kvass","boza","mugicha","colomba","cake","pastelon"
+    ],
+    like: [
+      ["re:pan(?:ecit|it|cit|ecill|ecic)[oa]","pan"],["panazo","pan"],["re:boll(?:it|et)[oe]","bollo"],["re:pren(?:ao|au)","bollo"],["re:tostadit[a]","tostada"],["re:gallet(?:it|ic)[a]","galleta"],["re:bizcochit[o]","bizcocho"],["re:bocad(?:it|illit)[o]","bocadillo"],["re:tartit[a]","tarta"],["re:empanadit[a]","empanada"],["re:croquetit[a]","croqueta"],["re:fideit[o]","fideo"],["re:macarroncit[o]","macarrones"],["re:harin(?:it|ill)[a]","harina"],["trigito","trigo"],["re:cervecit[a]","cerveza"],["re:canit[a]","cerveza"],
+      ["re:[hj]?arin+a","harina"],["re:tri+[gj]o","trigo"],["re:glut+h?e[nm]","gluten"],["gluen","gluten"],["re:[cs]ebad+a","cebada"],["re:a[bv]en+a","avena"],["re:[cz]enten+o","centeno"],["espelt","espelta"],["re:kamut+","kamut"],["re:[ck][ou]u?s[\\s-]*[ck][ou]u?s","cuscus"],["re:ma[ck]ar+on(?:es)","macarrones"],["re:e?spag+[hu]?e+t+[iy]s?","espagueti"],["re:ta(?:ll|y)arin","tallarines"],["re:la[sz]a[gn]+[ea]","lasana"],["re:raviol[ie]s?","ravioli"],["re:g?noquis?","noqui"],["panrallado","pan rallado"],["re:re[bv]o[sz]ad[oa]","rebozado"],["re:empanaos?","empanado"],["re:empanadiy[a]","empanadilla"],["re:cro[ck]et+a","croqueta"],["re:[cz]er[bv]e[szc]+(?:a|ita)","cerveza"],["re:pi[tz]+a","pizza"],["re:bo[ck]at[a]","bocadillo"],["re:bocadiy[o]","bocadillo"],["re:san[dg]?u?[wi]+ch","sandwich"],["sanguis","sandwich"],["re:h?ambur?gu?e?sa","hamburguesa"],["burguer","burger"],["re:hot[\\s-]?dog","hot dog"],["re:ke[bv]a[bp]","kebab"],["re:cr[ou][ia]?s+an+t?","croissant"],["re:ma[gd]?dalena","magdalena"],["re:[bv]i[sz]co(?:ch|tx)o","bizcocho"],["re:ga(?:ll|l|y)etas?","galleta"],["panqueque","tortita"],["hotcake","tortita"],["hot cake","tortita"],["re:waf+les?","gofre"],["crepa","crepe"],["re:h?ojaldre","hojaldre"],["re:te[mn]pur+a","tempura"],["seytan","seitan"],["bulgour","bulgur"],["burgul","bulgur"],["re:tab+ul+e","tabule"],["re:[kq]u?i[bp]+eh?","kibbeh"],["re:b[ea]i?gels?","bagel"],["re:baguet+e?","baguette"],["re:ch?iabat+a","chapata"],["re:foca[ct]+h?[ia]a?","focaccia"],["re:h?ogaza","hogaza"],["fogaza","hogaza"],["pitta","pita"],["nan","naan"]
+    ],
+    excl: [
+      "re:fideos\\s+de\\s+(?:celofan|cristal|arroz|boniato|soja|judias?|mungo)","re:soba\\s+(?:100\\s*%|de\\s+(?:alforfon|trigo\\s+sarraceno)\\s+pur[oa]|juwari)","re:(?:rebozad[oa]s?|empanad[oa]s?|tempura)\\s+(?:de|con)\\s+(?:harina\\s+de\\s+)?(?:maiz|arroz|garbanzos?|almendras?|coco|quinoa|yuca|mandioca|tapioca)",
+      "re:(?:crepes?|galettes?|blinis?|tortitas?|filloas?)\\s+(?:bretonn?[ae]s?\\s+)?(?:de|au|a\\s+la)\\s+(?:trigo\\s+sarraceno|alforfon|sarrasin|ble\\s+noir|buckwheat)","re:bulgur\\s+de\\s+(?:quinoa|coliflor)","re:(?:extracto\\s+de\\s+)?malta\\s+de\\s+arroz","re:gluten\\s+de\\s+maiz","re:pao\\s+de\\s+queijo","re:rice\\s+cakes?","re:cakes?\\s+de\\s+arroz","re:salsa\\s+de\\s+ostras?\\s+(?:vegan[ao]s?|vegetal|sin\\s+gluten)","re:bun\\s+(?:cha|bo|thit|rieu|ga|mam)"
+    ]
+  },
+  "PESCADO": {
+    strong: [
+      "brandada","kanikama","ictiocola","isinglass","niboshi","bourride","cacciucco","brodetto","stoccafisso","stockfish","kedgeree","rollmops","matjes","kipper","kippers","lutefisk","fishcake","fishcakes","kamaboko","chikuwa","narutomaki","taramasalata","tarama","bottarga","tarako","salsa tonnata","pan bagnat","ensalada nizarda","nizarda","unagi","anago","saba","hamachi","maguro","kabayaki","negitoro","re:sake\\s+(?:nigiri|teriyaki|maki|don|sashimi)","morena frita","morena en adobo","espetos de sardinas","espeto de sardinas",
+      "codfish","pollack","coley","saithe","whiting","tunny","skipjack","albacore","yellowfin","bluefin","pilchard","whitebait","bass","bream","gilthead","flounder","anglerfish","red mullet","mullet","shark","dogfish","elvers","sturgeon","pangasius","basa","zander","seafood sticks","worcester sauce","lox","gravadlax",
+      "lieu noir","lieu jaune","eglefin","aiglefin","limande","baudroie","merou","requin","roussette","anguille","esturgeon","re:nuoc[\\s-]?mam","oeufs de lompe","pesci","acciuga","aringhe","platessa","rana pescatrice","coda di rospo","dentice","palombo","anguilla","storione","bagnacauda",
+      "dorsch","schellfisch","seehecht","re:(?!tinten)[a-z]*fisch(?!er)[a-z]*","re:[a-z]*lachs[a-z]*","anchovis","bismarckhering","re:[a-z]*hering[a-z]*","wolfsbarsch","steinbutt","seezunge","scholle","heilbutt","seeteufel","hecht","karpfen","aal","backfisch","pregado","tamboril","garoupa","enguia","salmo","anxova","anxoves","verat","sorell",
+      "koolvis","schelvis","heek","wijting","forel","sardien","zeebaars","zeebrasem","tarbot","schol","heilbot","zeeduivel","snoekbaars","paling","vissaus","visbouillon","visolie","visgelatine","kibbeling","lekkerbekje","visstick","vissticks","visfilet",
+      "mintaj","morszczuk","pstrąg","sardynka","sardynki","sardela","śledzie","okoń","szczupak","karp","sandacz","węgorz","flądra","re:ryb[a-z]*","paluszki rybne",
+      "re:[a-z]*fisk[a-z]*","torsk","kolja","lax","laks","oring","ørred","sill","sild","makrill","makrel","kala","turska","lohi","silakka","silli","muikku","kuha","hauki","ahven","kalakastike","hal","tokehal","lazac","pisztrang","ponty","szardinia","treska","losos","pstruh","kapr","sardinka","tunak",
+      "рыба","рыбы","рыбный","рыбная","рыбное","треска","тунец","лосось","семга","форель","сардина","анчоус","анчоусы","скумбрия","сельдь","селедка","судак","щука","карп","угорь","осетр","рыбий жир","икра","ψαρι","ψαρια","μπακαλιαρος","τονος","σολομος","σαρδελα","γαυρος","αντζουγια","τσιπουρα","λαβρακι","balık","balik","ton balıgı","somon","hamsi","sardalya","levrek","cipura","uskumru",
+      "鱼","魚","鱼肉","鳕鱼","金枪鱼","吞拿鱼","三文鱼","鲑鱼","沙丁鱼","凤尾鱼","鱼露","鱼油","鱼胶","鱼丸","魚肉","さかな","鮭","サーモン","まぐろ","マグロ","鰹","かつお","鰹節","鱈","たら","鯖","さば","鰯","いわし","鰻","うなぎ","魚醤","생선","어류","참치","연어","고등어","멸치","액젓","어묵","سمك","سمكة","تونة","سلمون","سردين","أنشوجة","arrain","arraina","bakailao","legatz","hegaluze","antxoa","bokarta","izokin","txitxarro"
+    ],
+    weak: ["oden","espeto","tataki","california roll","fritto misto","fritto misto di mare","meeresfruchte","owoce morza","shellfish"],
+    like: [
+      ["re:sardinit[a]","sardina"],["re:anchoit[a]","anchoa"],["re:atuncit[o]","atun"],["re:bacalait[o]","bacalao"],["re:merlucit[a]","merluza"],["re:truchit[a]","trucha"],["re:salmoncit[o]","salmon"],["re:salmonetit[o]","salmonete"],
+      ["re:pe[sz]ca[od]?o","pescado"],["re:[bv]a[ck]ala[od]?o","bacalao"],["re:[sz]ardinas?","sardina"],["re:bo[kq]u?eron","boqueron"],["re:merlu[sz]+a","merluza"],["re:an(?:ch|x)o(?:[bv]?[ae]s?|it[a]s?)","anchoa"],["vonito","bonito"],["re:roda[bv]allo","rodaballo"],["lenguao","lenguado"],["cavalla","caballa"],["re:pe[sz][\\s-]?espada","pez espada"],["re:fish[\\s-]?and[\\s-]?chips","fish and chips"],["fishandchips","fish and chips"],["re:[sz]urimi","surimi"]
+    ],
+    excl: [
+      "re:(?:dashi\\s+(?:de\\s+)?(?:kombu|shiitake|alga|vegano|vegetal)|(?:kombu|shiitake)\\s+dashi)","re:furikake\\s+(?:de\\s+alga|vegano|vegetal)",
+      "re:(?:atun|salmon|caviar|surimi|anchoas?|boquerones?|(?<!salsa de )pescado|rape|bacalao|merluza|sardinas?|gambas?|palitos\\s+de\\s+cangrejo|salsa\\s+worcestershire|salsa\\s+cesar)\\s+(?:[a-z]+\\s+){0,2}(?:vegan[oa]s?|vegetal(?:es)?|veggie|plant[\\s-]based|de\\s+(?:tomate|zanahoria|berenjena|algas?|tofu|soja|seitan|setas|konjac|calabacin|sandia|chocolate))",
+      "re:pe(?:z|ces)\\s+(?:de\\s+limon\\s+)?de\\s+chocolate","re:adobo\\s+de\\s+(?:pollo|pavo|cerdo|carne|lomo|costillas?|conejo|cordero)","re:(?:lomo|pollo|pavo|cerdo|carne|costillas?|pinchos?|pincho|chuletas?|solomillo|secreto|presa|pluma|abanico|panceta|alitas?|conejo|cordero|pechuga)\\s+(?:en\\s+)?adobo"
+    ]
+  },
+  "CRUSTÁCEOS": {
+    strong: [
+      "lubrigante","esquila","esquilas","krupuk","kroepoek","ebi","thermidor","bocas de la isla","bocas de cangrejo",
+      "crawfish","crabmeat","barnacle","barnacles","goose barnacle","goose barnacles","shellfish","langouste","tourteau","araignee de mer","etrille","pouce-pied","pouces-pieds","re:gamber[a-z]*","mazzancolla","mazzancolle","scampo","granchi","grancevola","granseola",
+      "re:[a-z]*garnele[a-z]*","re:[a-z]*krabben[a-z]*","re:[a-z]*hummer[a-z]*","languste","re:[a-z]*krebs[a-z]*","meeresfruchte","lagostins","lavagante","gambes","llagosta","llamantol","marisc","sarsuela",
+      "re:[a-z]*garnal[a-z]*","re:[a-z]*kreeft[a-z]*","langoest","re:schaal-?\\s*en\\s+schelpdieren","zeevruchten","homar","langusta","rak","kraby","owoce morza","re:krewetk[a-z]*",
+      "rakor","raka","reker","rejer","krabba","kraftor","skaldjur","skalldyr","katkarapu","katkaravut","rapu","ravut","hummeri","taskurapu","ayriaiset","garnela","garnelarak","rakfelek","kreveta","krevety","humr","korysi",
+      "креветка","креветки","краб","крабы","омар","лобстер","лангуст","лангустин","рак","ракообразные","морепродукты","γαριδα","γαριδες","αστακος","καραβιδα","καραβιδες","καβουρι","οστρακοειδη","θαλασσινα","karides","ıstakoz","istakoz","yengec","kerevit","kabuklu deniz urunleri","deniz urunleri",
+      "虾","蝦","虾仁","龙虾","螃蟹","蟹","蟹肉","海鲜","虾酱","虾米","虾皮","海老","えび","エビ","かに","カニ","ロブスター","伊勢海老","甲殻類","桜えび","干しえび","새우","랍스터","갑각류","해산물","새우젓","جمبري","روبيان","قريدس","سلطعون","كابوريا","استاكوزا","قشريات","ganba","otarrain","karramarro","abakando"
+    ],
+    weak: ["california roll","salpicon","mar y montana","mar i muntanya","spaghetti allo scoglio","fritto misto","fritto misto di mare"],
+    like: [
+      ["re:langostinit[o]","langostino"],["re:cangrejit[o]","cangrejo"],["re:camaroncit[o]","camaron"],["re:percebit[o]","percebe"],["re:langostit[a]","langosta"],["re:bogavantit[o]","bogavante"],
+      ["re:ga[mn][bv]a[sz]?","gamba"],["re:la[ng]+[ou]stino","langostino"],["re:[bv]oga[bv]ante","bogavante"],["sigala","cigala"],["re:cara[bv]inero","carabinero"],["re:[cs]ento(?:ll|y)o","centollo"],["nekora","necora"],["persebe","percebe"],["re:[ck]amaron","camaron"],["re:[ck]rusta[cs]eo","crustaceo"],["re:mari[sz][ck]o","marisco"],["srimp","shrimp"],["praun","prawn"],["lobstar","lobster"]
+    ],
+    excl: [
+      "re:(?:gambas?|langostinos?|camarones?|cangrejos?|bogavante|langosta|krill|galeras?|percebes?|surimi\\s+de\\s+cangrejo|krupuk)\\s+(?:[a-z]+\\s+){0,2}(?:vegan[oa]s?|vegetal(?:es)?|veggie|plant[\\s-]based|de\\s+(?:konjac|tofu|soja|seitan|setas|chocolate|cristal|zanahoria))",
+      "re:(?:kimchi|pad\\s+thai|tom\\s+yum|tom\\s+kha|laksa|nasi\\s+goreng|mie\\s+goreng|curry\\s+(?:rojo|verde))\\s+(?:[a-z]+\\s+){0,2}(?:vegetarian[oa]s?|vegan[oa]s?|de\\s+(?:tofu|setas|verduras))","re:sambal\\s+(?:oelek|ulek|de\\s+chile|badjak)","re:pinzas\\s+de\\s+cangrejo\\s+de\\s+chocolate"
+    ]
+  },
+  "MOLUSCOS": {
+    strong: [
+      "conchas finas","re:conchas?\\s+de\\s+peregrino","arroz negre","arros negre","ika","ikayaki","frutti di mare","shellfish",
+      "whelk","whelks","winkle","winkles","periwinkle","periwinkles","conch","geoduck","re:(?<!a la |fruits a )coque(?!s)","praire","praires","petoncle","petoncles","re:(?:coquilles?\\s+|noix\\s+de\\s+)?saint[\\s-]jacques","encornet","encornets","supions","pieuvre","bulot","bulots","bigorneau","bigorneaux","ormeau","ormeaux",
+      "vongola","fasolari","tartufi di mare","re:capp?[ae]sant[ae]","totano","totani","re:seppi[a-z]*","moscardini","polpi","polipo","lumaca","chiocciole","canestrelli","cannolicchi","datteri di mare","telline",
+      "re:[a-z]*muschel[a-z]*","re:auster[a-z]*","re:tintenfisch[a-z]*","kalmar","kalmare","oktopus","krake","kraken","re:(?!zimt|hefe|nuss|mohn|franz|schoko)[a-z]*schnecken?","re:weichtier[a-z]*",
+      "berbigao","berbigoes","caracois","buzio","buzios","conquilhas","escopinyes","ostres","navalles","vieires",
+      "kokkel","kokkels","venusschelp","venusschelpen","re:sint-?jakobsschelp[a-z]*","coquille","coquilles","pijlinktvis","zeekat","slak","slakken","wulk","wulken","schelpdieren","oestersaus",
+      "małż","omułki","omułek","ostrygi","ostryga","przegrzebki","przegrzebek","kalmary","mątwa","ośmiornica","ślimaki","ślimak","sos ostrygowy","owoce morza","meeresfruchte",
+      "musslor","mussla","blamusslor","ostron","blackfisk","kammusslor","sniglar","muslinger","blamuslinger","østers","blaeksprutte","snegle","simpukka","simpukat","sinisimpukka","osteri","osterit","mustekala","kampasimpukka","etana","etanat","kagylo","osztriga","tintahal","polip","csiga","mlzi","slavky","ustrice","chobotnice","olihen","sepie","sneci","hlemyzdi",
+      "моллюски","мидии","мидия","устрицы","устрица","гребешок","гребешки","кальмар","кальмары","каракатица","осьминог","улитки","улитка","устричный соус","μυδια","μυδι","στρειδια","στρειδι","χτενια","καλαμαρι","καλαμαρακια","σουπια","χταποδι","σαλιγκαρια","μαλακια","midye","istiridye","ahtapot","salyangoz","yumusakcalar",
+      "贝类","蛤蜊","青口","贻贝","扇贝","生蚝","牡蛎","鱿鱼","乌贼","墨鱼","章鱼","八爪鱼","蜗牛","鲍鱼","蚝油","貝類","あさり","アサリ","はまぐり","ホタテ","帆立","牡蠣","イカ","いか","タコ","たこ","軟体動物","エスカルゴ","조개","홍합","가리비","오징어","문어","낙지","달팽이","전복","연체동물","محار","بلح البحر","حبار","أخطبوط","كاليماري","حلزون","رخويات","muskuilu","txirla","olagarro","txipiroi","txibi","barraskilo"
+    ],
+    weak: ["tigres","linguine allo scoglio","spaghetti allo scoglio","paella marinera","fritto misto","fritto misto di mare","okonomiyaki"],
+    like: [
+      ["re:mejilloncit[o]","mejillon"],["re:chipironcit[o]","chipiron"],["re:calamarit[o]","calamar"],["re:calamarcit[o]","calamar"],["re:sepi(?:t|et)[ae]","sepia"],["re:vieirit[a]","vieira"],["re:zamburinit[a]","zamburina"],["re:caracolit[o]","caracol"],["re:ostrit[a]","ostra"],
+      ["re:me[jgx]i(?:ll|y|l)on(?:es)?","mejillon"],["re:al?me[jg]as?","almeja"],["re:[bv]er[bv]erechos?","berberecho"],["nabaja","navaja"],["hostra","ostra"],["re:vie[iy]?ras?","vieira"],["re:[sz]amburin(?:a|as|ha|has)","zamburina"],["re:[ck]alamar(?:e|es)?","calamar"],["re:txipiron","chipiron"],["sepiya","sepia"],["gibia","jibia"],["choko","choco"],["pupo","pulpo"],["pulpu","pulpo"],["re:[ck]ara[ck]ol(?:es)?","caracol"],["re:molus[ck]o[sz]?","molusco"],["musels","mussels"],["oister","oyster"],["skuid","squid"],["octupus","octopus"]
+    ],
+    excl: [
+      "re:navajas?\\s+(?:suiza|de\\s+afeitar|multiusos)","re:(?:tono|color|foto\\s+en)\\s+sepia","re:sepia\\s+\\(color\\)",
+      "re:(?:pulpo|calamares?|chipirones?|mejillones?|vieiras?|ostras?|almejas?|sepia|caracoles?|navajas?|tinta)\\s+(?:[a-z]+\\s+){0,2}(?:vegan[oa]s?|vegetal(?:es)?|veggie|plant[\\s-]based|de\\s+(?:tofu|setas|seitan|konjac|soja|berenjena|pasta|chocolate|hojaldre|calabacin|zanahoria))","re:(?:pasta|caracoles)\\s+en\\s+forma\\s+de\\s+caracol",
+      "re:salsa\\s+(?:vegetariana|vegana)\\s+de\\s+ostras?","re:salsa\\s+de\\s+(?:setas|champinones)\\s+(?:estilo|sabor)\\s+ostras?","re:salsa\\s+de\\s+ostras?\\s+(?:vegetarian[ao]|vegan[ao]|sin\\s+moluscos)","re:tinta\\s+de\\s+(?:calamar|sepia)\\s+vegan[ao]","re:okonomiyaki\\s+(?:vegetal|vegan[ao]|de\\s+col|de\\s+verduras)","re:arro[sz]\\s+negr[oe]\\s+(?:[a-z]+\\s+){0,3}(?:vegan[oa]|vegetal(?:es)?|veggie)"
+    ]
+  },
+  "FRUTOS CON CÁSCARA": {
+    strong: [
+      "frutos con cascara","espinacas a la catalana","bastela","kataifi","pan de cadiz","huesos de santo","tarta bakewell","bakewell tart","bakewell","cantuccini","arnadi","pastel de gloria","rosegons","ametllats","gianduiotti","gianduiotto","kinder bueno","croccante","bacio","baci perugina","baci","orgeat","fesenjan","satsivi","pralin","almon",
+      "pignoli","pignons","pignons de pin","dacquoise","tarte amandine","amandine","frutta secca","torrone","marzapane","re:(?!kokos|muskat|erd|ge|ross|zirbel|venus)[a-z]*nuss(?!frei)[a-z]*","pistazie","pinienkerne","krokant","studentenfutter","bienenstich","frankfurter kranz",
+      "re:castanha[\\s-]do[\\s-]para","pinhoes","marzipa","macapao","avellanes","torro","massapa","re:amandel[a-z]*","re:(?!kokos|pinda|aard|wal)[a-z]+no(?:ot|ten)(?:je|jes|pasta|mix)?","notenpasta","notenmix","marsepein","gevulde koek","gevulde speculaas","re:hazelno(?:ot|ten)[a-z]*",
+      "re:orzech[a-z]*","re:migda[lł][^\\s,.;()]*","pijnboompitten","nerkowce","marcepan","nugat",
+      "re:mandl(?:ar|er|ern|arna)","re:hasselno[a-z]*","hasselnødder","hasselnøtter","re:valno[a-z]*","valnødder","valnøtter","re:cashewno[a-z]*","cashewnødder","cashewnøtter","re:pistage[a-z]*","pistacienødder","pistasjnøtter","re:pinje(?:notter|kerner|kjerner)","notter","nødder","nøtter","marsipan","kransekake","mandelmassa",
+      "re:manteli[a-z]*","re:(?!maa)[a-z]*pahkin[a-z]*","re:pistaasi[a-z]*","pinjansiemenet","marsipaani","re:mandula[a-z]*","re:(?<!foldi)mogyoro(?!vaj)[a-z]*","kesudio","pisztacia","marcipan","mandle","re:or(?:ech|is[ek])[a-z]*","kesu","pistacie",
+      "re:миндал[а-я]*","фундук","re:орех[а-я]*","кешью","re:фисташк[а-я]*","пекан","макадамия","марципан","нуга","re:αμυγδαλ[α-ω]*","re:φουντουκ[α-ω]*","re:καρυδι[α-ω]*","κασιους","re:φιστικ[α-ω]*\\s+αιγινης","κουκουναρι","ξηροι καρποι","badem","fındık","findik","ceviz","re:antep\\s+f[iı]st[iı]g[iı]","fıstık","fistik","fıstıklı","fistikli","kaju","re:cam\\s+f[iı]st[iı]g[iı]","kuruyemis","لوز","بندق","re:جوز(?!\\s+الهند)","كاجو","فستق","صنوبر","مكسرات",
+      "杏仁","榛子","核桃","腰果","开心果","松子","坚果","夏威夷果","碧根果","巴旦木","果仁","アーモンド","ナッツ","くるみ","胡桃","カシューナッツ","ピスタチオ","ヘーゼルナッツ","マカダミア","松の実","아몬드","호두","캐슈넛","피스타치오","헤이즐넛","견과류","견과","잣","마카다미아","intxaur","intxaurrak","hurrak"
+    ],
+    weak: ["marquesas","re:marquesas\\s+de\\s+sonseca","re:florentin[oa]s","massaman","curry massaman","mix energetico","pan de higo","trail mix"],
+    like: [
+      ["re:almendrit[a]","almendra"],["re:avellanit[a]","avellana"],["re:nuec(?:ec)?it[a]","nuez"],["re:pistachit[o]","pistacho"],["re:anacardit[o]","anacardo"],["re:pinoncit[o]","pinon"],["re:turroncit[o]","turron"],["re:mazapancit[o]","mazapan"],
+      ["re:(?:almedra|almenda|alemndra|almendar)s?","almendra"],["re:a[bv]ellanas?","avellana"],["re:nue[sz]e[sz]","nuez"],["re:pista(?:x|cc|ch)i?os?","pistacho"],["re:(?:anakard|anarcad)os?","anacardo"],["re:pinyon(?:es)?","pinon"],["re:ma[sz]apan(?:es)?","mazapan"],["re:nut+el+a","nutella"],["re:no[cs]il+a","nocilla"],["re:pe[ck]an+as?","pecana"],["re:ha[sz]l?e?l?nuts?","hazelnut"],["re:wall?nuts?","walnut"],["re:cashew(?:nuts?)?","cashew"],["cashu","cashew"],["re:ba[kq]h?lav[ae]s?","baklava"]
+    ],
+    excl: ["re:verde\\s+pistacho","re:(?:color|tono)\\s+pistacho","re:marquesa\\s+de\\s+chocolate","ココナッツ","ピーナッツ","ピーナツ"]
+  },
+  "CACAHUETES": {
+    strong: [
+      "cacahuet","cacahues","re:gado[\\s-]gado","re:kare[\\s-]kare","re:reese'?s(?:\\s+pieces)?","reeses","mazapan de la rosa","palanqueta","palanquetas","re:encacahuatad[oa]s?","mafe","maafe","domoda","chikki","nutter butter","re:pb\\s*&\\s*j","pbj",
+      "monkey nuts","goober","goobers","goober peas","noccioline americane","noccioline","amendoins","pacoca","re:pe[\\s-]de[\\s-]moleque","re:pinda[a-z]*","satesaus","borrelnootjes","masło orzechowe","maslo orzechowe","orzeszki","re:jordnot[a-z]*","peanøtter","peanøtt","peanøttsmør","jordnødder","peanutbutter","re:maapahkin[a-z]*","re:foldimogyoro[a-z]*","mogyorovaj","re:arasid[a-z]*","burske orisky",
+      "re:арахис[а-я]*","re:αραπικ[α-ω]*\\s+φιστικ[α-ω]*","re:φυστικ[α-ω]*","re:yer\\s+f[iı]st[iı]g[iı]","fıstık ezmesi","fistik ezmesi","فول سوداني","re:زبدة\\s+(?:ال)?فول\\s+(?:ال)?سوداني","فستق سوداني","花生","ピーナッツ","ピーナツ","落花生","땅콩","re:kakahuete[a-z]*","re:lur[\\s-]intxaurra"
+    ],
+    weak: ["garapinada","garapinado","garrapinado"],
+    like: [
+      ["re:cacahuetit[o]","cacahuete"],["re:cacahuetill[o]","cacahuete"],["re:manicit[o]","mani"],
+      ["re:(?:cacahute|cacaguete|cacauete|cacahue|kakahuete|cacajuete|cacauhete|kakahuate)s?","cacahuete"],["re:sat(?:ai|aye|ey)","satay"],["re:(?:penaut|peanot|peenut|pinut)s?","peanut"],["re:(?:kungpao|kun\\s+pao|gongbao)","kung pao"],["re:pa[dt][\\s-]?th?ai","pad thai"],["masaman","massaman"],["conguito","conguitos"],["lacasito","lacasitos"],["re:snikers?","snickers"],["re:mym|m\\s+y\\s+m","m&m"]
+    ],
+    excl: ["erdnussfrei"]
+  },
+  "SOJA": {
+    strong: [
+      "tempe","nasu dengaku","ketjap","ketjap manis","tianmianjiang","douchi","re:salsa\\s+de\\s+judias\\s+negras(?:\\s+fermentadas)?","judias negras fermentadas","black bean sauce","fermented black beans","impossible burger","tofunesa","mapotofu","soje",
+      "textured vegetable protein","tvp","bean curd","beancurd","re:[a-z]*tofu(?!nesa)[a-z]*","tahoe","re:kie[lł]ki\\s+soi","re:soija[a-z]*","re:szoja[a-z]*","re:sojov[a-z]*",
+      "re:соев[а-я]*","соя","сои","тофу","мисо","темпе","эдамаме","re:σογια[α-ω]*","τοφου","صويا","توفو",
+      "大豆","黄豆","豆腐","酱油","醬油","生抽","老抽","豆浆","豆漿","毛豆","腐乳","豆豉","豆瓣酱","味噌","豆皮","腐竹","大豆油","大豆蛋白","纳豆","豆干","素鸡","油豆腐","臭豆腐","豆奶","醤油","しょうゆ","みそ","とうふ","納豆","なっとう","枝豆","えだまめ","豆乳","油揚げ","厚揚げ","湯葉","きな粉","黄粉","照り焼き","てりやき","ポン酢","大豆レシチン","テンペ","高野豆腐","がんもどき","콩","대두","두부","간장","된장","고추장","쌈장","청국장","두유","콩나물","유부","콩기름","템페","불고기","갈비"
+    ],
+    weak: ["tonkatsu","okonomiyaki","takoyaki"],
+    like: [
+      ["re:tofucit[o]","tofu"],["re:sojit[a]","soja"],["re:edamamit[o]","edamame"],
+      ["re:sojja|sollla|shoya","soja"],["tofoo","tofu"],["re:misso|mizo","miso"],["edamane","edamame"],["re:teri+ya?k+[iy]|teriyaqui|teriaki|teryaki","teriyaki"],["re:joisin|hoisine","hoisin"],["ponsu","ponzu"],["re:soyu|shoyo","shoyu"],["re:kik+oman","kikkoman"],["texturizada","texturizado"],["re:[gk]o(?:ch|tch)u(?:j|y|ch)ang?","gochujang"],["re:doen[jy]ang","doenjang"],["re:bulgo[gk](?:i|ui)","bulgogi"],["re:suki(?:ya|lla)k[iy]","sukiyaki"],["yakitory","yakitori"],["re:yaki[sz]o[bv]a","yakisoba"],["rramen","ramen"],["re:chow\\s*mien|chowmein","chow mein"],["re:chop\\s*suei|chopsuey","chop suey"],["yakiniku","salsa yakiniku"]
+    ],
+    excl: [
+      "re:(?<!de )soy\\s+(?:alergic[oa]s?|celiac[oa]s?|intolerante|vegetarian[oa]s?|vegan[oa]s?|diabetic[oa]s?|de|un|una|el|la|yo|muy|tu|su|mi|persona)","re:yo\\s+soy","sojafrei",
+      "re:chocolates?\\s+(?:[a-z]+\\s+){0,2}con\\s+lecitina\\s+de\\s+girasol","re:tofu\\s+de\\s+(?:garbanzos?|almendras?|canamo|sesamo|arroz)","re:(?:chickpea|burmese|almond)\\s+tofu"
+    ]
+  },
+  "APIO": {
+    strong: [
+      "re:[a-z]*sellerie(?!frei)[a-z]*","suppengrun","salsao","re:[a-z]*selderij[a-z]*","re:[a-z]*selderie[a-z]*","re:seler[a-z]*","re:[a-z]*selleri[a-z]*","re:zeller[a-z]*","celer","re:celerov[a-z]*","re:сельдере[а-я]*","re:σελιν[α-ω]*","re:kereviz[a-z]*","كرفس","芹菜","西芹","根芹","セロリ","セルリー","셀러리","샐러리"
+    ],
+    weak: ["sopa juliana","court bouillon","soffritto","gemusebruhe"],
+    like: [
+      ["re:apiecit[o]","apio"],["re:ap+[iy]o","apio"],["hapio","apio"],["re:[sc]el+[ae]r(?:y|ie|iy)","celery"],["sedanno","sedano"],["re:celeria[ck]o?","celeriac"],["re:apio[\\s-]?navo","apionabo"]
+    ],
+    excl: ["selleriefrei","re:fondos\\s+(?:de\\s+)?alcachofas?"]
+  },
+  "MOSTAZA": {
+    strong: [
+      "dijonaise","re:dijon[a-z]*","re:[a-z]*senf(?!frei)[a-z]*","re:mosterd[a-z]*","re:musztard[a-z]*","re:gorczyc[a-z]*","senap","re:senaps[a-z]*","sennep","re:senneps[a-z]*","re:sinap[a-z]*","re:mustar[a-z]*","re:horcic[a-z]*","re:горчи[а-я]*","re:μουσταρδ[α-ω]*","re:hardal[a-z]*","خردل","芥末","芥菜","マスタード","からし","辛子","がらし","머스타드","머스터드","겨자","ziape","ziapea"
+    ],
+    weak: ["pastrami","reuben","sandwich cubano","cuban sandwich","huevos endiablados","deviled eggs","huevos a la diabla","salsa diabla","sauce diable","bratwurst","weisswurst","potato salad","egg salad","ensalada alemana"],
+    like: [
+      ["re:mostazit[a]|mostacit[a]","mostaza"],["re:mo[sz]ta[szc]a?s?","mostaza"],["diyon","dijon"],["re:(?:mustad|mostard|mustardd|moutard|mutarde)s?","mustard"],["senaf","senf"],["re:(?:wasavi|guasabi|wasaby)","wasabi"],["re:remulade|remoulad","remoulade"],["re:pical+il+i","piccalilli"]
+    ],
+    excl: ["senffrei"]
+  },
+  "SÉSAMO": {
+    strong: [
+      "tahine","zatar","zahtar","til ke ladoo","tilkut","pasteli","jian dui","kuro goma","goma ae","gomae","salsa goma","sabich","re:ka'?ak","barazek","halawa","halawet","re:tahino[a-z]*","koulouri","prawn toast",
+      "re:(?:houmous|houmus|homus|hommus|humous|humuss|hummuss|jumus)","re:sezam[a-z]*","chałwa","chalwa","re:seesami[a-z]*","re:szezam[a-z]*","re:кунжут[а-я]*","тахини","хумус","халва","σουσαμι","σησαμι","ταχινι","χαλβας","παστελι","κουλουρι","susam","helva","سمسم","طحينة","طحينه","طحينية","زعتر","芝麻","麻油","胡麻","ごま","ゴマ","참깨","참기름","깨소금","흑임자"
+    ],
+    weak: ["tarator"],
+    like: [
+      ["re:sesamit[o]","sesamo"],["re:(?:sessamo|cesamo|sezamo|seasame|sesamun)s?","sesamo"],["re:ta[jh]in+i|thaini","tahini"],["re:(?:babaganush|baba ganuch|babaghanouj|baba ghanouj|baba ghanoush)","baba ganoush"],["re:an?jonjoli[en]?","ajonjoli"],["gomacio","gomasio"],["furikaque","furikake"],["re:(?:halua|jalva|chalva)","halva"]
+    ],
+    excl: ["sesamfrei"]
+  },
+  "SULFITOS": {
+    strong: [
+      "re:so\\s?2(?!\\d)","re:(?:blanco|rosado)\\s+de\\s+la\\s+casa","clericot","clerico","sulfiten","metabisulphite","bisulphite","rose wine","vin rose","port wine","porto","cider","hard cider","cidre","cremant","spumante","sottaceti","re:[a-z]*sottaceto","frutta essiccata","uvetta","uva passa","re:(?:albicocche|prugne|fichi)\\s+secch[ei]","capperi","re:dried\\s+(?:apricots?|cranberries|mango|figs?|fruits?|prunes|plums|cherries|raisins|dates)","raisins","prunes","re:sun[\\s-]?dried","re:pickled","gherkins","capers","maraschino cherries","glace cherries","candied fruit","crystallized ginger","crystallised ginger","fruits seches","re:abricots\\s+secs","raisins secs","pruneaux","cornichons","capres","beurre blanc",
+      "geschwefelt","re:(?!schwein)[a-z]*(?<!sch)wein(?!traube|berg|blatt)[a-z]*","sekt","re:[a-z]*essig[a-z]*","re:trocken(?:fruchte|obst)","rosinen","sultaninen","re:getrocknete\\s+[a-z]+","dorrobst","gewurzgurken","kapern","re:vinho[a-z]*","espumante","passas","re:(?:damascos|ameixas|figos|uvas)\\s+(?:secos|secas|passas)","re:vi\\s+(?:negre|blanc|rosat|dolc|ranci)","panses","orellanes",
+      "re:[a-z]*wijn[a-z]*","re:[a-z]*azijn[a-z]*","re:gedroogde\\s+[a-z]+","rozijnen","augurken","zilveruitjes","tafelzuur","wino","re:ocet[a-z]*","re:suszone\\s+[a-z]+","rodzynki","ogorki konserwowe","pikle",
+      "sulfiter","svaveldioxid","svoveldioksid","svovldioxid","rodvin","rott vin","vitt vin","rødvin","hvidvin","hvitvin","vinager","vineddik","eddik","balsamvinager","torkad frukt","tørret frugt","tørket frukt","russin","rosiner","torkade aprikoser","sulfiitti","sulfiitit","rikkidioksidi","re:[a-z]*viini[a-z]*","etikka","re:kuivatut\\s+[a-z]+","rusinat","re:szulfit[a-z]*","ken-dioxid","re:(?:voros|feher)bor","re:[a-z]*ecet","re:aszalt\\s+[a-z]+","mazsola","oxid siricity","siricitany","re:susene\\s+[a-z]+","rozinky",
+      "сульфиты","диоксид серы","вино","вина","re:уксус[а-я]*","сухофрукты","изюм","курага","чернослив","маринованные огурцы","θειωδη","διοξειδιο του θειου","re:κρασι[α-ω]*","ξυδι","ξιδι","βαλσαμικο","αποξηραμενα φρουτα","σταφιδες","τουρσι","re:sulfit(?!frei)[a-z]*","kukurt dioksit","sarap","sirke","re:[a-z]+\\s+sirkesi","kuru meyve","kuru üzüm","kuru uzum","kuru kayısı","kuru kayisi","turşu","tursu","كبريتيت","ثاني أكسيد الكبريت","نبيذ","خل","فواكه مجففة","زبيب","مخلل",
+      "亚硫酸盐","二氧化硫","葡萄酒","红酒","白葡萄酒","醋","果干","葡萄干","杏干","酸黄瓜","亜硫酸塩","二酸化硫黄","ワイン","酢","ビネガー","バルサミコ","ドライフルーツ","レーズン","干しぶどう","ピクルス","아황산염","이산화황","와인","식초","발사믹","건과일","건포도","피클","re:ardoa?","txakolina","ozpina"
+    ],
+    weak: ["espumoso","maridaje"],
+    like: [
+      ["re:vinit[o]|vinill[o]|vinete","vino"],["re:bino|vinno","vino"],["re:binagre|vinage","vinagre"],["re:binagreta|vinagrete","vinagreta"],["re:(?:sulfiots|sulfitoz|sufitos|sulphitos)","sulfito"],["re:dioxido\\s+de\\s+a[sz]ufre","dioxido de azufre"],["re:(?:champana|xampany|champany|txanpan)","champan"],["cavernet","cabernet"],["re:sauvinon|savignon","sauvignon"],["re:merlot?t?","merlot"],["re:chardon(?:e|a)y","chardonnay"],["tempranilo","tempranillo"],["rivera del duero","ribera del duero"],["berdejo","verdejo"],["godeyo","godello"],["re:garnatxa|grenache","garnacha"],["monastrel","monastrell"],["sirah","syrah"],["lambrusko","lambrusco"],["proseco","prosecco"],["bermut","vermut"],["re:xerez|sherry","jerez"],["pasitas","pasas"],["orejon","orejones"],["re:(?:escaveche|escabetxe|escabeix|escabechao)","escabeche"],["re:valsamico|balsamiko","balsamico"],["re:[ck]alimo(?:tx|ch)o","kalimotxo"]
+    ],
+    excl: ["re:px\\s*\\d+","re:\\d+\\s*px","sulfitfrei"]
+  },
+  "ALTRAMUCES": {
+    strong: [
+      "chochitos","cevichochos","cevichocho","tarwi","tauri","chocho andino","re:lupinus(?:\\s+albus|\\s+angustifolius|\\s+luteus)?","re:(?!lupinenfrei)[a-z]*lupin[a-z]*","llobi","llobins","re:[lł]ubin(?!a)[^\\s,.;()]*","re:lupiini[a-z]*","re:csillagfurt[a-z]*","vlci bob","re:люпин[а-я]*","re:λουπιν[α-ω]*","acı bakla","aci bakla","lupen","ترمس","羽扇豆","ルピナス","ルピン","루핀","루피니","re:eskuzuri[a]?"
+    ],
+    like: [
+      ["re:altramucit[o]","altramuz"],["re:a[lr]?tr?amu[sczx]+(?:e[sz]?)?s?","altramuz"],["re:tremo[szc]os","tremoco"]
+    ],
+    excl: ["lupinenfrei"]
+  }
+};
+// 3.18: aditivos, derivados técnicos de etiqueta y MARCAS que son el alérgeno o lo llevan en todas sus variantes
+// corrientes (strong) o en la mayoría (weak → PREGUNTA). Las recetas cambian: por eso casi todo va como duda.
+const AL_MORE_2 = {
+  "HUEVO": {
+    strong: ["apovitelina","eiern","re:hellmann'?s","ligeresa","re:mayonesa\\s+(?:calve|kraft|musa|ybarra)","alioli chovi","chovi alioli","flan chino mandarin","re:(?:magdalenas|madalenas|palmeras)\\s+dulcesol","yemas de santa teresa"],
+    weak: ["calve","pasta rana","giovanni rana","raviolis rana","tortellini rana","dhul","flan dhul","bollycao","donuts","donettes","tigreton","phoskitos","pantera rosa","madalenas","madalena"],
+    excl: ["re:albumina\\s+(?:de\\s+suero|vegetal|de\\s+patata|serica)","re:lisozima\\s+vegana"]
+  },
+  "LÁCTEO": {
+    strong: ["burgo de arias","caprice des dieux","president","babybel","mini babybel","boursin","galbani","el caserio","la vaca que rie","kiri","danone","actimel","danonino","yoplait","activia","vitalinea","puleva","central lechera asturiana","kaiku","leche pascual","batido pascual","yogur pascual","nestle extrafino","milkybar","twix","maltesers","smarties","tigreton","phoskitos","bollycao","pantera rosa","donettes","galletas principe","chips ahoy","dinosaurus","tosta rica","chiquilin","maria fontaneda","ritter sport","cadbury","re:hershey'?s?","magnum","cornetto","re:h[aä]agen[\\s-]?dazs","re:ben\\s*(?:&|and)\\s*jerry'?s","re:carte\\s+d'?or","frigopie","la lechera","oikos","cacaolat","re:kinder\\s+(?:bueno|sorpresa|chocolate|delice|maxi)"],
+    weak: ["pascual","lindt","donuts","oreo","digestive","fontaneda","frigo","kalise","tulipan","cornetto","nesquik","cola cao","colacao","crunch","lion","mars","alpro"]
+  },
+  "GLUTEN": {
+    strong: ["khorasan","grunkern","bimbo","panrico","oroweat","la bella easo","donettes","bollycao","pantera rosa","tigreton","phoskitos","galletas principe","chips ahoy","oreo","filipinos","dinosaurus","chiquilin","fontaneda","maria fontaneda","re:marb[uú](?:\\s+dorada)?","cuetara","artiach","artinata","twix","huesitos","kinder bueno","maltesers","yatekomo","maruchan","re:kellogg'?s","special k","frosties","choco krispies","chocapic","weetabix","re:all[\\s-]?bran","nestle fitness","smacks","miel pops","pasta gallo","macarrones gallo","barilla","de cecco","garofalo","la molisana","rummo","krissia","palitos krissia","kikkoman","ovaltine","ovomaltina","cola cao original","colacao original","yakisoba yatekomo","cup noodles","nissin"],
+    weak: ["silueta","gullon","lion","nissin","cheerios","corona","coronita","giovanni rana","pasta rana","buitoni","tarradellas","casa tarradellas","re:dr\\.?\\s*oetker","dr oetker","dr. oetker","oetker","la cocinera","maheso","findus","gallina blanca","avecrem","knorr","maggi","cola cao","colacao","nesquik","donuts","heura","quorn","garden gourmet","pringles","cheetos"],
+    excl: ["re:(?:estrella\\s+damm\\s+)?daura","re:(?:pan|galletas|pasta|harina|cerveza)\\s+sch[aä]r","re:sch[aä]r\\s+(?:sin\\s+gluten|gluten\\s+free)","re:(?:mahou|san\\s+miguel|estrella\\s+galicia|ambar|cruzcampo|alhambra)\\s+(?:sin\\s+gluten|gluten[\\s-]?free)"]
+  },
+  "SOJA": {
+    strong: ["vivesoy","yosoy soja","alpro soja","sojasun","sojade","natursoy","natur soy","taifun","re:mori[\\s-]?nu","morinu","salsa de soja kikkoman","salsa teriyaki kikkoman"],
+    weak: ["alpro","yosoy","vegetalia","provamel","yatekomo","cup noodles","nissin","maruchan","mars","twix","lion","maltesers","chocapic","garden gourmet","quorn","vegalia","soria natural"]
+  },
+  "PESCADO": {
+    strong: ["colageno marino","hondashi","krissia","palitos krissia","re:findus\\s+varitas|varitas\\s+findus","rodolfos","pescanova rodolfos","atun calvo","atun isabel","bonito ortiz","atun albo","atun cuca","atun campos","atun miau","rianxeira","frinsa","re:pay[\\s-]?pay","anchoas codesa","codesa","don bocarte","anchoas consorcio","sardinillas la brujula","squid brand","three crabs","tiparos","re:lea\\s*(?:&|and)\\s*perrins"],
+    weak: ["pescanova","red boat","findus","la sirena","lee kum kee"]
+  },
+  "CRUSTÁCEOS": { strong: ["gambas pescanova","langostinos pescanova","pescanova langostinos"], weak: ["quitosano","chitosan","pescanova","la sirena"], excl: ["re:(?:quitosano|chitosan)\\s+(?:fungico|vegetal|vegano|de\\s+hongos|de\\s+setas)"] },
+  "MOLUSCOS": { strong: ["perna canaliculus","lee kum kee"], excl: ["re:caracol(?:es)?\\s+de\\s+chocolate"] },
+  "SÉSAMO": { strong: ["re:til\\s+oil","tortas ines rosales","tahini al wadi"], weak: ["big mac","bigmac","whopper","regañas","regana"], excl: ["re:salsa\\s+big\\s+mac"] },
+  "SULFITOS": {
+    strong: ["re:hidrogenosulfitos?(?:\\s+de\\s+(?:sodio|potasio|calcio))?","so₂","metabisolfito","re:(?:natrium|kalium|calcium)(?:meta)?bisulfit[a-z]*","re:(?:natrium|kalium|calcium)sulfit[a-z]*",
+      "marques de riscal","marques de caceres","protos","vega sicilia","pingus","muga","ramon bilbao","campo viejo","vina pomal","vina albina","faustino","matarromera","emilio moro","pesquera","pago de carraovejas","abadia retuerta","sangre de toro","vina sol","gran vina sol","vina esmeralda","freixenet","codorniu","anna de codorniu","re:juv[eé]\\s+(?:y|&|i)\\s+camps","gramona","raventos","re:mo[eë]t(?:\\s*&\\s*chandon)?","veuve clicquot","dom perignon","bollinger","taittinger","cinzano","yzaguirre","vermut lacuesta","lacuesta","tio pepe","la guita","la ina","barbadillo","solear","osborne","alvear","el gaitero","sidra maeloc","maeloc","sidra trabanco","trabanco","martini rosso","martini bianco","vermut yzaguirre","vermut perucchi","perucchi"]
+  },
+  "CACAHUETES": { strong: ["skippy","jif","nutter butter","capitan mani","crema de cacahuete calve","whole earth peanut butter","cacahuetes facundo","facundo cacahuetes"] },
+  "FRUTOS CON CÁSCARA": { strong: ["el almendro","turron el almendro","turron el lobo","turron pico","re:la\\s+estepena","polvorones la muralla","mazapan santo tome","disaronno","nocino","pinonate","almendrina","almond breeze","alpro almendra","turron 1880"] },
+  "MOSTAZA": { strong: ["maille","mostaza maille","mostaza amora","grey poupon","re:colman'?s","re:french'?s","handlmaier","lowensenf","heinz mustard","mostaza heinz","piccalilli heinz"], weak: ["thomy"] },
+  "APIO": { weak: ["gallina blanca","knorr","maggi","bovril","bisto","oxo","cubitos oxo","v8","zumo de tomate v8","sopinstant","sopa de sobre","sopas de sobre","sopa instantanea","crema de sobre"] }
+};
+// 3.18: platos de cocinas del mundo tal y como aparecen en cartas españolas: lo que SUELE llevar la receta corriente
+// (weak → PREGUNTA) y lo que lleva por definición (strong).
+const AL_MORE_3 = {
+  "GLUTEN": {
+    strong: ["ebi fry","ebi furai","jajangmyeon","ramyeon","pajeon","hotteok","xiaolongbao","sfenj","koshari","fatteh","iskender","philly cheesesteak","lobster roll","po boy","po' boy","cinnamon roll","cinnamon rolls","pissaladiere","flammekueche","flammkuchen","schwarzwalder","schwarzwalder kirschtorte","langos","loukoumades","galaktoboureko","smorrebrod","kanelbullar","semla","semlor","panzanella","tortelloni","amatriciana","fritto misto","suppli","pappa al pomodoro","tramezzino","tramezzini","mozzarella in carrozza","torta della nonna","baci di dama","jalebi","caneles","canele","smørrebrød"],
+    weak: ["agedashi tofu","korean fried chicken","dakgangjeong","pancit","kofta","kofte","bangers and mash","full english breakfast","english breakfast","full english","sunday roast","gumbo","poutine","peanut butter and jelly","saganaki","taramasalata","avgolemono","zurek","parmigiana","parmigiana di melanzane","berenjenas a la parmesana","puttanesca","chicken 65","murtabak"]
+  },
+  "HUEVO": {
+    strong: ["chawanmushi","murtabak","caneles","canele","avgolemono","mozzarella in carrozza","torta della nonna","galaktoboureko"],
+    excl: ["re:tofu\\s+revuelto","re:revuelto\\s+de\\s+tofu","re:tortilla\\s+(?:vegana|de\\s+garbanzos?|de\\s+harina\\s+de\\s+garbanzo)"],
+    weak: ["ebi fry","ebi furai","sukiyaki","pajeon","full english breakfast","english breakfast","full english","gado gado","gado-gado","arroz chaufa","pan de queso","pao de queijo","corn dog","crab cakes","crab cake","donut","donuts","cinnamon roll","chicken 65","schwarzwalder","loukoumades","tortelloni"]
+  },
+  "SOJA": {
+    strong: ["unagi","kabayaki","jajangmyeon","adobo filipino","arroz chaufa","sundubu jjigae","sundubu","doenjang jjigae"],
+    weak: ["katsu curry","shabu shabu","shabu-shabu","nabe","chawanmushi","kimchi jjigae","korean fried chicken","pollo frito coreano","dakgangjeong","samgyeopsal","bossam","ramyeon","mandu","banchan","dan dan noodles","hot pot","xiaolongbao","pancit","mole poblano","hotteok","pajeon"]
+  },
+  "LÁCTEO": {
+    excl: ["re:chocolate\\s+con\\s+(?:leche|bebida)\\s+(?:de\\s+)?(?:avena|soja|almendras?|coco|arroz|anacardos?)","re:(?:cafe|capuchino|cappuccino|latte|cortado|chai|matcha)\\s+(?:[a-z]+\\s+){0,2}con\\s+(?:leche|bebida)\\s+(?:de\\s+)?(?:avena|soja|almendras?|coco|arroz|anacardos?)"],
+    strong: ["bingsu","barfi","mansaf","iskender","philly cheesesteak","poutine","caneles","canele","kouign amann","sauce hollandaise","salsa holandesa","flammekueche","flammkuchen","tarte flambee","horiatiki","semla","semlor","paprikash","chicken paprikash","sfogliatella","cassata","torta della nonna","focaccia di recco","frico","galaktoboureko","langos"],
+    weak: ["rogan josh","jalebi","chai","masala chai","mezze","fatteh","shish taouk","pide","borek","burrito","burritos","chilaquiles","pupusas","pupusa","bangers and mash","buffalo wings","alitas buffalo","waffles","waffle","bagel con salmon","cinnamon roll","escargots","tarte tatin","gyros","albondigas suecas","kanelbullar","baci di dama","baccala alla vicentina","loukoumades"]
+  },
+  "FRUTOS CON CÁSCARA": {
+    strong: ["torta della nonna","semla","semlor"],
+    weak: ["tajine de cordero con ciruelas","tajin de cordero con ciruelas","briouat","briouats","maqluba","barfi","cassata"]
+  },
+  "CACAHUETES": { weak: ["bhel puri"] },
+  "CRUSTÁCEOS": { strong: ["acaraje"], weak: ["som tam","som tum","mie goreng","rollitos vietnamitas","bun bo hue","linguine allo scoglio"] },
+  "PESCADO": { strong: ["acqua pazza","all'acqua pazza"], weak: ["bun bo hue","larb","sinigang"] },
+  "SÉSAMO": { weak: ["manakish","manakish de za'atar","mezze"] },
+  "SULFITOS": { strong: ["sauerbraten","zabaione","zabaglione"], weak: ["moules marinieres","tartiflette","pollo alla cacciatora","cacciatora"] }
+};
+// 3.18: cartas de España en catalán, valenciano, euskera y gallego (formas declinadas y plurales incluidas)
+const AL_MORE_4 = {
+  "PESCADO": { strong: ["arros a banda","arros del senyoret","re:truita\\s+de\\s+riu","re:bakailao[a-z]*","re:legatz[a-z]*","re:hegaluze[a-z]*","re:izokin[a-z]*","sardinak","re:bokart[a-z]*","xurelo","xurelos","robaliza","bacallau","pixin","pixins","chopa","chopas","rollo de bonito"] },
+  "CRUSTÁCEOS": { strong: ["arros del senyoret","re:ganb[a-z]*","centola","centolo","centolas","centolos","lumbrigante","lumbrigantes","andaricas","andarica"] },
+  "MOLUSCOS": { strong: ["caragols","caragol","clotxines","clotxina","re:txipiroi[a-z]*","re:muskuilu[a-z]*","re:txirl[a-z]*","re:olagarro[a-z]*","re:txibi[a-z]*","polbo","ameixas","ameixa","croques","luras","lura","amasueles","amasuela"], excl: ["re:ameixas?\\s+(?:secas?|pretas?|em\\s+calda|vermelhas?|amarelas?)","re:(?:sumo|compota|doce|tarte|bolo|geleia)\\s+de\\s+ameixas?"] },
+  "HUEVO": { strong: ["bunyols","bunyol","re:arrautz[a-z]*","bacalao dorado","bacalhau a bras","bacalao a bras","tostada de pamplona","tostadas de pamplona","canutillos de bilbao","canutillo de bilbao","torta de santiago","bica","larpeira","melindres","cachopin","cachopines"], weak: ["truita","carolinas","rosca de pascua","roscas de pascua","huesos de santo","rollo de bonito"] },
+  "LÁCTEO": { strong: ["recuit","recuit de drap","esnea","esne","mamia","re:queixo[a-z]*","requeixo","tostada de pamplona","canutillos de bilbao","bica","larpeira","cachopin","cachopines"], weak: ["brandada","brandada de bacallà","brandada de bacalao","gateau basque","brazo de gitano"], excl: ["re:(?:soja|soia|olo|arroz|almendra|koko|kokos|oloa)\\s+esnea?"] },
+  "GLUTEN": { strong: ["bunyols","bunyol","torrada","torrades","entrepa","entrepans","coques","ogi","ogia","re:ogitarteko[a-z]*","canutillos de bilbao","bica","larpeira","melindres","cachopin","cachopines","tostada de pamplona"], weak: ["escudella","pintxos","carolinas"] },
+  "FRUTOS CON CÁSCARA": { strong: ["torrons","almendrak","abelas","abela","torta de santiago"] },
+  "SULFITOS": { strong: ["sagardoa","sagardo","sukalki"] }
+};
+// 3.18: postres, bollería y dulces regionales de las cartas españolas
+const AL_MORE_5 = {
+  "HUEVO": {
+    strong: ["bartolillo","bartolillos","flores de carnaval","flor de carnaval","princesitas","princesita","tortas de alcazar","rollos de anis","rollo de anis"],
+    weak: ["re:(?:de|rellen[oa]s?\\s+de)\\s+crema(?!\\s+(?:de\\s+)?(?:cacao|avellanas?|chocolate|cacahuete|calabaza|verduras|calabacin|setas|champinones|marisco|esparragos|puerros?|zanahoria|guisantes|balsamico|balsamica|coco|orujo|whisky|cafe\\s+irlandes))","bollo de leche","bollos de leche","berlina","berlinas","pepito de crema","pepitos de crema","pepito de chocolate","pepito de nata","medianoche","medianoches","canas de crema","canas rellenas","cana de crema","cana rellena","roscos fritos","roscos de anis","rosco de anis","marquesas","polkas","bollos de mantequilla","bollo de mantequilla","amarguillos","almendrados","mostachones","mostachon","coquitos","bolas de coco","bolitas de coco","canutillos","canutillo","gato mallorquin","gato de almendra"]
+  },
+  "LÁCTEO": {
+    strong: ["bartolillo","bartolillos","cafe vienes"],
+    weak: ["re:(?:de|rellen[oa]s?\\s+de)\\s+crema(?!\\s+(?:de\\s+)?(?:cacao|avellanas?|chocolate|cacahuete|calabaza|verduras|calabacin|setas|champinones|marisco|esparragos|puerros?|zanahoria|guisantes|balsamico|balsamica|coco|orujo|whisky|cafe\\s+irlandes))","re:caracolas?\\s+de\\s+(?:canela|hojaldre|pasas|crema|chocolate)","berlina","berlinas","bollo suizo","bollos suizos","suizo","suizos","pepito de crema","pepito de chocolate","pepito de nata","medianoche","medianoches","canas de crema","canas rellenas","cana de crema","cana rellena","canutillos","canutillo","lemon pie","lionesas","lionesa","petit choux","petits choux","profiteroles","polkas"]
+  },
+  "GLUTEN": {
+    strong: ["bartolillo","bartolillos","tortas de la mancha","torta de la mancha","flores de carnaval","flor de carnaval","hojaldrinas","hojaldrina","tortas de alcazar","rollos de anis","rollo de anis","lazos de jijona","medianoche","medianoches","truchas de navidad","truchas de batata","trucha de batata"],
+    weak: ["canutillos","canutillo","cortadillos","cortadillo"]
+  },
+  "FRUTOS CON CÁSCARA": {
+    strong: ["princesitas","princesita","catanies","catanias","catania","gato mallorquin","gato de almendra","re:gat[oó](?=\\s+(?:mallorqui|d'ametlla|de\\s+almendra))"],
+    weak: ["rosquillas de san isidro","tarta opera","opera"]
+  },
+  "PESCADO": { excl: ["re:truchas?\\s+de\\s+(?:batata|navidad|boniato|cabello\\s+de\\s+angel|chocolate)"] }
+};
+// 3.18: cocinas de las comunidades inmigrantes más numerosas en España (rumana y búlgara, magrebí y senegalesa,
+// pakistaní y bangladesí, ucraniana, polaca y rusa, filipina, portuguesa)
+const AL_MORE_6 = {
+  "GLUTEN": {
+    strong: ["ciorba de perisoare","papanasi","cozonac","placinta","covrigi","covrig","paine","pasca","coliva","gogosi","clatite","snitel","banitsa","mekitsi","tikvenik","kozunak","bastilla","rfissa","baghrir","harcha","khobz","batbout","sellou","sfouf","fekkas","mhancha","chakhchoukha","chorba frik","makroud","makrout","baklawa","zlabia","fataya","fatayas","ndambe","puff puff","chin chin","haleem","papri chaat","sooji halwa","kulcha","chole bhature","bhature","fuchka","singara","luchi","porota","shemai","varenyky","syrniki","sirniki","oladi","kotleta po-kyivsky","paska","kulich","medovik","sushki","pryaniki","kotlet schabowy","schabowy","placki ziemniaczane","sernik","makowiec","paczki","szarlotka","chalka","chałka","zapiekanka","pirozhki","piroshki","lumpiang shanghai","ensaymada","pandesal","hopia","pasteis de bacalhau","pataniscas","francesinha","bifana","alheira","pasteis de belem","pao de lo","queijadas","queijada","travesseiros de sintra","salame de chocolate","bolas de berlim","malassadas","pao alentejano","sagres","super bock"],
+    weak: ["ghriba","chorba","nihari","chiftele","kyufte","deruny","draniki","kotlety","kotleti","napoleon","tort napoleon","flaki","placki","turon","prego","prego no pao","seekh kebab"]
+  },
+  "HUEVO": {
+    strong: ["salata de icre","icre","papanasi","cozonac","pasca","gogosi","clatite","banitsa","mekitsi","kozunak","bastilla","baghrir","chin chin","varenyky","syrniki","sirniki","oladi","olivier","ensalada olivier","salat olivye","shuba","seledka pod shuboy","kotleta po-kyivsky","paska","medovik","ptichye moloko","zefir","kotlet schabowy","schabowy","sernik","makowiec","paczki","szarlotka","ptasie mleczko","chalka","chałka","pirozhki","piroshki","tapsilog","longsilog","bibingka","ensaymada","pasteis de bacalhau","pataniscas","pasteis de belem","pao de lo","leite creme","toucinho do ceu","travesseiros de sintra","salame de chocolate","bolas de berlim","malassadas"],
+    weak: ["ciorba de burta","ciorba de perisoare","vareniki","salata de vinete","tochitura","drob","drob de miel","chiftele","snitel","musaca","salata de boeuf","kyufte","tajin de kefta","chapli kebab","shami kebab","deruny","draniki","kotlety","kotleti","napoleon","tort napoleon","pastila","placki","sisig","bacalhau a gomes de sa","bacalhau gomes de sa"]
+  },
+  "LÁCTEO": {
+    strong: ["mamaliga","mamaliga cu branza","papanasi","cozonac","placinta","branza","telemea","cascaval","smantana","pasca","clatite","bulz","urda","lapte","kiselo mlyako","sirene","kashkaval","banitsa","shopska","shopska salata","mekitsi","kozunak","harcha","thiakry","thiakri","dahi bhalla","dahi vada","gajar ka halwa","falooda","doodh patti","kulcha","bhature","murgh makhani","bhapa doi","mishti doi","rasgulla","sandesh","borhani","shemai","firni","sheer khurma","syrniki","sirniki","oladi","kotleta po-kyivsky","tvorog","ryazhenka","paska","kulich","medovik","ptichye moloko","oscypek","sernik","paczki","ptasie mleczko","krowki","zapiekanka","halo-halo","halo halo","ube halaya","bibingka","ensaymada","mais con yelo","bacalhau com natas","pasteis de belem","serradura","bolas de berlim","galao","meia de leite","tosta mista","francesinha"],
+    weak: ["ciorba de burta","musaca","tarator","chaat","samosa chaat","papri chaat","handi","halwa","sooji halwa","halwa puri","tikka","napoleon","tort napoleon","okroshka","champorado","buko pie","queijadas","queijada"]
+  },
+  "PESCADO": { strong: ["salata de icre","icre","peste","thieboudienne","thiebou dienne","ceebu jen","shuba","seledka pod shuboy","ukha","shorshe ilish","ilish","hilsa","machher jhol","maach","patis","bagoong","kinilaw","daing","tuyo","bangus","tinapa","dilis","pataniscas"], weak: ["pastels","garba","pancit palabok","palabok","pinakbet"] },
+  "CRUSTÁCEOS": { strong: ["bagoong","hipon","alimango"], weak: ["kare-kare","kare kare","pancit palabok","palabok","bicol express","laing","pinakbet","ndole","cataplana"] },
+  "MOLUSCOS": { strong: ["pusit","tahong","halaan","carne de porco a alentejana","porco a alentejana"], weak: ["cataplana"] },
+  "SOJA": { strong: ["chicken adobo","pork adobo","taho","lumpiang shanghai"] },
+  "FRUTOS CON CÁSCARA": { strong: ["cozonac","coliva","nuca","nuci","alune","migdale","kozunak","tikvenik","sellou","sfouf","kaab el ghzal","cuernos de gacela","fekkas","mhancha","baklawa","falooda","firni","sheer khurma","makowiec","toucinho do ceu","travesseiros de sintra","bastilla","gajar ka halwa"], weak: ["ghriba","makroud","makrout","shahi paneer","murgh makhani","zarda","bolo rei"], excl: ["re:halva\\s+de\\s+girasol","re:sunflower\\s+halva"] },
+  "CACAHUETES": { strong: ["arahide","suya"], weak: ["ndole","kare-kare","kare kare"] },
+  "SÉSAMO": { strong: ["sellou"] },
+  "MOSTAZA": { strong: ["mustar","shorshe ilish","shorshe"], weak: ["yassa","yassa poulet","poulet yassa","dibi","achar","pickle","jhal muri"] },
+  "APIO": { strong: ["telina"] },
+  "SULFITOS": { strong: ["vin rosu","vin alb"], weak: ["vinegret","ameijoas a bulhao pato","bulhao pato"] }
+};
+const mergeMore = MORE => Object.keys(MORE).forEach(al => {
+  const m = MORE[al], r = AL_RULES[al];
+  if (m.strong) r.strong = r.strong.concat(m.strong);
+  if (m.weak) r.weak = (r.weak || []).concat(m.weak);
+  if (m.excl) r.excl = (r.excl || []).concat(m.excl);
+  const has = (list, b) => (list || []).some(w => !/^re:/.test(w) && normText(w) === b);
+  (m.like || []).forEach(([k, base]) => {
+    const b = normText(base);
+    if (!has(r.strong, b) && has(r.weak, b)) r.weak.push(k); else r.strong.push(k);
+    if (DENIABLE[al] && has(DENIABLE[al], b)) DENIABLE[al].push(k);
+  });
+});
+mergeMore(AL_MORE); mergeMore(AL_MORE_2); mergeMore(AL_MORE_3); mergeMore(AL_MORE_4); mergeMore(AL_MORE_5); mergeMore(AL_MORE_6);
 Object.keys(AL_RULES).forEach(al => {
   const r = AL_RULES[al];
   r.strongRe = kwTest(r.strong);
@@ -2614,7 +3004,7 @@ const FREE_WORDS = {
 };
 // 3.9.1: la traza termina donde el texto vuelve a hablar de lo que SÍ lleva el plato
 // («puede contener trazas de pescado y lleva harina de trigo»: el trigo es ingrediente, no traza)
-const TRACE_END_RE = /(?:^|[^a-z0-9])(?:contiene|contienen|lleva|llevan|incluye|incluyen|elaborad[oa] con|preparad[oa] con|hech[oa] con|contains|includes|contient|con ingredientes?)(?=[^a-z0-9]|$)/;
+const TRACE_END_RE = /(?:^|[^a-z0-9])(?<!que |which |that |die |qui )(?:contiene|contienen|lleva|llevan|incluye|incluyen|elaborad[oa] con|preparad[oa] con|hech[oa] con|contains|includes|contient|con ingredientes?)(?=[^a-z0-9]|$)/;
 // «sin gluten salvo el pan»: lo que viene tras la excepción SÍ está en el plato
 const EXCEPTION_RE = /(?:^|[^a-z0-9])(?:salvo|excepto|exceptuando|a excepcion de|con excepcion de|except for|except|apart from|ausser)\s+([^.;\n()]*)/g;
 // 3.9.4: «sin X» que es una OPCIÓN no quita X del plato. «Pan (opción sin gluten disponible)», «con o sin queso»,
@@ -2691,6 +3081,9 @@ function hitException(al, r, exc, strongOnly) {
 // («bocadillo», «tarta»). Sirve para saber si un componente quitable explica el nombre del plato.
 const VEGAN_RE = /(^|[^a-z0-9])(?!no\s)(?:vegan[oa]s?|vegan|plant[\s-]based|100\s*%\s*vegetal)(?=[^a-z0-9]|$)/;
 const VEGAN_FREE = new Set(["HUEVO", "LÁCTEO", "PESCADO", "CRUSTÁCEOS", "MOLUSCOS"]);
+// 3.18: declaraciones del plato que se creen en las dietas
+const VEGETARIAN_RE = /(^|[^a-z0-9])(?!no\s)(?:(?:ovo|lacto|ovolacto)?[\s-]?vegetarian[oa]s?|veggie|vegetarian|vegetariens?|vegetarisch)(?=[^a-z0-9]|$)/;
+const NO_PICANTE_RE = /(?:^|[^a-z0-9])(?:sin\s+picante|no\s+picantes?|nada\s+picante|no\s+pica|sin\s+picar|not\s+spicy|no\s+spicy|non\s+spicy|mild|suave|sin\s+(?:guindilla|cayena|chile|aji)|libre\s+de\s+picante|0\s*%\s*picante|nicht\s+scharf|non\s+piccante|pas\s+(?:epice|piquant))(?=[^a-z0-9]|$)/;
 function detectAllergens(raw, ctx, strongOnly) {
   const full = neutralizeOptional(" " + normText(raw) + " ");
   const ctxFull = ctx ? neutralizeOptional(" " + normText(ctx) + " ") : "";
@@ -2772,6 +3165,83 @@ const DIET_RULES = {
     excl: ["re:(?:origen|producto|hecho|elaborado|fabricado|cosecha|vino)\\s*:?\\s*(?:de\\s+|en\\s+)?chile", "re:piment\\s+doux", "re:aji\\s+dulce"]
   }
 };
+
+// AMPLIACIÓN 3.18 · Embarazo: crudos y poco hechos, curados, lácteos sin pasteurizar y quesos blandos de
+// moho o azules, patés y vísceras, pescados grandes (mercurio), brotes crudos y bebidas con alcohol
+// (recomendaciones de AESAN y de las guías de las sociedades de ginecología). Lo cocinado o pasteurizado
+// se excluye expresamente («chorizo a la sidra», «brie al horno», «pollo al vino», «cerveza sin alcohol»).
+const DIET_MORE = {
+  // 3.18 · Sin cerdo: cortes, embutidos y platos del mundo que son cerdo aunque no lo digan
+  CERDO: {
+    kw: ["costillar","lechon","lechona","lechon asado","cerdito","cerditos","schweinebraten","schweinshaxe","schweinefilet","hot dog","hot dogs","perrito caliente","perritos calientes","ribs","baby back ribs","spare ribs","katsudon","samgyeopsal","bossam","jajangmyeon","sisig","rillettes","jambon","jambon beurre","choucroute garnie","choucroute","saucisson","andouillette","boudin","boudin noir","black pudding","english breakfast","full english breakfast","full english","bangers and mash","bangers","sausage roll","gricia","nduja","cotechino","zampone","salsiccia","wurst","bratwurst","weisswurst","leberkase","kassler","eisbein","careta","castaneta","magro","magro con tomate","cordon bleu","pincho moruno","pinchos morunos","mixto","sandwich mixto","bikini","sacramentos","alubias con sacramentos","mortadella","guanciale","lardons","pulled pork","pork","pork belly","pork ribs","pork chop","pork chops","porchetta","prosciutto","jamon de bellota","paleta iberica","paletilla iberica","lacon","lacon con grelos","costillas bbq","costillas a la barbacoa","costillas barbacoa","costillas asadas","costillas al horno","costillas de cerdo"],
+    excl: ["re:(?:mortadela|salami|pepperoni|jamon|pulled\\s+pork|carnitas|cochinita|lomo|chorizo|salchichas?|bacon|beicon|panceta|lacon|chicharrones?|lechona?|costillar|costillas?|ribs|magro|pincho\\s+moruno|pinchos\\s+morunos|hot\\s+dogs?|perritos?\\s+calientes?|wurst|bratwurst|saucisson|rillettes|cordon\\s+bleu)\\s+(?:[a-z]+\\s+){0,2}(?:de\\s+)?(?:pollo|pavo|pato|ternera|vacuno|buey|cordero|cabrito|cabra|cerdo\\s+vegano|vegan[oa]s?|vegetal(?:es)?|veggie|vegetarian[oa]s?|de\\s+jackfruit|de\\s+yaca|de\\s+setas|de\\s+soja|de\\s+seitan|de\\s+tofu|de\\s+heura|de\\s+lentejas|de\\s+garbanzos|de\\s+pescado|de\\s+atun|de\\s+salmon|de\\s+calamar)",
+           "re:(?:salmorejo|migas|menestra|cocido|escudella|patatas\\s+revolconas|ensaimada|arroz\\s+al\\s+horno|olleta|trinxat|mantecados?|polvoron(?:es)?|croque\\s+monsieur|tartiflette|raclette|mapo\\s+tofu|huevos\\s+a\\s+la\\s+flamenca|callos|fabada|lentejas|judiones|garbanzos|alubias|arroz|pizza|tortilla|revuelto|huevos\\s+rotos|bocadillo|bocata|sandwich|pasta|macarrones|espaguetis|risotto|quiche|croquetas?|empanada)\\s+(?:[a-z]+\\s+){0,3}(?:sin\\s+(?:jamon|chorizo|carne|panceta|bacon|beicon|tocino|cerdo|torreznos|embutido|sacramentos|costilla|magro|lacon)|vegetarian[oa]s?|vegan[oa]s?|veggie)"]
+  },
+  // 3.18 · Vegetariana: cortes, platos del mundo, casquería y marcas de comida rápida que son carne o pescado
+  NO_VEGETARIANO: {
+    kw: ["caldo de huesos","bone broth","ramen","tonkotsu","galbi","samgyeopsal","bossam","gyudon","oyakodon","katsudon","sundubu jjigae","rendang","adobo filipino","lumpia","rogan josh","shish taouk","kofta","kofte","kafta","iskender","mansaf","maqluba","birria","sancocho","bangers and mash","bangers","sunday roast","cornish pasty","philly cheesesteak","cheesesteak","buffalo wings","choucroute garnie","sauerbraten","pastitsio","bollito misto","toro","dan dan noodles","nem","nems","nabe","sukiyaki","shabu shabu","chawanmushi","oxtail","pepitoria","caza","civet","salmis","wagyu","angus","black angus","kobe","t-bone","tomahawk","ribeye","rib eye","sirloin","brisket","pastrami","roastbeef","roast beef","bresaola","charqui","tasajo","tortilla paisana","huevos benedict","eggs benedict","huevos benedictinos","merguez","sucuk","pastirma","pastırma","manti","mantı","kuzu tandir","kuzu tandır","hunkar begendi","musakka","kavurma","cig kofte","kokorec","iskembe","paca","tripe","mondongo","pancita","chinchulines","achuras","entrana","matambre","kfc","mcnuggets","big mac","whopper","mcpollo","mcchicken","perrito","perritos","weisswurst","leberwurst","blutwurst","sulze","aspic","ancas de rana","frog legs","cuisses de grenouille","ramyeon","jajangmyeon","sisig","mcrib","mcroyal","bacon","beicon","wurst","bratwurst","saucisson","cotechino","salsiccia","salami","pepperoni","mortadella","prosciutto","guanciale","lardons","pulled pork","pork","ribs","hot dog","hot dogs","jambon","rillettes","andouillette","boudin","black pudding","scotch egg","sausage roll","pork pie","gricia","nduja","zampone","leberkase","kassler","eisbein","schweinshaxe","schweinebraten","cordon bleu","pincho moruno","pinchos morunos","costillar","lechon","lechona","careta","magro","sacramentos","mixto","sandwich mixto","bikini"],
+    excl: ["re:(?:pimientos?|verduras?|patatas?|calabaza|boniatos?|berenjenas?|cebollas?|tomates?|castanas|manzanas?|pina|platanos?|coliflor|brocoli|esparragos|alcachofas|setas|champinones|puerros?|zanahorias?|pan|queso|tofu|seitan)\\s+(?:[a-z]+\\s+){0,2}asad[oa]s?",
+           "re:beyond\\s+(?:burger|meat|sausage|beef|chicken)","re:(?:bistec|filete|filetes|escalope|escalopes|milanesa|milanesas|solomillo|chuleta|chuletas|steak|hamburguesa|hamburguesas|albondigas?|nuggets?|salchichas?|carne|kebab|doner|durum|shawarma|gyros|bacon|beicon|jamon|chorizo|pulled\\s+pork|ribs|costillas?|pepperoni|salami|mortadela|pastrami)\\s+(?:[a-z]+\\s+){0,2}(?:de\\s+)?(?:tofu|seitan|soja|heura|berenjena|setas|champinones|coliflor|calabaza|lentejas|garbanzos|quinoa|verduras?|jackfruit|yaca|vegan[oa]s?|vegetal(?:es)?|veggie|vegetarian[oa]s?)",
+           "re:consome\\s+(?:de\\s+)?(?:verduras?|vegetal|vegetariano|vegano)","re:arroz\\s+frito\\s+(?:con\\s+|de\\s+)?(?:verduras?|vegetariano|vegano|tres\\s+delicias\\s+vegetariano)","re:enchiladas?\\s+de\\s+(?:queso|frijoles|verduras?|calabaza|espinacas)",
+           "re:(?:kebab|doner|durum|shawarma|gyros|ramen|pho|bibimbap|pad\\s+thai|curry|mapo\\s+tofu|moussaka|musaka|croque\\s+monsieur|tartiflette|lasana|canelones|paella|arroz|fideua|risotto|pizza|quiche|empanada|croquetas?|sopa|caldo|fondo|consome|chili|tacos?|burritos?|quesadillas?|nachos|pupusas?|arepas?|tamal(?:es)?|dumplings?|gyozas?|bao|wok|salteado|noodles|yakisoba|udon|poke|sushi|makis?|ensalada|bocadillo|sandwich|hamburguesa|burger|nuggets|salchichas?|chorizo|jamon|bacon|pate|foie|caviar|gelatina)\\s+(?:[a-z]+\\s+){0,3}(?:vegetarian[oa]s?|vegan[oa]s?|veggie|vegetal(?:es)?|de\\s+(?:verduras?|tofu|setas|champinones|queso|falafel|frijoles|lentejas|garbanzos|calabaza|espinacas|berenjena|aguacate|frutas?))",
+           "re:(?:salmorejo|migas|menestra|cocido|escudella|patatas\\s+revolconas|ensaimada|arroz\\s+al\\s+horno|olleta|trinxat|mantecados?|polvoron(?:es)?|croque\\s+monsieur|tartiflette|mapo\\s+tofu|huevos\\s+a\\s+la\\s+flamenca|callos|fabada|lentejas|judiones|garbanzos|alubias|arroz|pizza|tortilla|revuelto|huevos\\s+rotos|bocadillo|bocata|sandwich|pasta|macarrones|espaguetis|risotto|quiche|croquetas?|empanada|ensalada|sopa|caldo|crema)\\s+(?:[a-z]+\\s+){0,3}sin\\s+(?:jamon|chorizo|carne|panceta|bacon|beicon|tocino|cerdo|torreznos|embutido|sacramentos|costilla|magro|lacon|pollo|atun|anchoas|gambas|marisco|pescado)",
+           "re:(?:toro|toros?)\\s+(?:de\\s+)?(?:lidia|osborne|bravo)","re:(?:pancita|panza)\\s+de\\s+(?:cerdo|ternera)?","re:jamon\\s+(?:de\\s+)?(?:pavo|pollo)\\s+vegano","re:(?:pasta|raviolis?|tortellini|gnocchi|noquis)\\s+rana","re:giovanni\\s+rana","re:hot\\s+(?:cakes?|chocolate|pot|sauce)","re:perritos?\\s+(?:de\\s+)?(?:tofu|vegan[oa]s?|vegetal(?:es)?|veggie)"]
+  },
+  // 3.18 · Vegana: productos de origen animal que faltaban
+  NO_VEGANO: {
+    kw: ["polen","galleta","galletas","hotteok","tranchetes","huesos de santo","trufas de chocolate","trufa de chocolate","marquesas","amarguillos","almendrados","yema","yemas","yema tostada","cuajada","requeson","mantecados","mantecadas","sobaos","quesada","leche frita","torrijas","flan de huevo","bizcocho","magdalenas","madalenas","croissant","croissants","cruasan","brioche","pan de leche","bollo de leche","ensaimada","hornazo","mona de pascua","roscon de reyes","roscon","pestinos","rosquillas","bunuelos","churros","gofres","tortitas","pancakes","crepes","tiramisu","cheesecake","tarta de queso","panna cotta","mousse","coulant","brownie","cookies","muffin","muffins","cupcake","cupcakes","macarons","profiteroles","eclair","milhojas","sacher","selva negra","red velvet","carrot cake","pavlova","merengue","merengues","suspiros","custard","creme brulee","creme caramel","lemon curd","lemon pie","key lime pie","banoffee","helado","helados","nata","mantequilla","queso","quesos","leche","yogur","yogures","kefir","batido","batidos","milkshake","lassi","raita","tzatziki","labneh","paneer","ghee","bechamel","besamel","carbonara","alfredo","gratinado","gratinada","raclette","fondue","gratin","soufflé","souffle","omelette","omelet","frittata","tortilla francesa","tortilla de patatas","tortilla","revuelto","huevos","huevo","mayonesa","mahonesa","alioli","allioli","aioli","salsa holandesa","hollandaise","bearnesa","bearnaise","tartara","salsa cesar","cesar","caesar"],
+    excl: ["re:(?:galletas?|bizcochos?|magdalenas|madalenas|croissants?|brownies?|cookies|muffins?|cupcakes?|tartas?|pasteles?|helados?|batidos?|yogur(?:es)?|quesos?|natas?|mantequillas?|leches?|mayonesas?|alioli|tortillas?|revueltos?|crepes?|gofres?|tortitas|pancakes|cheesecakes?|tiramisu|flan(?:es)?|natillas|mousses?|donuts?|churros|bunuelos|rosquillas|torrijas|pan\\s+de\\s+leche|bechamel|carbonara|gratinad[oa]s?|merengues?)\\s+(?:[a-z]+\\s+){0,3}(?:vegan[oa]s?|vegetal(?:es)?|veggie|plant[\\s-]based|sin\\s+huevo(?:\\s+ni\\s+leche)?|sin\\s+leche(?:\\s+ni\\s+huevo)?|sin\\s+lacteos|de\\s+(?:soja|avena|coco|almendras?|arroz|anacardos?|tofu|garbanzos?|platano))",
+           "re:(?:leche|bebida|nata|queso|yogur|mantequilla|helado|batido|mayonesa|alioli|crema)\\s+(?:de\\s+)?(?:soja|avena|coco|almendras?|arroz|anacardos?|avellanas?|cacahuete|vegetal(?:es)?|vegan[oa]s?)","re:tofu\\s+revuelto","re:revuelto\\s+de\\s+tofu","re:yemas?\\s+de\\s+(?:coco|chocolate\\s+vegano)","re:crema\\s+de\\s+(?:verduras?|calabaza|calabacin|setas|champinones|esparragos|puerros?|zanahoria|guisantes|marisco|cacahuete|almendras?|avellanas?|cacao|sesamo|coco)","re:(?:miel|sirope|jarabe)\\s+de\\s+(?:cana|palma|agave|arce|arroz|datil|datiles)"]
+  },
+  // 3.18 · Picante: nombres de carta que avisan de picante sin decirlo
+  PICANTE: {
+    kw: ["dan dan","dan dan noodles","laksa","rendang","arrabiata","puttanesca","hot wings","salsa bufalo","salsa buffalo","buffalo","salsa macha","cajun","hot","extra hot","medium hot","buldak","shin ramyun","samyang","fuego","al fuego","infierno","del infierno","volcan","dinamita","pique","con pique","habanera","salsa habanera","merguez","picor","picoso","picosa","muy picoso","enchiloso","enchilosa","chile de arbol","chile serrano","chile habanero","jalapenos","chiles","spicy chicken","spicy tuna","spicy salmon","spicy mayo","mayonesa picante","mayo picante","mostaza picante","ramen picante","ramyeon picante","tteokbokki","kimchi jjigae","pollo cajun","pollo fuego","pollo piri piri","pollo peri peri","salsa de habanero","salsa de jalapeno","jalapenos encurtidos","pimientos picantes","pimiento picante","guindillas picantes","olio al peperoncino","aglio olio e peperoncino","pollo alla diavola","salsa romesco picante","xato picante","kebab picante","chorizo criollo picante","paprika picante","pimenton picante","pimenton de la vera picante","picantes variados","surtido picante","nivel de picante","con mucho picante","salsa roja picante","salsa verde picante","aceite de chile","aceite picante","chili crisp","chili oil","salsa de chile","chili con carne","chili","sopa agripicante","sopa agria y picante","hot and sour soup","jalapeno poppers","nachos picantes","ceviche picante","aguachile","camarones a la diabla","alitas picantes","wings picantes","patatas bravas picantes","salsa brava picante"],
+    excl: ["re:chiles?\\s+dulces?","re:chili\\s+(?:sin\\s+picante|dulce|suave)","re:(?:pimientos?\\s+de\\s+)?padron\\s+dulces?","re:piparras\\s+dulces","re:hot\\s+(?:dogs?|cakes?|chocolate|pot|cross\\s+buns?|toddy|milk|tea|coffee|drinks?|water|plates?)","hotcakes","re:a\\s+fuego\\s+(?:lento|vivo|medio|suave|fuerte)","re:(?:al|a)\\s+fuego\\s+de\\s+(?:lena|carbon|brasa)","re:fuego\\s+(?:de\\s+)?(?:lena|campamento|carbon)","re:(?:cocinad[oa]s?|hech[oa]s?|asad[oa]s?)\\s+(?:al|a)\\s+fuego","re:volcan\\s+de\\s+chocolate","re:coulant","re:bomba(?:s)?\\s+(?:de\\s+)?(?:patata|arroz|chocolate|crema|nata|helado)","re:arroz\\s+bomba","re:bombay","re:buffalo\\s+(?:mozzarella|burrata)","re:mozzarella\\s+(?:di\\s+)?b[uú]fala","re:cajun\\s+(?:sin\\s+picante|suave)"]
+  },
+  CRUDO_EMBARAZO: {
+    kw: [
+      // Carne poco hecha y curados
+      "vuelta y vuelta","sangrante","sangrantes","poco hecho","poco hecha","blue","bleu","saignant","rare","medium rare","kibbeh nayeh","mett","carne apache","kitfo","yukhoe",
+      "paleta iberica","paletilla iberica","paleta curada","paletilla curada","lomo curado","cana de lomo","longaniza curada","pepperoni","speck","bresaola","coppa","lomo iberico","ibericos","tabla de ibericos","surtido de ibericos","magret curado","jamon de bellota","jamon de pato","lacon curado","cecina de leon",
+      // Pescado y marisco crudo, ahumado, con mercurio
+      "maki","makis","uramaki","chirashi","tiradito","usuzukuri","hamachi","re:(?:o-?)?toro\\s+(?:nigiri|sashimi|maki)","nigiri de toro","salmon curado","salmon marinado","hueva","ikura","tobiko","masago","re:(?:almejas?|berberechos?|navajas?|ostras?|vieiras?|mejillones?|coquinas?|canaillas?)\\s+al\\s+natural","marlin","cazon","tiburon","marrajo","lucio","tintorera",
+      // Huevo crudo o poco cuajado
+      "re:huevos?\\s+a\\s+\\d{2}\\s*(?:grados|º|°)","pasado por agua","pasados por agua","yema liquida","yema cruda","yema curada","alioli casero","alioli de la casa","mayonesa de la casa","mahonesa casera","mousse de chocolate","mousse casera","sabayon","zabaione","zabaglione","ponche de huevo","eggnog","pisco sour","whisky sour","amaretto sour","gin fizz","clover club","huevos benedict","huevos benedictinos","eggs benedict","salsa holandesa","holandesa","hollandaise","salsa bearnesa","bearnesa","re:(?:salsa\\s+)?cesar\\s+caser[ao]","merengue crudo","merengue italiano crudo","tiramisu casero",
+      // Lácteos sin pasteurizar y quesos blandos de moho o azules
+      "rohmilch*","leite cru","queso azul","quesos azules","blue cheese","cabrales","roquefort","gorgonzola","stilton","danablu","queso picon","picon","valdeon","bleu d'auvergne","fourme d'ambert","brie","camembert","torta del casar","torta de la serena","reblochon","taleggio","epoisses","munster","livarot","re:pont[\\s-]l'?eveque","chaource","neufchatel","re:quesos?\\s+(?:de\\s+cabra\\s+)?(?:con\\s+moho|de\\s+corteza\\s+enmohecida|de\\s+pasta\\s+blanda\\s+sin\\s+pasteurizar)","re:(?:queso|burrata|mozzarella|feta|ricotta|requeson)\\s+(?:[a-z]+\\s+){0,3}(?:de\\s+leche\\s+cruda|sin\\s+pasteurizar|no\\s+pasteurizad[oa])",
+      // Patés, vísceras, brotes crudos
+      "mi-cuit","micuit","mi cuit","higado","higados","higaditos","rillettes","brotes","germinados","alfalfa","zumo sin pasteurizar","sidra sin pasteurizar",
+      // Bebidas con alcohol
+      "vino","vinos","vino tinto","vino blanco","vino rosado","tinto","rioja","ribera del duero","albarino","verdejo","cava","champan","champagne","prosecco","espumoso","sidra","cerveza","cervezas","re:canas?\\s+(?:y\\s+tapas?|de\\s+cerveza|bien\\s+tirad[ao]s?|doble)","doble de cerveza","tercio","tercios","botellin","botellines","clara con limon","clara de limon","clara de cerveza","re:canas?\\s+y\\s+claras?",
+      "tinto de verano","sangria","calimocho","kalimotxo","vermut","vermu","vermouth","licor","licores","orujo","pacharan","chupito","chupitos","gin tonic","gintonic","gin-tonic","mojito","re:(?<!pizza\\s)(?<!pizzas\\s)(?<!pizza\\s\\s)margaritas?","caipirinha","daiquiri","pina colada","coctel","cocktail","cocteles","cocktails","cubata","cubatas","ron","whisky","whiskey","bourbon","vodka","ginebra","tequila","mezcal","brandy","conac","cognac","armagnac","licor de hierbas","crema de orujo","limoncello","amaretto","baileys","sake","soju","aguardiente","carajillo","irish coffee","re:ponches?(?!\\s+segoviano)","grog","vino dulce","moscatel","pedro ximenez","jerez","oloroso","amontillado","mistela","hidromiel","rebujito","agua de valencia","leche de pantera","queimada","bellini","mimosa","spritz","aperol","negroni","manhattan","old fashioned","white russian","bloody mary","cerveza con alcohol","con alcohol","alcohol"
+    ],
+    excl: [
+      // Cocinado: ya no es crudo ni curado sin cocinar
+      "re:(?:chorizos?|salchichon(?:es)?|morcillas?|longanizas?|chistorras?|sobrasadas?|butifarras?)\\s+(?:a\\s+la\\s+(?:sidra|brasa|parrilla|plancha)|al\\s+(?:vino|horno|infierno|fuego)|frit[oa]s?|cocid[oa]s?|asad[oa]s?|guisad[oa]s?|criollos?(?:\\s+a\\s+la\\s+(?:parrilla|brasa))?|a\\s+la\\s+plancha)",
+      "re:(?:lentejas|fabada|cocido|potaje|garbanzos|alubias|judias|judiones|habas|migas|arroz|patatas|huevos|revuelto|pisto|tortilla|pizza|empanada|croquetas?|pasta|macarrones|espaguetis|risotto|sopa|caldo)\\s+(?:[a-z]+\\s+){0,2}con\\s+(?:chorizo|jamon|sobrasada|panceta|bacon|beicon)",
+      "re:(?:sushi|makis?|uramakis?|pokes?|tartar(?:es)?|ceviches?|tatakis?|carpaccios?|tiraditos?|sashimis?|nigiris?)\\s+(?:vegan[oa]s?|vegetal(?:es)?|veggie|de\\s+(?:tofu|aguacate|tomates?|frutas?|mango|champinones|setas|remolacha|verduras?|pepino|calabacin|sandia|melon|fresas?|pina|manzana|pera|kiwi|naranja|boletus|alcachofas?|tempeh|seitan))",
+      "re:(?:quesos?|mozzarella|provolone|scamorza|idiazabal|tofu|verduras?|berenjenas?|pimientos?|patatas?|sal|pimenton|aceite|mantequilla|tomates?)\\s+ahumad[oa]s?","re:ahumad[oa]s?\\s+(?:en\\s+frio\\s+)?de\\s+(?:verduras?|tofu|quesos?)",
+      "re:(?:queso\\s+azul|brie|camembert|roquefort|gorgonzola|cabrales|feta|burrata|mozzarella|queso\\s+de\\s+cabra|rulo\\s+de\\s+cabra)\\s+(?:[a-z]+\\s+){0,2}(?:pasteurizad[oa]s?|al\\s+horno|gratinad[oa]s?|fundid[oa]s?|frit[oa]s?|a\\s+la\\s+plancha|en\\s+tempura|rebozad[oa]s?|a\\s+la\\s+brasa)",
+      "re:(?:salsa|crema|sopa|risotto|pasta|macarrones|espaguetis|noquis|gnocchi|croquetas?|pizza|hamburguesa|solomillo|entrecot|chuleton|carne|pollo|patatas?)\\s+(?:[a-z]+\\s+){0,3}(?:de|al|con)\\s+(?:queso\\s+azul|roquefort|cabrales|gorgonzola|brie|camembert|stilton)",
+      "re:brotes\\s+(?:salteados|cocinados|al\\s+wok|a\\s+la\\s+plancha)","re:germinados\\s+(?:salteados|cocinados|al\\s+wok)",
+      // Alcohol que se cocina o que no es alcohol
+      "re:(?:al|con|en|a\\s+la)\\s+(?:vino|vinos|cerveza|sidra|cava|brandy|whisky|ron|vermut|jerez|oporto|moscatel|pedro\\s+ximenez|px|licor|cognac|conac|orujo|anis|calvados|armagnac|champan|tinto)(?:\\s+(?:tinto|blanco|rosado|dulce|rancio|negra|tostada|rubia|de\\s+jerez|de\\s+oporto|de\\s+la\\s+casa))?",
+      "re:(?:salsa|reduccion|caldo|guiso|estofado|fondo|jugo|gelatina|mermelada|helado|sorbete|granizado|bizcocho|tarta|pastel|peras?|manzanas?|melocotones?|fresas?|frutas?)\\s+(?:[a-z]+\\s+){0,2}(?:de|al|con)\\s+(?:vino|cerveza|sidra|cava|brandy|whisky|ron|jerez|oporto|px|pedro\\s+ximenez|moscatel|licor|orujo|champan|cognac|conac|baileys|amaretto|limoncello)(?:\\s+(?:tinto|blanco|rosado|dulce|rancio|negra|tostada|rubia))?",
+      "re:vinagres?\\s+de\\s+(?:vino|jerez|sidra|manzana|cava|modena|arroz)","re:(?:vino|cerveza|sidra|licor)\\s+(?:para|de)\\s+cocinar","re:(?:cerveza|vino|cava|sidra|mojito|coctel|cocktail|cerveza\\s+artesana|tinto\\s+de\\s+verano|gin\\s+tonic|sangria|vermut)s?\\s+(?:[a-z]+\\s+){0,2}(?:sin\\s+alcohol|0[,.]0\\s*%?|0\\s*%|00|cero)","sin alcohol","re:mosto","re:zumo\\s+de\\s+uva","re:huevos?\\s+mimosa","re:cocteles?\\s+de\\s+(?:gambas|langostinos|marisco|frutas?)","re:(?:salsa\\s+)?cocktail\\s+de\\s+(?:gambas|langostinos|marisco)","salsa cocktail","salsa coctel",
+      "re:tinto\\s+(?:de\\s+)?(?:verano\\s+sin\\s+alcohol)","re:(?:lomo|solomillo|presa|secreto|pluma|carrillera|costillas?|pollo|cordero|rabo|ternera|cerdo)\\s+(?:[a-z]+\\s+){0,2}(?:al|en|con)\\s+(?:vino|cerveza|sidra|jerez|oporto|px|brandy|whisky|ron)",
+      "re:(?:rulo|queso)\\s+de\\s+cabra\\s+(?:pasteurizad[oa]|al\\s+horno|gratinad[oa]|a\\s+la\\s+plancha|frit[oa]|caramelizad[oa]|con\\s+miel|templad[oa])",
+      "re:higado\\s+de\\s+bacalao","re:aceite\\s+de\\s+higado","re:brotes\\s+de\\s+(?:bambu|ajo)"
+    ]
+  }
+};
+Object.keys(DIET_MORE).forEach(id => {
+  const m = DIET_MORE[id], r = DIET_RULES[id];
+  r.kw = r.kw.concat(m.kw);
+  r.excl = (r.excl || []).concat(m.excl || []);
+});
+// Bebidas sin alcohol: se borra la bebida entera antes de procesar las negaciones («cerveza sin alcohol»,
+// «mojito 0,0», «vino desalcoholizado»); si no, al quitar «sin alcohol» quedaría «cerveza» y avisaría.
+DIET_RULES.CRUDO_EMBARAZO.preStrip = /(?:^|[^a-z0-9])(?:[a-z]+\s+){0,4}?(?:sin\s+alcohol|0[,.]0\s*%?|0\s*%\s*(?:de\s+)?alcohol|cero\s+alcohol|alcohol[\s-]free|non[\s-]alcoholic|sans\s+alcool|alkoholfrei|analcolic[oa]|sem\s+alcool|desalcoholizad[oa]s?)(?=[^a-z0-9]|$)/g;
 Object.values(DIET_RULES).forEach(r => { r.kwRe = kwTest(r.kw); r.exclRe = r.excl ? kwStrip(r.excl) : null; });
 
 // Inferencia segura: si lleva pescado/marisco no es vegetariano; si lleva leche o huevo no es vegano
@@ -2793,10 +3263,17 @@ function detectDiets(raw, allergens) {
   Object.keys(DIET_RULES).forEach(id => {
     const r = DIET_RULES[id];
     if (r.rawRe && r.rawRe.test(full)) { found.add(id); return; }
-    const x = r.exclRe ? t.replace(r.exclRe, "$1 ") : t;
+    // 3.18: las exclusiones se aplican antes de quitar las negaciones, para que puedan ver «sin jamón» o «sin huevo»
+    const base = r.exclRe ? full.replace(r.exclRe, "$1 ") : full;
+    const x = r.preStrip ? stripNegations(base.replace(r.preStrip, " ")) : (r.exclRe ? stripNegations(base) : t);
     if (r.kwRe.test(x)) found.add(id);
   });
   inferDietsFromAllergens(allergens || detectAllergens(raw).a, found);
+  // 3.18: lo que el plato declara se cree. «Vegano» quita carne, cerdo y origen animal; «vegetariano» quita carne y
+  // cerdo (el huevo y la leche siguen); «sin picante», «suave» o «not spicy» quitan el picante.
+  if (VEGAN_RE.test(full)) { found.delete("NO_VEGETARIANO"); found.delete("NO_VEGANO"); found.delete("CERDO"); }
+  else if (VEGETARIAN_RE.test(full)) { found.delete("NO_VEGETARIANO"); found.delete("CERDO"); }
+  if (NO_PICANTE_RE.test(full)) found.delete("PICANTE");
   return Array.from(found);
 }
 
@@ -2868,7 +3345,7 @@ const COMPOUND_TYPES = [
   [["rebozado","rebozada","rebozados","rebozadas","empanado","empanada","empanados","empanadas","empanadilla","empanadillas","tempura","masa","masas","crujiente","crujientes","gabardina"], "GHLSZU"],
   [["fritura","frituras"], "GHLSPCO"],
   [["relleno","rellenos","rellena","rellenas","mezcla","mezclas","re:(?<!\\S\\s)picadas?","guarnicion","guarniciones","decoracion","adorno","adornos","acompanamiento","acompanamientos","extras","complementos","de la casa","casero","casera","caseros","caseras","al gusto","variado","variada","variados","variadas","surtido","surtida","surtidos","surtidas","especial","especiales","del chef","mixto","mixta","mixtos","mixtas","combinado","combinada","combinados","secreta","tabla","tablas","topping","toppings","preparado","preparados"], "*"],
-  [["aceite","aceites"], "KNSZ"],
+  [["re:aceites?(?!\\s+(?:de|del)\\s+(?:oliva|olivas|aove|girasol|maiz|colza|coco|argan|lino|palma|aguacate|trufa|ajo|guindilla|pimenton|picante|hierbas|romero|albahaca|limon|naranja|uva|arroz|oliva\\s+virgen))"], "KNSZ"],
   [["alioli","allioli","aioli","ali oli","all i oli","ajoaceite","mayonesa","mahonesa","lactonesa","veganesa","salsa rosa","tartara"], "HMULS"],
   [["pesto","romesco","re:(?<!\\S\\s)picadas?","picada catalana","salsa de trufa"], "NLGKU"], [["hummus","humus","tahini","baba ganoush","mutabal"], "ZN"], [["guacamole"], "LU"], [["tzatziki","raita"], "L"],
   [["mojo","mojos","chimichurri","mojo picon"], "UN"], [["ketchup","catsup"], "AMU"], [["mostaza"], "MUG"], [["satay"], "KSG"], [["teriyaki","salsa de soja","tamari","shoyu"], "SGZ"],
@@ -2888,7 +3365,21 @@ const COMPOUND_TYPES = [
   [["cereales","cereal","granola","muesli","barrita","barritas"], "GNKLSZ"], [["caramelo","toffee","dulce de leche"], "LSN"], [["margarina"], "LS"],
   [["nata vegetal","queso vegano","queso vegetal","bebida vegetal","leche vegetal","yogur vegetal"], "SNGL"], [["batido","batidos","smoothie","smoothies","milkshake"], "LSNGH"],
   [["coctel","cocktail","combinado","combinados","cocteles"], "UHLNG"], [["encurtidos","pickles","chutney","relish"], "UMA"], [["queso de untar","queso crema","queso fundido","queso en lonchas","tranchetes"], "LGSH"],
-  [["pate vegetal","hummus de"], "ZNLS"], [["crema de verduras","crema de calabaza","crema de calabacin","crema de champinones","crema de setas"], "LAGS"]
+  [["pate vegetal","hummus de"], "ZNLS"], [["crema de verduras","crema de calabaza","crema de calabacin","crema de champinones","crema de setas"], "LAGS"],
+  // 3.18: sinónimos, diminutivos y otros idiomas de los nombres de componente que pueden esconder alérgenos
+  [["salsita","salsitas","sauce","sauces","sugo","sughi","sosse","dip","dips","coulis","jus","reduccion","reducciones","glaseado","glaseados","emulsion","emulsiones"], "UMHLNSZPGA"],
+  [["caldito","bouillon","brodo","bruhe","stock","broth","fond","soup","soups","soupe","zuppa","minestra","suppe","potage","chowder"], "AGLSPCOHU"],
+  [["guisito","guisado","guisada","estofat","ragout","ragu","stew","eintopf","goulash","gulash","tajin","tajine","tagine","chilindron","fricando","civet","blanqueta","blanquette","fricase","fricassee","daube","navarin","carbonnade","carbonada","cassoulet","chili con carne","chili"], "AGULSPCON"],
+  [["a la romana","a la andaluza","breaded","battered","batter","pane","panado","panada","impanato","impanata","paniert","panierte","crispy","crunchy","croustillant","croccante","knusprig","orly","a la orly","bunuelo","bunuelos","enharinado","enharinada","empanizado","empanizada","apanado","apanada","schnitzel","wiener schnitzel","cordon bleu","croquette","croquettes","kroketten","nugget","meatball","meatballs","polpette","boulettes","frikadelle","frikadellen","kottbullar","kofta","kofte","kefta","patty","cutlet","escalopin","escalopines","bitoque","filete ruso","frito con harina"], "GHLSZU"],
+  [["crouton","croutons","regana","reganas","bread","breads","bun","buns","baguette","ciabatta","chapata","chapatas","focaccia","toast","toasts","pain","re:brot(?!e)","brotchen","panino","panini","bocadillo","bocadillos","bocata","bocatas","sandwich","sandwiches","montadito","montaditos","biscote","biscotes","pan de molde","naan","chapati","roti","cracker","crackers","galletas saladas","grissini","breadsticks","bagel","bagels","pretzel","bretzel","hogaza","barra de pan","rebanada","rebanadas"], "GLHSZNT"],
+  [["spaghetti","penne","fusilli","tagliatelle","fettuccine","linguine","rigatoni","orecchiette","farfalle","lasagne","lasagna","tortellini","cannelloni","noodle","udon","soba","dumpling","dumplings","gyoza","gyozas","wonton","wantan","dim sum","bao","quiche","re:cocas?(?!\\s*-?\\s*cola)","calzone","blini","blinis","spatzle","knodel","volovan","vol au vent","tartaleta","tartaletas","rollito","rollitos","nem","nems","samosa","samosas"], "GHLS"],
+  [["charcuteria","charcuterie","cold cuts","salami","pepperoni","sausage","sausages","wurst","bratwurst","saucisse","saucisson","salsiccia","choped","chopped","terrina","terrine","rillettes","bacon","beicon","lacon","pechuga de pavo en lonchas","jamon de pavo","fiambre de pavo","fiambre de pollo"], "LGSUNHAM"],
+  [["ice cream","gelato","glace","eis","frappe","biscuit","biscuits","cake","cakes","re:pie(?!s)","tart","tarte","gateau","torta","torte","kuchen","kekse","keks","pastry","pastries","cupcake","cheesecake","tiramisu","waffle","waffles","pancake","pancakes","scone","scones","doughnut","beignet","milhojas","coulant","ganache","fondant","porridge","gachas","corn flakes","cornflakes","shake","frappuccino","lassi","postre","postres","reposteria","pasteleria","napolitana","palmera","palmeras","sobao","sobaos","mantecada","mantecadas","trenza","cruasan","cruasanes"], "GHLSNKZ"],
+  [["sushi","maki","makis","uramaki","nigiri","niguiri","temaki","poke","wok","salteado","salteados","stir fry","stir-fry","yakitori","yakisoba","chow mein","pad thai","dashi","ponzu","gochujang","sambal","sriracha","salsa thai","salsa oriental"], "SGZPCOHK"],
+  [["korma","masala","tikka masala","butter chicken","biryani"], "LNAMSG"],
+  [["ensalada","ensaladas","salad","salads","salade","salades","insalata","insalate","salat","salate","mezclum","mesclun"], "NHLMUZPSGA"],
+  [["picoteo","degustacion","homemade","house","maison","fatto in casa","hausgemacht","special","speciale","mixed","assorted","mixte","misto","gemischt","selection","selezione","auswahl","platter","board","garnish","garniture","contorno","beilage","stuffing","stuffed","farci","farcie","ripieno","ripieni","gefullt","filling","fillings","condimentado","condimentada","sazonado","sazonada","a nuestra manera","ingrediente secreto","omelette","omelet","frittata","tapa","tapas","entrante","entrantes","menu degustacion"], "*"],
+  [["seasoning","seasonings","spice","spices","spice mix","epices","spezie","gewurz","gewurze","chili powder","sal de hierbas","sal sazonada","sazon","bouquet garni","hierbas","hierbas provenzales","finas hierbas","hierbas aromaticas","aroma","aromas","aromatizante","saborizante","potenciador del sabor","extracto","extractos"], "AMZGS"]
 ];
 COMPOUND_TYPES.forEach(t => { t[2] = kwTest(t[0]); });
 // Alérgenos que puede esconder este nombre de componente. null = no es una preparación compuesta.
@@ -3337,7 +3828,19 @@ function dishEquipLines(d, eqx) {
 const famList = s => String(s || "").split(",").map(x => x.trim()).filter(Boolean);
 const FOOD_FAMILIES = [];
 function famDef(id, m, x, rel, o) {
-  FOOD_FAMILIES.push(Object.assign({ id, n: id, m: famList(m), x: Array.isArray(x) ? x : famList(x), rel: famList(rel), incl: [], ex: [] }, o || {}));
+  FOOD_FAMILIES.push(Object.assign({ id, n: id, m: famList(m), x: Array.isArray(x) ? x : famList(x), rel: famList(rel), incl: [], ex: [], rawX: [] }, o || {}));
+}
+// 3.18: añade nombres (m), sospechosos (x) y exclusiones (ex) a una familia ya definida, sin repetir
+function famAdd(id, m, x, ex, rawX) {
+  const f = FOOD_FAMILIES.find(f => f.id === id);
+  if (!f) throw new Error("familia desconocida: " + id);
+  const L = v => Array.isArray(v) ? v : famList(v);
+  const key = w => /^re:/.test(w) ? w : famNorm(w);
+  const have = new Set(f.m.concat(f.x).map(key));
+  L(m).forEach(w => { if (!have.has(key(w))) { f.m.push(w); have.add(key(w)); } });
+  L(x).forEach(w => { if (!have.has(key(w))) { f.x.push(w); have.add(key(w)); } });
+  if (ex) f.ex = (f.ex || []).concat(L(ex));
+  if (rawX) f.rawX = (f.rawX || []).concat(L(rawX));
 }
 // Ingredientes genéricos que pueden esconder casi cualquier cosa
 const X_SAZON = famList("sofrito, adobo, sazonador, condimento, especias, mezcla de especias");
@@ -3390,7 +3893,7 @@ famDef("trufa", "trufa, truffle, truffe, tartufo, trüffel, aceite de trufa, cri
 famDef("manzana", "manzana, sidra, compota de manzana, tatin, strudel, calvados, apple, cider, pomme, mela, apfel, tarta de manzana", [...X_FRUTA, "pectina", "sangría", "sangria"], "pera, melocoton, membrillo");
 famDef("pera", "pera, pear, poire, birne", X_FRUTA, "manzana, membrillo, melocoton");
 famDef("membrillo", "membrillo, dulce de membrillo, quince, coing", "", "manzana, pera");
-famDef("melocoton", "melocotón, durazno, paraguayo, nectarina, peach, nectarine, pêche, pesca, pfirsich, melocotón en almíbar", [...X_FRUTA, "sangría", "sangria"], "albaricoque, ciruela, cereza, manzana, fresa", { relA: ["FRUTOS CON CÁSCARA"] });
+famDef("melocoton", "melocotón, durazno, paraguayo, nectarina, peach, nectarine, pêche, pesche, pesca noce, pesche noci, pesca gialla, pesca bianca, pfirsich, melocotón en almíbar", [...X_FRUTA, "sangría", "sangria"], "albaricoque, ciruela, cereza, manzana, fresa", { relA: ["FRUTOS CON CÁSCARA"] });
 famDef("albaricoque", "albaricoque, damasco, apricot, abricot, albicocca, aprikose", X_FRUTA, "melocoton, ciruela, cereza");
 famDef("ciruela", "ciruela, ciruela pasa, prune, plum, prugna, pflaume", X_FRUTA, "melocoton, albaricoque, cereza");
 famDef("cereza", "cereza, guinda, picota, cherry, cerise, ciliegia, kirsche, kirsch", [...X_FRUTA, ...X_ROJOS], "melocoton, albaricoque, ciruela, fresa");
@@ -3473,7 +3976,7 @@ famDef("romero", "romero, rosemary, romarin, rosmarino, rosmarin", X_HIERBAS, "m
 famDef("salvia", "salvia, sage, sauge, salbei", X_HIERBAS, "menta, albahaca, oregano, tomillo, romero");
 
 // ---------- Dulces, bebidas y aditivos ----------
-famDef("cacao", "cacao, chocolate, cocoa, cioccolato, schokolade, bombón, brownie, mousse de chocolate", famList("praliné, tiramisú, tiramisu, profiteroles, mole, turrón, nutella"), "cafeina");
+famDef("cacao", "cacao, chocolate, cocoa, cioccolato, schokolade, bombón, brownie, mousse de chocolate", famList("praliné, tiramisú, tiramisu, profiteroles, mole, turrón, nutella"), "cafeina", { alias: ["chocolate", "chocolates", "choco"] });
 famDef("cafeina", "café, cafeína, espresso, expreso, cortado, capuchino, cappuccino, moka, mocca, latte, té verde, té negro, matcha, guaraná, bebida energética, coca cola, coca-cola, pepsi, refresco de cola, bebida de cola", famList("chocolate, cacao, tiramisú, tiramisu, descafeinado"), "cacao", { n: "cafeína" });
 famDef("miel", "miel, honey, hidromiel, polen, propóleo, jalea real", "", "");
 famDef("alcohol", "alcohol, cerveza, vino, cava, champán, champagne, licor, ron, whisky, ginebra, vodka, brandy, coñac, vermut, sidra, sangría, sangria, tinto de verano, mojito, cóctel, cocktail, aguardiente, orujo, pacharán, tequila, amaretto, kirsch, calvados", famList("flambeado, flambé, flambe, al vino, al whisky, al brandy, al jerez, al oporto, reducción de vino, reducción de vermut, borracho, borracha, tarta borracha"), "", { ex: ["cerveza sin alcohol", "cerveza 0 0", "cerveza 0,0", "cerveza 00", "vino sin alcohol", "cava sin alcohol", "sidra sin alcohol", "bebida sin alcohol"] });
@@ -3507,6 +4010,137 @@ famDef("marisco", "gamba, langostino, camarón, cigala, carabinero, langosta, bo
 famDef("cefalopodo", "pulpo, calamar, sepia, choco, chipirón, jibia, potera, pota, tinta de calamar, tinta de sepia, octopus, poulpe, polpo, squid, calamari, seiche", "arroz negro, fideuá, marisco, mariscada", "bivalvo, marisco", { n: "pulpo", relA: ["MOLUSCOS"] });
 famDef("bivalvo", "mejillón, almeja, berberecho, ostra, vieira, zamburiña, navaja, coquina, chirla, volandeira, bivalvo, caracol, bígaro, lapa, mussel, clam, oyster, scallop, moule, huître, cozza, vongola, auster, muschel, escargot", "marisco, mariscada, salsa de ostras", "cefalopodo, marisco", { n: "mejillón", relA: ["MOLUSCOS"] });
 
+// ============================================================
+// 3.18: ampliación de las familias (sinónimos, diminutivos, erratas, otros idiomas, exclusiones)
+// y familias nuevas para lo que la gente escribe a mano (grupos, sustancias y aditivos).
+// ============================================================
+famAdd("pimiento", "pimentao, pimentao doce, pimientito, pimientitos, pimientillo, pimientillos, pebrot, pebrots, pebre, pebrera, pimienton, pimento, red pepper, green pepper, yellow pepper, paprikaschote, paprikaschoten, piparra, piparras, pimientos del padron, pimiento de padron",
+  "chistorra, mojo picon, mojo rojo, chimichurri, nduja, salchichon, goulash, gulash, nachos con salsa, salsa mexicana, salsa ranchera");
+famAdd("tomate", "pa amb tomaquet, tomaquet, tomatiga, bolognesa, sugo, bloody mary, tomatillo, tomatada, tomatet, pomodorini, tomates cherry, tomate cherry",
+  "albondigas en salsa");
+famAdd("cebolla", "scallion, scallions, cipolle, cipollotto, zwiebeln, zwiebelringe, ceba, cebes, calcot, calcots, calsot, calsots, cebollon, cebollones, cebolla morada, cebolla roja, cebolla tierna, aros de cebolla, onion rings, sopa de cebolla");
+famAdd("ajo", "ajoaceite, re:knoblauch[a-z]*, alls tendres, ajito, ajitos, ajoatao, ajonesa, toum, salsa toum, skordalia, aglio e olio, garlic bread, pan de ajo, ajo negro",
+  "chistorra");
+famAdd("patata", "chips, crisps, parmentier, noqui, french fries, fries, pommes de terre, pommes frites, frites, patatine, re:kartoffel[a-z]*, pataton, patatita, patatitas, gratin dauphinois, marmitako, patatas bravas, patatas al horno, pure de patata, pure de patatas",
+  "", "papa noel, papa francisco, papa benedicto, papa juan pablo");
+famAdd("seta", "champis, champi, rovellon, rovellones, rovellons, robellon, robellones, trompetas de la muerte, trompeta amarilla, shitake, cantharellus, angula de monte, angulas de monte, perrechico, perrechicos, perretxiko, perretxikos, oreja de judas, setita, setitas, duxelle, duxelles, eringi, maitake, matsutake, nameko, hongos silvestres, setas silvestres");
+famAdd("calabacin", "zucchina, calabacincito, calabacinito, carbasso, carbassons");
+famAdd("zanahoria", "carote, karotten, mohre, mohren, pastanaga, pastanagues, zanahorita, zanahoritas, zanaoria, gajar halwa, gajar");
+famAdd("col", "brussels sprouts, rosenkohl, chucrut, sauerkraut, choucroute, rotkohl, weisskohl, blaukraut, spitzkohl, wirsing, bok choy, pak choi, pak choy, nabiza, nabizas, coleslaw, ensalada de col", "caldo gallego");
+famAdd("brocoli", "brocoli, brocolis, bimi, broccolini");
+famAdd("rabano", "radish, radishes, turnip, turnips, daikon");
+famAdd("guisante", "peas, pea, petits pois, guisantitos");
+famAdd("cordero", "xai, chuletillas, chuletillas de cordero, paletilla de cordero, pierna de cordero, cabrito, lechazo");
+famAdd("pavo", "gall dindi, pavita, pavitas");
+famAdd("pato", "goose, gans, anec, pato laqueado, pato pekin, canard confit", "", "pato de chocolate, patos de chocolate, pato de goma");
+famAdd("manzana", "apfelstrudel, applesauce, mele, torta di mele, apfelmus, poma, pomes, manzanita, manzanitas, ensalada waldorf, waldorf, mansana, apple crumble, apple pie", "compota");
+famAdd("melocoton", "paraguaya, paraguayas, pfirsiche, pressec, pressecs, melocotoncito, melocotoncitos, bellini");
+famAdd("cereza", "clafoutis, cherries, picotas, guindas");
+famAdd("fresa", "fresita, fresitas, strawberries, fragole, fragoline, erdbeeren, erdbeerkuchen, maduixa, maduixes, maduixot, fresas con nata");
+famAdd("platano", "platanito, platanitos, tostones, patacones, maduros fritos, platan, platans, banoffee, banoffee pie, banana split, banana bread");
+famAdd("aguacate", "aguacatito, guac, alvocat, alvocats, avocado toast");
+famAdd("coco", "coquito, coquitos, cocada, cocadas, re:kokos[a-z]*, pina colada, bounty, raffaello, agua de coco, aceite de coco, harina de coco, azucar de coco");
+famAdd("uva", "uvetta, traube, trauben, weintrauben, rosinen, raim, panses, uvita, uvitas, sultanas, uvas pasas");
+famAdd("limon", "limoni, re:zitrone[a-z]*, llimona, llimones, limoncito, limoncitos, lemon curd, lemon pie");
+famAdd("kiwi", "kiwicito, kiwicitos");
+famAdd("garbanzo", "panissa, farinata, kichererbsen, cigro, cigrons, garbancito, garbancitos, chana masala, channa masala, chana, aquafaba");
+famAdd("lenteja", "lenticchia, re:linsen[a-z]*, llentia, llenties, daal, lentejita, lentejitas");
+famAdd("arroz", "sake, mochi, mochis, dango, milchreis, arros, arros negre, arrocito, arrocitos, congee, biryani, pilaf, pilav, pulao, jollof, arancini, arroz con leche");
+famAdd("maiz", "kikos, esquites, sweetcorn, popcorn, pop corn, cornbread, maisbrot, blat de moro, panis, mote, cancha, talo, talos, tortos, tortos de maiz, maicito, maicitos", "", "mais oui");
+famAdd("cilantro", "celiandre, cilantrillo");
+famAdd("canela", "re:zimt[a-z]*, canyella, canelita, canelitas, leche merengada, cinnamon roll, cinnamon rolls");
+famAdd("pimienta", "pepper, black pepper, white pepper, pepper sauce, re:pfeffer[a-z]*, pebre negre, au poivre, steak au poivre, a la pimienta");
+famAdd("cacao", "chocolatina, chocolatinas, chocolatito, chocolatitos, cioccolata, xocolata, xocolate, coulant, tarta sacher, sacher, ganache, ganache, cacao en polvo, chocolate caliente, chocolate a la taza", "nocilla, crema de cacao");
+const ALC_DRINKS = famList("mojito, coctel, cocteles, cocktail, cocktails, cerveza, cervezas, vino, vinos, sidra, cava, gin tonic, gintonic, sangria, tinto de verano, espumoso, vermut, vermu, ron, ginebra, whisky, vodka, licor, cubata, pina colada, daiquiri, margarita, caipirinha, clara, radler, kalimotxo, rebujito, champan, champagne, prosecco, aperol spritz, spritz, negroni, bellini, mimosa, cerveza artesana, vino tinto, vino blanco, vino rosado, tinto, blanco, rosado, bebida, bebidas, combinado, combinados, cerveza de trigo, lager, ipa, tostada, negra");
+famAdd("alcohol", "whiskey, cognac, gin tonic, gintonic, gin-tonic, caipirinha, daiquiri, margarita, pina colada, cubata, cubatas, chupito, chupitos, chupitin, baileys, mezcal, pisco, grappa, sake, oporto, jerez, moscatel, mistela, limoncello, frangelico, cointreau, triple sec, vermu, bourbon, cana, canas, tercio, tercios, clara, clara con limon, radler, shandy, kalimotxo, rebujito, agua de valencia, queimada, ponche, hidromiel, vinito, vinillo, cervecita, cervecitas, copa de vino, copita de vino, licor de hierbas, licor 43, chartreuse, absenta, aperol, campari, martini, negroni, spritz, aperol spritz, bellini, mimosa, kir, kir royal, cosmopolitan, bloody mary, white russian, tequila sunrise, sex on the beach, long island, pina colada, carajillo, cafe irlandes, irish coffee",
+  "al pedro ximenez, al px, flambeada, flambeadas",
+  [...famList("vinagre de vino, vinagre de jerez, vinagre de sidra, vinagre de cava, vinagre de champan, pizza margarita, pizza margherita, cana de lomo, canas rellenas, cana rellena, cana de azucar, canas de azucar, clara de huevo, claras de huevo, clara montada, claras montadas, claras a punto de nieve, ponche segoviano, 0,0, 0.0, sin alcohol anadido"),
+   ...ALC_DRINKS.flatMap(d => [d + " sin alcohol", d + " 0,0", d + " 0.0", d + " 0%", d + " 0 %", d + " cero", "virgin " + d, d + " virgin", d + " sin"])]);
+famAdd("cerdo", "secreto, presa, pluma, abanico, abanico iberico, manitas, morro, careta, tocineta, chicharron, chicharrones, chistorra, fuet, botifarra, salami, pepperoni, lechona, gorrino, jambon, lardon, lardons, pancetta, guanciale, re:schwein[a-z]*, schinken, re:[a-z]*wurst[a-z]*, cansalada, pernil, llom, llonganissa, cerdito, cerditos, carnitas, cochinita pibil, lomo adobado, cinta de lomo, magro, papada, castaneta, cabecero, cabezada, codillo, frankfurt, frankfurts, wiener, wurstchen, hot dog, hot dogs, perrito caliente, perritos calientes, pulled pork, costillas de cerdo, costillar",
+  "picadillo, carne picada, salchicha fresca, salchichas frescas",
+  "jamon de pato, jamon de pavo, jamon de pollo, jamon vegano, jamon vegetal, chorizo de pavo, chorizo de pollo, chorizo vegano, chorizo vegetal, bacon de pavo, beicon de pavo, bacon vegano, bacon vegetal, mortadela de pollo, mortadela de pavo, salami de pavo, pepperoni de pavo, pepperoni vegano, cerdo vegano, fiambre de pavo, fiambre de pollo, pechuga de pavo, salchicha vegana, salchichas veganas, salchicha vegetal, salchichas vegetales");
+famAdd("ternera", "veal, entrecote, lomo bajo, lomo alto, picana, picanha, morcillo, ossobuco, osso buco, roastbeef, steak, sirloin, ribeye, rib eye, t-bone, tomahawk, filet mignon, vitello, vitello tonnato, bistecca, bistecca alla fiorentina, rindfleisch, re:rind(?:er|s)[a-z]*, kalb, re:kalb[a-z]*, vedella, bou, ternerita, terneritas, steak tartar, steak tartare, escalopin, escalopines, asado de tira, bife, bife de chorizo, wagyu, kobe, angus, black angus, chateaubriand, tournedos, brisket, corned beef, pastrami",
+  "lasana de carne, lasagna de carne, canelones de carne",
+  "buey de mar, bueyes de mar, ternera vegana, ternera vegetal, hamburguesa vegana, hamburguesa vegetal, hamburguesa de tofu, hamburguesa de lentejas, hamburguesa de garbanzos, hamburguesa de soja, hamburguesa de seitan, hamburguesa de quinoa, hamburguesa de verduras, hamburguesa de pollo, hamburguesa de pavo, hamburguesa de pescado, hamburguesa de salmon, hamburguesa de atun, veggie burger, vegan burger, tuna steak, steak de atun, steak de salmon, salmon steak, swordfish steak, steak de pez espada");
+famAdd("pollo", "picanton, picantones, coquelet, pollito, pollitos, re:[a-z]*hahnchen[a-z]*, huhn, huhnchen, re:huhner[a-z]*, yakitori, karaage, pollo al ast, pollo a l'ast",
+  "doner, durum, croquetas de pollo",
+  "pollo vegano, pollo vegetal, pollo de soja, pollo de seitan, pollo de heura, nuggets veganos, nuggets vegetales, nuggets de tofu, nuggets vegetarianos");
+famAdd("atun", "vitello tonnato, re:thunfisch[a-z]*, tonyina, atuncito, atuncillo, ensalada murciana, tartar de atun, tataki de atun",
+  "nigiri, niguiri, maki, sashimi",
+  "atun vegano, atun vegetal, atun de tomate, atun de sandia");
+famAdd("salmon", "salmoncito, gravlax, gravad lax, re:[a-z]*lachs[a-z]*, salmo, salmo fumat, ikura, salmon ahumado",
+  "", "salmon vegano, salmon vegetal, salmon de zanahoria");
+famAdd("marisco", "gambon, gambones, centolla, crayfish, gamberi, gamberoni, garnelen, gambeta, gambetes, llagosti, llagostins, gambita, gambitas, langostinito, langostinitos, cigalita, cigalitas, quisquillas, krill",
+  "", "gambas veganas, langostinos veganos, gambas de konjac, gambas vegetales, gamba vegetal, surimi vegano, cangrejo de chocolate, cangrejos de chocolate, langosta de chocolate");
+famAdd("bivalvo", "tigres, mejilloncito, mejilloncitos, almejita, almejitas, cozze, vongole, capesante, austern, muscheln, musclo, musclos, cloissa, cloisses, escopinyes, navalles, vieires, cargols, conchas finas",
+  "", "navaja suiza, navajas suizas, caracol de chocolate, caracoles de chocolate, mejillones veganos, ostra vegana, ostras veganas, salsa de ostras vegana, salsa de ostras vegetariana, leche de tigre");
+
+// ---------- Grupos que la gente escribe a mano ----------
+famDef("legumbres", "legumbre, legumbres, legumes, legumineuses, legumi, hulsenfruchte, pulses, soja, soya, edamame, tofu, tempeh, miso, altramuz, altramuces, chochos, lupin, lupino, mungo, judia mungo, azuki, azukis, garrofo, garrofon, porotos, michirones, pochas, judiones, cacahuetes, mantequilla de cacahuete, crema de cacahuete",
+  "cocido, potaje, olla, menestra, proteina vegetal, hamburguesa vegetal, hamburguesa vegana, veggie burger", "", { broad: true, incl: ["garbanzo", "lenteja", "guisante", "judia", "haba", "cacahuete"], relA: ["SOJA", "CACAHUETES", "ALTRAMUCES"] });
+famDef("solanaceas", "solanaceas, solanacea, nightshade, nightshades, goji, bayas de goji, physalis, alquequenje, tomatillo", "", "", { broad: true, n: "solanáceas", incl: ["tomate", "pimiento", "berenjena", "patata"] });
+famDef("cruciferas", "cruciferas, crucifera, cruciferous, brassicas, brasicas, mostaza, hojas de mostaza, colinabo, kohlrabi, rutabaga, mizuna, daikon, berro, berros, kimchi", "", "", { broad: true, n: "crucíferas", incl: ["col", "brocoli", "rabano", "rucula", "colza"], relA: ["MOSTAZA"] });
+famDef("aliaceas", "aliaceas, aliacea, allium, alliums", "", "", { broad: true, n: "aliáceas", incl: ["cebolla", "ajo", "puerro", "cebollino"] });
+famDef("fruta de hueso", "fruta de hueso, frutas de hueso, stone fruit, stone fruits, drupa, drupas, orejones", [...X_FRUTA, ...X_ROJOS, "sangría", "sangria"], "", { broad: true, n: "fruta de hueso", incl: ["melocoton", "albaricoque", "ciruela", "cereza"], relA: ["FRUTOS CON CÁSCARA"] });
+famDef("frutos rojos", "frutos rojos, frutas del bosque, frutos del bosque, berries, mixed berries, red fruits, fruits rouges, fruits des bois, frutti di bosco, beeren, waldbeeren", [...X_FRUTA, "coulis"], "", { broad: true, n: "frutos rojos", incl: ["fresa", "frambuesa", "mora", "arandano", "grosella", "cereza"] });
+famDef("carne roja", "carne roja, carnes rojas, red meat, viande rouge, carne rossa, rotes fleisch, cabra, cabrito, chivo, caballo, carne de caballo, potro, toro, carne de toro, mutton",
+  "carne, carne picada, hamburguesa, hamburguesa mixta, albondigas, picadillo, embutido, salchicha, salchichas, kebab, cocido, caldo de carne, bolonesa, bolonesa, lasana, lasagna, canelones, croquetas de carne, empanada de carne, empanadillas de carne, pastel de carne, carne en salsa, estofado, guiso, chuleta, chuletas, costillas, chuletillas, filete, filetes, escalope, milanesa, asado, parrillada, parrillada de carne, brocheta de carne, pincho moruno, pinchos morunos, churrasco, barbacoa",
+  "", { broad: true, n: "carne roja", incl: ["ternera", "cerdo", "cordero", "caza"],
+    ex: famList("col roja, cebolla roja, salsa roja, fruta roja, frutos rojos, pimiento rojo, vino rojo, atun rojo, carne de membrillo, carne de pimiento choricero, carne de coco, hamburguesa vegana, hamburguesa vegetal, carne vegetal, carne de soja, hamburguesa de pollo, hamburguesa de pavo, hamburguesa de pescado, hamburguesa de salmon, hamburguesa de atun, veggie burger, vegan burger, filete de pollo, filetes de pollo, filete de pavo, filete de merluza, filetes de merluza, filete de pescado, filetes de pescado, filete de salmon, filete de lenguado, filete de dorada, filete de lubina") });
+famDef("ave", "ave, aves, carne de ave, aves de corral, poultry, volaille, pollame, geflugel, pichon, pichones, paloma, perdiz, perdices, codorniz, codornices, faisan, pintada, gallina de guinea, caza de pluma, quail, quails",
+  "pechuga, muslo, contramuslo, kebab, doner, durum, caldo, consome, fondo, pastilla de caldo, fiambre, embutido, salchichas, nuggets", "", { broad: true, incl: ["pollo", "pavo", "pato"], relA: ["HUEVO"], ex: famList("ave maria, avemaria, nuggets veganos, nuggets vegetales, nuggets de tofu, fiambre de cerdo, fiambre vegano, fiambre vegetal") });
+famDef("casqueria", "casqueria, visceras, viscera, despojos, menudos, menudencias, menudillos, corazon, corazones, higado, higaditos, higadillos, pate, pates, foie, foie gras, micuit, mi-cuit, rinones, rinon, callos, mollejas, molleja, sesos, criadillas, lengua, corazones de pollo, corazon de ternera, corazones de pato, oreja, orejas, morro, morros, careta, manitas, manitas de cerdo, manos de cerdo, rabo de toro, rabo, tripas, tripa, gallinejas, entresijos, zarajos, asadura, asadurilla, chanfaina, sangrecilla, sangre encebollada, morcilla, botifarra negra, madeja, madejas, patas de cerdo, panza, mondongo, chinchulines, achuras, trippa, lampredotto, fegato, animelle, rognons, ris de veau, foie de veau, tripes, andouillette, liver, kidneys, tripe, sweetbreads, offal, giblets, leber, nieren, kutteln, innereien, cap i pota, capipota, fetge, ronyons, tripa a la catalana, menudo, pancita, buche, cabeza de jabali, lengua a la vinagreta, pate de campana, terrina de foie, higado de bacalao",
+  "", "", { broad: true, n: "casquería", ex: famList("lengua de gato, lenguas de gato, lengua de suegra, corazon de alcachofa, corazones de alcachofa, corazon de lechuga, corazones de lechuga, corazon de la ensalada, oreja de mar, orejas de carnaval, orejones, rabo de gato, pate vegetal, pate vegano, pate de aceitunas, pate de berenjena, pate de setas, pate de tomate, pate de pimientos") });
+famDef("lactosa", "lactosa, lactose, laktose, lattosio, leche, leche entera, leche semidesnatada, leche desnatada, leche en polvo, leche condensada, leche evaporada, suero de leche, suero lacteo, nata, nata liquida, nata montada, nata para cocinar, crema de leche, mantequilla, queso fresco, queso crema, queso de untar, queso para untar, requeson, ricotta, mascarpone, burrata, mozzarella, yogur, yogures, kefir, helado, bechamel, besamel, salsa bechamel, crema pastelera, natillas, flan, arroz con leche, leche frita, cuajada, cafe con leche, cortado, capuchino, cappuccino, latte, chocolate con leche, dulce de leche, petit suisse, milk, cream, butter, whey, lait, creme, beurre, panna, burro, milch, sahne, molke, llet, solidos lacteos, lacteo, lacteos, productos lacteos",
+  "queso, quesos, queso curado, queso rallado, parmesano, manchego, gratinado, gratinada, tabla de quesos, fiambre, jamon cocido, jamon york, embutido, salchichas, pan de molde, bolleria, galletas, chocolate, croquetas, pure, pure de patatas, pures, cremas, crema de verduras, sopa de sobre, alino, aderezo, batido, batidos",
+  "", { broad: true, relA: ["LÁCTEO"], ex: famList("leche de almendras, leche de almendra, leche de avena, leche de soja, leche de coco, leche de arroz, leche de anacardos, leche vegetal, bebida vegetal, nata vegetal, nata de soja, nata de coco, nata de avena, mantequilla de cacahuete, mantequilla de almendras, queso vegano, queso vegetal, yogur de soja, yogur vegetal, yogur de coco, helado de soja, helado vegano, sorbete, leche de tigre, crema de cacahuete, crema de almendras, re:[a-z]+(?:\\s+[a-z]+)?(?:\\s+[a-z]+)?(?:\\s+[a-z]+)?\\s+sin\\s+lactosa") });
+famDef("fructosa", "fructosa, fructose, fruktose, fruttosio, levulosa, jarabe de fructosa, jarabe de maiz alto en fructosa, jarabe de glucosa-fructosa, jarabe de glucosa y fructosa, sirope de agave, agave, jarabe de agave, nectar de agave, miel, miel de abeja, miel de flores, sirope de maiz, jarabe de maiz, high fructose corn syrup, hfcs, azucar invertido, jarabe de azucar invertido, inulina, fructooligosacaridos, fos, oligofructosa",
+  [...X_FRUTA, ...famList("zumo, zumos, zumo de frutas, nectar, mermelada, confitura, compota, manzana, pera, sandia, mango, cereza, cerezas, uva, uvas, uvas pasas, pasas, higos, datiles, datil, ciruela, ciruelas, melocoton, frutos rojos, platano, kiwi, pina, orejones, fruta deshidratada, fruta desecada, frutas secas, ketchup, salsa barbacoa, salsa agridulce, refresco, refrescos, bebida energetica, cereales de desayuno, barritas de cereales, galletas, bolleria, chocolate, caramelo, caramelos, gominolas, chicle, edulcorante, edulcorantes, sirope, jarabe, azucar, sacarosa, azucar moreno, azucar de caña, cebolla, ajo, puerro, alcachofa, esparragos, esparrago, remolacha, boniato, batata, tomate frito, salsa de tomate, vino dulce, moscatel, sidra, licor")], "sorbitol", { broad: true });
+famDef("sorbitol", "sorbitol, re:e[\\s-]?420, sorbit, sorbitolo, jarabe de sorbitol, sorbitol liquido",
+  "chicle, chicles, light, zero, edulcorante, edulcorantes, polialcohol, polialcoholes, maltitol, xilitol, manitol, isomalt, eritritol, lactitol, pera, peras, ciruela, ciruelas, ciruela pasa, ciruelas pasas, orejones, albaricoque, albaricoques, albaricoques secos, manzana, melocoton, cereza, cerezas, fruta deshidratada, fruta desecada, zumo de pera, zumo de manzana, nectar de pera, compota de pera, apto para diabeticos, para diabeticos, tolerado por diabeticos, dietetico, productos light",
+  "fructosa, edulcorantes", { broad: true, rawX: famList("sin azucar, sin azucares, sin azucares anadidos, sin azucar anadido, 0% azucar, 0% de azucar, 0 % azucar, cero azucar, zero azucar, sugar free, sugar-free, sans sucre, senza zucchero, zuckerfrei, ohne zucker") });
+famDef("edulcorantes", "edulcorante, edulcorantes, edulcorante artificial, edulcorantes artificiales, sacarina, sacarina sodica, sacarina liquida, aspartamo, aspartame, acesulfamo, acesulfamo k, acesulfame, sucralosa, sucralose, ciclamato, estevia, stevia, stevia rebaudiana, glucosidos de esteviol, neotamo, advantamo, taumatina, xilitol, maltitol, eritritol, manitol, isomalt, sorbitol, lactitol, polialcoholes, polioles, re:e[\\s-]?(?:420|421|950|951|952|953|954|955|957|959|960|961|962|964|965|966|967|968|969), sweetener, sweeteners, artificial sweetener, edulcorant, edulcorants, dolcificante, dolcificanti, sussstoff, sussungsmittel, saccharin, truvia, canderel, natreen, hermesetas, edulcorado, edulcorada, bebida edulcorada, con edulcorantes, con edulcorante",
+  "light, zero, cero azucar, chicle, chicles, refresco light, refresco zero, coca cola zero, coca-cola zero, coca cola light, coca-cola light, pepsi max, bebida light, yogur light, yogur 0%, yogur desnatado, apto para diabeticos, para diabeticos, dietetico, productos light, bajo en calorias, bajo en azucar, proteina en polvo, batido de proteinas, bebida energetica zero, tonica light, tonica zero, mermelada light",
+  "sorbitol", { broad: true, rawX: famList("sin azucar, sin azucares, sin azucares anadidos, sin azucar anadido, 0% azucar, 0% de azucar, 0 % azucar, cero azucar, zero azucar, sugar free, sugar-free, sans sucre, senza zucchero, zuckerfrei, ohne zucker") });
+famDef("nitritos", "nitritos, nitrito, nitrito de sodio, nitrito sodico, nitrito de potasio, nitrato de sodio, nitrato de potasio, nitratos, nitrato, re:e[\\s-]?(?:249|250|251|252), sal nitrificante, sales nitrificantes, sal de cura, sal de curado, sales de curado, curing salt, sodium nitrite, sodium nitrate, potassium nitrate, nitrite, nitrites, nitrate, nitrates, salpetre, salitre, nitrit, nitrat, nitriti, nitrati, pokelsalz, nitritpokelsalz",
+  "jamon cocido, jamon york, jamon de york, fiambre, fiambres, fiambre de pavo, pechuga de pavo, pechuga de pavo en lonchas, bacon, beicon, panceta ahumada, tocino ahumado, salchichas, salchicha, frankfurt, frankfurts, salchicha de frankfurt, salchichas de frankfurt, hot dog, perrito caliente, mortadela, chopped, choped, salami, pepperoni, chorizo, salchichon, fuet, lomo embuchado, cecina, jamon curado, jamon serrano, jamon iberico, embutido, embutidos, tabla de embutidos, tabla de ibericos, ibericos, charcuteria, charcuterie, cold cuts, deli meats, lunch meat, pastrami, corned beef, lacon, paleta, paletilla curada, sobrasada, butifarra, morcilla, carne curada, carnes curadas, carne procesada, carnes procesadas, embutido curado, ahumado, ahumados, salmon ahumado, pescado ahumado, bacalao ahumado, trucha ahumada, pato curado, jamon de pato, cecina de vaca, magret curado, speck, prosciutto, prosciutto cotto, jambon, jambon blanc, pizza con jamon, pizza de pepperoni, bocadillo de jamon york, sandwich mixto, bikini, croque monsieur, croque madame, san jacobo, cordon bleu, flamenquin, salchichas de pollo, salchichas de pavo, chorizo de pavo, bacon de pavo, jamon de pavo, mortadela de pollo",
+  "", { broad: true, ex: famList("chorizo vegano, jamon vegano, bacon vegano, salchichas veganas, salchicha vegana, embutido vegano, embutido vegetal, nitrogeno, nitro") });
+famDef("azucar", "azucar, azucares, azucar blanco, azucar blanquilla, azucar moreno, azucar de cana, azucar integral, azucar glas, azucar glass, azucar glace, azucar en polvo, azucar invertido, azucar de coco, panela, sacarosa, jarabe, sirope, jarabe de glucosa, jarabe de maiz, sirope de agave, jarabe de arce, maple syrup, miel, melaza, melazas, caramelo, caramelos, caramelo liquido, salsa de caramelo, dulce de leche, almibar, en almibar, glasa, fondant, confitura, mermelada, mermeladas, jalea, sugar, brown sugar, icing sugar, powdered sugar, cane sugar, syrup, honey, molasses, sucre, sucre glace, cassonade, sirop, zucchero, zucchero a velo, sciroppo, zucker, puderzucker, rohrzucker, sirup, sucre roux, sucre de canne, azucarillo, azucarillos, azucarado, azucarada, con azucar, terron de azucar, terrones de azucar, azucar anadido, azucares anadidos",
+  "refresco, refrescos, coca cola, coca-cola, fanta, bebida energetica, zumo, zumo envasado, nectar, batido, batidos, chocolate, chocolate con leche, chocolatina, bolleria, bollo, bollos, croissant, napolitana, donut, donuts, galleta, galletas, cereales, cereales de desayuno, barrita de cereales, barritas de cereales, granola, muesli, tarta, tartas, pastel, pasteles, postre, postres, helado, helados, flan, natillas, arroz con leche, yogur de sabores, yogur azucarado, yogur de fresa, petit suisse, leche condensada, nocilla, nutella, crema de cacao, gominolas, chucherias, chuches, turron, mazapan, polvoron, mantecados, roscon, churros, gofre, gofres, crepe, crepes, tortitas, pancakes, ketchup, salsa barbacoa, salsa agridulce, salsa teriyaki, salsa hoisin, vinagre balsamico, crema balsamica, pan de molde, pan de hamburguesa, tomate frito, salsa de tomate envasada, alino, aderezo, vinagreta, salsa rosa, salsa cesar, encurtidos, pepinillos, cebolla caramelizada, cebolla confitada, fruta en almibar, fruta confitada, fruta escarchada, frutas escarchadas, fruta deshidratada, datiles, pasas, sangria, tinto de verano, vermut, licor, licores, coctel, cocteles, mojito, pina colada, daiquiri, vino dulce, moscatel, cava semiseco, sidra dulce, cafe bombon, cafe con leche condensada, leche merengada, horchata, granizado, granizados, smoothie, smoothies, frappe, frappuccino, te frio, te helado, kombucha, bebida isotonica, bebida vegetal, bebida de avena, bebida de arroz, yogur vegetal, embutido, jamon cocido, fiambre, salchichas, surimi, palitos de cangrejo, sushi, arroz de sushi, pan de leche, bizcocho, magdalenas, madalenas, sobaos, quesada, tarta de queso, cheesecake, tiramisu, brownie, cookie, cookies, muffin, muffins, cupcake, macarons, profiteroles, palmera, palmeras, ensaimada, torrijas, bunuelos, pestinos, rosquillas, alfajores, brazo de gitano, milhojas, tocino de cielo, yemas, huesos de santo, panellets, coca de san juan, mona de pascua, hojaldre, hojaldres, pasta de hojaldre, masa quebrada, masa brisa, glaseado, confitado, confitada",
+  "edulcorantes, fructosa", { broad: true, n: "azúcar", ex: famList("azucarero, azucareros, azucena") });
+famDef("vinagre", "vinagre, vinagres, balsamico, aceto balsamico, aceto, crema balsamica, crema de balsamico, glaseado balsamico, reduccion de modena, vinagreta, vinagretas, vinaigrette, vinegar, vinaigre, essig, weinessig, apfelessig, balsamessig, vinagrito, vinagrillo, escabeche, en escabeche, escabechado, escabechada, encurtido, encurtidos, pickles, pepinillos, banderillas, piparras, alcaparras, alcaparrones, aceitunas alinadas, salsa agridulce, agridulce, sweet and sour, ketchup, mostaza, salsa worcestershire, salsa inglesa, salsa perrins, chimichurri, mojo picon, mojo, gazpacho, salmorejo, pipirrana, salpicon, papas alinas, patatas alinas, en vinagre, boquerones en vinagre, vinagre en polvo",
+  "alino, alinos, alinado, alinada, alinados, pincho moruno, pinchos morunos, mayonesa, salsa tartara, salsa cesar, salsa barbacoa, salsa rosa, ceviche, cebiche, tiradito, kimchi, chucrut, sauerkraut, marinado, marinada, adobo, adobado, adobada, aderezo, aderezos, sushi, arroz de sushi",
+  "", { broad: true, ex: famList("vinagrera, vinagreras") });
+famDef("histamina", "histamina, histamine, histamin, istamina, alto en histamina, rico en histamina, liberador de histamina, liberadores de histamina",
+  "queso curado, queso viejo, queso azul, roquefort, gorgonzola, parmesano, manchego curado, queso cabrales, cabrales, embutido, embutidos, chorizo, salchichon, salami, fuet, jamon curado, jamon serrano, jamon iberico, cecina, sobrasada, bacon, beicon, panceta ahumada, salchichas, frankfurt, fiambre, jamon cocido, atun, atun en lata, bonito, caballa, sardinas, sardinas en lata, anchoas, boquerones en vinagre, arenque, arenques, salmon ahumado, ahumados, pescado ahumado, marisco, mariscos, gambas, langostinos, mejillones, almejas, ostras, pescado en conserva, conservas de pescado, surimi, salsa de pescado, nam pla, tomate, tomates, salsa de tomate, ketchup, tomate frito, espinacas, berenjena, berenjenas, aguacate, champinones, setas, chucrut, sauerkraut, kimchi, encurtidos, pepinillos, vinagre, vinagre balsamico, salsa de soja, soja, tofu, tempeh, miso, levadura, extracto de levadura, vino, vino tinto, vino blanco, cava, champan, cerveza, sidra, licor, alcohol, vinagre de vino, kombucha, kefir, yogur, chocolate, cacao, cacao en polvo, fresas, fresa, frambuesas, citricos, naranja, limon, pomelo, pina, kiwi, platano, papaya, frutos secos, nueces, anacardos, cacahuetes, clara de huevo, huevo crudo, mayonesa, alioli, glutamato, glutamato monosodico, potenciador del sabor, aditivos, colorantes, conservantes, sulfitos, benzoatos, nitritos, te negro, te verde, cafe, bebida energetica, refresco de cola, regaliz, canela, clavo, nuez moscada, curry, guindilla, cayena, chile, pimenton, picante, mostaza, salsa picante, tabasco, sriracha, harissa, pescado azul, caldo concentrado, pastilla de caldo, sopa instantanea",
+  "", { broad: true, relA: ["PESCADO", "CRUSTÁCEOS", "MOLUSCOS", "SULFITOS"] });
+
+// 3.18 · Lo que la gente evita por salud: sal (hipertensión), purinas (gota), níquel (alergia de contacto que algunos
+// médicos tratan con dieta) y yodo (tiroides). m = la sustancia y lo que la lleva seguro; x = alimentos que la tienen en
+// cantidad (listas habituales de las guías dietéticas). No es una fuente médica: la app enseña qué busca.
+famDef("sal", "sal, sal baja en sodio, sal marina, sal gorda, sal fina, sal yodada, sal de apio, sal de ajo, flor de sal, sal maldon, sal ahumada, sal rosa, sal del himalaya, salado, salada, salados, saladas, salazon, salazones, en salazon, salmuera, en salmuera, sodio, alto en sodio, bicarbonato de sodio, glutamato, glutamato monosodico, salt, salted, sea salt, sel, salz, gesalzen, salato, salata, salati",
+  "anchoas, anchoa, boquerones en salazon, bacalao salado, bacalao en salazon, mojama, hueva de atun, huevas, caviar, sucedaneo de caviar, salsa de soja, shoyu, tamari, miso, potenciador del sabor, caldo concentrado, pastilla de caldo, cubito de caldo, avecrem, knorr, starlux, maggi, sopa de sobre, embutido, embutidos, jamon serrano, jamon iberico, jamon curado, jamon, cecina, cecina de leon, chorizo, salchichon, fuet, lomo embuchado, panceta curada, panceta, bacon, beicon, mortadela, fiambre, jamon cocido, jamon york, salchichas, frankfurt, encurtidos, pepinillos, aceitunas, aceitunas alinadas, banderillas, alcaparras, piparras, queso curado, queso azul, roquefort, feta, parmesano, queso de bola, queso manchego, patatas fritas de bolsa, patatas chips, chips, snacks salados, snacks, aperitivos salados, aperitivos, frutos secos salados, cacahuetes salados, pipas con sal, palomitas saladas, palomitas, galletas saladas, pretzel, bretzel, reganas, regana, picos, colines, ketchup, salsa barbacoa, mostaza, salsa worcestershire, salsa de pescado, nam pla, nuoc mam, surimi, palitos de cangrejo, conservas, en conserva, en lata, atun en lata, sardinas en lata, sopa instantanea, ramen instantaneo, fideos instantaneos, sazonador, condimento, adobo, marinado en salmuera, pizza, hamburguesa, kebab, comida rapida, precocinado, precocinados, platos preparados, pan de molde, queso, quesos, caldo, consome",
+  "", { broad: true, ex: famList("ensalada, ensaladas, ensaladilla, salmon, salmonete, salmorejo, salteado, salteada, salteados, saltead, salvia, salvado, sala, salon, salsa de la casa, sal de frutas, sales minerales, sal sin yodo, sal baja en sodio, pan sin sal, mantequilla sin sal, frutos secos sin sal, sin sal, sin sal anadida, bajo en sal, bajo en sodio, sin sodio, re:(?:salchichas?|embutidos?|quesos?|jamon|bacon|fiambres?|galletas|pan|frutos\\s+secos|cacahuetes|pipas|aceitunas|snacks?|patatas|chips)\\s+(?:[a-z]+\\s+)?(?:[a-z]+\\s+)?(?:sin\\s+sal|bajos?\\s+en\\s+(?:sal|sodio)|sin\\s+sodio)") });
+famDef("purinas", "purinas, purina, acido urico, rico en purinas, alto en purinas",
+  "higado, higados, higaditos, higadillos, rinones, rinon, mollejas, molleja, sesos, callos, casqueria, visceras, viscera, pate, pates, foie, foie gras, morcilla, anchoas, anchoa, boquerones, boqueron, sardinas, sardina, sardinas en lata, arenque, arenques, caballa, jurel, atun, bonito, salmon, trucha, bacalao, huevas, caviar, marisco, mariscos, gambas, gamba, langostinos, langostino, cigalas, bogavante, langosta, cangrejo, mejillones, almejas, vieiras, ostras, calamares, pulpo, sepia, carne roja, ternera, buey, cordero, cerdo, caza, venado, jabali, perdiz, codorniz, pato, oca, embutido, embutidos, chorizo, salchichon, jamon, bacon, beicon, panceta, cecina, caldo de carne, caldo de huesos, caldo de pescado, consome, fumet, extracto de carne, bovril, cubito de caldo, pastilla de caldo, salsa de carne, jugo de carne, gravy, demi glace, cerveza, cerveza sin alcohol, vino, licor, alcohol, levadura, levadura de cerveza, extracto de levadura, espinacas, esparragos, setas, champinones, coliflor, guisantes, lentejas, garbanzos, alubias, judias, habas, soja, tofu, tempeh, cacahuetes, pipas, semillas de girasol, avena, salvado, germen de trigo, pan integral, bebidas azucaradas, refresco de cola, refrescos, bebida energetica, zumo de naranja envasado, jarabe de maiz, fructosa, sirope de agave, miel",
+  "", { broad: true, relA: ["PESCADO", "CRUSTÁCEOS", "MOLUSCOS"], ex: famList("purina, pureza, depurado, depurativo") });
+famDef("niquel", "niquel, nickel, alto en niquel, rico en niquel",
+  "cacao, chocolate, chocolate negro, chocolate con leche, cacao en polvo, cola cao, colacao, nutella, nocilla, brownie, tarta de chocolate, legumbres, lentejas, garbanzos, alubias, judias, guisantes, habas, soja, salsa de soja, tofu, edamame, frutos secos, almendras, avellanas, nueces, anacardos, pistachos, cacahuetes, mantequilla de cacahuete, semillas, semillas de girasol, pipas, semillas de lino, semillas de sesamo, sesamo, tahini, hummus, avena, copos de avena, porridge, muesli, granola, cereales integrales, pan integral, harina integral, salvado, trigo sarraceno, alforfon, mijo, quinoa, amaranto, centeno, arroz integral, espinacas, acelgas, col rizada, kale, brocoli, coliflor, coles de bruselas, esparragos, puerro, ajo, tomate en lata, tomate enlatado, conservas, en conserva, en lata, atun en lata, sardinas en lata, pina en lata, melocoton en almibar, marisco, mariscos, gambas, mejillones, ostras, almejas, pescado azul, arenque, caballa, salmon, pera, ciruela, ciruelas pasas, pasas, higos, higos secos, datiles, kiwi, pina, frambuesas, regaliz, te negro, te verde, cafe, vino tinto, cerveza, levadura, margarina, gelatina, frutos secos tostados, barritas de cereales, galletas integrales, pasta integral, leche de soja, bebida de avena, bebida de almendras",
+  "", { n: "níquel", broad: true, ex: famList("niquelado, niquelada, acero inoxidable, cromo") });
+famDef("yodo", "yodo, iodo, yoduro, yoduro de potasio, yodato, yodato de potasio, sal yodada, alto en yodo, rico en yodo, eritrosina, e127, e-127",
+  "algas, alga, alga nori, nori, wakame, kombu, kelp, espirulina, agar agar, agar-agar, ensalada de algas, sushi, maki, onigiri, dashi, caldo dashi, miso con wakame, sopa de miso, pescado, pescado blanco, pescado azul, bacalao, merluza, lubina, dorada a la, dorada al, filete de dorada, lomo de dorada, dorada a la sal, atun, salmon, sardinas, anchoas, marisco, mariscos, gambas, langostinos, mejillones, almejas, ostras, vieiras, calamares, pulpo, surimi, palitos de cangrejo, huevo, huevos, yema de huevo, leche, yogur, queso, nata, mantequilla, lacteos, pan con sal yodada, sal marina, carragenanos, carragenato, e407, alginato, e401, e400",
+  "", { broad: true, ex: famList("sin yodo, bajo en yodo, sal sin yodar, sal sin yodo, yoga, yodado, re:(?:leche|bebida|nata|queso|yogur|mantequilla|helado)\\s+(?:de\\s+)?(?:soja|avena|coco|almendras?|arroz|anacardos?|vegetal(?:es)?|vegan[oa]s?)") });
+
+// 3.18 · Lo que la gente escribe tal cual: «queso», «fruta», «carne»
+famDef("queso", "queso, quesos, quesito, quesitos, cheese, fromage, formaggio, kase, queijo, formatge, gazta, manchego, brie, camembert, parmesano, parmigiano, pecorino, grana padano, gorgonzola, roquefort, cabrales, idiazabal, mozzarella, burrata, feta, halloumi, cheddar, gouda, emmental, gruyere, mascarpone, ricotta, requeson, mato, provolone, scamorza, stracciatella, tetilla, torta del casar, queso de cabra, rulo de cabra, philadelphia, queso crema, queso fresco, queso de burgos, tranchetes, queso rallado, paneer, labneh, cottage, quark, raclette, fondue de queso, tiropita, saganaki, cuatro quesos, 4 quesos, a la parmesana, parmigiana, gratinado con queso, tabla de quesos, queso azul, stilton, comte, reblochon, taleggio, edam, havarti, mahon, zamorano, payoyo, afuega'l pitu, san simon, arzua, tetilla gallega, queso de oveja, queso de vaca, queso curado, queso semicurado, queso tierno",
+  "pizza, pizzas, lasana, lasagna, canelones, gratinado, gratinada, gratinados, gratinadas, croque monsieur, quesadilla, quesadillas, nachos, tequenos, cheesecake, tarta de queso, sandwich mixto, bikini, bocadillo mixto, hamburguesa completa, cheeseburger, mac and cheese, risotto, carbonara, alfredo, pasta cuatro quesos, ensalada cesar, ensalada caprese, ensalada griega, moussaka, pastitsio, enchiladas, chilaquiles, arepa rellena, empanada de queso, croquetas de queso, bechamel, salsa de queso, fondue, raclette",
+  "lactosa", { relA: ["LÁCTEO"], ex: famList("queso vegano, queso vegetal, queso de anacardos, queso de almendras, queso de soja, queso de tofu, queso de cerdo, quesillo") });
+famDef("fruta", "fruta, frutas, fruit, fruits, frutta, obst, fruita, pieza de fruta, fruta del tiempo, fruta de temporada, fruta fresca, macedonia, ensalada de frutas, brocheta de fruta, zumo de frutas, smoothie, smoothie de frutas, mermelada, confitura, compota, fruta deshidratada, fruta desecada, frutas secas, fruta confitada, fruta escarchada, fruta en almibar",
+  "tarta de frutas, tarta de fruta, sorbete, sorbetes, helado de fruta, nectar, zumo, zumos, batido de frutas, coulis, gelatina de frutas, yogur de frutas, yogur con frutas",
+  "", { broad: true, incl: ["manzana", "pera", "membrillo", "melocoton", "albaricoque", "ciruela", "cereza", "fresa", "frambuesa", "mora", "arandano", "grosella", "kiwi", "platano", "aguacate", "mango", "papaya", "pina", "maracuya", "higo", "granada", "uva", "datil", "caqui", "melon", "sandia", "citricos"], ex: famList("fruta de la pasion, frutos secos, fruto seco, frutos de cascara, pan de frutas, frutas del mar, frutos del mar, fruta de hueso") });
+famDef("carne", "carne, carnes, meat, viande, fleisch, carni, carne picada, carne roja, carnes rojas, carne blanca, carnes blancas, pate, pates",
+  "", "", { broad: true, incl: ["carne roja", "ave", "conejo"], ex: famList("carne de membrillo, carne de pimiento choricero, carne de coco, carne vegetal, carne de soja, carne vegana, pate vegetal, pate vegano, pate de aceitunas, pate de berenjena, pate de setas, re:(?:albondigas?|hamburguesas?|salchichas?|nuggets|filetes?|escalopes?|milanesas?|chorizos?|bacon|jamon)\\s+(?:de\\s+)?(?:garbanzos?|lentejas|tofu|soja|seitan|quinoa|verduras|setas|berenjena|vegan[oa]s?|vegetal(?:es)?|veggie)") });
+
 // ---------- Motor ----------
 let FAM_BY_ID = null, FAM_INDEX = null, FAM_DISP = null;
 function famNorm(s) { return normText(s).trim().replace(/\s+/g, " "); }
@@ -3524,13 +4158,20 @@ function famInit() {
   // Una palabra que aparece en varias familias («pesto», «paella», «chorizo») NO sirve para saber a cuál
   // se refiere quien la escribe: se busca tal cual. El nombre de cada familia sí se reconoce siempre.
   const uses = new Map();
-  FOOD_FAMILIES.forEach(fam => new Set(fam.m.concat(fam.x).filter(r => !/^re:/.test(r)).map(famNorm)).forEach(k => uses.set(k, (uses.get(k) || 0) + 1)));
+  const names = new Set(FOOD_FAMILIES.flatMap(f => [famNorm(f.id), famNorm(f.n)]));  // «carne roja» es otra familia, no un nombre de «carne»
+  // 3.18: las familias «amplias» (grupos como «legumbres» o sustancias como «lactosa») no compiten por las palabras:
+  // «gazpacho» sigue siendo tomate aunque también lo vigile quien evita el vinagre.
+  FOOD_FAMILIES.forEach(fam => !fam.broad && new Set(fam.m.concat(fam.x).filter(r => !/^re:/.test(r)).map(famNorm)).forEach(k => uses.set(k, (uses.get(k) || 0) + 1)));
   FOOD_FAMILIES.forEach(fam => {
     FAM_BY_ID[fam.id] = fam;
     put(famNorm(fam.id), fam.id);
     put(famNorm(fam.n), fam.id);
     fam.m.concat(fam.x).forEach(raw => { if (!/^re:/.test(raw)) { const k = famNorm(raw); if (!FAM_DISP.has(k)) FAM_DISP.set(k, raw); } });
-    fam.m.forEach(raw => { if (!/^re:/.test(raw)) { const k = famNorm(raw); if (uses.get(k) === 1) put(k, fam.id); } });
+    if (!fam.broad) fam.m.forEach(raw => { if (!/^re:/.test(raw)) { const k = famNorm(raw); if (uses.get(k) === 1) put(k, fam.id); } });
+    // 3.18: una familia amplia reconoce sus nombres si ninguna otra familia los usa («leche» → lactosa); y los alias se
+    // reconocen siempre («chocolate» → cacao aunque la avellana y la cafeína también lo vigilen)
+    else fam.m.forEach(raw => { if (!/^re:/.test(raw)) { const k = famNorm(raw); if (!uses.has(k) && !names.has(k)) put(k, fam.id); } });
+    (fam.alias || []).forEach(a => put(famNorm(a), fam.id));
   });
 }
 // ¿A qué familias pertenece lo que escribió el comensal? «boletus» → seta, «pimentón» → pimiento, «pimiento rojo» → pimiento
@@ -3568,10 +4209,12 @@ function famRules(term) {
   const sureNorm = new Set([...sure].map(x => /^re:/.test(x) ? x : famNorm(x)));
   const sureList = [...sureNorm], maybeList = [...maybe].filter(x => /^re:/.test(x) || !sureNorm.has(famNorm(x)));
   const ex = [];
-  seen.forEach(id => (FAM_BY_ID[id].ex || []).forEach(e => ex.push(famNorm(e))));
+  seen.forEach(id => (FAM_BY_ID[id].ex || []).forEach(e => ex.push(/^re:/.test(e) ? e : famNorm(e))));
+  const rawList = [];
+  seen.forEach(id => (FAM_BY_ID[id].rawX || []).forEach(x => rawList.push(x)));
   // Si la palabra escrita es justo la que se excluye, no se excluye
-  const exRe = ex.filter(e => !sureNorm.has(e)).length ? new RegExp("(^|[^a-z0-9])(?:" + ex.filter(e => !sureNorm.has(e)).map(e => rxEscape(e).replace(/\s+/g, "\\s+")).join("|") + ")(?=[^a-z0-9]|$)", "g") : null;
-  return (famRulesCache[k] = { fams, ids: [...seen], sureList, maybeList, exRe, sureRe: famCap(sureList), maybeRe: famCap(maybeList) });
+  const exRe = ex.filter(e => !sureNorm.has(e)).length ? new RegExp("(^|[^a-z0-9])(?:" + ex.filter(e => !sureNorm.has(e)).map(e => /^re:/.test(e) ? e.slice(3) : rxEscape(e).replace(/\s+/g, "\\s+")).join("|") + ")(?=[^a-z0-9]|$)", "g") : null;
+  return (famRulesCache[k] = { fams, ids: [...seen], sureList, maybeList, sureNorm, exRe, sureRe: famCap(sureList), maybeRe: famCap(maybeList), rawRe: famCap(rawList) });
 }
 function famShow(norm) { famInit(); return FAM_DISP.get(norm) || FAM_DISP.get(famForms(norm)[1] || "") || norm; }
 // null | { kind: "sure"|"maybe", via: "pimentón" }
@@ -3581,10 +4224,19 @@ function customHitInfo(text, term) {
   const R = famRules(k);
   let t = neutralizeOptional(" " + normText(text) + " ");
   if (R.exRe) t = t.replace(R.exRe, "$1 ");
+  const t0 = t;
   t = stripNegations(t);
   let m = R.sureRe && R.sureRe.exec(t);
   if (m) return { kind: "sure", via: famShow(m[1].replace(/\s+/g, " ")) };
+  // 3.18: si el texto niega el propio alimento («pizza sin tomate», «hamburguesa sin cerdo», «jamón cocido sin
+  // nitritos»), lo que el plato SUELE llevar ya no cuenta. Lo que lo lleva seguro («ensaladilla sin patata») sigue avisando.
+  const neg = negatedWords(t0);
+  const denied = [...neg].some(w => R.sureNorm.has(w) || famForms(w).some(f => R.sureNorm.has(f)));
+  if (denied) return null;
   m = R.maybeRe && R.maybeRe.exec(t);
+  if (m) return { kind: "maybe", via: famShow(m[1].replace(/\s+/g, " ")) };
+  // «sin azúcar», «0% azúcar»: pistas que la negación borraría y que para algunas familias (edulcorantes) son sospechosas
+  m = R.rawRe && R.rawRe.exec(t0);
   if (m) return { kind: "maybe", via: famShow(m[1].replace(/\s+/g, " ")) };
   return null;
 }
