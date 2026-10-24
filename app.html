@@ -306,9 +306,6 @@
   .fab-scan span { font-size:1.2rem; }
   .view-title { margin:0 0 12px; font-size:1.3rem; }
   .row-sub { font-size:0.82rem; color:var(--muted); font-weight:400; }
-  .me-card { background:var(--card); border:1.5px solid var(--border); border-radius:16px; padding:16px; margin-bottom:12px; }
-  .me-label { font-size:0.8rem; color:var(--muted); font-weight:700; text-transform:uppercase; }
-  .me-value { font-size:1.15rem; font-weight:700; margin:6px 0 14px; color:#fca5a5; line-height:1.35; }
   .btn-block { width:100%; }
   @media (min-width: 1100px) {
     header { margin-left:-232px; }
@@ -694,11 +691,6 @@
   <div class="page-hero">
     <span class="ph-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
     <div><h2 class="ph-title">Yo</h2><p class="ph-sub">Tu perfil, tus ajustes y tu cuenta</p></div>
-  </div>
-  <div class="me-card">
-    <div class="me-label">Lo que evitas</div>
-    <div class="me-value" id="meAvoidSummary">Todavía no has marcado nada</div>
-    <button class="btn btn-primary btn-block" onclick="openAllergyProfileModal()">Editar lo que evito</button>
   </div>
   <button type="button" class="pro-entry" id="btnOwnerEntry" onclick="showView('owner')">
     <span class="pe-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/></svg></span>
@@ -1420,7 +1412,7 @@
       <summary>🛡️ 1. Configura tu perfil (lo primero)</summary>
       <div class="help-body">
         <ol>
-          <li>Ve a «👤 Yo» → «Editar lo que evito». También puedes tocar la píldora de arriba («Evitas: …» o «Marca tus alergias»).</li>
+          <li>Toca la barra de arriba («Evitas: …» o «Marca tus alergias»): se abre la lista para marcar lo que evitas.</li>
           <li>Toca los alérgenos que debes evitar. Son los 14 que la ley obliga a declarar en Europa.</li>
           <li>Si sigues una dieta, márcala: embarazada, vegana, vegetariana, sin cerdo o sin picante.</li>
           <li>¿Evitas algo más (ajo, pimiento, kiwi…)? Escríbelo en «Otros alimentos que te sientan mal» y pulsa «+ Vigilar».</li>
@@ -1834,7 +1826,7 @@
 
 <script>
 /* © ComeClaro (comeclaro.es) - Todos los derechos reservados. Obra y Base de Datos protegidas por el TRLPI (Real Decreto Legislativo 1/1996, Art. 133 Derecho sui generis sobre bases de datos) y la Ley 1/2019 de Secretos Empresariales. Queda estrictamente prohibida la reproducción, extracción, descompilación, ingeniería inversa o reutilización total o parcial de este motor y sus diccionarios sin autorización expresa. */
-const APP_VERSION = "3.23.0";
+const APP_VERSION = "3.23.1";
 const PLAN = {
 monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",
 founderMonthly: "9,99\u00a0€", founderYearly: "99,99\u00a0€",
@@ -5044,9 +5036,6 @@ const chips = [...al.map(a => `<span class="pp-chip">${AL_ICONS[a] || ""} ${esc(
 $("activeProfileSummary").innerHTML = total
 ? `<span class="pp-chips">${chips.join("")}</span>${strictTracesEnabled ? "" : "<span class='pp-dim'>trazas ok</span>"}<button type="button" class="pp-edit pp-card" onclick="event.stopPropagation(); openWaiterCardModal()" aria-label="Tarjeta para el camarero" title="Tarjeta para el camarero"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20M6 15h4"/></svg></button><span class="pp-edit" aria-hidden="true">✎</span>`
 : `<b>Marca tus alergias</b><span class="pp-edit">✎</span>`;
-const me = $("meAvoidSummary");
-const labels = profileLabels();
-if (me) me.innerHTML = labels.length ? esc(labels.join(", ")) + (strictTracesEnabled ? "" : " <span class='pp-dim'>(trazas permitidas)</span>") : "Todavía no has marcado nada";
 }
 const AL_ICONS = { "GLUTEN":"🌾","CRUSTÁCEOS":"🦐","HUEVO":"🥚","PESCADO":"🐟","CACAHUETES":"🥜","SOJA":"🫘","LÁCTEO":"🥛","FRUTOS CON CÁSCARA":"🌰","APIO":"🥬","MOSTAZA":"🟡","SÉSAMO":"⚪","SULFITOS":"🍷","ALTRAMUCES":"🌼","MOLUSCOS":"🐚" };
 function initFilterButtons() {
