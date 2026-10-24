@@ -511,6 +511,40 @@
   body.v-app .pp-chips { flex-wrap:nowrap; overflow-x:auto; max-height:none; }
   body.v-app .profile-pill { min-height:42px; padding-top:3px; padding-bottom:3px; }
   @media (min-width: 1100px) { .bottom-nav { padding-top:132px; } .rc-track { margin:0; padding-left:0; padding-right:0; } .rc-card { flex-basis:420px; } }
+  /* 3.16.0 · Título discreto, guardados abajo, cabeceras de «Yo» y «En casa», ajustes */
+  .sec-head { margin:2px 2px 10px; font-size:0.92rem; font-weight:700; color:#94a3b8; letter-spacing:0.01em; }
+  .scan-line a, .suggest-line a { color:var(--accent); font-weight:700; text-decoration:underline; text-underline-offset:3px; }
+  .scan-line { margin:12px 0 0; }
+  .pp-card { border:0; padding:0; cursor:pointer; }
+  .pp-card svg { display:block; }
+  .profile-pill.empty .pp-card { display:none; }
+  .page-hero { display:flex; align-items:center; gap:14px; padding:16px; margin:0 0 14px; border-radius:20px; border:1px solid rgba(56,189,248,0.28); background:radial-gradient(circle at 100% 0%, rgba(56,189,248,0.22), transparent 58%), linear-gradient(135deg, #1c2541, #111a3a); position:relative; overflow:hidden; }
+  .page-hero::after { content:""; position:absolute; right:-26px; bottom:-34px; width:120px; height:120px; border-radius:50%; border:1px solid rgba(56,189,248,0.2); box-shadow:0 0 0 18px rgba(56,189,248,0.05); pointer-events:none; }
+  .ph-ico { flex:0 0 auto; width:54px; height:54px; border-radius:17px; display:flex; align-items:center; justify-content:center; color:#04121f; background:linear-gradient(135deg, #7dd3fc, #38bdf8); box-shadow:0 8px 20px rgba(56,189,248,0.3); }
+  .ph-ico svg { width:28px; height:28px; }
+  .ph-title { margin:0; font-size:1.65rem; font-weight:800; letter-spacing:-0.015em; line-height:1.1; }
+  .ph-sub { margin:4px 0 0; font-size:0.86rem; color:#cbd5e1; line-height:1.4; position:relative; z-index:1; }
+  .pro-entry { display:flex; align-items:center; gap:13px; width:100%; text-align:left; margin:0 0 10px; padding:14px; border-radius:16px; border:1.5px solid rgba(129,140,248,0.5); background:linear-gradient(135deg, rgba(129,140,248,0.16), rgba(129,140,248,0.06)); color:var(--text); cursor:pointer; font-family:inherit; }
+  .pe-ico { flex:0 0 auto; width:44px; height:44px; border-radius:13px; display:flex; align-items:center; justify-content:center; background:rgba(129,140,248,0.22); color:#c7d2fe; }
+  .pe-ico svg { width:24px; height:24px; }
+  .pe-txt { flex:1; min-width:0; }
+  .pe-txt b { display:block; font-size:1.02rem; }
+  .pe-txt small { display:block; font-size:0.84rem; color:#c7d2fe; opacity:0.85; margin-top:2px; }
+  .pro-entry .chev, .set-row .chev, .set-card .chev { color:var(--muted); font-size:1.6rem; flex-shrink:0; }
+  .set-card { display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; text-align:left; padding:14px; margin:0 0 6px; border-radius:16px; border:1px solid var(--border); background:var(--card); color:var(--text); cursor:pointer; font-family:inherit; }
+  .sr-t b { display:block; font-size:1rem; }
+  .sr-t small { display:block; font-size:0.84rem; color:var(--muted); font-weight:400; margin-top:2px; line-height:1.35; }
+  .set-title { margin:20px 4px 8px; font-size:0.78rem; font-weight:800; letter-spacing:0.07em; text-transform:uppercase; color:var(--muted); }
+  .set-group { background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+  .set-row { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; text-align:left; padding:14px; background:transparent; border:0; border-bottom:1px solid var(--border); color:var(--text); font-family:inherit; cursor:pointer; }
+  .set-row:last-child { border-bottom:0; }
+  div.set-row { cursor:default; }
+  .switch { appearance:none; -webkit-appearance:none; flex:0 0 auto; width:50px; height:30px; border-radius:15px; background:#475569; position:relative; cursor:pointer; transition:background .2s; border:0; }
+  .switch::after { content:""; position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%; background:#fff; transition:transform .2s; }
+  .switch:checked { background:var(--accent); }
+  .switch:checked::after { transform:translateX(20px); }
+  #dataModal .set-title:first-of-type { margin-top:14px; }
+  #homeView .list-tools { margin-top:12px; }
 </style>
 </head>
 <body>
@@ -561,31 +595,21 @@
     <button type="button" class="icon-btn" id="btnSearchToggle" onclick="toggleDiscoverSearch()" aria-label="Buscar un restaurante por su nombre">🔍</button>
   </div>
   <input type="search" id="discoverSearch" class="search-input" style="display:none; width:100%; margin:0 0 10px;" placeholder="Nombre del restaurante o localidad" oninput="renderDinerView()" aria-label="Buscar restaurante o localidad">
-  <div class="seg2" role="tablist">
-    <button type="button" class="on" id="seg-near" role="tab" onclick="setDiscoverSeg('near')">Restaurantes</button>
-    <button type="button" id="seg-saved" role="tab" onclick="setDiscoverSeg('saved')">Guardados</button>
-  </div>
+  <h2 class="sec-head" id="discoverTitle">Restaurantes según tus alergias</h2>
 
   <div id="nearBox"><div id="nearList"></div></div>
 
-  <div id="savedBox" style="display:none;">
-    <div class="folder-bar" id="routeFoldersBar"></div>
-    <div class="list-tools">
-      <button class="btn btn-outline" onclick="createNewRouteFolder()">+ Nueva lista</button>
-      <button class="btn btn-outline" id="btnRenameFolder" style="display:none;" onclick="renameActiveFolder()">Renombrar</button>
-      <button class="btn btn-outline danger-text" id="btnDeleteFolder" style="display:none;" onclick="deleteActiveFolder()">Borrar lista</button>
-    </div>
-    <div id="myRestaurantsList"></div>
-  </div>
-
   <p class="scan-line">¿Estás ya en un restaurante? <a href="#" onclick="openUniversalScanner(); return false;">Escanea el QR de la mesa</a></p>
-  <p class="suggest-line">¿Falta un restaurante? <a href="#" onclick="openSuggestRestModal(); return false;">Sugiérelo</a></p>
+  <p class="scan-line">¿Quieres volver a uno que guardaste? <a href="#" onclick="openSavedSheet(); return false;">Tus guardados<span id="savedCount"></span></a></p>
+  <p class="scan-line">¿Falta un restaurante? <a href="#" onclick="openSuggestRestModal(); return false;">Sugiérelo</a></p>
 </div>
 
 <!-- PESTAÑA 2: EN CASA (MIS PLATOS Y PRODUCTOS) -->
 <div id="homeView" class="container" style="display:none;">
-  <h2 class="view-title">En casa</h2>
-  <p class="row-sub" style="margin:-6px 0 12px;">Apunta lo que cocinas o escanea lo que compras y te decimos si encaja con lo que evitas.</p>
+  <div class="page-hero">
+    <span class="ph-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9z"/></svg></span>
+    <div><h2 class="ph-title">En casa</h2><p class="ph-sub">Apunta lo que cocinas o escanea lo que compras y te decimos si encaja con lo que evitas.</p></div>
+  </div>
   <button class="btn btn-primary btn-xl" onclick="openHomeDishModal()">+ Añadir plato</button>
   <div class="folder-bar" id="homeListsBar" style="margin-top:14px;"></div>
   <div class="list-tools">
@@ -641,50 +665,36 @@
   </div>
 </div>
 
-<!-- PESTAÑA 4: YO (PERFIL, AYUDA, LEGAL Y MODO RESTAURANTE) -->
+<!-- PESTAÑA 4: YO (ALERGIAS, MODO RESTAURANTE, AYUDA Y AJUSTES) -->
 <div id="profileView" class="container" style="display:none;">
-  <h2 class="view-title">Yo</h2>
+  <div class="page-hero">
+    <span class="ph-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+    <div><h2 class="ph-title">Yo</h2><p class="ph-sub">Tu perfil, tus ajustes y tu cuenta</p></div>
+  </div>
   <div class="me-card">
     <div class="me-label">Lo que evitas</div>
     <div class="me-value" id="meAvoidSummary">Todavía no has marcado nada</div>
     <button class="btn btn-primary btn-block" onclick="openAllergyProfileModal()">Editar lo que evito</button>
   </div>
-  <div class="rest-list-card">
-    <div><b>Tarjeta para el camarero</b><br><span class="row-sub">En español, inglés, francés e italiano</span></div>
-    <button class="btn btn-outline" onclick="openWaiterCardModal()">Abrir</button>
+  <button type="button" class="pro-entry" id="btnOwnerEntry" onclick="showView('owner')">
+    <span class="pe-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/></svg></span>
+    <span class="pe-txt"><b>Tengo un restaurante</b><small>Sube tu carta y saca tu QR de mesa</small></span>
+    <span class="chev" aria-hidden="true">›</span>
+  </button>
+  <button type="button" class="set-card" id="btnHelp" onclick="openHelpModal()">
+    <span class="sr-t"><b>Cómo se usa Comeclaro</b><small>Paso a paso</small></span><span class="chev" aria-hidden="true">›</span>
+  </button>
+
+  <div class="set-title">Ajustes</div>
+  <div class="set-group">
+    <button type="button" class="set-row" onclick="openModal('dataModal')"><span class="sr-t"><b>Mis datos</b><small>Copia de seguridad y borrado</small></span><span class="chev" aria-hidden="true">›</span></button>
+    <label class="set-row" style="cursor:pointer;"><span class="sr-t"><b>Estadísticas de uso</b><small>Solo el día y el tipo de móvil, nunca tus alergias. Nos ayuda a conseguir apoyos para Comeclaro</small></span><input type="checkbox" id="usageToggle" class="switch" onchange="toggleUsage(this.checked)" aria-label="Permitir estadísticas de uso"></label>
   </div>
-  <div class="rest-list-card">
-    <div><b>Cómo se usa Comeclaro</b><br><span class="row-sub">Paso a paso</span></div>
-    <button class="btn btn-outline" id="btnHelp" onclick="openHelpModal()">Ver</button>
-  </div>
-  <div class="rest-list-card pro-entry">
-    <div><b>Tengo un restaurante</b><br><span class="row-sub">Sube tu carta y saca tu QR de mesa</span></div>
-    <button class="btn btn-outline" id="btnOwnerEntry" onclick="showView('owner')">Entrar</button>
-  </div>
-  <div class="section-title">Mis datos</div>
-  <div class="rest-list-card">
-    <div><b>Copia de seguridad</b><br><span class="row-sub">Guarda o recupera tus platos y listas</span></div>
-    <div style="display:flex; gap:6px;">
-      <button class="btn btn-outline" onclick="exportBackupJson()">Exportar</button>
-      <label class="btn btn-outline" style="cursor:pointer; margin:0;">Importar<input type="file" accept=".json" style="display:none;" onchange="importBackupJson(event)"></label>
-    </div>
-  </div>
-  <div class="rest-list-card">
-    <div><b>Estadísticas de uso</b><br><span class="row-sub">Solo el día y el tipo de móvil, nunca tus alergias. Nos ayuda a conseguir apoyos para Comeclaro</span></div>
-    <label style="display:flex; align-items:center; gap:6px; font-size:0.9rem; font-weight:700; cursor:pointer;"><input type="checkbox" id="usageToggle" onchange="toggleUsage(this.checked)"> Permitir</label>
-  </div>
-  <div class="section-title">Legal</div>
-  <div class="rest-list-card">
-    <div><b>Aviso legal y normativa sanitaria</b><br><span class="row-sub">Reglamento UE 1169/2011 y exención de responsabilidad</span></div>
-    <button class="btn btn-outline" onclick="openModal('legalModal')">Ver</button>
-  </div>
-  <div class="rest-list-card">
-    <div><b>Privacidad</b><br><span class="row-sub">Tu perfil de alergias se queda en tu móvil</span></div>
-    <button class="btn btn-outline" onclick="openPrivacyModal()">Ver</button>
-  </div>
-  <div class="rest-list-card" style="border-color:rgba(239,68,68,0.5);">
-    <div><b>Borrar todos mis datos</b><br><span class="row-sub">Elimina de este móvil tu perfil, platos, listas, reseñas y cuenta de restaurante</span></div>
-    <button class="btn btn-danger" onclick="deleteAllMyData()">Borrar</button>
+
+  <div class="set-title">Información legal</div>
+  <div class="set-group">
+    <button type="button" class="set-row" onclick="openPrivacyModal()"><span class="sr-t"><b>Política de privacidad</b><small>Tu perfil de alergias se queda en tu móvil</small></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="set-row" onclick="openModal('legalModal')"><span class="sr-t"><b>Aviso legal y normativa sanitaria</b><small>Reglamento UE 1169/2011 y exención de responsabilidad</small></span><span class="chev" aria-hidden="true">›</span></button>
   </div>
   <p class="app-copyright">Comeclaro <span id="aboutVersion"></span> · © 2026 Francisco José Ureña Castillo. Comeclaro, su diseño y su código son de su titular. <a href="LICENCIAS-LIBRERIAS.txt" target="_blank" rel="noopener">Licencias de las librerías</a></p>
 </div>
@@ -814,6 +824,43 @@
   </div>
 </nav>
 
+<!-- MIS DATOS: copia de seguridad y borrado -->
+<div class="modal" id="dataModal" role="dialog" aria-modal="true" aria-labelledby="dataModalTitle" onclick="if(event.target===this) closeModal('dataModal')">
+  <div class="modal-content sheet">
+    <h2 class="sheet-title" id="dataModalTitle">Mis datos</h2>
+    <p class="row-sub" style="margin:0 0 6px;">Tu perfil, tus platos y tus listas se guardan solo en este móvil. Aquí puedes llevártelos o borrar lo que quieras.</p>
+    <div class="set-title">Copia de seguridad</div>
+    <div class="tg-btns">
+      <button class="btn btn-outline" onclick="exportBackupJson()">Exportar copia</button>
+      <label class="btn btn-outline" style="cursor:pointer; margin:0;">Importar copia<input type="file" accept=".json" style="display:none;" onchange="closeModal('dataModal'); importBackupJson(event)"></label>
+    </div>
+    <div class="set-title">Borrar por partes</div>
+    <div class="set-group">
+      <div class="set-row"><span class="sr-t"><b>Mi perfil de alergias</b><small>Alérgenos, dietas y alimentos a evitar</small></span><button class="btn btn-outline danger-text" onclick="clearMyProfileData()">Borrar</button></div>
+      <div class="set-row"><span class="sr-t"><b>Mis platos de casa</b><small>Los platos y productos de «En casa»</small></span><button class="btn btn-outline danger-text" onclick="clearMyHomeData()">Borrar</button></div>
+      <div class="set-row"><span class="sr-t"><b>Mis guardados</b><small>Las listas de restaurantes guardados</small></span><button class="btn btn-outline danger-text" onclick="clearMySavedData()">Borrar</button></div>
+    </div>
+    <div class="set-title">Eliminar mi cuenta y mis datos</div>
+    <p class="row-sub" style="margin:0 0 8px;">Borra todo lo anterior y también lo que publicaste (opiniones y denuncias). Si tienes cuenta de restaurante, elimina la cuenta con sus locales, cartas y estadísticas. No se puede deshacer.</p>
+    <button class="btn btn-outline danger-text btn-block" onclick="closeModal('dataModal'); deleteAllMyData()">Eliminar mi cuenta y todos mis datos</button>
+    <button class="btn btn-primary btn-block" style="margin-top:10px;" onclick="closeModal('dataModal')">Cerrar</button>
+  </div>
+</div>
+
+<!-- RESTAURANTES GUARDADOS -->
+<div class="modal" id="savedModal" role="dialog" aria-modal="true" aria-labelledby="savedModalTitle" onclick="if(event.target===this) closeModal('savedModal')">
+  <div class="modal-content sheet">
+    <div class="scan-head"><h2 id="savedModalTitle">Tus guardados</h2><button class="btn btn-outline" onclick="closeModal('savedModal')">Cerrar</button></div>
+    <div class="folder-bar" id="routeFoldersBar" style="margin-top:10px;"></div>
+    <div class="list-tools">
+      <button class="btn btn-outline" onclick="createNewRouteFolder()">+ Nueva lista</button>
+      <button class="btn btn-outline" id="btnRenameFolder" style="display:none;" onclick="renameActiveFolder()">Renombrar</button>
+      <button class="btn btn-outline danger-text" id="btnDeleteFolder" style="display:none;" onclick="deleteActiveFolder()">Borrar lista</button>
+    </div>
+    <div id="myRestaurantsList"></div>
+  </div>
+</div>
+
 <!-- ELEGIR ZONA: mi ubicación, ciudad o mapa -->
 <div class="modal" id="locModal" role="dialog" aria-modal="true" aria-labelledby="locModalTitle" onclick="if(event.target===this) closeModal('locModal')">
   <div class="modal-content sheet">
@@ -875,6 +922,7 @@
       </label>
       <button class="btn btn-outline" onclick="clearAllFilters()">Borrar todo</button>
     </div>
+    <button type="button" class="btn btn-outline btn-block" style="margin-top:14px;" onclick="closeModal('allergyProfileModal'); openWaiterCardModal()">Tarjeta para el camarero</button>
   </div>
 </div>
 
@@ -1231,7 +1279,7 @@
 <h3 id="borrar-cuenta">Cómo borrar tu cuenta y tus datos</h3>
 <ul>
   <li><b>Restaurantes:</b> en la app, pestaña Hostelería → «🗑️ Eliminar cuenta». Se borran al momento tu cuenta, tus locales, sus cartas, opiniones y estadísticas, y tus denuncias y reclamaciones. Solo quedan, si fuiste Fundador, una marca técnica sin datos personales que impide volver a ocupar otra plaza, y el registro de los locales borrados (12 meses). Si tienes una suscripción, la cancelamos en ese momento para que no se te vuelva a cobrar. Si la contrataste con Google Play, también puedes cancelarla tú en Google Play → Pagos y suscripciones.</li>
-  <li><b>Clientes:</b> en la app, «Yo» → «Borrar todos mis datos». Se borran los datos de tu móvil y las opiniones y denuncias que enviaste desde él. Si alguna no se puede borrar (por ejemplo, sin conexión), la app te lo dice; escríbenos indicando el restaurante y la fecha, y la borramos.</li>
+  <li><b>Clientes:</b> en la app, «Yo» → «Mis datos» → «Eliminar mi cuenta y todos mis datos». Se borran los datos de tu móvil y las opiniones y denuncias que enviaste desde él. Si alguna no se puede borrar (por ejemplo, sin conexión), la app te lo dice; escríbenos indicando el restaurante y la fecha, y la borramos.</li>
   <li><b>Sin abrir la app:</b> escribe a <a href="mailto:contacto@comeclaro.es?subject=Solicitud%20de%20borrado%20de%20cuenta">contacto@comeclaro.es</a> (asunto «Solicitud de borrado de cuenta») desde el email de tu cuenta, o indicando el restaurante y la fecha de tus opiniones. Lo haremos en el plazo máximo de un mes.</li>
 </ul>
 
@@ -1396,7 +1444,7 @@
       <div class="help-body">
         <ul>
           <li><b>«Avisar al restaurante»</b>: escribe tu nombre, cuántos sois, el día y la hora. Se abre WhatsApp con un mensaje al restaurante que incluye tus alergias y dietas, y tú decides si lo envías. Solo aparece si el local tiene WhatsApp.</li>
-          <li><b>«♡ Guardar»</b>: guarda el local en una lista, por ejemplo «Favoritos» o «Vacaciones». Tus listas están en «🍽️ Comer fuera», en «Guardados». Con «Renombrar» cambias su nombre y con «Borrar lista» la borras.</li>
+          <li><b>«♡ Guardar»</b>: guarda el local en una lista, por ejemplo «Favoritos» o «Vacaciones». Tus listas están en «🍽️ Comer fuera», abajo, en «Tus guardados». Con «Renombrar» cambias su nombre y con «Borrar lista» la borras.</li>
           <li><b>«📲 Compartir»</b>: envía el enlace de la carta por WhatsApp.</li>
         </ul>
       </div>
@@ -1405,7 +1453,7 @@
     <details class="help-sec" id="help-camarero">
       <summary>🗣️ 4. En la mesa: tarjeta para el camarero</summary>
       <div class="help-body">
-        <p>Pulsa «Mostrar al camarero» (en la carta del local) o «👤 Yo» → «Tarjeta para el camarero». La tarjeta explica tus alergias en español, inglés, francés o italiano: elige el idioma y enseña la pantalla.</p>
+        <p>Pulsa «Mostrar al camarero» (en la carta del local) o el icono de tarjeta que hay junto al lápiz, arriba, en tu lista de alergias (también en «Lo que evito» → «Tarjeta para el camarero»). La tarjeta explica tus alergias en español, inglés, francés o italiano: elige el idioma y enseña la pantalla.</p>
       </div>
     </details>
 
@@ -1470,9 +1518,9 @@
       <div class="help-body">
         <ul>
           <li>Tu perfil, tus platos caseros y tus rutas se guardan <b>solo en este móvil</b>. Si cambias de móvil o borras la app, se pierden, salvo que hagas una copia.</li>
-          <li><b>«💾 Copia de Seguridad»</b>: «📤 Exportar» descarga un archivo con todo. En el móvil nuevo, pulsa «📥 Importar» y elige ese archivo. Ojo: sustituye lo que haya en ese móvil.</li>
+          <li><b>«Mis datos»</b> (en «👤 Yo»): «Exportar copia» descarga un archivo con todo. En el móvil nuevo, pulsa «Importar copia» y elige ese archivo. Ojo: sustituye lo que haya en ese móvil.</li>
           <li><b>«📊 Estadísticas de uso»</b>: solo si lo permites, cuenta que este móvil usa la app, sin tu nombre ni tus alergias. Si lo desactivas, se borra lo apuntado.</li>
-          <li><b>«🗑️ Borrar todos mis datos»</b>: elimina de este móvil todo lo tuyo. Lee el aviso antes de confirmar.</li>
+          <li><b>Borrar</b>: en «Mis datos» puedes borrar por partes (tu perfil de alergias, tus platos de casa o tus guardados) o eliminar tu cuenta y todos tus datos. Lee el aviso antes de confirmar.</li>
           <li><b>Botón «atrás» del móvil</b>: cierra la ventana abierta o vuelve a la pantalla anterior. En la pantalla de inicio, púlsalo dos veces para salir.</li>
           <li><b>Sin internet</b>, la app se abre con lo último que guardó. Para buscar productos, ver el mapa o publicar cambios hace falta conexión.</li>
         </ul>
@@ -1786,7 +1834,7 @@
 </div>
 
 <script>
-const APP_VERSION = "3.15.0";
+const APP_VERSION = "3.16.0";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
@@ -3908,7 +3956,7 @@ function updateProfileBarSummary() {
   if (pill) pill.classList.toggle("empty", !total);
   const chips = [...al.map(a => `<span class="pp-chip">${AL_ICONS[a] || ""} ${esc(capWords(a))}</span>`), ...di.map(d => `<span class="pp-chip">${esc(d)}</span>`), ...cu.map(c => `<span class="pp-chip">Sin ${esc(c)}</span>`)];
   $("activeProfileSummary").innerHTML = total
-    ? `<span class="pp-chips">${chips.join("")}</span>${strictTracesEnabled ? "" : "<span class='pp-dim'>trazas ok</span>"}<span class="pp-edit">✎</span>`
+    ? `<span class="pp-chips">${chips.join("")}</span>${strictTracesEnabled ? "" : "<span class='pp-dim'>trazas ok</span>"}<button type="button" class="pp-edit pp-card" onclick="event.stopPropagation(); openWaiterCardModal()" aria-label="Tarjeta para el camarero" title="Tarjeta para el camarero"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20M6 15h4"/></svg></button><span class="pp-edit" aria-hidden="true">✎</span>`
     : `<b>Marca tus alergias</b><span class="pp-edit">✎</span>`;
   const me = $("meAvoidSummary");
   const labels = profileLabels();
@@ -4705,14 +4753,8 @@ async function deleteActiveHomeList() {
 // RESTAURANTES: LISTA, RUTAS, MAPA, ALTA/EDICIÓN Y CARTA
 // ============================================================
 // ---------- Comer fuera: un restaurante a la vez ----------
-let userPos = null, geoBusy = false, nearShown = 40, discoverSeg = "near", mapOpen = false, locMode = "all", locCity = "";
-function setDiscoverSeg(seg) {
-  discoverSeg = seg;
-  $("seg-near").classList.toggle("on", seg === "near");
-  $("seg-saved").classList.toggle("on", seg === "saved");
-  $("nearBox").style.display = seg === "near" ? "block" : "none";
-  $("savedBox").style.display = seg === "saved" ? "block" : "none";
-}
+let userPos = null, geoBusy = false, nearShown = 40, mapOpen = false, locMode = "all", locCity = "";
+function openSavedSheet() { renderDinerView(); openModal("savedModal"); }
 function toggleDiscoverSearch() {
   const inp = $("discoverSearch");
   const open = inp.style.display === "none";
@@ -4745,6 +4787,8 @@ function updateLocTab() {
   const l = $("locTabLabel"), t = $("locTab");
   if (!l || !t) return;
   l.innerText = geoBusy ? "Buscando…" : locMode === "near" ? "Cerca de ti" : locMode === "city" ? locCity : "Elegir zona";
+  const h = $("discoverTitle");
+  if (h) h.innerText = locMode === "near" ? "Restaurantes cerca de ti" : locMode === "city" ? "Restaurantes en " + locCity : "Restaurantes según tus alergias";
   t.classList.toggle("set", locMode !== "all");
 }
 function openLocSheet() { $("locCityInput").value = ""; renderCityChips(); openModal("locModal"); }
@@ -4933,6 +4977,8 @@ function rcGo(d) {
 
 function renderDinerView() {
   renderNearList();
+  const sc = $("savedCount");
+  if (sc) { const n = new Set(appState.routeFolders.flatMap(f => f.restIds || [])).size; sc.innerText = n ? ` (${n})` : ""; }
   const folder = appState.routeFolders.find(f => f.id === appState.activeFolderId) || appState.routeFolders[0];
   appState.activeFolderId = folder.id;
   const isSec = folder.id !== "f_fav";
@@ -5368,7 +5414,7 @@ async function deleteRestaurant(id, isSuggested) {
 
 function openRestaurantForDiner(id) {
   if (!appState.restaurants.some(r => r.id === id)) return;
-  closeMapSheet();
+  closeMapSheet(); closeModal("savedModal");
   activeRestId = id; isStaffUnlocked = false; resetStaffGuest();
   const r = getActiveRest();
   if (r.cloud) cloudInc(id, "views");
@@ -8006,6 +8052,7 @@ const BACK_CLOSERS = {
   homeDishModal: () => closeIfNoChanges("homeDishModal", closeHomeDishModal),
   allergenWarningModal: () => cancelAddUnsafeProduct(),
   registerModal: () => cancelRegistration(),
+  mapModal: () => closeMapSheet(),
   legalModal: () => {}            // la bienvenida no se puede saltar: hay que aceptarla
 };
 function topOpenModal() {
@@ -9068,6 +9115,21 @@ function openPrivacyModal() {
   openModal("privacyModal");
 }
 function openTermsModal() { openModal("termsModal"); }
+// Borrado por partes (desde «Yo» → «Mis datos»): cada uno pide confirmación y solo toca lo suyo
+async function clearMyProfileData() {
+  if (!await uiConfirm("¿Borrar de este móvil tu perfil de alergias, dietas y alimentos a evitar?", { okText: "Borrar", danger: true })) return;
+  clearAllFilters(); toast("Perfil de alergias borrado.");
+}
+async function clearMyHomeData() {
+  if (!await uiConfirm("¿Borrar de este móvil todos tus platos y productos de «En casa»?", { okText: "Borrar", danger: true })) return;
+  appState.homeLists = makeDefaultHomeLists(); appState.activeHomeListId = "hl_default";
+  saveAppState(); if (currentView === "home") renderHomeView(); toast("Platos de casa borrados.");
+}
+async function clearMySavedData() {
+  if (!await uiConfirm("¿Vaciar todas tus listas de restaurantes guardados? Los restaurantes no se borran.", { okText: "Vaciar", danger: true })) return;
+  appState.routeFolders.forEach(f => { f.restIds = []; });
+  saveAppState(); renderDinerView(); toast("Guardados vaciados.");
+}
 async function deleteAllMyData() {
   if (isCloudMode() && !cloud) await initCloud();      // así se sabe bien si hay cuenta de hostelería
   const owner = cloudOwner();
