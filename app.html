@@ -8,7 +8,7 @@
 <style id="antiClickjack">html{display:none!important}</style><script>(function(){var ok=false;try{ok=window.top===window.self||window.top.location.origin===location.origin;}catch(e){}if(ok){var s=document.getElementById("antiClickjack");if(s)s.parentNode.removeChild(s);return;}try{window.top.location=location.href;}catch(e){}})();</script>
 <!--/seguridad-3.12-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0b132b">
+<meta name="theme-color" content="#060b19">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -17,7 +17,8 @@
 <script src="firebase-config.js"></script>
 <title>Comeclaro · Cartas según tus alergias</title>
 <style>
-  :root { --bg:#0b132b; --card:#1c2541; --card-alt:#060b19; --text:#f8fafc; --muted:#94a3b8; --green:#10b981; --amber:#f59e0b; --red:#ef4444; --accent:#38bdf8; --purple:#a855f7; --orange:#f97316; --border:#2d3a5d; }
+  /* 3.16.2: fondo más oscuro y tarjetas un punto más claras para que las opciones se separen del fondo */
+  :root { --bg:#070c1c; --card:#222c4c; --card-alt:#060b19; --text:#f8fafc; --muted:#94a3b8; --green:#10b981; --amber:#f59e0b; --red:#ef4444; --accent:#38bdf8; --purple:#a855f7; --orange:#f97316; --border:#35436d; }
   * { box-sizing:border-box; font-family:system-ui,-apple-system,sans-serif; -webkit-tap-highlight-color:transparent; }
   body { margin:0; background:var(--bg); color:var(--text); padding-bottom:92px; }
   header { background:var(--card-alt); padding:10px 14px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:1000; border-bottom:1px solid var(--border); }
@@ -488,7 +489,7 @@
   .cover-preview.has-img { border-style:solid; }
   .cover-btns { display:flex; gap:8px; flex-wrap:wrap; }
   /* Animación de bienvenida con el logo */
-  #splash { position:fixed; inset:0; z-index:9999; background:radial-gradient(circle at 50% 42%, #13204a 0%, #0b132b 62%); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; transition:opacity .4s ease, visibility .4s; }
+  #splash { position:fixed; inset:0; z-index:9999; background:radial-gradient(circle at 50% 42%, #111c40 0%, #070c1c 62%); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; transition:opacity .4s ease, visibility .4s; }
   #splash.out { opacity:0; visibility:hidden; }
   .no-splash #splash { display:none; }
   .sp-logo { width:132px; height:132px; overflow:visible; filter:drop-shadow(0 12px 30px rgba(56,189,248,0.25)); }
@@ -1846,7 +1847,7 @@
 </div>
 
 <script>
-const APP_VERSION = "3.16.1";
+const APP_VERSION = "3.16.2";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido

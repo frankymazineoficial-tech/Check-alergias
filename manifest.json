@@ -9,7 +9,7 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0b132b",
+  "background_color": "#070c1c",
   "theme_color": "#0b132b",
   "categories": [
     "food",
