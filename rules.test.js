@@ -340,6 +340,33 @@ const R = (db_, p) => db_.doc(p);
   await t('NO borrar la portada de otra cuenta', seedCov, () => assertFails(R(db.owner('own2'), 'covers/own1_1').delete()));
   await t('NO borrar una portada sin sesión', seedCov, () => assertFails(R(db.anon(), 'covers/own1_1').delete()));
 
+  sec('15) 3.19 · Señales para mejorar el detector (kb_signals)');
+  const KB = 'a1b2c3d4_0123456789ab';
+  const kb = (extra = {}) => ({ v: '3.19.0', kind: 'ing', txt: 'puntillitas', sub: 'puntillitas', cat: 'tapas', det: [], weak: ['GLUTEN'], comp: ['HUEVO'],
+    saved: ['GLUTEN', 'HUEVO'], added: ['GLUTEN', 'HUEVO'], dropped: [], src: 'owner', vf: false, lh: 'a1b2c3d4', at: ST(), ...extra });
+  const seedKb = () => seed(d => d.doc('kb_signals/' + KB).set({ ...kb(), at: TS.now() }));
+  await t('una cuenta de restaurante SÍ deja una señal', null, () => assertSucceeds(R(db.owner('own1'), 'kb_signals/' + KB).set(kb())));
+  await t('con la fuente de la IA o con el local verificado también', null, () => assertSucceeds(R(db.owner('own1'), 'kb_signals/' + KB).set(kb({ src: 'ai_review', vf: true, kind: 'dish' }))));
+  await t('NO sin sesión', null, () => assertFails(R(db.anon(), 'kb_signals/' + KB).set(kb())));
+  await t('NO como cliente anónimo', null, () => assertFails(R(db.guest('c1'), 'kb_signals/' + KB).set(kb())));
+  await t('NO leerlas siendo restaurante', seedKb, () => assertFails(R(db.owner('own1'), 'kb_signals/' + KB).get()));
+  await t('NO leerlas sin sesión', seedKb, () => assertFails(R(db.anon(), 'kb_signals/' + KB).get()));
+  await t('la administración SÍ las lee', seedKb, () => assertSucceeds(R(db.admin(), 'kb_signals/' + KB).get()));
+  await t('la administración SÍ las borra', seedKb, () => assertSucceeds(R(db.admin(), 'kb_signals/' + KB).delete()));
+  await t('NO borrarlas siendo restaurante', seedKb, () => assertFails(R(db.owner('own1'), 'kb_signals/' + KB).delete()));
+  await t('NO cambiar una señal ya enviada', seedKb, () => assertFails(R(db.owner('own1'), 'kb_signals/' + KB).set(kb({ added: ['SOJA'], saved: ['SOJA'] }))));
+  await t('NO un nombre de documento que no sea lh_resumen', null, () => assertFails(R(db.owner('own1'), 'kb_signals/mi-local-bar-uno').set(kb())));
+  await t('NO si el lh no coincide con el nombre del documento', null, () => assertFails(R(db.owner('own1'), 'kb_signals/' + KB).set(kb({ lh: 'ffffffff' }))));
+  await t('NO campos extra (por ejemplo, el local o la cuenta)', null, () => assertFails(R(db.owner('own1'), 'kb_signals/' + KB).set(kb({ rid: 'own1_1' }))));
+  await t('NO un alérgeno inventado', null, () => assertFails(R(db.owner('own1'), 'kb_signals/' + KB).set(kb({ added: ['PIMIENTO'] }))));
+  await t('NO un origen inventado', null, () => assertFails(R(db.owner('own1'), 'kb_signals/' + KB).set(kb({ src: 'admin' }))));
+  await t('NO un tipo inventado', null, () => assertFails(R(db.owner('own1'), 'kb_signals/' + KB).set(kb({ kind: 'otro' }))));
+  await t('NO un texto de más de 160 caracteres', null, () => assertFails(R(db.owner('own1'), 'kb_signals/' + KB).set(kb({ txt: 'x'.repeat(161) }))));
+  await t('NO un texto vacío', null, () => assertFails(R(db.owner('own1'), 'kb_signals/' + KB).set(kb({ txt: '' }))));
+  await t('NO una señal sin nada añadido ni quitado', null, () => assertFails(R(db.owner('own1'), 'kb_signals/' + KB).set(kb({ added: [], dropped: [] }))));
+  await t('NO una fecha inventada', null, () => assertFails(R(db.owner('own1'), 'kb_signals/' + KB).set(kb({ at: TS.now() }))));
+  await t('quitar un alérgeno que el motor daba por seguro SÍ se anota (para revisar falsos positivos)', null, () => assertSucceeds(R(db.owner('own1'), 'kb_signals/' + KB).set(kb({ added: [], saved: [], dropped: ['GLUTEN'], det: ['GLUTEN'] }))));
+
   await env.cleanup();
   console.log(`\n==== ${pass} correctas, ${fail} fallos ====`);
   if (fail) { console.log('Fallos:\n - ' + failed.join('\n - ')); process.exit(1); }

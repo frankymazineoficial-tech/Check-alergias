@@ -718,7 +718,7 @@
   <div class="set-title">Información legal</div>
   <div class="set-group">
     <button type="button" class="set-row" onclick="openPrivacyModal()"><span class="sr-t"><b>Política de privacidad</b><small>Tu perfil de alergias se queda en tu móvil</small></span><span class="chev" aria-hidden="true">›</span></button>
-    <button type="button" class="set-row" onclick="openModal('legalModal')"><span class="sr-t"><b>Aviso legal y normativa sanitaria</b><small>Reglamento UE 1169/2011 y exención de responsabilidad</small></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="set-row" onclick="openLegalModal()"><span class="sr-t"><b>Aviso legal y normativa sanitaria</b><small>Reglamento UE 1169/2011 y exención de responsabilidad</small></span><span class="chev" aria-hidden="true">›</span></button>
   </div>
   <p class="app-copyright">Comeclaro <span id="aboutVersion"></span> · © 2026 Francisco José Ureña Castillo. Comeclaro, su diseño y su código son de su titular. <a href="LICENCIAS-LIBRERIAS.txt" target="_blank" rel="noopener">Licencias de las librerías</a></p>
 </div>
@@ -971,7 +971,7 @@
             <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleBarcodePhotoScan(event, 'universal')">
           </label>
           <div style="display:flex; gap:6px;">
-            <input type="text" id="universalManualInput" class="search-input" placeholder="Escribir el código o pegar un enlace" aria-label="Nº de código de barras o enlace del QR" style="flex:1;">
+            <input type="text" id="universalManualInput" class="search-input" placeholder="Escribir el código o pegar un enlace" aria-label="Nº de código de barras o enlace del QR" style="flex:1;" onkeydown="if(event.key==='Enter') handleUniversalManualInput()">
             <button class="btn btn-primary" onclick="handleUniversalManualInput()">Analizar</button>
           </div>
         </div>
@@ -985,7 +985,7 @@
   <div class="modal-content" style="border:2px solid var(--amber);">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <h2 style="margin:0; font-size:1rem; color:var(--amber);" id="homeDishModalTitle">🍲 Plato en Casa</h2>
-      <button class="btn btn-outline" onclick="closeHomeDishModal()">✕</button>
+      <button class="btn btn-outline" onclick="closeIfNoChanges('homeDishModal', closeHomeDishModal)" aria-label="Cerrar">✕</button>
     </div>
     <input type="hidden" id="editHomeDishId">
     <div class="form-group">
@@ -1013,7 +1013,7 @@
           <label class="btn btn-outline" style="cursor:pointer; margin:0;">Foto de la etiqueta<input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleLabelPhotoScan(event, 'home')"></label>
         </div>
         <div style="display:flex; gap:6px; margin-bottom:6px;">
-          <input type="text" id="homeManualBarcodeInput" class="search-input" placeholder="Escribe el nº del código de barras" style="flex:1;">
+          <input type="text" id="homeManualBarcodeInput" class="search-input" placeholder="Escribe el nº del código de barras" style="flex:1;" onkeydown="if(event.key==='Enter') lookupBarcodeNumber(this.value, 'home')">
           <button type="button" class="btn btn-outline" onclick="lookupBarcodeNumber(document.getElementById('homeManualBarcodeInput').value, 'home')">Leer</button>
         </div>
         <div style="display:flex; gap:6px; margin-bottom:6px;">
@@ -1049,7 +1049,7 @@
   <div class="modal-content">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
       <h2 style="margin:0; font-size:1rem;" id="dishModalTitle">✏️ Plato de la Carta</h2>
-      <button class="btn btn-outline" onclick="closeRestDishModal()">✕</button>
+      <button class="btn btn-outline" onclick="closeIfNoChanges('dishModal', closeRestDishModal)" aria-label="Cerrar">✕</button>
     </div>
     <input type="hidden" id="editDishId">
     <div style="display:grid; grid-template-columns:1fr 130px; gap:8px;">
@@ -1833,7 +1833,7 @@
 </div>
 
 <script>
-const APP_VERSION = "3.18.0";
+const APP_VERSION = "3.19.0";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
@@ -2215,6 +2215,14 @@ function sanitizeHomeProduct(p) {
   }
   return out;
 }
+function sanitizeKb(q) {
+  if (!q || typeof q !== "object" || !/^[A-Za-z0-9_-]{1,60}$/.test(String(q.rid || "")) || !["ing", "dish"].includes(q.kind) || !["owner", "owner_ok", "ai_review"].includes(q.src)) return null;
+  const al = l => ALLERGENS.filter(x => (Array.isArray(l) ? l : []).includes(x));
+  const txt = str(q.txt, 160);
+  if (!txt || !al(q.added).concat(al(q.dropped)).length) return null;
+  return { rid: String(q.rid), kind: q.kind, txt, sub: str(q.sub, 300), cat: str(q.cat, 60), det: al(q.det), weak: al(q.weak), comp: al(q.comp),
+    saved: al(q.saved), added: al(q.added), dropped: al(q.dropped), src: q.src, vf: q.vf === true };
+}
 function normalizeState(s) {
   s = (s && typeof s === "object") ? s : {};
   const rests = (Array.isArray(s.restaurants) ? s.restaurants : []).map(sanitizeRest);
@@ -2251,6 +2259,9 @@ function normalizeState(s) {
     myReports: (Array.isArray(s.myReports) ? s.myReports : []).map(x => str(x, 130)).filter(x => /^[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+$/.test(x)).slice(-500),
     activeFolderId: routeFolders.some(f => f.id === s.activeFolderId) ? s.activeFolderId : "f_fav",
     activeHomeListId: homeLists.some(l => l.id === s.activeHomeListId) ? s.activeHomeListId : "hl_default",
+    // 3.19: señales para mejorar el detector que aún no se han subido, y la sal con la que se anonimiza el local (solo en este móvil)
+    kbQueue: (Array.isArray(s.kbQueue) ? s.kbQueue : []).map(sanitizeKb).filter(Boolean).slice(-200),
+    kbSalt: typeof s.kbSalt === "string" && /^[0-9a-f]{32}$/.test(s.kbSalt) ? s.kbSalt : "",
     currentUser: cu, legalAccepted: !!s.legalAccepted,
     legalVersion: typeof s.legalVersion === "string" ? s.legalVersion.slice(0, 20) : "",
     // Hasta dónde está al día el mapa compartido (ver cloudPullPublic)
@@ -3371,9 +3382,316 @@ const COMPOUND_TYPES = [
   [["korma","masala","tikka masala","butter chicken","biryani"], "LNAMSG"],
   [["ensalada","ensaladas","salad","salads","salade","salades","insalata","insalate","salat","salate","mezclum","mesclun"], "NHLMUZPSGA"],
   [["picoteo","degustacion","homemade","house","maison","fatto in casa","hausgemacht","special","speciale","mixed","assorted","mixte","misto","gemischt","selection","selezione","auswahl","platter","board","garnish","garniture","contorno","beilage","stuffing","stuffed","farci","farcie","ripieno","ripieni","gefullt","filling","fillings","condimentado","condimentada","sazonado","sazonada","a nuestra manera","ingrediente secreto","omelette","omelet","frittata","tapa","tapas","entrante","entrantes","menu degustacion"], "*"],
-  [["seasoning","seasonings","spice","spices","spice mix","epices","spezie","gewurz","gewurze","chili powder","sal de hierbas","sal sazonada","sazon","bouquet garni","hierbas","hierbas provenzales","finas hierbas","hierbas aromaticas","aroma","aromas","aromatizante","saborizante","potenciador del sabor","extracto","extractos"], "AMZGS"]
+  [["seasoning","seasonings","spice","spices","spice mix","epices","spezie","gewurz","gewurze","chili powder","sal de hierbas","sal sazonada","sazon","bouquet garni","hierbas","hierbas provenzales","finas hierbas","hierbas aromaticas","aroma","aromas","aromatizante","saborizante","potenciador del sabor","extracto","extractos"], "AMZGS"],
 ];
+  // 3.19: FORMAS DE PREPARACIÓN. El nombre del plato (o del componente) dice cómo se cocina, no sus ingredientes: la «marinera» lleva harina
+  // y vino, la «pepitoria» yema y almendra, «al vino» sulfitos. Sin desglose se pregunta; con desglose o «✔ comprobado» no.
+// Se aplican a componentes (como el resto de COMPOUND_TYPES) y TAMBIÉN al nombre del plato («Mejillones a la marinera»): ahí solo dan PREGUNTA.
+const PREP_TYPES = [
+  [["a la marinera","marinera","en salsa marinera"], "UGA"], [["pepitoria","en pepitoria"], "UHNG"],
+  [["al ajillo","ajillo","ajillos","al ajo"], "UG"], [["ajoarriero","ajo arriero","ajoarrieros"], "HG"],
+  [["al vino","al vino tinto","al vino blanco","en vino","al jerez","al pedro ximenez","a la sidra","en sidra","al oporto","al cava","al marsala","al brandy","al coñac","al cognac","al whisky","coq au vin","al moscatel","al pacharan","al txakoli","al rioja","al ron","bourguignon"], "U"],
+  [["a la cerveza","en cerveza","con cerveza","rebozado en cerveza"], "UG"],
+  [["a la vizcaina","vizcaina","al club ranero","club ranero","al pil pil","pil pil","a la gallega","a galega","a la bilbaina","a la donostiarra","a la zaragozana","a la sanabresa"], "GU"],
+  [["en su tinta","su tinta","con tinta","tinta de calamar","tinta de sepia"], "UGP"],
+  [["alinado","alinada","alinados","alinadas","alinadas","alinar","aliño","alino de","alinas","encurtido","encurtida","escabechado","en escabeche","en adobo","al mojo","con mojo","mojo picon","mojo verde","mojo rojo"], "UMG"],
+  [["en vinagre"], "U"],
+  [["pinchos morunos","pincho moruno","pinchito moruno","pinchitos morunos","alitas","alitas de pollo","chicken wings","wings","costillas bbq","costillas barbacoa","costillas a la barbacoa","salsa barbacoa","salsa bbq","bbq","barbecue","barbacoa","costilla glaseada","laqueado","laqueada","agridulce","salsa agridulce","teriyaki","kung pao","karaage","yakitori","yakiniku","bulgogi","galbi","tikka","tandoori","vindaloo","tajin","a la plancha con salsa"], "UMSGA"],
+  [["chopitos","chopito","puntillitas","puntillita","puntillas","rabas","pescaito","pescaito frito","pescadito frito","pescado frito","boquerones fritos","calamares fritos","calamares a la romana","gambas rebozadas","fritura andaluza","fritura de pescado","fritura malaguena","adobo andaluz","adobo de cazon","bienmesabe","cazon en adobo","pijota","tortillitas de camarones","buñuelos de bacalao","buñuelos"], "GHUS"],
+  // KB-AUTO-BEGIN-PREP (tools/learn_from_signals.js --aplicar añade aquí; no editar a mano)
+  // KB-AUTO-END-PREP
+];
+PREP_TYPES.forEach(t => { t[2] = kwTest(t[0]); });
+COMPOUND_TYPES.push(...PREP_TYPES);
 COMPOUND_TYPES.forEach(t => { t[2] = kwTest(t[0]); });
+
+// 3.19 · AL_MORE_7: NOMBRES PROPIOS DE PLATO que no dicen en el nombre lo que llevan («Puntillitas», «Bienmesabe», «Pollo en pepitoria»,
+// «Lentejas»). Cada entrada: [nombres, letras de alérgenos que «suele llevar»]. Se usan SOLO con el nombre del plato y solo dan PREGUNTA
+// (nunca NO APTO, y nunca sobre un componente: la «lenteja» como ingrediente es una lenteja). Desaparece con el desglose del local.
+const AL_MORE_7 = [
+  [["affogato"], "HNS"],
+  [["ajada"], "U"],
+  [["aji de gallina"], "H"],
+  [["alfajores"], "H"],
+  [["all i pebre"], "GN"],
+  [["arancini"], "S"],
+  [["arepa reina pepiada"], "M"],
+  [["aros de cebolla"], "LS"],
+  [["arroz a banda"], "CHOU"],
+  [["arroz a la cubana"], "G"],
+  [["arroz al horno"], "GLS"],
+  [["arroz caldoso con bogavante"], "O"],
+  [["arroz con costra"], "GLS"],
+  [["arroz con mango"], "Z"],
+  [["arroz del senyoret"], "U"],
+  [["arroz meloso de setas"], "LU"],
+  [["arroz negro"], "H"],
+  [["arroz tres delicias"], "GL"],
+  [["asado argentino con chimichurri"], "GLS"],
+  [["bacalao con tomate"], "G"],
+  [["bandeja paisa"], "GLS"],
+  [["banderillas"], "P"],
+  [["banh mi"], "HMS"],
+  [["banoffee"], "S"],
+  [["barrita con aceite"], "T"],
+  [["berenjenas con miel de cana"], "HL"],
+  [["bibimbap"], "G"],
+  [["bicicleta murciana"], "M"],
+  [["bienmesabe","bienmesabe de cazon"], "L"],
+  [["biryani de pollo"], "U"],
+  [["bloody mary"], "GU"],
+  [["bol de acai"], "GLNSZ"],
+  [["botillo del bierzo"], "GLS"],
+  [["bouillabaisse"], "AGHU"],
+  [["bowl de quinoa con verduras"], "MNSZ"],
+  [["bruschetta"], "LSZ"],
+  [["bucatini all'amatriciana"], "U"],
+  [["burrito de ternera"], "S"],
+  [["cachapa"], "H"],
+  [["caldero del mar menor"], "H"],
+  [["canelones de carne"], "AU"],
+  [["canelones de la abuela"], "AU"],
+  [["cannoli"], "NU"],
+  [["caracoles a la llauna"], "H"],
+  [["carne picada"], "GS"],
+  [["carne picada de ternera"], "GS"],
+  [["carpaccio de ternera"], "LMU"],
+  [["carrilleras al vino tinto"], "AG"],
+  [["casadielles"], "HLU"],
+  [["causa limena"], "C"],
+  [["cerdo agridulce"], "H"],
+  [["chop suey de pollo"], "GOZ"],
+  [["clara con limon"], "U"],
+  [["club sandwich"], "M"],
+  [["coca de sant joan"], "U"],
+  [["codillo asado"], "MU"],
+  [["cogollos de tudela con anchoas"], "MU"],
+  [["coleslaw"], "U"],
+  [["coq au vin"], "AGL"],
+  [["costillas a la barbacoa"], "P"],
+  [["croque monsieur"], "HM"],
+  [["curry de garbanzos"], "N"],
+  [["curry rojo de ternera"], "KN"],
+  [["curry verde de pollo"], "N"],
+  [["cuscus de cordero"], "A"],
+  [["cuscus de verduras"], "A"],
+  [["dal"], "LM"],
+  [["dim sum"], "Z"],
+  [["dolmas"], "U"],
+  [["dorayaki"], "LS"],
+  [["duelos y quebrantos"], "GLS"],
+  [["durum de pollo"], "H"],
+  [["enchiladas"], "G"],
+  [["ensaladilla rusa","ensaladilla","ensaladilla de gambas"], "CMU"],
+  [["escalivada"], "P"],
+  [["espaguetis a la puttanesca"], "U"],
+  [["espaguetis frutti di mare"], "PU"],
+  [["espaguetis vongole"], "U"],
+  [["espinacas con garbanzos"], "U"],
+  [["esqueixada de bacalao"], "U"],
+  [["fajitas de pollo"], "LS"],
+  [["falafel"], "G"],
+  [["fartons"], "S"],
+  [["feijoada"], "GLS"],
+  [["fideua","fideua de marisco"], "HU"],
+  [["fish and chips"], "HMU"],
+  [["fish pie"], "C"],
+  [["fondue de queso"], "G"],
+  [["frangollo"], "U"],
+  [["garbanzos con espinacas"], "GU"],
+  [["gazpachuelo malagueno"], "CMO"],
+  [["gilda"], "U"],
+  [["gyozas de cerdo"], "Z"],
+  [["gyozas de verduras"], "Z"],
+  [["hamburguesa vegana"], "N"],
+  [["har gow"], "SZ"],
+  [["harira"], "H"],
+  [["higado encebollado"], "GU"],
+  [["hornazo de salamanca"], "LS"],
+  [["huevos a la flamenca"], "GLS"],
+  [["huevos benedict"], "SU"],
+  [["huevos estrellados"], "GLS"],
+  [["judiones de la granja"], "GLS"],
+  [["katsu curry"], "L"],
+  [["kebab"], "H"],
+  [["lasana de carne"], "AU"],
+  [["lasana vegana"], "N"],
+  [["leche de tigre"], "CLO"],
+  [["lentejas","lentejas estofadas","lentejas de la abuela"], "GLS"],
+  [["lomo saltado"], "U"],
+  [["lubina a la espalda"], "U"],
+  [["mac and cheese"], "HM"],
+  [["macarons"], "L"],
+  [["macedonia de frutas"], "U"],
+  [["maki de pepino"], "MU"],
+  [["maki de salmon y aguacate"], "MU"],
+  [["manitas de cerdo"], "GU"],
+  [["mapo tofu"], "GZ"],
+  [["marinera murciana"], "M"],
+  [["marmitako"], "U"],
+  [["mejillones al vapor"], "U"],
+  [["mejillones tigre"], "U"],
+  [["menestra de verduras"], "GH"],
+  [["merluza en salsa"], "CO"],
+  [["michirones"], "GLS"],
+  [["migas aragonesas"], "HLS"],
+  [["migas extremenas"], "LS"],
+  [["migas manchegas"], "HLS"],
+  [["minestrone"], "L"],
+  [["mochi"], "LS"],
+  [["mole poblano"], "GU"],
+  [["morteruelo"], "LS"],
+  [["musaka"], "U"],
+  [["nasi goreng"], "G"],
+  [["nigiri de atun"], "MU"],
+  [["nigiri de salmon"], "MU"],
+  [["okonomiyaki"], "CM"],
+  [["olla gitana"], "N"],
+  [["onigiri"], "HMPSZ"],
+  [["ossobuco"], "L"],
+  [["pa amb tomaquet"], "HLSTZ"],
+  [["paella de marisco"], "PU"],
+  [["paella valenciana","paella de pollo y conejo"], "O"],
+  [["pakoras"], "GM"],
+  [["papas alinas"], "P"],
+  [["parmesano"], "H"],
+  [["pastel de pastor"], "APU"],
+  [["pastela marroqui"], "L"],
+  [["patatas a la riojana"], "GLS"],
+  [["patatas a lo pobre"], "U"],
+  [["patatas bravas","bravas"], "AGHMU"],
+  [["pato laqueado"], "Z"],
+  [["perrito caliente"], "AHLSZ"],
+  [["perrunillas"], "NU"],
+  [["pescaito frito"], "CO"],
+  [["pestinos"], "HU"],
+  [["pho"], "GS"],
+  [["pina colada"], "L"],
+  [["pisto manchego"], "H"],
+  [["pisto murciano"], "H"],
+  [["pizza barbacoa"], "P"],
+  [["pizza napolitana"], "U"],
+  [["pizza vegana"], "N"],
+  [["pochas a la navarra"], "GLS"],
+  [["poke bowl de salmon"], "MU"],
+  [["pollo al curry"], "N"],
+  [["pollo al limon"], "HU"],
+  [["pollo asado"], "LU"],
+  [["pollo asado con patatas"], "LU"],
+  [["pollo con almendras"], "Z"],
+  [["pollo karaage"], "HZ"],
+  [["pollo kung pao"], "Z"],
+  [["porra antequerana"], "HP"],
+  [["porrusalda"], "P"],
+  [["potaje de garbanzos y bacalao"], "H"],
+  [["pote asturiano"], "GLS"],
+  [["pringa"], "GLS"],
+  [["profiteroles"], "S"],
+  [["provoleta"], "H"],
+  [["pulpo al horno"], "U"],
+  [["queso"], "H"],
+  [["queso frito con mermelada"], "S"],
+  [["queso manchego"], "H"],
+  [["queso manchego curado"], "H"],
+  [["rabas","rabas de calamar"], "L"],
+  [["rabo de toro"], "AG"],
+  [["raxo con patatas"], "U"],
+  [["red velvet"], "S"],
+  [["rinones al jerez"], "G"],
+  [["risotto de marisco"], "AP"],
+  [["risotto de setas"], "A"],
+  [["rollitos de primavera"], "CPZ"],
+  [["rollitos de primavera vegetales"], "Z"],
+  [["rollitos vietnamitas"], "KP"],
+  [["ropa vieja canaria"], "U"],
+  [["rosquillas de san isidro"], "L"],
+  [["salmon al horno"], "LMU"],
+  [["saltimbocca"], "GL"],
+  [["samosas"], "M"],
+  [["sancocho canario"], "GU"],
+  [["sandwich vegetal"], "MP"],
+  [["sashimi de salmon"], "GMS"],
+  [["satay de pollo"], "P"],
+  [["shakshuka"], "L"],
+  [["shawarma de pollo"], "H"],
+  [["siu mai"], "HZ"],
+  [["solomillo de cerdo al pedro ximenez"], "GL"],
+  [["solomillo de ternera a la pimienta"], "GMU"],
+  [["souvlaki"], "GL"],
+  [["steak tartar"], "GU"],
+  [["strudel de manzana"], "HNU"],
+  [["suquet de peix"], "GNU"],
+  [["suspiro limeno"], "U"],
+  [["tacos al pastor"], "GL"],
+  [["tacos de cochinita pibil"], "GU"],
+  [["takoyaki"], "M"],
+  [["tamales"], "L"],
+  [["tartar de atun"], "GHMSUZ"],
+  [["tataki de atun"], "GSUZ"],
+  [["tempeh marinado"], "Z"],
+  [["ternera con bambu y setas"], "OZ"],
+  [["tiramisu"], "U"],
+  [["tom kha gai"], "S"],
+  [["tom yum"], "OS"],
+  [["torrijas"], "U"],
+  [["tortellini de carne"], "A"],
+  [["trenza de almudevar"], "U"],
+  [["txangurro al horno"], "LU"],
+  [["uramaki california"], "MU"],
+  [["uramaki de langostino tempura"], "M"],
+  [["uramaki philadelphia"], "MU"],
+  [["urta a la rotena"], "U"],
+  [["vichyssoise"], "A"],
+  [["vieiras gratinadas"], "U"],
+  [["vitello tonnato"], "MU"],
+  [["wantan frito"], "CZ"],
+  [["yakisoba"], "M"],
+  [["arroz negro","arroz negro con alioli"],"UH"], [["costillas de cerdo","costillas al horno","costillas de cerdo al horno"],"UMSG"], [["matrimonio","matrimonios"],"G"],
+  // Ampliación 3.19: platos conocidos que no dicen en el nombre lo que llevan
+  [["salmorejo","salmorejo cordobes"], "GH"],
+  [["gazpacho","gazpacho andaluz"], "GU"],
+  [["ajoblanco"], "NG"],
+  [["albondigas","albondigas en salsa","albondigas de la abuela"], "GHLS"],
+  [["carrillada","carrilleras","carrillera"], "GUA"],
+  [["rabo de toro","rabo de buey"], "GAU"],
+  [["callos a la madrilena","callos"], "GAU"],
+  [["fabada asturiana","fabada"], "UL"],
+  [["paella","paella mixta","paella de marisco","paella de verduras"], "UOP"],
+  [["zarzuela","zarzuela de pescado","zarzuela de marisco"], "GUCO"],
+  [["sopa de pescado","sopa de marisco","sopa de ajo","sopa castellana"], "GUHPC"],
+  [["tortilla francesa","tortilla de patatas","tortilla espanola"], "H"],
+  [["cachopo","flamenquin","san jacobo"], "GHL"],
+  [["big mac","whopper","cheeseburger","mcchicken","hamburguesa con queso","hamburguesa completa"], "GHLMSZ"],
+  [["mcnuggets","nuggets de pollo","tiras de pollo","pollo crujiente","pollo frito","pollo kentucky","fingers de pollo"], "GHLS"],
+  [["perrito","perrito caliente","hot dog","hotdog"], "GLSAMZH"],
+  [["bocadillo de calamares","bocadillo de lomo","bocadillo de tortilla","bocadillo mixto","montadito","montaditos"], "GHLS"],
+  [["bravas","patatas bravas picantes","patatas con alioli","patatas con salsa"], "GHMU"],
+  [["torrija","torrijas"], "GHLU"],
+  [["leche frita","natillas","crema catalana","crema quemada","arroz con leche"], "GHLU"],
+  [["tarta de queso","tarta de la abuela","tarta casera"], "GHLSN"],
+  [["coulant","volcan de chocolate","brownie con helado","coca de llanda","bizcocho casero"], "GHLSN"],
+  [["calamares en su tinta","chipirones en su tinta","sepia en su tinta"], "UGPO"],
+  [["pulpo a la gallega","pulpo a feira","pulpo a la brasa"], "U"],
+  [["bacalao al pil pil","bacalao a la llauna","bacalao dorado","bacalao con samfaina","bacalao ajoarriero"], "GUH"],
+  [["merluza a la koskera","merluza a la romana","merluza rebozada","merluza en salsa verde"], "GUHO"],
+  [["lubina a la sal","dorada a la sal","dorada al horno","lubina al horno"], "U"],
+  [["conejo al ajillo","conejo en salmorejo","liebre estofada","perdiz estofada","codorniz escabechada"], "UG"],
+  [["pisto con huevo","pisto","menestra","menestra de verduras","revuelto de setas","revuelto de gambas"], "GHU"],
+  [["setas al ajillo","champinones al ajillo","esparragos trigueros","alcachofas con jamon","habas con jamon","judias con jamon"], "UGH"],
+  [["gyozas","gyoza","dumplings","dim sum","siu mai","wantan","wonton"], "GSZ"],
+  [["ramen","pad thai","yakisoba","chow mein","arroz frito","arroz tres delicias","nasi goreng","bibimbap","bulgogi"], "GSZHP"],
+  [["sushi variado","sushi roll","california roll","maki","nigiri","temaki","sashimi"], "SMUG"],
+  [["tacos","burrito","fajitas","quesadilla","enchiladas","nachos con queso","guacamole con nachos"], "GLSU"],
+  [["kebab","durum","shawarma","falafel","hummus con pan","pan de pita"], "GLSZM"],
+  // KB-AUTO-BEGIN-DISH (tools/learn_from_signals.js --aplicar añade aquí; no editar a mano)
+  // KB-AUTO-END-DISH
+];
+AL_MORE_7.forEach(t => { t[2] = kwTest(t[0]); });
+function dishMaybe(name) {
+  const n = " " + normText(name) + " ", out = new Set();
+  AL_MORE_7.concat(PREP_TYPES).forEach(t => { if (t[2].test(n)) t[1].split("").forEach(ch => out.add(AL_LETTER[ch])); });
+  return ALLERGENS.filter(x => out.has(x));
+}
 // Alérgenos que puede esconder este nombre de componente. null = no es una preparación compuesta.
 // "*" en el resultado = cualquiera (nombre genérico), y entonces también se pregunta por dietas y «otros alimentos».
 function compoundRisks(name) {
@@ -3410,9 +3728,9 @@ function ingUnknown(ing) {
 function ingGaps(ing) { return ingUnknown(ing) !== null; }
 // Alérgenos que un texto PODRÍA esconder sin decirlo (preparaciones compuestas que menciona): para medir y para avisar
 function possibleAllergens(text) {
-  const r = compoundRisks(text);
-  if (!r) return [];
-  return r === "*" ? ALLERGENS.slice() : ALLERGENS.filter(x => r.has(x));
+  const r = compoundRisks(text), dm = dishMaybe(text);
+  if (!r) return dm;
+  return r === "*" ? ALLERGENS.slice() : ALLERGENS.filter(x => r.has(x) || dm.includes(x));
 }
 function ingIsCompound(ing) { return !!compoundRisks(ing && ing.n); }
 // ¿El texto de este componente (y el contexto del plato) dice que NO lleva este alérgeno? («pan sin gluten», «vegano»)
@@ -3575,6 +3893,10 @@ function evaluateDish(dish, strict, eqx) {
       if (!S.al.has(x)) return;
       if (sure.has(x)) { if (stillNamed("A:" + x, t => memoDetect("s", t, ctx).a.includes(x))) { hits.push(x); named.add("A:" + x); } }
       else if (!isCov("A:" + x)) { maybe.push(x); named.add("A:" + x); }
+    });
+    // 3.19: nombres propios de plato que «suelen llevar» algo sin decirlo (AL_MORE_7): solo PREGUNTA
+    dishMaybe(name).forEach(x => {
+      if (S.al.has(x) && !nd.a.includes(x) && !isCov("A:" + x) && !textDenies(x, name, ctx)) { maybe.push(x); named.add("A:" + x); }
     });
     nDiets.forEach(t => {
       if (S.di.has(t) && stillNamed("D:" + t, n => dietsLeft(n, ctx).includes(t))) { hits.push(DIET_TAG_LABELS[t] || t); named.add("D:" + t); }
@@ -4273,6 +4595,55 @@ function customForCard(term, max) {
 function famAll() { return FOOD_FAMILIES; }
 
 // ============================================================
+// 3.19 · SEÑALES PARA MEJORAR EL DETECTOR (kb_signals)
+// Cuando un restaurante guarda un plato o publica una carta leída con IA, se compara lo que el motor veía
+// con lo que la persona dejó marcado. Lo que el motor no daba por SEGURO y la persona sí marca (`added`) es
+// una pista de riesgo oculto: nombre nuevo, preparación nueva, marca nueva. Lo que el motor daba por seguro y la
+// persona quita (`dropped`) solo sirve para revisar posibles falsos positivos: NUNCA borra nada del diccionario
+// (un local concreto puede hacer una versión «sin gluten»). Sin datos personales: solo texto de ingrediente o plato.
+// El navegador solo guarda la señal; el análisis y las propuestas van en tools/learn_from_signals.js.
+// ============================================================
+function kbClean(s, max) {
+  return normText(s).replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, " ").replace(/https?:\/\/\S+/g, " ").replace(/\d{5,}/g, " ")
+    .replace(/\s+/g, " ").trim().slice(0, max);
+}
+// Componente (ingrediente) de un plato: ¿qué marcó la persona que el motor no daba por seguro?
+function kbIngSignal(ing, cat, src) {
+  if (!ing || isPlaceholderIng(ing)) return null;
+  const txt = kbClean(ing.n, 160);
+  if (!txt) return null;
+  const text = (ing.n || "") + " . " + (ing.sub || "");
+  const strong = detectAllergens(text, undefined, true).a, all = detectAllergens(text).a;
+  const weak = all.filter(x => !strong.includes(x));
+  const saved = ALLERGENS.filter(x => (ing.a || []).includes(x));
+  const added = saved.filter(x => !strong.includes(x));
+  const dropped = strong.filter(x => !saved.includes(x));
+  if (!added.length && !dropped.length) return null;
+  return { kind: "ing", txt, sub: kbClean(ing.sub, 300), cat: kbClean(cat, 60), det: strong, weak, comp: possibleAllergens(ing.n || ""),
+    saved, added, dropped, src: ing.ok === true ? "owner_ok" : src };
+}
+// Plato: alérgenos de sus componentes que el NOMBRE no hacía sospechar (un «Puntillitas» con huevo)
+function kbDishSignal(name, cat, ings, src) {
+  const txt = kbClean(name, 80);
+  const real = (ings || []).filter(i => i && !isPlaceholderIng(i));
+  if (!txt || !real.length) return null;
+  const strong = detectAllergens(name, undefined, true).a, all = detectAllergens(name).a;
+  const saved = ALLERGENS.filter(x => real.some(i => (i.a || []).includes(x)));
+  const added = saved.filter(x => !strong.includes(x));
+  if (!added.length) return null;
+  return { kind: "dish", txt, sub: "", cat: kbClean(cat, 60), det: strong, weak: all.filter(x => !strong.includes(x)),
+    comp: dishMaybe(name), saved, added, dropped: [], src: real.some(i => i.ok === true) ? "owner_ok" : src };
+}
+// Cola local: una señal por local, tipo y texto (sin repetidos) y como mucho `max`
+function kbEnqueue(queue, rid, sig, max) {
+  if (!sig || !rid) return false;
+  if (queue.some(q => q.rid === rid && q.kind === sig.kind && q.txt === sig.txt)) return false;
+  queue.push({ rid, ...sig });
+  while (queue.length > max) queue.shift();
+  return true;
+}
+
+// ============================================================
 // CÓDIGO BIDI (QR) GENERADO EN EL PROPIO MÓVIL
 // - La carta va comprimida (deflate) y en formato compacto: ~3,5 veces más corta.
 // - El QR se dibuja aquí mismo, sin enviar la carta a servicios externos.
@@ -4588,6 +4959,7 @@ function syncAddressBar() {
   try {
     const r = currentView === "app" ? getActiveRest() : null;
     const want = r && r.cloud && !r.suggestion && !isStaffUnlocked ? location.pathname + "?r=" + encodeURIComponent(r.id) : location.pathname;
+    try { sessionStorage.setItem("cc_viewing", want !== location.pathname ? r.id : ""); } catch (e) {}   // para distinguir una recarga de un QR nuevo
     if (location.pathname + location.search + location.hash !== want) history.replaceState(history.state, "", want);
   } catch (e) {}
 }
@@ -4614,7 +4986,7 @@ const AL_ICONS = { "GLUTEN":"🌾","CRUSTÁCEOS":"🦐","HUEVO":"🥚","PESCADO"
 function initFilterButtons() {
   $("allergenGrid").innerHTML = ALLERGENS.map((a, i) => `<div class="chip al ${selectedAllergens.has(a) ? "active" : ""}" role="button" tabindex="0" aria-pressed="${selectedAllergens.has(a)}" onclick="toggleAl(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAl(${i});}"><span class="al-ico" aria-hidden="true">${AL_ICONS[a] || "•"}</span>${esc(a)}</div>`).join("");
   $("dietGrid").innerHTML = DIETS.map((d, i) => `<div class="chip diet ${selectedDiets.has(d.id) ? "active" : ""}" onclick="toggleDiet(${i})">${d.label}</div>`).join("");
-  $("quickIngBar").innerHTML = QUICK_CUSTOM_INGS.map((q, i) => `<span class="quick-ing ${customAvoidSet.has(q.toLowerCase()) ? "active" : ""}" onclick="toggleQuickCustom(${i})">🚫 ${esc(q)}</span>`).join("");
+  $("quickIngBar").innerHTML = QUICK_CUSTOM_INGS.map((q, i) => `<span class="quick-ing ${hasCustom(q) ? "active" : ""}" onclick="toggleQuickCustom(${i})">🚫 ${esc(q)}</span>`).join("");
   $("activeCustomTags").innerHTML = [...customAvoidSet].map((t, i) => `<span class="custom-tag-Badge" onclick="removeCustomIdx(${i})">Sin ${esc(t.toUpperCase())} ✕</span>`).join("");
   $("strictTraces").checked = strictTracesEnabled;
   renderCustomInfo();
@@ -4642,7 +5014,9 @@ function renderCustomInfo() {
   }
   box.innerHTML = html;
 }
-function addSuggestedCustom(i) { const n = customSuggestions.custom[i]; if (n) { customAvoidSet.add(String(n).toLowerCase()); onProfileChanged(); } }
+// «maíz» y «maiz» son el mismo alimento: no se añaden dos veces
+const hasCustom = t => [...customAvoidSet].some(x => normText(x) === normText(t));
+function addSuggestedCustom(i) { const n = customSuggestions.custom[i]; if (n && !hasCustom(n)) { customAvoidSet.add(String(n).toLowerCase()); onProfileChanged(); } }
 function addSuggestedAllergen(i) { const a = customSuggestions.allergens[i]; if (a) { selectedAllergens.add(a); onProfileChanged(); } }
 function onProfileChanged() {
   saveProfile();
@@ -4652,14 +5026,32 @@ function onProfileChanged() {
   if ($("homeDishModal").style.display === "block") renderTempHomeDishIngs();
 }
 function openAllergyProfileModal() { initFilterButtons(); openModal("allergyProfileModal"); }
-function toggleAl(i) { const a = ALLERGENS[i]; selectedAllergens.has(a) ? selectedAllergens.delete(a) : selectedAllergens.add(a); onProfileChanged(); }
-function toggleDiet(i) { const d = DIETS[i].id; selectedDiets.has(d) ? selectedDiets.delete(d) : selectedDiets.add(d); onProfileChanged(); }
-function toggleQuickCustom(i) { const t = QUICK_CUSTOM_INGS[i].toLowerCase(); customAvoidSet.has(t) ? customAvoidSet.delete(t) : customAvoidSet.add(t); onProfileChanged(); }
+// Las rejillas se vuelven a pintar al marcar: con el teclado, el foco vuelve al mismo botón
+function refocusChip(gridId, i, hadFocus) {
+  if (!hadFocus) return;
+  const c = $(gridId).children[i];
+  if (!c) return;
+  if (!c.hasAttribute("tabindex")) c.setAttribute("tabindex", "0");     // las dietas lo reciben después, por el repaso de accesibilidad
+  c.focus();
+}
+function toggleAl(i) {
+  const a = ALLERGENS[i], kb = !!(document.activeElement && document.activeElement.closest("#allergenGrid"));
+  selectedAllergens.has(a) ? selectedAllergens.delete(a) : selectedAllergens.add(a); onProfileChanged(); refocusChip("allergenGrid", i, kb);
+}
+function toggleDiet(i) {
+  const d = DIETS[i].id, kb = !!(document.activeElement && document.activeElement.closest("#dietGrid"));
+  selectedDiets.has(d) ? selectedDiets.delete(d) : selectedDiets.add(d); onProfileChanged(); refocusChip("dietGrid", i, kb);
+}
+function toggleQuickCustom(i) {
+  const t = QUICK_CUSTOM_INGS[i].toLowerCase();
+  if (hasCustom(t)) [...customAvoidSet].filter(x => normText(x) === normText(t)).forEach(x => customAvoidSet.delete(x)); else customAvoidSet.add(t);
+  onProfileChanged();
+}
 function removeCustomIdx(i) { const t = [...customAvoidSet][i]; if (t !== undefined) customAvoidSet.delete(t); onProfileChanged(); }
 function addCustomIngFromInput() {
   const el = $("customIngInput");
   const v = str(el.value, 60).trim().toLowerCase();
-  if (v) { customAvoidSet.add(v); el.value = ""; onProfileChanged(); }
+  if (v) { if (!hasCustom(v)) customAvoidSet.add(v); el.value = ""; onProfileChanged(); }
 }
 function clearAllFilters() { selectedAllergens.clear(); selectedDiets.clear(); customAvoidSet.clear(); onProfileChanged(); }
 function toggleStrictTraces(checked) { strictTracesEnabled = !!checked; onProfileChanged(); }
@@ -4778,7 +5170,13 @@ async function submitOwnerAuth() {
   }
   finally { btn.disabled = false; }
 }
+let googleBusy = false;
 async function loginWithGoogle() {
+  if (googleBusy) return;
+  googleBusy = true;
+  try { await loginWithGoogleNow(); } finally { googleBusy = false; }
+}
+async function loginWithGoogleNow() {
   if (!isCloudMode()) {
     uiAlert("🌐 El acceso con Google funciona cuando la app está conectada a su servidor.\n\nEn este modo de prueba entra con tu email: tus locales se guardan solo en este móvil.");
     return;
@@ -4921,7 +5319,9 @@ function labelButtonHtml(mode) {
   return `<label class="btn btn-amber" style="cursor:pointer; margin-top:8px;">📑 Leer la etiqueta con una foto<input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleLabelPhotoScan(event, '${mode}')"></label>`;
 }
 
+let scanSeq = 0;      // cambia al abrir, cerrar o repetir el escáner: una respuesta tardía de otra vuelta se descarta
 function openUniversalScanner() {
+  scanSeq++;
   $("universalManualInput").value = "";
   $("universalScanStatus").style.display = "none";
   lastUniversalProduct = null;
@@ -4929,19 +5329,22 @@ function openUniversalScanner() {
   startBarcodeScanner("universal");   // el botón ESCANEAR abre directamente la cámara en vivo
 }
 function scanAnother() {
+  scanSeq++;
   $("universalScanStatus").style.display = "none";
   lastUniversalProduct = null;
   startBarcodeScanner("universal");
 }
 function closeUniversalScanner() {
+  scanSeq++;
   stopBarcodeScanner();
   closeModal("universalScanModal");
 }
-function isBidiLink(txt) { return /https?:\/\//i.test(txt) || /(?:[#&?])(?:c|carta|restId|r)=/.test(txt); }
+function isBidiLink(txt) { return /(?:[#&?])(?:c|carta|restId|r)=/.test(txt); }     // una web cualquiera no es una carta de Comeclaro
 function handleUniversalManualInput() {
   const val = $("universalManualInput").value.trim();
   if (!val) return;
   if (isBidiLink(val)) { closeUniversalScanner(); processIncomingUrl(val); }
+  else if (/^https?:\/\//i.test(val)) toast("Ese enlace no es una carta de Comeclaro.", "err");
   else lookupBarcodeNumber(val, "universal");
 }
 
@@ -4996,7 +5399,11 @@ function startBarcodeScanner(mode = "home") {
   const prev = stopBarcodeScanner();           // espera a que la cámara anterior se libere del todo
   if (typeof Html5Qrcode === "undefined") {
     toast("⏳ Cargando el escáner...", "info");
-    ensureLib("scanner").then(ok => { if (ok) startBarcodeScanner(mode); else uiAlert("📷 " + libFailText("El escáner")); });
+    ensureLib("scanner").then(ok => {
+      const host = $(containerId) && $(containerId).closest(".modal");
+      if (host && host.style.display !== "block") return;   // la ventana se cerró mientras cargaba: no encender la cámara
+      if (ok) startBarcodeScanner(mode); else uiAlert("📷 " + libFailText("El escáner"));
+    });
     return;
   }
   $(containerId).style.display = "block";
@@ -5123,14 +5530,17 @@ async function lookupBarcodeNumber(rawCode, mode = "home") {
   stopBarcodeScanner();
   const box = statusBoxFor(mode);
   setStatus(box, "info", `📊 Consultando el código ${esc(code)} en Open Food Facts...`);
+  const seq = scanSeq;
   let data;
   try {
     const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${encodeURIComponent(code)}.json?fields=${OFF_FIELDS}`);
     data = await res.json();
   } catch (e) {
+    if (mode === "universal" && seq !== scanSeq) return;
     setStatus(box, "err", "⚠️ No se pudo consultar la base de datos de productos. " + esc(netFailText()) + (inPreview() ? "" : labelButtonHtml(mode)));
     return;
   }
+  if (mode === "universal" && seq !== scanSeq) return;       // se cerró o se volvió a escanear mientras llegaba
   if (!data || data.status !== 1 || !data.product) {
     setStatus(box, "warn", `⚠️ El código ${esc(code)} no está en Open Food Facts. Lee la lista de ingredientes con una foto o añádelo a mano.` + labelButtonHtml(mode));
     return;
@@ -5184,7 +5594,7 @@ function renderUniversalResult(prod, box, caution = "") {
   if (c.length) {
     setStatus(box, "err", `<span class="verdict">✕ No es para ti</span><span class="verdict-why">Lleva: ${esc(c.join(", "))}</span>${facts}${caution}${LABEL_NOTE}${addBtn}`);
   } else if (noProfile) {
-    setStatus(box, "warn", `<span class="verdict">? Marca tus alergias</span><span class="verdict-why">Sin tu perfil no podemos saber si es apto para ti.</span><button class="btn btn-primary" style="margin-top:6px;" onclick="openAllergyProfileModal()">Marcar mis alergias</button>${facts}${caution}${addBtn}`);
+    setStatus(box, "warn", `<span class="verdict">? Marca tus alergias</span><span class="verdict-why">Sin tu perfil no podemos saber si es apto para ti.</span><button class="btn btn-primary" style="margin-top:6px;" onclick="closeUniversalScanner(); openAllergyProfileModal()">Marcar mis alergias</button>${facts}${caution}${addBtn}`);
   } else {
     const trInfo = !strictTracesEnabled ? productTraceInfo(prod) : [];
     setStatus(box, "ok", `<span class="verdict">✓ Apto para ti</span><span class="verdict-why">Según tu perfil y los datos del producto.${trInfo.length ? ` Ojo: puede contener trazas de ${esc(trInfo.join(", "))}.` : ""}</span>${LABEL_NOTE}${facts}${caution}${addBtn}`);
@@ -5573,7 +5983,7 @@ function renderNearList() {
   const box = $("nearList");
   if (!box) return;
   updateLocTab();
-  const q = normalizeStr(($("discoverSearch") || {}).value || "");
+  const q = normalizeStr(($("discoverSearch") || {}).value || "").trim().replace(/\s+/g, " ");
   const cq = locMode === "city" ? normalizeStr(locCity) : "";
   let list = appState.restaurants.filter(r => {
     if (r.demo && isCloudMode()) return false;
@@ -5590,6 +6000,7 @@ function renderNearList() {
     box.innerHTML = `<p class="empty-note">${q || cq ? "No hay restaurantes con esa búsqueda." : "Todavía no hay restaurantes en esta zona."} Prueba otra zona.</p>`;
     return;
   }
+  const totalShown = list.length;
   list = list.slice(0, nearShown);
   box.innerHTML = (geoBusy ? `<p class="empty-note">Buscando tu ubicación…</p>` : "") + `<div class="rc-wrap">
     <button type="button" class="rc-arrow rc-prev" onclick="rcGo(-1)" aria-label="Restaurante anterior">‹</button>
@@ -5604,7 +6015,7 @@ function renderNearList() {
       </article>`;
     }).join("")}</div>
     <button type="button" class="rc-arrow rc-next" onclick="rcGo(1)" aria-label="Siguiente restaurante">›</button>
-  </div><div class="rc-count" id="rcCount" aria-live="polite"></div>`;
+  </div><div class="rc-count" id="rcCount" aria-live="polite"></div>` + (totalShown > list.length ? `<p class="empty-note">Se muestran ${list.length} de ${totalShown}: elige una zona o busca por nombre para ver el resto.</p>` : "");
   setupCarousel(list);
 }
 function setupCarousel(list) {
@@ -5850,9 +6261,9 @@ async function saveRestaurantMeta() {
     Object.assign(r, { name, city, phone, lat, lng });
     if (!r.cloud) r.pass = pass;
     saveAppState();
-    await applyCoverDraft(r);
+    const coverOk = await applyCoverDraft(r);
     closeModal("restModal"); renderRestaurantApp();
-    toast("💾 Datos guardados.");
+    toast(coverOk ? "💾 Datos guardados." : "💾 Datos guardados, pero la foto de portada no se pudo subir.", coverOk ? "ok" : "err");
     return;
   }
   const btn = $("restSaveBtn");
@@ -5881,7 +6292,7 @@ async function saveRestaurantMeta() {
       return;
     }
     if (!isSug) {
-      if (!appState.currentUser) { uiAlert("Inicia sesión en Hostelería para dar de alta un restaurante."); return; }
+      if (!appState.currentUser) { uiAlert("Entra en «Yo» → «Tengo un restaurante» con tu cuenta para dar de alta un restaurante."); return; }
       if (pass.length < 4) { toast("Elige una contraseña del local de al menos 4 caracteres.", "err"); return; }
     }
     const newId = uid("r_");
@@ -5904,7 +6315,7 @@ async function saveRestaurantMeta() {
 function renderOwnerView() {
   const mine = appState.restaurants.filter(ownsRestaurant);
   if (!mine.length) {
-    $("ownerRestaurantsList").innerHTML = `<div style="text-align:center; padding:18px; color:var(--muted); font-size:0.8rem;">Aún no tienes locales. Pulsa «➕ Alta Restaurante».</div>`;
+    $("ownerRestaurantsList").innerHTML = `<div style="text-align:center; padding:18px; color:var(--muted); font-size:0.8rem;">Aún no tienes locales. Pulsa «+ Añadir restaurante».</div>`;
     return;
   }
   $("ownerRestaurantsList").innerHTML = mine.map(r => `
@@ -5914,7 +6325,7 @@ function renderOwnerView() {
       </div>
       <div style="display:flex; gap:5px;">
         <button class="btn btn-primary" onclick="manageRestaurant('${r.id}')">${r.cloud ? "✏️ Gestionar" : "🔐 Gestionar"}</button>
-        <button class="btn btn-green" onclick="openQrModal('${r.id}')">📱 Bidi</button>
+        <button class="btn btn-green" onclick="openQrModal('${r.id}')">📱 Código QR</button>
         <button class="btn btn-danger" onclick="deleteRestaurant('${r.id}', false)" aria-label="Borrar restaurante">🗑️</button>
       </div>
     </div>`).join("") + (mine.some(r => r.cloud && !r.verified) ? `<div style="font-size:0.72rem; color:var(--muted); margin-top:6px; line-height:1.4;">⏳ <b>Sin verificar</b>: tu carta se ve igual. La administración de Comeclaro comprobará con el local que la cuenta es suya (por su teléfono o email públicos); después saldrá como «✓ Verificado» y primero en las listas.</div>` : "");
@@ -5940,7 +6351,11 @@ function confirmOwnerPassword() {
   }
 }
 function exitLocalMode() { isStaffUnlocked = false; pinOpen = false; resetStaffGuest(); showView("discover"); }
-function lockStaffMode() { isStaffUnlocked = false; resetStaffGuest(); showView("owner"); }
+async function lockStaffMode() {
+  // Con PIN y un solo local, «Mis restaurantes» volvería solo a la vista del camarero: se pide el PIN para abrir el panel
+  if (!pinOpen && pinIsSet() && waiterRestaurants().length === 1 && !await pinUnlock()) return;
+  isStaffUnlocked = false; resetStaffGuest(); showView("owner");
+}
 function confirmMenuUpdatedToday() {
   const r = getActiveRest();
   r.lastVerified = today();
@@ -6086,7 +6501,8 @@ function renderRoiMetrics(r) {
 let lastRenderedRestId = null;
 function renderRestaurantApp() {
   const r = getActiveRest();
-  if (lastRenderedRestId !== r.id) { lastRenderedRestId = r.id; currentTab = "all"; document.querySelectorAll("#appView .tab").forEach(x => x.classList.remove("active")); }
+  const restChanged = lastRenderedRestId !== r.id;
+  if (restChanged) { lastRenderedRestId = r.id; currentTab = "all"; document.querySelectorAll("#appView .tab").forEach(x => x.classList.remove("active")); }
   // Para el cliente el nombre del local va sobre la carta; la cabecera conserva la marca
   $("headerMainTitle").innerText = isStaffUnlocked ? r.name : "Comeclaro";
   const waiter = isStaffUnlocked && !pinOpen;            // vista del camarero: solo alergias de la mesa y carta
@@ -6094,7 +6510,7 @@ function renderRestaurantApp() {
   $("restTitle").innerText = r.name;
   $("restTitleRow").style.display = isStaffUnlocked ? "none" : "flex";
   $("dishSearchBar").style.display = isStaffUnlocked ? "" : "none";       // el cliente filtra por resultado y categoría, no escribe
-  if (!isStaffUnlocked) $("searchInput").value = "";
+  if (!isStaffUnlocked || restChanged) $("searchInput").value = "";
   updateFavButton();
   $("restInfoCard").style.display = waiter ? "none" : "block";
   $("menuLegalBanner").style.display = (waiter || isStaffUnlocked) ? "none" : "block";
@@ -6143,7 +6559,7 @@ function renderDishes() {
     $("dishList").innerHTML = `<div style="text-align:center; padding:20px; color:var(--muted); font-size:0.8rem;">${isStaffUnlocked && !pinOpen ? "La carta aún no tiene platos publicados." : isStaffUnlocked ? "Tu carta está vacía. Pulsa «📸 Subir carta con foto» para cargarla de una vez, o añade los platos uno a uno." : "Este local aún no tiene platos cargados."}</div>`;
     return;
   }
-  const q = normalizeStr($("searchInput").value);
+  const q = normalizeStr($("searchInput").value).trim().replace(/\s+/g, " ");
   const cat = $("catFilter").value || "ALL";
   const counts = { aptos: 0, mod: 0, ask: 0, proh: 0 };
   const staffEdit = isStaffUnlocked && pinOpen;           // con las herramientas abiertas se edita; el camarero solo mira
@@ -6491,6 +6907,7 @@ async function saveDishFromModal() {
   } else {
     r.menu.unshift({ id: Date.now(), cat, name, protocol, traces, ings, draft, rev });
   }
+  kbCapture(r, name, cat, ings, "owner");            // 3.19: señal para mejorar el detector (anónima)
   saveAppState(); closeRestDishModal(); renderRestaurantApp();
   toast(draft ? "📝 Guardado como borrador: solo lo ves tú. Publícalo cuando esté listo."
     : (r.cloud ? "💾 Plato guardado y publicado. Tu carta online se actualiza sola." : "💾 Plato guardado. Recuerda generar de nuevo el código Bidi."));
@@ -6513,6 +6930,7 @@ async function openQrModal(id) {
   const r = appState.restaurants.find(x => x.id === id) || getActiveRest();
   currentQrName = r.name;
   currentQrCanvas = null;
+  currentBidiLink = ""; $("qrDirectLink").value = "";      // si falla, no se comparte el enlace del local anterior
   $("qrBox").innerHTML = `<div style="padding:40px 10px; color:#334155;">⏳ Generando código...</div>`;
   $("qrInfo").innerHTML = "";
   $("btnQrDownload").style.display = "none";
@@ -6559,6 +6977,7 @@ function downloadQrPng() {
 }
 function copyBidiLink() {
   const link = currentBidiLink || $("qrDirectLink").value;
+  if (!link) { toast("Todavía no hay enlace.", "err"); return; }
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(link).then(() => toast("✅ Enlace copiado")).catch(() => { $("qrDirectLink").select(); toast("Mantén pulsado el enlace para copiarlo.", "info"); });
   } else { $("qrDirectLink").select(); toast("Mantén pulsado el enlace para copiarlo.", "info"); }
@@ -6570,6 +6989,7 @@ async function shareWhatsApp() {
   if (!window.open(url, "_blank")) location.href = url;
 }
 function shareBidiWhatsApp() {
+  if (!currentBidiLink) { toast("Todavía no hay enlace.", "err"); return; }
   const url = `https://wa.me/?text=${encodeURIComponent("🛡️ Carta de alérgenos de " + currentQrName + ": " + currentBidiLink)}`;
   window.open(url, "_blank");
 }
@@ -6651,8 +7071,10 @@ async function openCloudLink(rid, followed) {
       r = upsertCloudRest(rid, s.data());
     } catch (e) { if (!r) { uiAlert("⚠️ No se pudo cargar la carta. " + netFailText()); return false; } }
   } else if (!r) { uiAlert("⚠️ No se pudo cargar la carta. " + netFailText()); return false; }
+  let reload = false;
+  try { reload = sessionStorage.getItem("cc_viewing") === rid; } catch (e) {}   // la app ya estaba en esta carta (recarga): no es un QR nuevo
   const fav = appState.routeFolders.find(f => f.id === "f_fav");
-  if (fav && !fav.restIds.includes(rid)) fav.restIds.push(rid);
+  if (fav && !reload && !fav.restIds.includes(rid)) fav.restIds.push(rid);
   saveAppState();
   openRestaurantForDiner(rid);
   return true;
@@ -7401,10 +7823,11 @@ async function onCloudAuth(user) {
     appState.currentUser = { name: String(me.email || "").split("@")[0], email: me.email || "", uid: me.uid };
     try { await cloudPullOwner(); } catch (e) { console.warn("pullOwner:", e); }
     cloudAutoClaimFounder();
+    kbFlush();                                   // señales que quedaron sin subir (sin conexión)
   } else {
     // Con servidor, solo cuentan las sesiones reales (se descarta la del modo de prueba)
     appState.currentUser = null;
-    if (isStaffUnlocked) { isStaffUnlocked = false; resetStaffGuest(); }
+    if (isStaffUnlocked) exitLocalMode();
   }
   saveAppState();
   refreshAfterCloud();
@@ -7831,7 +8254,7 @@ function freeSlotsFor(uidNow) {
   return free;
 }
 async function cloudCreateRestaurant(data) {
-  if (!cloudOwner()) { uiAlert("Inicia sesión en Hostelería para dar de alta un restaurante."); return null; }
+  if (!cloudOwner()) { uiAlert("Entra en «Yo» → «Tengo un restaurante» con tu cuenta para dar de alta un restaurante."); return null; }
   if (!ownerProfile) { openCompleteRegistration(); return null; }
   if (!ownerPulledOk) { try { await cloudPullOwner(); } catch (e) { uiAlert("Necesitas conexión a internet para dar de alta un restaurante."); return null; } }
   const { F, db } = cloud;
@@ -8320,6 +8743,47 @@ async function cloudDeleteMyReviews() {
   return failed;
 }
 
+// ---------- 3.19 · Señales para mejorar el detector (kb_signals) ----------
+// Solo de cuentas de restaurante, sobre locales de la nube. Cada señal lleva el texto del plato o componente y los alérgenos
+// (ver kbIngSignal / kbDishSignal en 02b_families.js), sin el identificador del local: `lh` es un resumen de 8 caracteres
+// de «sal secreta de este móvil + local», así se pueden contar locales distintos sin saber cuáles. El identificador del
+// documento es lh + resumen del texto: la misma señal del mismo local solo se guarda una vez (las reglas no dejan actualizarla).
+const KB_MAX_QUEUE = 200, KB_MAX_SESSION = 40;
+let kbSent = 0, kbBusy = false;
+function kbSalt() {
+  if (!appState.kbSalt) appState.kbSalt = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, "0")).join("");
+  return appState.kbSalt;
+}
+function kbCapture(r, name, cat, ings, src) {
+  try {
+    if (!isCloudMode() || !r || !r.cloud || r.suggestion || r.demo) return;
+    const vf = r.verified === true;
+    let n = 0;
+    const put = sig => { if (sig && kbEnqueue(appState.kbQueue, r.id, { ...sig, vf }, KB_MAX_QUEUE)) n++; };
+    put(kbDishSignal(name, cat, ings, src));
+    (ings || []).forEach(i => put(kbIngSignal(i, cat, src)));
+    if (n) { kbSalt(); kbFlush(); }
+  } catch (e) { console.warn("kb:", e); }
+}
+async function kbFlush() {
+  if (kbBusy || !cloud || !cloudOwner() || navigator.onLine === false || !(appState.kbQueue || []).length) return;
+  kbBusy = true;
+  try {
+    const { F, db } = cloud;
+    while (appState.kbQueue.length && kbSent < KB_MAX_SESSION) {
+      const q = appState.kbQueue[0];
+      const lh = (await sha256hex(kbSalt() + "|" + q.rid)).slice(0, 8);
+      const id = lh + "_" + (await sha256hex(q.kind + "|" + q.txt)).slice(0, 12);
+      const { rid, ...pub } = q;
+      try { await F.setDoc(F.doc(db, "kb_signals", id), { ...pub, v: APP_VERSION, lh, at: F.serverTimestamp() }); kbSent++; }
+      catch (e) { if (!/permission/i.test(cloudErr(e))) break; }          // sin permiso = ya enviada: se descarta
+      appState.kbQueue.shift();
+    }
+    try { localStorage.setItem(STATE_KEY, JSON.stringify(appState)); } catch (e) {}
+  } catch (e) { console.warn("kb:", e); }
+  finally { kbBusy = false; }
+}
+
 // ============================================================
 // COBRO A RESTAURANTES (apagado hasta que la administración ponga una fecha en admin.html)
 // - meta/plan guarda la fecha de inicio del cobro, un texto de aviso y qué formas de pago
@@ -8690,7 +9154,7 @@ const BACK_CLOSERS = {
   allergenWarningModal: () => cancelAddUnsafeProduct(),
   registerModal: () => cancelRegistration(),
   mapModal: () => closeMapSheet(),
-  legalModal: () => {}            // la bienvenida no se puede saltar: hay que aceptarla
+  legalModal: () => { if (legalUpToDate()) closeModal("legalModal"); }     // la bienvenida no se puede saltar; el aviso ya aceptado (desde «Yo») sí se cierra
 };
 function topOpenModal() {
   if ($("uiDialog") && $("uiDialog").style.display === "block") return "uiDialog";
@@ -8868,7 +9332,7 @@ function updateMenuAiButton() {
 
 // ---------- Ventana ----------
 function openMenuAiModal() {
-  if (!menuAiAllowed()) { uiAlert("📸 «Subir carta con foto» es solo para restaurantes con cuenta de Hostelería. Entra en la pestaña Hostelería con tu cuenta y gestiona tu local desde allí."); return; }
+  if (!menuAiAllowed()) { uiAlert("📸 «Subir carta con foto» es solo para restaurantes con cuenta. Entra en «Yo» → «Tengo un restaurante» con tu cuenta y gestiona tu local desde allí."); return; }
   maiFiles = []; maiDishes = [];
   $("maiFileInfo").textContent = "";
   $("maiReadBtn").disabled = true;
@@ -8929,7 +9393,7 @@ function menuAiErrorText(e) {
   if (/sin-nube/.test(c)) return "La app no está conectada a su servidor.";
   if (/not-found|unimplemented/.test(c)) return "La lectura con IA aún no está activada en el servidor de Comeclaro (guía: «Carta con foto»).";
   if (/resource-exhausted|invalid-argument|failed-precondition|permission-denied|data-loss/.test(c) && m) return m;
-  if (/unauthenticated/.test(c)) return "Entra en Hostelería con tu cuenta de restaurante.";
+  if (/unauthenticated/.test(c)) return "Entra en «Yo» → «Tengo un restaurante» con tu cuenta de restaurante.";
   if (/deadline-exceeded/.test(c)) return "La lectura ha tardado demasiado. Prueba con menos páginas a la vez.";
   if (navigator.onLine === false || /unavailable|network/.test(c) || /failed to fetch|networkerror|load failed/i.test(m)) return m && /unavailable/.test(c) ? m : "Sin conexión a internet. Inténtalo de nuevo.";
   return "No se pudo leer la carta: " + (m || c || e);
@@ -9089,6 +9553,7 @@ function addReviewedAiDishes(asDrafts) {
   const base = Date.now();
   const add = chosen.slice(0, room).map((d, i) => ({ id: base + i, cat: d.cat, name: d.name, protocol: "", traces: d.traces, ings: d.ings, draft: !!asDrafts }));
   r.menu = sanitizeMenu((r.menu || []).concat(add));
+  add.forEach(d => kbCapture(r, d.name, d.cat, d.ings, "ai_review"));      // 3.19: señales para mejorar el detector
   if (!asDrafts) r.lastVerified = today();
   saveAppState();
   const left = asDrafts ? 0 : maiDishes.filter(d => !d.discarded && !d.reviewed).length;
@@ -9267,7 +9732,7 @@ async function openClaimModal() {
   const r = getActiveRest();
   if (!canClaimRest(r)) return;
   if (!cloudOwner()) {
-    await uiAlert("🔑 Para reclamar este local, primero entra o crea tu cuenta en la pestaña Hostelería y vuelve a abrir el local.");
+    await uiAlert("🔑 Para reclamar este local, primero entra o crea tu cuenta en «Yo» → «Tengo un restaurante» y vuelve a abrir el local.");
     showView("owner");
     return;
   }
@@ -9473,7 +9938,15 @@ function renderWaiterCardLang(lang) {
 // ============================================================
 // PRE-AVISO DE RESERVA POR WHATSAPP
 // ============================================================
-function openBookingModal() { openModal("bookingModal"); }
+// Lo escrito en la opinión o el pre-aviso es de un local: al abrir otro, los campos empiezan vacíos
+let draftRestId = null;
+function resetFormsForRest(r) {
+  if (draftRestId === r.id) return;
+  draftRestId = r.id;
+  ["revAuthor", "revComment", "revAllergens", "bookName", "bookTime", "bookNotes"].forEach(id => { $(id).value = ""; });
+  $("revStars").value = "5";
+}
+function openBookingModal() { resetFormsForRest(getActiveRest()); openModal("bookingModal"); }
 function sendBookingPreAlert() {
   const r = getActiveRest();
   const name = str($("bookName").value.trim(), 80), time = str($("bookTime").value.trim(), 80), notes = str($("bookNotes").value.trim(), 400);
@@ -9496,6 +9969,7 @@ function sendBookingPreAlert() {
   lines.push("Enviado con Comeclaro");
   if (r.cloud) cloudInc(r.id, "bookings"); else r.stats.bookings = (r.stats.bookings || 0) + 1;
   saveAppState();
+  ["bookName", "bookTime", "bookNotes"].forEach(id => { $(id).value = ""; });
   closeModal("bookingModal");
   const url = `https://wa.me/${phone}?text=${encodeURIComponent(lines.join("\n"))}`;
   if (!window.open(url, "_blank")) location.href = url;
@@ -9514,6 +9988,7 @@ function openReviewModal() {
   const r = getActiveRest();
   if (isOwnCloudRest(r)) { uiAlert("No puedes valorar tu propio local: las opiniones son de los clientes. Puedes responderlas desde «Gestionar»."); return; }
   // Las alergias son datos de salud: no se proponen ni se publican salvo que se marque la casilla
+  resetFormsForRest(r);
   $("revShareAllergens").checked = false;
   $("revAllergens").value = "";
   $("revAllergensRow").style.display = "none";
@@ -9668,7 +10143,7 @@ async function claimCommunityRestaurant() {
   const r = getActiveRest();
   if (r.cloud) {
     if (!cloudOwner()) {
-      await uiAlert("🔑 Primero entra o crea tu cuenta en la pestaña Hostelería y vuelve a este local para reclamarlo.");
+      await uiAlert("🔑 Primero entra o crea tu cuenta en «Yo» → «Tengo un restaurante» y vuelve a este local para reclamarlo.");
       showView("owner");
       return;
     }
@@ -9681,7 +10156,7 @@ async function claimCommunityRestaurant() {
     return;
   }
   if (!appState.currentUser) {
-    await uiAlert("🔑 Primero inicia sesión en la pestaña Hostelería y vuelve a este local para reclamarlo.");
+    await uiAlert("🔑 Primero inicia sesión en «Yo» → «Tengo un restaurante» y vuelve a este local para reclamarlo.");
     showView("owner");
     return;
   }
@@ -9737,6 +10212,7 @@ function openLegalModal() {
   openModal("legalModal");
 }
 function acceptLegalTerms() {
+  const first = !legalUpToDate();           // desde «Yo» se puede releer el aviso: entonces no es la bienvenida
   appState.legalAccepted = true;
   appState.legalVersion = LEGAL_VERSION;
   saveAppState();
@@ -9746,7 +10222,7 @@ function acceptLegalTerms() {
   renderUsageToggle();
   pingUsage();
   // Paso 2 de la bienvenida: si todavía no has marcado nada, se abre «Lo que evito»
-  if (!profileLabels().length) setTimeout(openAllergyProfileModal, 200);
+  if (first && !profileLabels().length) setTimeout(openAllergyProfileModal, 200);
 }
 function openPrivacyModal() {
   $("privacyLocalNote").style.display = isCloudMode() ? "none" : "block";

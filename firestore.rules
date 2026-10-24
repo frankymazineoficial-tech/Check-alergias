@@ -1,7 +1,7 @@
 rules_version = '2';
 
 // =====================================================================
-// REGLAS DE SEGURIDAD DE COMECLARO (versión 3.15.0)
+// REGLAS DE SEGURIDAD DE COMECLARO (versión 3.19.0)
 // Pégalas en: Consola de Firebase → Firestore Database → Reglas → Publicar.
 //
 // Antes de publicarlas, revisa la línea marcada con «ADMINISTRACIÓN»:
@@ -36,6 +36,7 @@ rules_version = '2';
 //   opiniones, 5 sugerencias de locales y 20 denuncias cada 24 horas (quotas/).
 // - 3.12.2 · Informes de errores técnicos de la app (clientErrors/): sin datos personales,
 //   uno por error y día; solo los lee la administración y se borran solos a los 90 días.
+// - 3.19 · kb_signals: señales anónimas para mejorar el detector (las crea una cuenta de restaurante; solo las lee la administración).
 // - 3.15 · Foto de portada de cada local (covers/): pública para leer; solo la sube o la quita su dueño
 //   (JPEG reducido, máximo ~170.000 caracteres) y la administración puede retirarla.
 // =====================================================================
@@ -409,6 +410,37 @@ service cloud.firestore {
         && request.resource.data.resolvedAt == request.time;
       // Quien reclama puede retirar su reclamación; la administración, borrarla
       allow delete: if isAdmin() || (isOwnerUser() && resource.data.uid == request.auth.uid);
+    }
+
+    // ---------- Señales para mejorar el detector (3.19) ----------
+    // Una cuenta de restaurante deja, al guardar un plato o publicar una carta leída con IA, qué alérgenos marcó la persona
+    // que el detector no daba por seguros (o quitó). Solo texto de plato o componente y alérgenos: sin cuenta, sin local.
+    // `lh` = 8 caracteres de un resumen con sal secreta del móvil (permite contar locales distintos sin saber cuáles).
+    // El documento se llama lh_resumenDelTexto: una señal por local y texto, y no se puede cambiar después.
+    // Las lee y borra solo la administración (tools/learn_from_signals.js).
+    function kbAl(l) {
+      return l is list && l.size() <= 14
+        && l.hasOnly(['GLUTEN', 'CRUSTÁCEOS', 'HUEVO', 'PESCADO', 'CACAHUETES', 'SOJA', 'LÁCTEO', 'FRUTOS CON CÁSCARA', 'APIO', 'MOSTAZA', 'SÉSAMO', 'SULFITOS', 'ALTRAMUCES', 'MOLUSCOS']);
+    }
+    match /kb_signals/{kbId} {
+      allow read, delete: if isAdmin();
+      allow create: if isOwnerUser()
+        && kbId.matches('[0-9a-f]{8}_[0-9a-f]{12}')
+        && request.resource.data.keys().hasOnly(['v', 'kind', 'txt', 'sub', 'cat', 'det', 'weak', 'comp', 'saved', 'added', 'dropped', 'src', 'vf', 'lh', 'at'])
+        && request.resource.data.keys().hasAll(['v', 'kind', 'txt', 'saved', 'added', 'dropped', 'src', 'vf', 'lh', 'at'])
+        && request.resource.data.lh == kbId.split('_')[0]
+        && request.resource.data.kind in ['ing', 'dish']
+        && request.resource.data.src in ['owner', 'owner_ok', 'ai_review']
+        && request.resource.data.vf is bool
+        && isStr(request.resource.data.v, 12)
+        && isStr(request.resource.data.txt, 160) && request.resource.data.txt.size() >= 1
+        && isStr(request.resource.data.get('sub', ''), 300)
+        && isStr(request.resource.data.get('cat', ''), 60)
+        && kbAl(request.resource.data.get('det', [])) && kbAl(request.resource.data.get('weak', [])) && kbAl(request.resource.data.get('comp', []))
+        && kbAl(request.resource.data.saved) && kbAl(request.resource.data.added) && kbAl(request.resource.data.dropped)
+        && request.resource.data.added.size() + request.resource.data.dropped.size() >= 1
+        && request.resource.data.at == request.time;
+      allow update: if false;
     }
 
     // ---------- Fotos de portada de los locales (3.15) ----------

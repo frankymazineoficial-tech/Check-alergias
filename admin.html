@@ -160,6 +160,13 @@
     </section>
 
     <section class="card">
+      <h2>Aprendizaje del detector</h2>
+      <p class="muted">Cuando un restaurante guarda un plato, la app deja una señal anónima (texto del plato o ingrediente y alérgenos que marcó o quitó, sin cuenta ni local). Descárgalas, junto con las cartas publicadas, y pásalas al script del taller: <code>node tools/learn_from_signals.js señales.json --menus cartas.json</code>. Propone qué nombres y preparaciones añadir; nada entra en el detector sin que lo revises.</p>
+      <div class="row"><button class="btn btn-primary" id="btnKbSignals">Descargar señales (JSON)</button> <button class="btn btn-outline" id="btnKbMenus">Descargar cartas publicadas (JSON)</button></div>
+      <div class="msg" id="kbMsg"></div>
+    </section>
+
+    <section class="card">
       <h2>Locales borrados por sus dueños</h2>
       <p class="muted">Al borrar un local se borran también sus opiniones. Este registro (sin datos de clientes) te deja ver si alguien borra un local para volver a crearlo sin sus opiniones malas: las condiciones lo prohíben y puedes retirar el local nuevo. Borra los registros de más de 12 meses.</p>
       <button class="btn btn-primary" id="btnDeleted">Cargar registro</button>
@@ -796,6 +803,31 @@ El equipo de Comeclaro`;
       show("deletedTable", qs.docs.length > 0);
       msg("deletedMsg", qs.docs.length ? plural(qs.docs.length, "registro.", "registros.") : "Ningún dueño ha borrado locales.", "ok");
     } catch (e) { msg("deletedMsg", errText(e), "err"); }
+  };
+
+  // ---------- Aprendizaje del detector (3.19) ----------
+  const saveJson = (data, name) => {
+    const blob = new Blob([JSON.stringify(data)], { type: "application/json" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+  $("btnKbSignals").onclick = async () => {
+    msg("kbMsg", "Descargando…");
+    try {
+      const qs = await F.getDocs(F.query(F.collection(db, "kb_signals"), F.limit(5000)));
+      const out = qs.docs.map(d => { const x = d.data(); return { id: d.id, ...x, at: tsMs(x.at) }; });
+      saveJson(out, `comeclaro_senales_${new Date().toISOString().slice(0, 10)}.json`);
+      msg("kbMsg", plural(out.length, "señal descargada.", "señales descargadas."), "ok");
+    } catch (e) { msg("kbMsg", errText(e), "err"); }
+  };
+  $("btnKbMenus").onclick = async () => {
+    msg("kbMsg", "Descargando…");
+    try {
+      const qs = await F.getDocs(F.query(F.collection(db, "menus"), F.limit(2000)));
+      const out = qs.docs.map(d => ({ rid: d.id, menu: (d.data().menu || []) }));
+      saveJson(out, `comeclaro_cartas_${new Date().toISOString().slice(0, 10)}.json`);
+      msg("kbMsg", plural(out.length, "carta descargada.", "cartas descargadas."), "ok");
+    } catch (e) { msg("kbMsg", errText(e), "err"); }
   };
 
   // ---------- Limpieza: lo resuelto hace más de 12 meses ----------
