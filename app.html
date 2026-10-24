@@ -545,6 +545,16 @@
   .switch:checked::after { transform:translateX(20px); }
   #dataModal .set-title:first-of-type { margin-top:14px; }
   #homeView .list-tools { margin-top:12px; }
+
+  /* 3.16.1 · Nombre del restaurante sobre la carta, con corazón y compartir; ficha del local al final */
+  .rest-title-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:2px 0 12px; }
+  .rest-title { margin:0; font-size:1.5rem; font-weight:800; line-height:1.2; letter-spacing:-0.01em; min-width:0; }
+  .rt-actions { display:flex; gap:8px; flex-shrink:0; }
+  .icon-act { width:36px; height:36px; border-radius:50%; border:1px solid var(--border); background:var(--card); color:var(--text); display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding:0; }
+  .icon-act.on { color:#f87171; border-color:rgba(248,113,113,0.55); }
+  .icon-act.on svg { fill:#f87171; }
+  .rest-info-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; margin-top:18px; }
+  .rest-info-card .btn { width:100%; }
 </style>
 </head>
 <body>
@@ -751,37 +761,29 @@
   </div>
 
   <div class="container">
-    <div id="restInfoCard" style="background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; margin-bottom:12px;">
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-        <div>
-          <span id="activeRestBadge" class="verified-badge"></span>
-          <span id="activeRestLastVerified" style="font-size:0.7rem; color:var(--green); margin-left:6px; font-weight:700;"></span>
-          <div id="activeRestCity" style="font-size:0.76rem; color:var(--muted); margin-top:3px;"></div>
-        </div>
-        <div id="dinerHeaderActions" class="diner-actions">
-          <button class="btn btn-primary" id="btnWaiterCard" onclick="openWaiterCardModal()">Mostrar al camarero</button>
-          <button class="btn btn-outline" id="btnToggleFav" onclick="openSaveToRouteModal(activeRestId)">♡ Guardar</button>
-          <button class="btn btn-outline" id="btnBookingAction" onclick="openBookingModal()">Avisar al restaurante</button>
-          <button class="btn btn-outline" id="btnShareMenu" onclick="shareWhatsApp()">Compartir</button>
-        </div>
+    <div class="rest-title-row" id="restTitleRow">
+      <h2 class="rest-title" id="restTitle"></h2>
+      <div class="rt-actions">
+        <button type="button" class="icon-act" id="btnToggleFav" onclick="toggleFavorite()" aria-pressed="false" aria-label="Guardar este restaurante"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5.2 5.2 0 0 0-7.4 0L12 7l-1.4-1.4a5.2 5.2 0 0 0-7.4 7.4L12 21.6l8.8-8.6a5.2 5.2 0 0 0 0-7.4z"/></svg></button>
+        <button type="button" class="icon-act" id="btnShareMenu" onclick="shareWhatsApp()" aria-label="Compartir este restaurante"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
       </div>
+    </div>
 
-      <div id="unclaimedBanner" style="display:none; margin-top:12px; padding:12px; border-radius:10px; background:rgba(245,158,11,0.14); border:1px solid rgba(245,158,11,0.4); color:#fde68a;">
-        <div style="font-size:0.82rem; font-weight:800; margin-bottom:4px;">💡 Local sugerido por la comunidad (Sin carta oficial verificada)</div>
-        <p style="margin:0 0 10px; font-size:0.74rem; color:#cbd5e1;">Este restaurante aún no ha subido su carta oficial. Puedes usar arriba el botón <b>🗣️ Camarero</b>, dejar tu reseña o pedir que suban su carta:</p>
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
-          <button class="btn btn-amber" id="btnRequestMenu" onclick="requestOfficialMenu()">🔥 Solicitar que suba su carta (1)</button>
-          <button class="btn btn-outline" onclick="claimCommunityRestaurant()">🔑 Soy el propietario: Reclamar</button>
-          <button class="btn btn-danger" id="btnDeleteSuggestion" onclick="deleteRestaurant(activeRestId, true)">🗑️ Borrar Sugerencia</button>
-        </div>
+    <div id="unclaimedBanner" style="display:none; margin:0 0 12px; padding:12px; border-radius:10px; background:rgba(245,158,11,0.14); border:1px solid rgba(245,158,11,0.4); color:#fde68a;">
+      <div style="font-size:0.82rem; font-weight:800; margin-bottom:4px;">💡 Local sugerido por la comunidad (Sin carta oficial verificada)</div>
+      <p style="margin:0 0 10px; font-size:0.74rem; color:#cbd5e1;">Este restaurante aún no ha subido su carta oficial. Puedes usar arriba el icono de tarjeta para el camarero, dejar tu reseña o pedir que suban su carta:</p>
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button class="btn btn-amber" id="btnRequestMenu" onclick="requestOfficialMenu()">🔥 Solicitar que suba su carta (1)</button>
+        <button class="btn btn-outline" onclick="claimCommunityRestaurant()">🔑 Soy el propietario: Reclamar</button>
+        <button class="btn btn-danger" id="btnDeleteSuggestion" onclick="deleteRestaurant(activeRestId, true)">🗑️ Borrar Sugerencia</button>
       </div>
     </div>
 
     <div id="menuInteractiveZone">
-      <div class="controls-bar">
+      <div class="controls-bar" id="dishSearchBar">
         <input type="search" id="searchInput" class="search-input" placeholder="Buscar un plato o ingrediente" oninput="renderDishes()">
-        <select id="catFilter" class="cat-filter" onchange="renderDishes()" aria-label="Filtrar la carta por sección" style="display:none;"></select>
       </div>
+      <select id="catFilter" class="cat-filter" onchange="renderDishes()" aria-label="Filtrar la carta por sección" style="display:none;"></select>
       <div class="cat-chips" id="catChips"></div>
       <div class="legal-line" id="menuLegalBanner">Según los datos del local · confírmalo con el camarero antes de pedir.</div>
       <div class="summary-strip" role="group" aria-label="Filtrar por resultado">
@@ -791,6 +793,16 @@
         <button type="button" class="tab proh" id="tab-proh" onclick="setTab('proh')"></button>
       </div>
       <div id="dishList"></div>
+    </div>
+
+
+    <div id="restInfoCard" class="rest-info-card">
+      <span id="activeRestBadge" class="verified-badge"></span>
+      <span id="activeRestLastVerified" style="font-size:0.8rem; color:var(--green); font-weight:700;"></span>
+      <div id="activeRestCity" style="font-size:0.84rem; color:var(--muted); margin-top:6px;"></div>
+      <div id="dinerHeaderActions" class="diner-actions" style="margin-top:10px;">
+        <button class="btn btn-outline" id="btnBookingAction" onclick="openBookingModal()">Avisar al restaurante</button>
+      </div>
     </div>
 
     <details id="reviewsSection" class="reviews-fold">
@@ -1444,7 +1456,7 @@
       <div class="help-body">
         <ul>
           <li><b>«Avisar al restaurante»</b>: escribe tu nombre, cuántos sois, el día y la hora. Se abre WhatsApp con un mensaje al restaurante que incluye tus alergias y dietas, y tú decides si lo envías. Solo aparece si el local tiene WhatsApp.</li>
-          <li><b>«♡ Guardar»</b>: guarda el local en una lista, por ejemplo «Favoritos» o «Vacaciones». Tus listas están en «🍽️ Comer fuera», abajo, en «Tus guardados». Con «Renombrar» cambias su nombre y con «Borrar lista» la borras.</li>
+          <li><b>El corazón ♡</b> junto al nombre del restaurante lo guarda (púlsalo otra vez para quitarlo). Tus guardados están en «🍽️ Comer fuera», abajo, en «Tus guardados»: ahí, con «Lista», lo pasas a otra lista (por ejemplo «Vacaciones»); con «Renombrar» cambias el nombre de una lista y con «Borrar lista» la borras.</li>
           <li><b>«📲 Compartir»</b>: envía el enlace de la carta por WhatsApp.</li>
         </ul>
       </div>
@@ -1453,7 +1465,7 @@
     <details class="help-sec" id="help-camarero">
       <summary>🗣️ 4. En la mesa: tarjeta para el camarero</summary>
       <div class="help-body">
-        <p>Pulsa «Mostrar al camarero» (en la carta del local) o el icono de tarjeta que hay junto al lápiz, arriba, en tu lista de alergias (también en «Lo que evito» → «Tarjeta para el camarero»). La tarjeta explica tus alergias en español, inglés, francés o italiano: elige el idioma y enseña la pantalla.</p>
+        <p>Pulsa el icono de tarjeta o el icono de tarjeta que hay junto al lápiz, arriba, en tu lista de alergias (también en «Lo que evito» → «Tarjeta para el camarero»). La tarjeta explica tus alergias en español, inglés, francés o italiano: elige el idioma y enseña la pantalla.</p>
       </div>
     </details>
 
@@ -1834,7 +1846,7 @@
 </div>
 
 <script>
-const APP_VERSION = "3.16.0";
+const APP_VERSION = "3.16.1";
 // Plan de lanzamiento (si cambias algo aquí, cambia también firestore.rules y condiciones.html)
 const PLAN = {
   monthly: "19,99\u00a0€", yearly: "199,99\u00a0€",                 // precio previsto, IVA incluido
@@ -3907,8 +3919,6 @@ function showView(v, fromBack) {
   if (!fromBack) navRemember(v);           // para el botón «atrás» del móvil
   if (v !== "app" && isStaffUnlocked) { isStaffUnlocked = false; resetStaffGuest(); }   // salir de la carta cierra el modo propietario
   if ((v !== "app" && v !== "owner") || (v === "app" && !isStaffUnlocked)) pinOpen = false;   // salir de hostelería bloquea las herramientas
-  const wb = $("btnWaiterCard");
-  if (wb) wb.style.display = (v === "owner" || (v === "app" && isStaffUnlocked)) ? "none" : "inline-flex";
   currentView = v;
   document.body.classList.toggle("local-mode", v === "owner" || (v === "app" && isStaffUnlocked));
   document.body.classList.toggle("local-app", v === "app" && isStaffUnlocked);
@@ -5050,6 +5060,32 @@ function openSaveToRouteModal(restId) {
   }).join("");
   openModal("saveRouteModal");
 }
+// El corazón de la carta: un toque guarda el local (en «Favoritos») y otro lo quita de tus guardados
+function isSavedAnywhere(id) { return appState.routeFolders.some(f => (f.restIds || []).includes(id)); }
+function updateFavButton() {
+  const b = $("btnToggleFav");
+  if (!b) return;
+  const on = isSavedAnywhere(activeRestId);
+  b.classList.toggle("on", on);
+  b.setAttribute("aria-pressed", on ? "true" : "false");
+  b.setAttribute("aria-label", on ? "Quitar de mis guardados" : "Guardar este restaurante");
+}
+function toggleFavorite() {
+  const id = activeRestId;
+  if (!id) return;
+  if (isSavedAnywhere(id)) {
+    appState.routeFolders.forEach(f => { f.restIds = (f.restIds || []).filter(x => x !== id); });
+    toast("Quitado de tus guardados.", "info");
+  } else {
+    const f = appState.routeFolders.find(x => x.id === "f_fav") || appState.routeFolders[0];
+    f.restIds.push(id);
+    const r = appState.restaurants.find(x => x.id === id);
+    if (r && r.cloud) cloudInc(id, "saves");
+    else if (r && !ownsRestaurant(r)) r.stats.saves = (r.stats.saves || 0) + 1;
+    toast("♥ Guardado en tus guardados.");
+  }
+  saveAppState(); updateFavButton(); renderDinerView();
+}
 function toggleRestInFolder(folderId, restId) {
   const f = appState.routeFolders.find(x => x.id === folderId);
   if (!f) return;
@@ -5454,15 +5490,19 @@ let lastRenderedRestId = null;
 function renderRestaurantApp() {
   const r = getActiveRest();
   if (lastRenderedRestId !== r.id) { lastRenderedRestId = r.id; currentTab = "all"; document.querySelectorAll("#appView .tab").forEach(x => x.classList.remove("active")); }
-  $("headerMainTitle").innerText = r.name;
+  // Para el cliente el nombre del local va sobre la carta; la cabecera conserva la marca
+  $("headerMainTitle").innerText = isStaffUnlocked ? r.name : "Comeclaro";
   const waiter = isStaffUnlocked && !pinOpen;            // vista del camarero: solo alergias de la mesa y carta
-  $("headerSubTitle").innerText = isStaffUnlocked ? (pinOpen ? "Modo propietario" : "Vista del camarero") : (r.city || "Carta de alérgenos");
+  $("headerSubTitle").innerText = isStaffUnlocked ? (pinOpen ? "Modo propietario" : "Vista del camarero") : "";
+  $("restTitle").innerText = r.name;
+  $("restTitleRow").style.display = isStaffUnlocked ? "none" : "flex";
+  $("dishSearchBar").style.display = isStaffUnlocked ? "" : "none";       // el cliente filtra por resultado y categoría, no escribe
+  if (!isStaffUnlocked) $("searchInput").value = "";
+  updateFavButton();
   $("restInfoCard").style.display = waiter ? "none" : "block";
   $("menuLegalBanner").style.display = (waiter || isStaffUnlocked) ? "none" : "block";
-  $("btnShareMenu").style.display = isStaffUnlocked ? "none" : "inline-flex";
   $("reviewsSection").style.display = waiter ? "none" : "block";
   $("dinerHeaderActions").style.display = isStaffUnlocked ? "none" : "flex";
-  $("btnWaiterCard").style.display = isStaffUnlocked ? "none" : "inline-flex";
   $("activeRestCity").innerText = r.city ? `📍 ${r.city}` : "";
   $("activeRestBadge").className = r.unclaimed ? "community-badge" : "verified-badge";
   $("activeRestBadge").innerText = r.demo ? "🧪 Carta de ejemplo (no es un restaurante real)" : (r.unclaimed ? "💡 Sugerido por la comunidad" : (r.imported ? "📱 Carta recibida por Bidi" : (r.cloud ? "🛡️ Carta publicada por el restaurante" : "📋 Carta guardada en este móvil"))) + (r.founder ? " · 🏅 Fundador" : "") + verifiedLabel(r);
