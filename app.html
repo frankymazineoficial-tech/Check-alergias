@@ -394,6 +394,8 @@
   .scan-actions .btn { flex:1 1 auto; }
   .scan-alt { display:flex; flex-direction:column; gap:8px; }
   .scan-manual > summary, .more-add > summary { cursor:pointer; color:var(--accent); font-weight:700; padding:8px 0; }
+  .scan-others { display:flex; flex-direction:column; gap:8px; margin-top:4px; }
+  .scan-addhome { display:block; width:100%; margin-top:10px; padding:6px 0; background:none; border:0; color:var(--accent); font-size:0.78rem; font-weight:700; text-decoration:underline; cursor:pointer; text-align:center; }
   .more-add { margin-top:4px; }
   .welcome-lead { margin:0 0 12px; font-size:1rem; color:var(--text); line-height:1.4; }
   .welcome-steps { display:flex; gap:8px; margin-bottom:12px; }
@@ -958,18 +960,20 @@
     </div>
     <div id="universalScanStatus" class="scan-result" style="display:none;"></div>
     <div class="scan-alt">
-      <button type="button" class="btn btn-primary btn-block" onclick="startBarcodeScanner('universal')">📷 Activar la cámara</button>
-      <label class="btn btn-outline btn-block" style="cursor:pointer;">Foto de la etiqueta (ingredientes)
-        <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleLabelPhotoScan(event, 'universal')">
-      </label>
-      <label class="btn btn-outline btn-block" style="cursor:pointer;">Foto del código de barras
-        <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleBarcodePhotoScan(event, 'universal')">
-      </label>
+      <button type="button" id="universalCamBtn" class="btn btn-primary btn-block" onclick="startBarcodeScanner('universal')">📷 Activar la cámara</button>
       <details class="scan-manual">
-        <summary>Escribir el código o pegar un enlace</summary>
-        <div style="display:flex; gap:6px; margin-top:8px;">
-          <input type="text" id="universalManualInput" class="search-input" placeholder="Nº de código de barras o enlace del QR" style="flex:1;">
-          <button class="btn btn-primary" onclick="handleUniversalManualInput()">Analizar</button>
+        <summary>Otras maneras de escanear</summary>
+        <div class="scan-others">
+          <label class="btn btn-outline btn-block" style="cursor:pointer;">Foto de la etiqueta (ingredientes)
+            <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleLabelPhotoScan(event, 'universal')">
+          </label>
+          <label class="btn btn-outline btn-block" style="cursor:pointer;">Foto del código de barras
+            <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleBarcodePhotoScan(event, 'universal')">
+          </label>
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="universalManualInput" class="search-input" placeholder="Escribir el código o pegar un enlace" aria-label="Nº de código de barras o enlace del QR" style="flex:1;">
+            <button class="btn btn-primary" onclick="handleUniversalManualInput()">Analizar</button>
+          </div>
         </div>
       </details>
     </div>
@@ -5008,6 +5012,7 @@ function startBarcodeScanner(mode = "home") {
     return;
   }
   $(containerId).style.display = "block";
+  if (mode === "universal") { const cb = $("universalCamBtn"); if (cb) cb.style.display = "none"; }   // con la cámara encendida solo se ve «Parar la cámara»
   scanLastCode = null; scanHits = 0;
 
   scannerQueue = prev.then(async () => {
@@ -5050,6 +5055,7 @@ function startBarcodeScanner(mode = "home") {
     catch (e) {
       if (html5QrScanner === sc) html5QrScanner = null;
       SCANNER_CONTAINERS.forEach(id => { const el = $(id); if (el) el.style.display = "none"; });
+      const camBtn = $("universalCamBtn"); if (camBtn) camBtn.style.display = "";
       const denied = /NotAllowed|Permission/i.test(String(e && (e.name || e.message || e)));
       uiAlert(denied
         ? "📷 El navegador no tiene permiso para usar la cámara.\n\nToca el candado de la barra de direcciones → Permisos → Cámara → Permitir. Recuerda abrir la app desde su dirección https://, no desde un archivo descargado."
@@ -5060,6 +5066,7 @@ function startBarcodeScanner(mode = "home") {
 
 function stopBarcodeScanner() {
   SCANNER_CONTAINERS.forEach(id => { const el = $(id); if (el) el.style.display = "none"; });
+  const camBtn = $("universalCamBtn"); if (camBtn) camBtn.style.display = "";   // cámara apagada: vuelve «Activar la cámara»
   const sc = html5QrScanner;
   html5QrScanner = null;
   scannerQueue = scannerQueue.then(async () => {
@@ -5184,7 +5191,7 @@ function renderUniversalResult(prod, box, caution = "") {
       🧪 Alérgenos: ${allA.length ? esc(allA.join(", ")) : "ninguno detectado"}${allTr.length ? `<br>ℹ️ Puede contener trazas de: ${esc(allTr.join(", "))}` : ""}
       ${prod.sub ? `<details style="margin-top:4px;"><summary>Ver ingredientes</summary>${esc(prod.sub)}</details>` : ""}
     </div>`;
-  const addBtn = `<div class="scan-actions"><button class="btn btn-primary" onclick="addUniversalProductToHomeDish()">Guardar en un plato</button><button class="btn btn-outline" onclick="scanAnother()">Escanear otro</button></div>`;
+  const addBtn = `<div class="scan-actions"><button class="btn btn-primary" onclick="scanAnother()">Escanear otro</button></div><button type="button" class="scan-addhome" onclick="addUniversalProductToHomeDish()">➕ Añadir a «En casa» como ingrediente de un plato nuevo</button>`;
   try { if (navigator.vibrate) navigator.vibrate(c.length ? [90, 60, 90] : 60); } catch (e) {}
   if (c.length) {
     setStatus(box, "err", `<span class="verdict">✕ No es para ti</span><span class="verdict-why">Lleva: ${esc(c.join(", "))}</span>${facts}${caution}${LABEL_NOTE}${addBtn}`);
@@ -5201,7 +5208,7 @@ function addUniversalProductToHomeDish() {
   closeUniversalScanner();
   if (currentView !== "home") showView("home");
   openHomeDishModal(null, JSON.parse(JSON.stringify(p)));
-  toast("Producto añadido. Ponle nombre al plato y guárdalo.");
+  toast("Producto añadido como ingrediente. Ponle nombre al plato y guárdalo.");
 }
 
 async function handleLabelPhotoScan(event, mode = "home") {
