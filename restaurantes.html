@@ -1418,6 +1418,26 @@ const AL_MORE_4 = {
   "FRUTOS CON CÁSCARA": { strong: ["torrons","almendrak","abelas","abela","torta de santiago"] },
   "SULFITOS": { strong: ["sagardoa","sagardo","sukalki"] }
 };
+// 3.18: postres, bollería y dulces regionales de las cartas españolas
+const AL_MORE_5 = {
+  "HUEVO": {
+    strong: ["bartolillo","bartolillos","flores de carnaval","flor de carnaval","princesitas","princesita","tortas de alcazar","rollos de anis","rollo de anis"],
+    weak: ["re:(?:de|rellen[oa]s?\\s+de)\\s+crema(?!\\s+(?:de\\s+)?(?:cacao|avellanas?|chocolate|cacahuete|calabaza|verduras|calabacin|setas|champinones|marisco|esparragos|puerros?|zanahoria|guisantes|balsamico|balsamica|coco|orujo|whisky|cafe\\s+irlandes))","bollo de leche","bollos de leche","berlina","berlinas","pepito de crema","pepitos de crema","pepito de chocolate","pepito de nata","medianoche","medianoches","canas de crema","canas rellenas","cana de crema","cana rellena","roscos fritos","roscos de anis","rosco de anis","marquesas","polkas","bollos de mantequilla","bollo de mantequilla","amarguillos","almendrados","mostachones","mostachon","coquitos","bolas de coco","bolitas de coco","canutillos","canutillo","gato mallorquin","gato de almendra"]
+  },
+  "LÁCTEO": {
+    strong: ["bartolillo","bartolillos","cafe vienes"],
+    weak: ["re:(?:de|rellen[oa]s?\\s+de)\\s+crema(?!\\s+(?:de\\s+)?(?:cacao|avellanas?|chocolate|cacahuete|calabaza|verduras|calabacin|setas|champinones|marisco|esparragos|puerros?|zanahoria|guisantes|balsamico|balsamica|coco|orujo|whisky|cafe\\s+irlandes))","re:caracolas?\\s+de\\s+(?:canela|hojaldre|pasas|crema|chocolate)","berlina","berlinas","bollo suizo","bollos suizos","suizo","suizos","pepito de crema","pepito de chocolate","pepito de nata","medianoche","medianoches","canas de crema","canas rellenas","cana de crema","cana rellena","canutillos","canutillo","lemon pie","lionesas","lionesa","petit choux","petits choux","profiteroles","polkas"]
+  },
+  "GLUTEN": {
+    strong: ["bartolillo","bartolillos","tortas de la mancha","torta de la mancha","flores de carnaval","flor de carnaval","hojaldrinas","hojaldrina","tortas de alcazar","rollos de anis","rollo de anis","lazos de jijona","medianoche","medianoches","truchas de navidad","truchas de batata","trucha de batata"],
+    weak: ["canutillos","canutillo","cortadillos","cortadillo"]
+  },
+  "FRUTOS CON CÁSCARA": {
+    strong: ["princesitas","princesita","catanies","catanias","catania","gato mallorquin","gato de almendra","re:gat[oó](?=\\s+(?:mallorqui|d'ametlla|de\\s+almendra))"],
+    weak: ["rosquillas de san isidro","tarta opera","opera"]
+  },
+  "PESCADO": { excl: ["re:truchas?\\s+de\\s+(?:batata|navidad|boniato|cabello\\s+de\\s+angel|chocolate)"] }
+};
 const mergeMore = MORE => Object.keys(MORE).forEach(al => {
   const m = MORE[al], r = AL_RULES[al];
   if (m.strong) r.strong = r.strong.concat(m.strong);
@@ -1430,7 +1450,7 @@ const mergeMore = MORE => Object.keys(MORE).forEach(al => {
     if (DENIABLE[al] && has(DENIABLE[al], b)) DENIABLE[al].push(k);
   });
 });
-mergeMore(AL_MORE); mergeMore(AL_MORE_2); mergeMore(AL_MORE_3); mergeMore(AL_MORE_4);
+mergeMore(AL_MORE); mergeMore(AL_MORE_2); mergeMore(AL_MORE_3); mergeMore(AL_MORE_4); mergeMore(AL_MORE_5);
 Object.keys(AL_RULES).forEach(al => {
   const r = AL_RULES[al];
   r.strongRe = kwTest(r.strong);
