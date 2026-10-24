@@ -1376,6 +1376,35 @@ const AL_MORE_2 = {
   "MOSTAZA": { strong: ["maille","mostaza maille","mostaza amora","grey poupon","re:colman'?s","re:french'?s","handlmaier","lowensenf","heinz mustard","mostaza heinz","piccalilli heinz"], weak: ["thomy"] },
   "APIO": { weak: ["gallina blanca","knorr","maggi","bovril","bisto","oxo","cubitos oxo","v8","zumo de tomate v8","sopinstant","sopa de sobre","sopas de sobre","sopa instantanea","crema de sobre"] }
 };
+// 3.18: platos de cocinas del mundo tal y como aparecen en cartas españolas: lo que SUELE llevar la receta corriente
+// (weak → PREGUNTA) y lo que lleva por definición (strong).
+const AL_MORE_3 = {
+  "GLUTEN": {
+    strong: ["ebi fry","ebi furai","jajangmyeon","ramyeon","pajeon","hotteok","xiaolongbao","sfenj","koshari","fatteh","iskender","philly cheesesteak","lobster roll","po boy","po' boy","cinnamon roll","cinnamon rolls","pissaladiere","flammekueche","flammkuchen","schwarzwalder","schwarzwalder kirschtorte","langos","loukoumades","galaktoboureko","smorrebrod","kanelbullar","semla","semlor","panzanella","tortelloni","amatriciana","fritto misto","suppli","pappa al pomodoro","tramezzino","tramezzini","mozzarella in carrozza","torta della nonna","baci di dama","jalebi","caneles","canele","smørrebrød"],
+    weak: ["agedashi tofu","korean fried chicken","dakgangjeong","pancit","kofta","kofte","bangers and mash","full english breakfast","english breakfast","full english","sunday roast","gumbo","poutine","peanut butter and jelly","saganaki","taramasalata","avgolemono","zurek","parmigiana","parmigiana di melanzane","berenjenas a la parmesana","puttanesca","chicken 65","murtabak"]
+  },
+  "HUEVO": {
+    strong: ["chawanmushi","murtabak","caneles","canele","avgolemono","mozzarella in carrozza","torta della nonna","galaktoboureko"],
+    weak: ["ebi fry","ebi furai","sukiyaki","pajeon","full english breakfast","english breakfast","full english","gado gado","gado-gado","arroz chaufa","pan de queso","pao de queijo","corn dog","crab cakes","crab cake","donut","donuts","cinnamon roll","chicken 65","schwarzwalder","loukoumades","tortelloni"]
+  },
+  "SOJA": {
+    strong: ["unagi","kabayaki","jajangmyeon","adobo filipino","arroz chaufa","sundubu jjigae","sundubu","doenjang jjigae"],
+    weak: ["katsu curry","shabu shabu","shabu-shabu","nabe","chawanmushi","kimchi jjigae","korean fried chicken","pollo frito coreano","dakgangjeong","samgyeopsal","bossam","ramyeon","mandu","banchan","dan dan noodles","hot pot","xiaolongbao","pancit","mole poblano","hotteok","pajeon"]
+  },
+  "LÁCTEO": {
+    strong: ["bingsu","barfi","mansaf","iskender","philly cheesesteak","poutine","caneles","canele","kouign amann","sauce hollandaise","salsa holandesa","flammekueche","flammkuchen","tarte flambee","horiatiki","semla","semlor","paprikash","chicken paprikash","sfogliatella","cassata","torta della nonna","focaccia di recco","frico","galaktoboureko","langos"],
+    weak: ["rogan josh","jalebi","chai","masala chai","mezze","fatteh","shish taouk","pide","borek","burrito","burritos","chilaquiles","pupusas","pupusa","bangers and mash","buffalo wings","alitas buffalo","waffles","waffle","bagel con salmon","cinnamon roll","escargots","tarte tatin","gyros","albondigas suecas","kanelbullar","baci di dama","baccala alla vicentina","loukoumades"]
+  },
+  "FRUTOS CON CÁSCARA": {
+    strong: ["torta della nonna","semla","semlor"],
+    weak: ["tajine de cordero con ciruelas","tajin de cordero con ciruelas","briouat","briouats","maqluba","barfi","cassata"]
+  },
+  "CACAHUETES": { weak: ["bhel puri"] },
+  "CRUSTÁCEOS": { strong: ["acaraje"], weak: ["som tam","som tum","mie goreng","rollitos vietnamitas","bun bo hue","linguine allo scoglio"] },
+  "PESCADO": { strong: ["acqua pazza","all'acqua pazza"], weak: ["bun bo hue","larb","sinigang"] },
+  "SÉSAMO": { weak: ["manakish","manakish de za'atar","mezze"] },
+  "SULFITOS": { strong: ["sauerbraten","zabaione","zabaglione"], weak: ["moules marinieres","tartiflette","pollo alla cacciatora","cacciatora"] }
+};
 const mergeMore = MORE => Object.keys(MORE).forEach(al => {
   const m = MORE[al], r = AL_RULES[al];
   if (m.strong) r.strong = r.strong.concat(m.strong);
@@ -1388,7 +1417,7 @@ const mergeMore = MORE => Object.keys(MORE).forEach(al => {
     if (DENIABLE[al] && has(DENIABLE[al], b)) DENIABLE[al].push(k);
   });
 });
-mergeMore(AL_MORE); mergeMore(AL_MORE_2);
+mergeMore(AL_MORE); mergeMore(AL_MORE_2); mergeMore(AL_MORE_3);
 Object.keys(AL_RULES).forEach(al => {
   const r = AL_RULES[al];
   r.strongRe = kwTest(r.strong);
