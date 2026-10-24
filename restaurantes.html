@@ -1897,9 +1897,316 @@ const COMPOUND_TYPES = [
   [["korma","masala","tikka masala","butter chicken","biryani"], "LNAMSG"],
   [["ensalada","ensaladas","salad","salads","salade","salades","insalata","insalate","salat","salate","mezclum","mesclun"], "NHLMUZPSGA"],
   [["picoteo","degustacion","homemade","house","maison","fatto in casa","hausgemacht","special","speciale","mixed","assorted","mixte","misto","gemischt","selection","selezione","auswahl","platter","board","garnish","garniture","contorno","beilage","stuffing","stuffed","farci","farcie","ripieno","ripieni","gefullt","filling","fillings","condimentado","condimentada","sazonado","sazonada","a nuestra manera","ingrediente secreto","omelette","omelet","frittata","tapa","tapas","entrante","entrantes","menu degustacion"], "*"],
-  [["seasoning","seasonings","spice","spices","spice mix","epices","spezie","gewurz","gewurze","chili powder","sal de hierbas","sal sazonada","sazon","bouquet garni","hierbas","hierbas provenzales","finas hierbas","hierbas aromaticas","aroma","aromas","aromatizante","saborizante","potenciador del sabor","extracto","extractos"], "AMZGS"]
+  [["seasoning","seasonings","spice","spices","spice mix","epices","spezie","gewurz","gewurze","chili powder","sal de hierbas","sal sazonada","sazon","bouquet garni","hierbas","hierbas provenzales","finas hierbas","hierbas aromaticas","aroma","aromas","aromatizante","saborizante","potenciador del sabor","extracto","extractos"], "AMZGS"],
 ];
+  // 3.19: FORMAS DE PREPARACIÓN. El nombre del plato (o del componente) dice cómo se cocina, no sus ingredientes: la «marinera» lleva harina
+  // y vino, la «pepitoria» yema y almendra, «al vino» sulfitos. Sin desglose se pregunta; con desglose o «✔ comprobado» no.
+// Se aplican a componentes (como el resto de COMPOUND_TYPES) y TAMBIÉN al nombre del plato («Mejillones a la marinera»): ahí solo dan PREGUNTA.
+const PREP_TYPES = [
+  [["a la marinera","marinera","en salsa marinera"], "UGA"], [["pepitoria","en pepitoria"], "UHNG"],
+  [["al ajillo","ajillo","ajillos","al ajo"], "UG"], [["ajoarriero","ajo arriero","ajoarrieros"], "HG"],
+  [["al vino","al vino tinto","al vino blanco","en vino","al jerez","al pedro ximenez","a la sidra","en sidra","al oporto","al cava","al marsala","al brandy","al coñac","al cognac","al whisky","coq au vin","al moscatel","al pacharan","al txakoli","al rioja","al ron","bourguignon"], "U"],
+  [["a la cerveza","en cerveza","con cerveza","rebozado en cerveza"], "UG"],
+  [["a la vizcaina","vizcaina","al club ranero","club ranero","al pil pil","pil pil","a la gallega","a galega","a la bilbaina","a la donostiarra","a la zaragozana","a la sanabresa"], "GU"],
+  [["en su tinta","su tinta","con tinta","tinta de calamar","tinta de sepia"], "UGP"],
+  [["alinado","alinada","alinados","alinadas","alinadas","alinar","aliño","alino de","alinas","encurtido","encurtida","escabechado","en escabeche","en adobo","al mojo","con mojo","mojo picon","mojo verde","mojo rojo"], "UMG"],
+  [["en vinagre"], "U"],
+  [["pinchos morunos","pincho moruno","pinchito moruno","pinchitos morunos","alitas","alitas de pollo","chicken wings","wings","costillas bbq","costillas barbacoa","costillas a la barbacoa","salsa barbacoa","salsa bbq","bbq","barbecue","barbacoa","costilla glaseada","laqueado","laqueada","agridulce","salsa agridulce","teriyaki","kung pao","karaage","yakitori","yakiniku","bulgogi","galbi","tikka","tandoori","vindaloo","tajin","a la plancha con salsa"], "UMSGA"],
+  [["chopitos","chopito","puntillitas","puntillita","puntillas","rabas","pescaito","pescaito frito","pescadito frito","pescado frito","boquerones fritos","calamares fritos","calamares a la romana","gambas rebozadas","fritura andaluza","fritura de pescado","fritura malaguena","adobo andaluz","adobo de cazon","bienmesabe","cazon en adobo","pijota","tortillitas de camarones","buñuelos de bacalao","buñuelos"], "GHUS"],
+  // KB-AUTO-BEGIN-PREP (tools/learn_from_signals.js --aplicar añade aquí; no editar a mano)
+  // KB-AUTO-END-PREP
+];
+PREP_TYPES.forEach(t => { t[2] = kwTest(t[0]); });
+COMPOUND_TYPES.push(...PREP_TYPES);
 COMPOUND_TYPES.forEach(t => { t[2] = kwTest(t[0]); });
+
+// 3.19 · AL_MORE_7: NOMBRES PROPIOS DE PLATO que no dicen en el nombre lo que llevan («Puntillitas», «Bienmesabe», «Pollo en pepitoria»,
+// «Lentejas»). Cada entrada: [nombres, letras de alérgenos que «suele llevar»]. Se usan SOLO con el nombre del plato y solo dan PREGUNTA
+// (nunca NO APTO, y nunca sobre un componente: la «lenteja» como ingrediente es una lenteja). Desaparece con el desglose del local.
+const AL_MORE_7 = [
+  [["affogato"], "HNS"],
+  [["ajada"], "U"],
+  [["aji de gallina"], "H"],
+  [["alfajores"], "H"],
+  [["all i pebre"], "GN"],
+  [["arancini"], "S"],
+  [["arepa reina pepiada"], "M"],
+  [["aros de cebolla"], "LS"],
+  [["arroz a banda"], "CHOU"],
+  [["arroz a la cubana"], "G"],
+  [["arroz al horno"], "GLS"],
+  [["arroz caldoso con bogavante"], "O"],
+  [["arroz con costra"], "GLS"],
+  [["arroz con mango"], "Z"],
+  [["arroz del senyoret"], "U"],
+  [["arroz meloso de setas"], "LU"],
+  [["arroz negro"], "H"],
+  [["arroz tres delicias"], "GL"],
+  [["asado argentino con chimichurri"], "GLS"],
+  [["bacalao con tomate"], "G"],
+  [["bandeja paisa"], "GLS"],
+  [["banderillas"], "P"],
+  [["banh mi"], "HMS"],
+  [["banoffee"], "S"],
+  [["barrita con aceite"], "T"],
+  [["berenjenas con miel de cana"], "HL"],
+  [["bibimbap"], "G"],
+  [["bicicleta murciana"], "M"],
+  [["bienmesabe","bienmesabe de cazon"], "L"],
+  [["biryani de pollo"], "U"],
+  [["bloody mary"], "GU"],
+  [["bol de acai"], "GLNSZ"],
+  [["botillo del bierzo"], "GLS"],
+  [["bouillabaisse"], "AGHU"],
+  [["bowl de quinoa con verduras"], "MNSZ"],
+  [["bruschetta"], "LSZ"],
+  [["bucatini all'amatriciana"], "U"],
+  [["burrito de ternera"], "S"],
+  [["cachapa"], "H"],
+  [["caldero del mar menor"], "H"],
+  [["canelones de carne"], "AU"],
+  [["canelones de la abuela"], "AU"],
+  [["cannoli"], "NU"],
+  [["caracoles a la llauna"], "H"],
+  [["carne picada"], "GS"],
+  [["carne picada de ternera"], "GS"],
+  [["carpaccio de ternera"], "LMU"],
+  [["carrilleras al vino tinto"], "AG"],
+  [["casadielles"], "HLU"],
+  [["causa limena"], "C"],
+  [["cerdo agridulce"], "H"],
+  [["chop suey de pollo"], "GOZ"],
+  [["clara con limon"], "U"],
+  [["club sandwich"], "M"],
+  [["coca de sant joan"], "U"],
+  [["codillo asado"], "MU"],
+  [["cogollos de tudela con anchoas"], "MU"],
+  [["coleslaw"], "U"],
+  [["coq au vin"], "AGL"],
+  [["costillas a la barbacoa"], "P"],
+  [["croque monsieur"], "HM"],
+  [["curry de garbanzos"], "N"],
+  [["curry rojo de ternera"], "KN"],
+  [["curry verde de pollo"], "N"],
+  [["cuscus de cordero"], "A"],
+  [["cuscus de verduras"], "A"],
+  [["dal"], "LM"],
+  [["dim sum"], "Z"],
+  [["dolmas"], "U"],
+  [["dorayaki"], "LS"],
+  [["duelos y quebrantos"], "GLS"],
+  [["durum de pollo"], "H"],
+  [["enchiladas"], "G"],
+  [["ensaladilla rusa","ensaladilla","ensaladilla de gambas"], "CMU"],
+  [["escalivada"], "P"],
+  [["espaguetis a la puttanesca"], "U"],
+  [["espaguetis frutti di mare"], "PU"],
+  [["espaguetis vongole"], "U"],
+  [["espinacas con garbanzos"], "U"],
+  [["esqueixada de bacalao"], "U"],
+  [["fajitas de pollo"], "LS"],
+  [["falafel"], "G"],
+  [["fartons"], "S"],
+  [["feijoada"], "GLS"],
+  [["fideua","fideua de marisco"], "HU"],
+  [["fish and chips"], "HMU"],
+  [["fish pie"], "C"],
+  [["fondue de queso"], "G"],
+  [["frangollo"], "U"],
+  [["garbanzos con espinacas"], "GU"],
+  [["gazpachuelo malagueno"], "CMO"],
+  [["gilda"], "U"],
+  [["gyozas de cerdo"], "Z"],
+  [["gyozas de verduras"], "Z"],
+  [["hamburguesa vegana"], "N"],
+  [["har gow"], "SZ"],
+  [["harira"], "H"],
+  [["higado encebollado"], "GU"],
+  [["hornazo de salamanca"], "LS"],
+  [["huevos a la flamenca"], "GLS"],
+  [["huevos benedict"], "SU"],
+  [["huevos estrellados"], "GLS"],
+  [["judiones de la granja"], "GLS"],
+  [["katsu curry"], "L"],
+  [["kebab"], "H"],
+  [["lasana de carne"], "AU"],
+  [["lasana vegana"], "N"],
+  [["leche de tigre"], "CLO"],
+  [["lentejas","lentejas estofadas","lentejas de la abuela"], "GLS"],
+  [["lomo saltado"], "U"],
+  [["lubina a la espalda"], "U"],
+  [["mac and cheese"], "HM"],
+  [["macarons"], "L"],
+  [["macedonia de frutas"], "U"],
+  [["maki de pepino"], "MU"],
+  [["maki de salmon y aguacate"], "MU"],
+  [["manitas de cerdo"], "GU"],
+  [["mapo tofu"], "GZ"],
+  [["marinera murciana"], "M"],
+  [["marmitako"], "U"],
+  [["mejillones al vapor"], "U"],
+  [["mejillones tigre"], "U"],
+  [["menestra de verduras"], "GH"],
+  [["merluza en salsa"], "CO"],
+  [["michirones"], "GLS"],
+  [["migas aragonesas"], "HLS"],
+  [["migas extremenas"], "LS"],
+  [["migas manchegas"], "HLS"],
+  [["minestrone"], "L"],
+  [["mochi"], "LS"],
+  [["mole poblano"], "GU"],
+  [["morteruelo"], "LS"],
+  [["musaka"], "U"],
+  [["nasi goreng"], "G"],
+  [["nigiri de atun"], "MU"],
+  [["nigiri de salmon"], "MU"],
+  [["okonomiyaki"], "CM"],
+  [["olla gitana"], "N"],
+  [["onigiri"], "HMPSZ"],
+  [["ossobuco"], "L"],
+  [["pa amb tomaquet"], "HLSTZ"],
+  [["paella de marisco"], "PU"],
+  [["paella valenciana","paella de pollo y conejo"], "O"],
+  [["pakoras"], "GM"],
+  [["papas alinas"], "P"],
+  [["parmesano"], "H"],
+  [["pastel de pastor"], "APU"],
+  [["pastela marroqui"], "L"],
+  [["patatas a la riojana"], "GLS"],
+  [["patatas a lo pobre"], "U"],
+  [["patatas bravas","bravas"], "AGHMU"],
+  [["pato laqueado"], "Z"],
+  [["perrito caliente"], "AHLSZ"],
+  [["perrunillas"], "NU"],
+  [["pescaito frito"], "CO"],
+  [["pestinos"], "HU"],
+  [["pho"], "GS"],
+  [["pina colada"], "L"],
+  [["pisto manchego"], "H"],
+  [["pisto murciano"], "H"],
+  [["pizza barbacoa"], "P"],
+  [["pizza napolitana"], "U"],
+  [["pizza vegana"], "N"],
+  [["pochas a la navarra"], "GLS"],
+  [["poke bowl de salmon"], "MU"],
+  [["pollo al curry"], "N"],
+  [["pollo al limon"], "HU"],
+  [["pollo asado"], "LU"],
+  [["pollo asado con patatas"], "LU"],
+  [["pollo con almendras"], "Z"],
+  [["pollo karaage"], "HZ"],
+  [["pollo kung pao"], "Z"],
+  [["porra antequerana"], "HP"],
+  [["porrusalda"], "P"],
+  [["potaje de garbanzos y bacalao"], "H"],
+  [["pote asturiano"], "GLS"],
+  [["pringa"], "GLS"],
+  [["profiteroles"], "S"],
+  [["provoleta"], "H"],
+  [["pulpo al horno"], "U"],
+  [["queso"], "H"],
+  [["queso frito con mermelada"], "S"],
+  [["queso manchego"], "H"],
+  [["queso manchego curado"], "H"],
+  [["rabas","rabas de calamar"], "L"],
+  [["rabo de toro"], "AG"],
+  [["raxo con patatas"], "U"],
+  [["red velvet"], "S"],
+  [["rinones al jerez"], "G"],
+  [["risotto de marisco"], "AP"],
+  [["risotto de setas"], "A"],
+  [["rollitos de primavera"], "CPZ"],
+  [["rollitos de primavera vegetales"], "Z"],
+  [["rollitos vietnamitas"], "KP"],
+  [["ropa vieja canaria"], "U"],
+  [["rosquillas de san isidro"], "L"],
+  [["salmon al horno"], "LMU"],
+  [["saltimbocca"], "GL"],
+  [["samosas"], "M"],
+  [["sancocho canario"], "GU"],
+  [["sandwich vegetal"], "MP"],
+  [["sashimi de salmon"], "GMS"],
+  [["satay de pollo"], "P"],
+  [["shakshuka"], "L"],
+  [["shawarma de pollo"], "H"],
+  [["siu mai"], "HZ"],
+  [["solomillo de cerdo al pedro ximenez"], "GL"],
+  [["solomillo de ternera a la pimienta"], "GMU"],
+  [["souvlaki"], "GL"],
+  [["steak tartar"], "GU"],
+  [["strudel de manzana"], "HNU"],
+  [["suquet de peix"], "GNU"],
+  [["suspiro limeno"], "U"],
+  [["tacos al pastor"], "GL"],
+  [["tacos de cochinita pibil"], "GU"],
+  [["takoyaki"], "M"],
+  [["tamales"], "L"],
+  [["tartar de atun"], "GHMSUZ"],
+  [["tataki de atun"], "GSUZ"],
+  [["tempeh marinado"], "Z"],
+  [["ternera con bambu y setas"], "OZ"],
+  [["tiramisu"], "U"],
+  [["tom kha gai"], "S"],
+  [["tom yum"], "OS"],
+  [["torrijas"], "U"],
+  [["tortellini de carne"], "A"],
+  [["trenza de almudevar"], "U"],
+  [["txangurro al horno"], "LU"],
+  [["uramaki california"], "MU"],
+  [["uramaki de langostino tempura"], "M"],
+  [["uramaki philadelphia"], "MU"],
+  [["urta a la rotena"], "U"],
+  [["vichyssoise"], "A"],
+  [["vieiras gratinadas"], "U"],
+  [["vitello tonnato"], "MU"],
+  [["wantan frito"], "CZ"],
+  [["yakisoba"], "M"],
+  [["arroz negro","arroz negro con alioli"],"UH"], [["costillas de cerdo","costillas al horno","costillas de cerdo al horno"],"UMSG"], [["matrimonio","matrimonios"],"G"],
+  // Ampliación 3.19: platos conocidos que no dicen en el nombre lo que llevan
+  [["salmorejo","salmorejo cordobes"], "GH"],
+  [["gazpacho","gazpacho andaluz"], "GU"],
+  [["ajoblanco"], "NG"],
+  [["albondigas","albondigas en salsa","albondigas de la abuela"], "GHLS"],
+  [["carrillada","carrilleras","carrillera"], "GUA"],
+  [["rabo de toro","rabo de buey"], "GAU"],
+  [["callos a la madrilena","callos"], "GAU"],
+  [["fabada asturiana","fabada"], "UL"],
+  [["paella","paella mixta","paella de marisco","paella de verduras"], "UOP"],
+  [["zarzuela","zarzuela de pescado","zarzuela de marisco"], "GUCO"],
+  [["sopa de pescado","sopa de marisco","sopa de ajo","sopa castellana"], "GUHPC"],
+  [["tortilla francesa","tortilla de patatas","tortilla espanola"], "H"],
+  [["cachopo","flamenquin","san jacobo"], "GHL"],
+  [["big mac","whopper","cheeseburger","mcchicken","hamburguesa con queso","hamburguesa completa"], "GHLMSZ"],
+  [["mcnuggets","nuggets de pollo","tiras de pollo","pollo crujiente","pollo frito","pollo kentucky","fingers de pollo"], "GHLS"],
+  [["perrito","perrito caliente","hot dog","hotdog"], "GLSAMZH"],
+  [["bocadillo de calamares","bocadillo de lomo","bocadillo de tortilla","bocadillo mixto","montadito","montaditos"], "GHLS"],
+  [["bravas","patatas bravas picantes","patatas con alioli","patatas con salsa"], "GHMU"],
+  [["torrija","torrijas"], "GHLU"],
+  [["leche frita","natillas","crema catalana","crema quemada","arroz con leche"], "GHLU"],
+  [["tarta de queso","tarta de la abuela","tarta casera"], "GHLSN"],
+  [["coulant","volcan de chocolate","brownie con helado","coca de llanda","bizcocho casero"], "GHLSN"],
+  [["calamares en su tinta","chipirones en su tinta","sepia en su tinta"], "UGPO"],
+  [["pulpo a la gallega","pulpo a feira","pulpo a la brasa"], "U"],
+  [["bacalao al pil pil","bacalao a la llauna","bacalao dorado","bacalao con samfaina","bacalao ajoarriero"], "GUH"],
+  [["merluza a la koskera","merluza a la romana","merluza rebozada","merluza en salsa verde"], "GUHO"],
+  [["lubina a la sal","dorada a la sal","dorada al horno","lubina al horno"], "U"],
+  [["conejo al ajillo","conejo en salmorejo","liebre estofada","perdiz estofada","codorniz escabechada"], "UG"],
+  [["pisto con huevo","pisto","menestra","menestra de verduras","revuelto de setas","revuelto de gambas"], "GHU"],
+  [["setas al ajillo","champinones al ajillo","esparragos trigueros","alcachofas con jamon","habas con jamon","judias con jamon"], "UGH"],
+  [["gyozas","gyoza","dumplings","dim sum","siu mai","wantan","wonton"], "GSZ"],
+  [["ramen","pad thai","yakisoba","chow mein","arroz frito","arroz tres delicias","nasi goreng","bibimbap","bulgogi"], "GSZHP"],
+  [["sushi variado","sushi roll","california roll","maki","nigiri","temaki","sashimi"], "SMUG"],
+  [["tacos","burrito","fajitas","quesadilla","enchiladas","nachos con queso","guacamole con nachos"], "GLSU"],
+  [["kebab","durum","shawarma","falafel","hummus con pan","pan de pita"], "GLSZM"],
+  // KB-AUTO-BEGIN-DISH (tools/learn_from_signals.js --aplicar añade aquí; no editar a mano)
+  // KB-AUTO-END-DISH
+];
+AL_MORE_7.forEach(t => { t[2] = kwTest(t[0]); });
+function dishMaybe(name) {
+  const n = " " + normText(name) + " ", out = new Set();
+  AL_MORE_7.concat(PREP_TYPES).forEach(t => { if (t[2].test(n)) t[1].split("").forEach(ch => out.add(AL_LETTER[ch])); });
+  return ALLERGENS.filter(x => out.has(x));
+}
 // Alérgenos que puede esconder este nombre de componente. null = no es una preparación compuesta.
 // "*" en el resultado = cualquiera (nombre genérico), y entonces también se pregunta por dietas y «otros alimentos».
 function compoundRisks(name) {
@@ -1936,9 +2243,9 @@ function ingUnknown(ing) {
 function ingGaps(ing) { return ingUnknown(ing) !== null; }
 // Alérgenos que un texto PODRÍA esconder sin decirlo (preparaciones compuestas que menciona): para medir y para avisar
 function possibleAllergens(text) {
-  const r = compoundRisks(text);
-  if (!r) return [];
-  return r === "*" ? ALLERGENS.slice() : ALLERGENS.filter(x => r.has(x));
+  const r = compoundRisks(text), dm = dishMaybe(text);
+  if (!r) return dm;
+  return r === "*" ? ALLERGENS.slice() : ALLERGENS.filter(x => r.has(x) || dm.includes(x));
 }
 function ingIsCompound(ing) { return !!compoundRisks(ing && ing.n); }
 // ¿El texto de este componente (y el contexto del plato) dice que NO lleva este alérgeno? («pan sin gluten», «vegano»)
@@ -2101,6 +2408,10 @@ function evaluateDish(dish, strict, eqx) {
       if (!S.al.has(x)) return;
       if (sure.has(x)) { if (stillNamed("A:" + x, t => memoDetect("s", t, ctx).a.includes(x))) { hits.push(x); named.add("A:" + x); } }
       else if (!isCov("A:" + x)) { maybe.push(x); named.add("A:" + x); }
+    });
+    // 3.19: nombres propios de plato que «suelen llevar» algo sin decirlo (AL_MORE_7): solo PREGUNTA
+    dishMaybe(name).forEach(x => {
+      if (S.al.has(x) && !nd.a.includes(x) && !isCov("A:" + x) && !textDenies(x, name, ctx)) { maybe.push(x); named.add("A:" + x); }
     });
     nDiets.forEach(t => {
       if (S.di.has(t) && stillNamed("D:" + t, n => dietsLeft(n, ctx).includes(t))) { hits.push(DIET_TAG_LABELS[t] || t); named.add("D:" + t); }
@@ -2797,6 +3108,55 @@ function customForCard(term, max) {
 
 // Solo para las pruebas
 function famAll() { return FOOD_FAMILIES; }
+
+// ============================================================
+// 3.19 · SEÑALES PARA MEJORAR EL DETECTOR (kb_signals)
+// Cuando un restaurante guarda un plato o publica una carta leída con IA, se compara lo que el motor veía
+// con lo que la persona dejó marcado. Lo que el motor no daba por SEGURO y la persona sí marca (`added`) es
+// una pista de riesgo oculto: nombre nuevo, preparación nueva, marca nueva. Lo que el motor daba por seguro y la
+// persona quita (`dropped`) solo sirve para revisar posibles falsos positivos: NUNCA borra nada del diccionario
+// (un local concreto puede hacer una versión «sin gluten»). Sin datos personales: solo texto de ingrediente o plato.
+// El navegador solo guarda la señal; el análisis y las propuestas van en tools/learn_from_signals.js.
+// ============================================================
+function kbClean(s, max) {
+  return normText(s).replace(/[\w.+-]+@[\w-]+(\.[\w-]+)+/g, " ").replace(/https?:\/\/\S+/g, " ").replace(/\d{5,}/g, " ")
+    .replace(/\s+/g, " ").trim().slice(0, max);
+}
+// Componente (ingrediente) de un plato: ¿qué marcó la persona que el motor no daba por seguro?
+function kbIngSignal(ing, cat, src) {
+  if (!ing || isPlaceholderIng(ing)) return null;
+  const txt = kbClean(ing.n, 160);
+  if (!txt) return null;
+  const text = (ing.n || "") + " . " + (ing.sub || "");
+  const strong = detectAllergens(text, undefined, true).a, all = detectAllergens(text).a;
+  const weak = all.filter(x => !strong.includes(x));
+  const saved = ALLERGENS.filter(x => (ing.a || []).includes(x));
+  const added = saved.filter(x => !strong.includes(x));
+  const dropped = strong.filter(x => !saved.includes(x));
+  if (!added.length && !dropped.length) return null;
+  return { kind: "ing", txt, sub: kbClean(ing.sub, 300), cat: kbClean(cat, 60), det: strong, weak, comp: possibleAllergens(ing.n || ""),
+    saved, added, dropped, src: ing.ok === true ? "owner_ok" : src };
+}
+// Plato: alérgenos de sus componentes que el NOMBRE no hacía sospechar (un «Puntillitas» con huevo)
+function kbDishSignal(name, cat, ings, src) {
+  const txt = kbClean(name, 80);
+  const real = (ings || []).filter(i => i && !isPlaceholderIng(i));
+  if (!txt || !real.length) return null;
+  const strong = detectAllergens(name, undefined, true).a, all = detectAllergens(name).a;
+  const saved = ALLERGENS.filter(x => real.some(i => (i.a || []).includes(x)));
+  const added = saved.filter(x => !strong.includes(x));
+  if (!added.length) return null;
+  return { kind: "dish", txt, sub: "", cat: kbClean(cat, 60), det: strong, weak: all.filter(x => !strong.includes(x)),
+    comp: dishMaybe(name), saved, added, dropped: [], src: real.some(i => i.ok === true) ? "owner_ok" : src };
+}
+// Cola local: una señal por local, tipo y texto (sin repetidos) y como mucho `max`
+function kbEnqueue(queue, rid, sig, max) {
+  if (!sig || !rid) return false;
+  if (queue.some(q => q.rid === rid && q.kind === sig.kind && q.txt === sig.txt)) return false;
+  queue.push({ rid, ...sig });
+  while (queue.length > max) queue.shift();
+  return true;
+}
 
 // =====================================================================
 // WEB DE RESTAURANTES (restaurantes.html) · 3.11
