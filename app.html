@@ -2821,8 +2821,45 @@ const AL_MORE = {
     excl: ["lupinenfrei"]
   }
 };
-Object.keys(AL_MORE).forEach(al => {
-  const m = AL_MORE[al], r = AL_RULES[al];
+// 3.18: aditivos, derivados técnicos de etiqueta y MARCAS que son el alérgeno o lo llevan en todas sus variantes
+// corrientes (strong) o en la mayoría (weak → PREGUNTA). Las recetas cambian: por eso casi todo va como duda.
+const AL_MORE_2 = {
+  "HUEVO": {
+    strong: ["apovitelina","eiern","re:hellmann'?s","ligeresa","re:mayonesa\\s+(?:calve|kraft|musa|ybarra)","alioli chovi","chovi alioli","flan chino mandarin","re:(?:magdalenas|madalenas|palmeras)\\s+dulcesol","yemas de santa teresa"],
+    weak: ["calve","pasta rana","giovanni rana","raviolis rana","tortellini rana","dhul","flan dhul","bollycao","donuts","donettes","tigreton","phoskitos","pantera rosa","madalenas","madalena"],
+    excl: ["re:albumina\\s+(?:de\\s+suero|vegetal|de\\s+patata|serica)","re:lisozima\\s+vegana"]
+  },
+  "LÁCTEO": {
+    strong: ["burgo de arias","caprice des dieux","president","babybel","mini babybel","boursin","galbani","el caserio","la vaca que rie","kiri","danone","actimel","danonino","yoplait","activia","vitalinea","puleva","central lechera asturiana","kaiku","leche pascual","batido pascual","yogur pascual","nestle extrafino","milkybar","twix","maltesers","smarties","tigreton","phoskitos","bollycao","pantera rosa","donettes","galletas principe","chips ahoy","dinosaurus","tosta rica","chiquilin","maria fontaneda","ritter sport","cadbury","re:hershey'?s?","magnum","cornetto","re:h[aä]agen[\\s-]?dazs","re:ben\\s*(?:&|and)\\s*jerry'?s","re:carte\\s+d'?or","frigopie","la lechera","oikos","cacaolat","re:kinder\\s+(?:bueno|sorpresa|chocolate|delice|maxi)"],
+    weak: ["pascual","lindt","donuts","oreo","digestive","fontaneda","frigo","kalise","tulipan","cornetto","nesquik","cola cao","colacao","crunch","lion","mars","alpro"]
+  },
+  "GLUTEN": {
+    strong: ["khorasan","grunkern","bimbo","panrico","oroweat","la bella easo","donettes","bollycao","pantera rosa","tigreton","phoskitos","galletas principe","chips ahoy","oreo","filipinos","dinosaurus","chiquilin","fontaneda","maria fontaneda","re:marb[uú](?:\\s+dorada)?","cuetara","artiach","artinata","twix","huesitos","kinder bueno","maltesers","yatekomo","maruchan","re:kellogg'?s","special k","frosties","choco krispies","chocapic","weetabix","re:all[\\s-]?bran","nestle fitness","smacks","miel pops","pasta gallo","macarrones gallo","barilla","de cecco","garofalo","la molisana","rummo","krissia","palitos krissia","kikkoman","ovaltine","ovomaltina","cola cao original","colacao original","yakisoba yatekomo","cup noodles","nissin"],
+    weak: ["silueta","gullon","lion","nissin","cheerios","corona","coronita","giovanni rana","pasta rana","buitoni","tarradellas","casa tarradellas","re:dr\\.?\\s*oetker","dr oetker","dr. oetker","oetker","la cocinera","maheso","findus","gallina blanca","avecrem","knorr","maggi","cola cao","colacao","nesquik","donuts","heura","quorn","garden gourmet","pringles","cheetos"],
+    excl: ["re:(?:estrella\\s+damm\\s+)?daura","re:(?:pan|galletas|pasta|harina|cerveza)\\s+sch[aä]r","re:sch[aä]r\\s+(?:sin\\s+gluten|gluten\\s+free)","re:(?:mahou|san\\s+miguel|estrella\\s+galicia|ambar|cruzcampo|alhambra)\\s+(?:sin\\s+gluten|gluten[\\s-]?free)"]
+  },
+  "SOJA": {
+    strong: ["vivesoy","yosoy soja","alpro soja","sojasun","sojade","natursoy","natur soy","taifun","re:mori[\\s-]?nu","morinu","salsa de soja kikkoman","salsa teriyaki kikkoman"],
+    weak: ["alpro","yosoy","vegetalia","provamel","yatekomo","cup noodles","nissin","maruchan","mars","twix","lion","maltesers","chocapic","garden gourmet","quorn","vegalia","soria natural"]
+  },
+  "PESCADO": {
+    strong: ["colageno marino","hondashi","krissia","palitos krissia","re:findus\\s+varitas|varitas\\s+findus","rodolfos","pescanova rodolfos","atun calvo","atun isabel","bonito ortiz","atun albo","atun cuca","atun campos","atun miau","rianxeira","frinsa","re:pay[\\s-]?pay","anchoas codesa","codesa","don bocarte","anchoas consorcio","sardinillas la brujula","squid brand","three crabs","tiparos","re:lea\\s*(?:&|and)\\s*perrins"],
+    weak: ["pescanova","red boat","findus","la sirena","lee kum kee"]
+  },
+  "CRUSTÁCEOS": { strong: ["gambas pescanova","langostinos pescanova","pescanova langostinos"], weak: ["quitosano","chitosan","pescanova","la sirena"], excl: ["re:(?:quitosano|chitosan)\\s+(?:fungico|vegetal|vegano|de\\s+hongos|de\\s+setas)"] },
+  "MOLUSCOS": { strong: ["perna canaliculus","lee kum kee"], excl: ["re:caracol(?:es)?\\s+de\\s+chocolate"] },
+  "SÉSAMO": { strong: ["re:til\\s+oil","tortas ines rosales","tahini al wadi"], weak: ["big mac","bigmac","whopper","regañas","regana"], excl: ["re:salsa\\s+big\\s+mac"] },
+  "SULFITOS": {
+    strong: ["re:hidrogenosulfitos?(?:\\s+de\\s+(?:sodio|potasio|calcio))?","so₂","metabisolfito","re:(?:natrium|kalium|calcium)(?:meta)?bisulfit[a-z]*","re:(?:natrium|kalium|calcium)sulfit[a-z]*",
+      "marques de riscal","marques de caceres","protos","vega sicilia","pingus","muga","ramon bilbao","campo viejo","vina pomal","vina albina","faustino","matarromera","emilio moro","pesquera","pago de carraovejas","abadia retuerta","sangre de toro","vina sol","gran vina sol","vina esmeralda","freixenet","codorniu","anna de codorniu","re:juv[eé]\\s+(?:y|&|i)\\s+camps","gramona","raventos","re:mo[eë]t(?:\\s*&\\s*chandon)?","veuve clicquot","dom perignon","bollinger","taittinger","cinzano","yzaguirre","vermut lacuesta","lacuesta","tio pepe","la guita","la ina","barbadillo","solear","osborne","alvear","el gaitero","sidra maeloc","maeloc","sidra trabanco","trabanco","martini rosso","martini bianco","vermut yzaguirre","vermut perucchi","perucchi"]
+  },
+  "CACAHUETES": { strong: ["skippy","jif","nutter butter","capitan mani","crema de cacahuete calve","whole earth peanut butter","cacahuetes facundo","facundo cacahuetes"] },
+  "FRUTOS CON CÁSCARA": { strong: ["el almendro","turron el almendro","turron el lobo","turron pico","re:la\\s+estepena","polvorones la muralla","mazapan santo tome","disaronno","nocino","pinonate","almendrina","almond breeze","alpro almendra","turron 1880"] },
+  "MOSTAZA": { strong: ["maille","mostaza maille","mostaza amora","grey poupon","re:colman'?s","re:french'?s","handlmaier","lowensenf","heinz mustard","mostaza heinz","piccalilli heinz"], weak: ["thomy"] },
+  "APIO": { weak: ["gallina blanca","knorr","maggi","bovril","bisto","oxo","cubitos oxo","v8","zumo de tomate v8","sopinstant","sopa de sobre","sopas de sobre","sopa instantanea","crema de sobre"] }
+};
+const mergeMore = MORE => Object.keys(MORE).forEach(al => {
+  const m = MORE[al], r = AL_RULES[al];
   if (m.strong) r.strong = r.strong.concat(m.strong);
   if (m.weak) r.weak = (r.weak || []).concat(m.weak);
   if (m.excl) r.excl = (r.excl || []).concat(m.excl);
@@ -2833,6 +2870,7 @@ Object.keys(AL_MORE).forEach(al => {
     if (DENIABLE[al] && has(DENIABLE[al], b)) DENIABLE[al].push(k);
   });
 });
+mergeMore(AL_MORE); mergeMore(AL_MORE_2);
 Object.keys(AL_RULES).forEach(al => {
   const r = AL_RULES[al];
   r.strongRe = kwTest(r.strong);
