@@ -2696,7 +2696,7 @@ const AL_MORE = {
   "MOLUSCOS": {
     strong: [
       "conchas finas","re:conchas?\\s+de\\s+peregrino","arroz negre","arros negre","ika","ikayaki","frutti di mare","shellfish",
-      "whelk","whelks","winkle","winkles","periwinkle","periwinkles","conch","geoduck","re:(?<!a la |fruits a )coques?","praire","praires","petoncle","petoncles","re:(?:coquilles?\\s+|noix\\s+de\\s+)?saint[\\s-]jacques","encornet","encornets","supions","pieuvre","bulot","bulots","bigorneau","bigorneaux","ormeau","ormeaux",
+      "whelk","whelks","winkle","winkles","periwinkle","periwinkles","conch","geoduck","re:(?<!a la |fruits a )coque(?!s)","praire","praires","petoncle","petoncles","re:(?:coquilles?\\s+|noix\\s+de\\s+)?saint[\\s-]jacques","encornet","encornets","supions","pieuvre","bulot","bulots","bigorneau","bigorneaux","ormeau","ormeaux",
       "vongola","fasolari","tartufi di mare","re:capp?[ae]sant[ae]","totano","totani","re:seppi[a-z]*","moscardini","polpi","polipo","lumaca","chiocciole","canestrelli","cannolicchi","datteri di mare","telline",
       "re:[a-z]*muschel[a-z]*","re:auster[a-z]*","re:tintenfisch[a-z]*","kalmar","kalmare","oktopus","krake","kraken","re:(?!zimt|hefe|nuss|mohn|franz|schoko)[a-z]*schnecken?","re:weichtier[a-z]*",
       "berbigao","berbigoes","caracois","buzio","buzios","conquilhas","escopinyes","ostres","navalles","vieires",
@@ -2889,6 +2889,17 @@ const AL_MORE_3 = {
   "SÉSAMO": { weak: ["manakish","manakish de za'atar","mezze"] },
   "SULFITOS": { strong: ["sauerbraten","zabaione","zabaglione"], weak: ["moules marinieres","tartiflette","pollo alla cacciatora","cacciatora"] }
 };
+// 3.18: cartas de España en catalán, valenciano, euskera y gallego (formas declinadas y plurales incluidas)
+const AL_MORE_4 = {
+  "PESCADO": { strong: ["arros a banda","arros del senyoret","re:truita\\s+de\\s+riu","re:bakailao[a-z]*","re:legatz[a-z]*","re:hegaluze[a-z]*","re:izokin[a-z]*","sardinak","re:bokart[a-z]*","xurelo","xurelos","robaliza","bacallau","pixin","pixins","chopa","chopas","rollo de bonito"] },
+  "CRUSTÁCEOS": { strong: ["arros del senyoret","re:ganb[a-z]*","centola","centolo","centolas","centolos","lumbrigante","lumbrigantes","andaricas","andarica"] },
+  "MOLUSCOS": { strong: ["caragols","caragol","clotxines","clotxina","re:txipiroi[a-z]*","re:muskuilu[a-z]*","re:txirl[a-z]*","re:olagarro[a-z]*","re:txibi[a-z]*","polbo","ameixas","ameixa","croques","luras","lura","amasueles","amasuela"], excl: ["re:ameixas?\\s+(?:secas?|pretas?|em\\s+calda|vermelhas?|amarelas?)","re:(?:sumo|compota|doce|tarte|bolo|geleia)\\s+de\\s+ameixas?"] },
+  "HUEVO": { strong: ["bunyols","bunyol","re:arrautz[a-z]*","bacalao dorado","bacalhau a bras","bacalao a bras","tostada de pamplona","tostadas de pamplona","canutillos de bilbao","canutillo de bilbao","torta de santiago","bica","larpeira","melindres","cachopin","cachopines"], weak: ["truita","carolinas","rosca de pascua","roscas de pascua","huesos de santo","rollo de bonito"] },
+  "LÁCTEO": { strong: ["recuit","recuit de drap","esnea","esne","mamia","re:queixo[a-z]*","requeixo","tostada de pamplona","canutillos de bilbao","bica","larpeira","cachopin","cachopines"], weak: ["brandada","brandada de bacallà","brandada de bacalao","gateau basque","brazo de gitano"], excl: ["re:(?:soja|soia|olo|arroz|almendra|koko|kokos|oloa)\\s+esnea?"] },
+  "GLUTEN": { strong: ["bunyols","bunyol","torrada","torrades","entrepa","entrepans","coques","ogi","ogia","re:ogitarteko[a-z]*","canutillos de bilbao","bica","larpeira","melindres","cachopin","cachopines","tostada de pamplona"], weak: ["escudella","pintxos","carolinas"] },
+  "FRUTOS CON CÁSCARA": { strong: ["torrons","almendrak","abelas","abela","torta de santiago"] },
+  "SULFITOS": { strong: ["sagardoa","sagardo","sukalki"] }
+};
 const mergeMore = MORE => Object.keys(MORE).forEach(al => {
   const m = MORE[al], r = AL_RULES[al];
   if (m.strong) r.strong = r.strong.concat(m.strong);
@@ -2901,7 +2912,7 @@ const mergeMore = MORE => Object.keys(MORE).forEach(al => {
     if (DENIABLE[al] && has(DENIABLE[al], b)) DENIABLE[al].push(k);
   });
 });
-mergeMore(AL_MORE); mergeMore(AL_MORE_2); mergeMore(AL_MORE_3);
+mergeMore(AL_MORE); mergeMore(AL_MORE_2); mergeMore(AL_MORE_3); mergeMore(AL_MORE_4);
 Object.keys(AL_RULES).forEach(al => {
   const r = AL_RULES[al];
   r.strongRe = kwTest(r.strong);
