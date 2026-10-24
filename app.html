@@ -2920,6 +2920,32 @@ const AL_MORE_5 = {
   },
   "PESCADO": { excl: ["re:truchas?\\s+de\\s+(?:batata|navidad|boniato|cabello\\s+de\\s+angel|chocolate)"] }
 };
+// 3.18: cocinas de las comunidades inmigrantes más numerosas en España (rumana y búlgara, magrebí y senegalesa,
+// pakistaní y bangladesí, ucraniana, polaca y rusa, filipina, portuguesa)
+const AL_MORE_6 = {
+  "GLUTEN": {
+    strong: ["ciorba de perisoare","papanasi","cozonac","placinta","covrigi","covrig","paine","pasca","coliva","gogosi","clatite","snitel","banitsa","mekitsi","tikvenik","kozunak","bastilla","rfissa","baghrir","harcha","khobz","batbout","sellou","sfouf","fekkas","mhancha","chakhchoukha","chorba frik","makroud","makrout","baklawa","zlabia","fataya","fatayas","ndambe","puff puff","chin chin","haleem","papri chaat","sooji halwa","kulcha","chole bhature","bhature","fuchka","singara","luchi","porota","shemai","varenyky","syrniki","sirniki","oladi","kotleta po-kyivsky","paska","kulich","medovik","sushki","pryaniki","kotlet schabowy","schabowy","placki ziemniaczane","sernik","makowiec","paczki","szarlotka","chalka","chałka","zapiekanka","pirozhki","piroshki","lumpiang shanghai","ensaymada","pandesal","hopia","pasteis de bacalhau","pataniscas","francesinha","bifana","alheira","pasteis de belem","pao de lo","queijadas","queijada","travesseiros de sintra","salame de chocolate","bolas de berlim","malassadas","pao alentejano","sagres","super bock"],
+    weak: ["ghriba","chorba","nihari","chiftele","kyufte","deruny","draniki","kotlety","kotleti","napoleon","tort napoleon","flaki","placki","turon","prego","prego no pao","seekh kebab"]
+  },
+  "HUEVO": {
+    strong: ["salata de icre","icre","papanasi","cozonac","pasca","gogosi","clatite","banitsa","mekitsi","kozunak","bastilla","baghrir","chin chin","varenyky","syrniki","sirniki","oladi","olivier","ensalada olivier","salat olivye","shuba","seledka pod shuboy","kotleta po-kyivsky","paska","medovik","ptichye moloko","zefir","kotlet schabowy","schabowy","sernik","makowiec","paczki","szarlotka","ptasie mleczko","chalka","chałka","pirozhki","piroshki","tapsilog","longsilog","bibingka","ensaymada","pasteis de bacalhau","pataniscas","pasteis de belem","pao de lo","leite creme","toucinho do ceu","travesseiros de sintra","salame de chocolate","bolas de berlim","malassadas"],
+    weak: ["ciorba de burta","ciorba de perisoare","vareniki","salata de vinete","tochitura","drob","drob de miel","chiftele","snitel","musaca","salata de boeuf","kyufte","tajin de kefta","chapli kebab","shami kebab","deruny","draniki","kotlety","kotleti","napoleon","tort napoleon","pastila","placki","sisig","bacalhau a gomes de sa","bacalhau gomes de sa"]
+  },
+  "LÁCTEO": {
+    strong: ["mamaliga","mamaliga cu branza","papanasi","cozonac","placinta","branza","telemea","cascaval","smantana","pasca","clatite","bulz","urda","lapte","kiselo mlyako","sirene","kashkaval","banitsa","shopska","shopska salata","mekitsi","kozunak","harcha","thiakry","thiakri","dahi bhalla","dahi vada","gajar ka halwa","falooda","doodh patti","kulcha","bhature","murgh makhani","bhapa doi","mishti doi","rasgulla","sandesh","borhani","shemai","firni","sheer khurma","syrniki","sirniki","oladi","kotleta po-kyivsky","tvorog","ryazhenka","paska","kulich","medovik","ptichye moloko","oscypek","sernik","paczki","ptasie mleczko","krowki","zapiekanka","halo-halo","halo halo","ube halaya","bibingka","ensaymada","mais con yelo","bacalhau com natas","pasteis de belem","serradura","bolas de berlim","galao","meia de leite","tosta mista","francesinha"],
+    weak: ["ciorba de burta","musaca","tarator","chaat","samosa chaat","papri chaat","handi","halwa","sooji halwa","halwa puri","tikka","napoleon","tort napoleon","okroshka","champorado","buko pie","queijadas","queijada"]
+  },
+  "PESCADO": { strong: ["salata de icre","icre","peste","thieboudienne","thiebou dienne","ceebu jen","shuba","seledka pod shuboy","ukha","shorshe ilish","ilish","hilsa","machher jhol","maach","patis","bagoong","kinilaw","daing","tuyo","bangus","tinapa","dilis","pataniscas"], weak: ["pastels","garba","pancit palabok","palabok","pinakbet"] },
+  "CRUSTÁCEOS": { strong: ["bagoong","hipon","alimango"], weak: ["kare-kare","kare kare","pancit palabok","palabok","bicol express","laing","pinakbet","ndole","cataplana"] },
+  "MOLUSCOS": { strong: ["pusit","tahong","halaan","carne de porco a alentejana","porco a alentejana"], weak: ["cataplana"] },
+  "SOJA": { strong: ["chicken adobo","pork adobo","taho","lumpiang shanghai"] },
+  "FRUTOS CON CÁSCARA": { strong: ["cozonac","coliva","nuca","nuci","alune","migdale","kozunak","tikvenik","sellou","sfouf","kaab el ghzal","cuernos de gacela","fekkas","mhancha","baklawa","falooda","firni","sheer khurma","makowiec","toucinho do ceu","travesseiros de sintra","bastilla","gajar ka halwa"], weak: ["ghriba","makroud","makrout","shahi paneer","murgh makhani","zarda","bolo rei"], excl: ["re:halva\\s+de\\s+girasol","re:sunflower\\s+halva"] },
+  "CACAHUETES": { strong: ["arahide","suya"], weak: ["ndole","kare-kare","kare kare"] },
+  "SÉSAMO": { strong: ["sellou"] },
+  "MOSTAZA": { strong: ["mustar","shorshe ilish","shorshe"], weak: ["yassa","yassa poulet","poulet yassa","dibi","achar","pickle","jhal muri"] },
+  "APIO": { strong: ["telina"] },
+  "SULFITOS": { strong: ["vin rosu","vin alb"], weak: ["vinegret","ameijoas a bulhao pato","bulhao pato"] }
+};
 const mergeMore = MORE => Object.keys(MORE).forEach(al => {
   const m = MORE[al], r = AL_RULES[al];
   if (m.strong) r.strong = r.strong.concat(m.strong);
@@ -2932,7 +2958,7 @@ const mergeMore = MORE => Object.keys(MORE).forEach(al => {
     if (DENIABLE[al] && has(DENIABLE[al], b)) DENIABLE[al].push(k);
   });
 });
-mergeMore(AL_MORE); mergeMore(AL_MORE_2); mergeMore(AL_MORE_3); mergeMore(AL_MORE_4); mergeMore(AL_MORE_5);
+mergeMore(AL_MORE); mergeMore(AL_MORE_2); mergeMore(AL_MORE_3); mergeMore(AL_MORE_4); mergeMore(AL_MORE_5); mergeMore(AL_MORE_6);
 Object.keys(AL_RULES).forEach(al => {
   const r = AL_RULES[al];
   r.strongRe = kwTest(r.strong);
